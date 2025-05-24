@@ -1,232 +1,256 @@
-# Phaser Next.js Template
+# Binary Coven - Block-Based Programming Game
 
-This is a Phaser 3 project template that uses the Next.js framework. It includes a bridge for React to Phaser game communication, hot-reloading for quick development workflow and scripts to generate production-ready builds.
+A innovative block-based programming game where you control a robot (qubit) by writing Python-like code. Built with **PhaserJS**, **NextJS**, and **React**.
 
-### Versions
+## 🎮 Game Overview
 
-This template has been updated for:
+In Binary Coven, you control a robot called "Qubit" by writing actual code in a Python-like syntax. The game features a grid-based world where you can:
 
-- [Phaser 3.88.2](https://github.com/phaserjs/phaser)
-- [Next.js 15.3.1](https://github.com/vercel/next.js)
-- [TypeScript 5](https://github.com/microsoft/TypeScript)
+- **Mine Bitcoins** using mining terminals
+- **Generate Energy** with dynamos
+- **Store Resources** in wallets
+- **Program Multiple Functions** that can call each other
+- **Control Character Stats** like walking speed and energy
 
-![screenshot](screenshot.png)
+## 🏗️ Architecture & Features
 
-## Requirements
+### ✨ Core Features
 
-[Node.js](https://nodejs.org) is required to install dependencies and run scripts via `npm`.
+- **Visual Code Editor**: Multiple draggable code windows with syntax highlighting
+- **Grid-Based World**: Tile-based movement and interaction system
+- **Real-time Execution**: Watch your code come to life as the qubit executes it
+- **Extensible Design**: Easy to add new grids, functions, and entities
+- **Resource Management**: Energy, Bitcoin, and currency systems
+- **Inventory System**: Store and manage items
 
-## Available Commands
+### 🔧 Technical Architecture
 
-| Command | Description |
-|---------|-------------|
-| `npm install` | Install project dependencies |
-| `npm run dev` | Launch a development web server |
-| `npm run build` | Create a production build in the `dist` folder |
-| `npm run dev-nolog` | Launch a development web server without sending anonymous data (see "About log.js" below) |
-| `npm run build-nolog` | Create a production build in the `dist` folder without sending anonymous data (see "About log.js" below) |
+- **Frontend**: React + NextJS with TypeScript
+- **Game Engine**: PhaserJS for 2D game rendering
+- **State Management**: Zustand for game state
+- **Code Editor**: Monaco Editor (VS Code editor)
+- **Modular Systems**: Extensible grid, entity, and function systems
 
-## Writing Code
+## 🎯 Grid Types & Functions
 
-After cloning the repo, run `npm install` from your project directory. Then, you can start the local development server by running `npm run dev`.
+### Bitcoin Mining Terminal
+- `mine_initiate()` - Start mining (takes 5 seconds, costs 10 energy)
+- `collect()` - Collect mined bitcoins (costs 5 energy)
 
-The local development server runs on `http://localhost:8080` by default. Please see the Next.js documentation if you wish to change this, or add SSL support.
+### Energy Dynamo
+- `crank()` - Generate 10 energy points (takes 10 seconds, costs 5 energy)
 
-Once the server is running you can edit any of the files in the `src` folder. Next.js will automatically recompile your code and then reload the browser.
+### Storage Wallet
+- `store(amount)` - Store bitcoins as spendable currency (costs 2 energy)
 
-## Template Project Structure
+## 🎮 Built-in Functions
 
-We have provided a default project structure to get you started. This is as follows:
+### Movement Functions
+- `move_up()`, `move_down()`, `move_left()`, `move_right()`
+- `move_to(x, y)` - Move to specific coordinates
 
-| Path                          | Description                                                                 |
-|-------------------------------|-----------------------------------------------------------------------------|
-| `src/pages/_document.tsx`     | A basic Next.js component entry point. It is used to define the `<html>` and `<body>` tags and other globally shared UI. |
-| `src`                         | Contains the Next.js client source code.                                   |
-| `src/styles/globals.css`      | Some simple global CSS rules to help with page layout. You can enable Tailwind CSS here. |
-| `src/page/_app.tsx`           | The main Next.js component.                                                |
-| `src/App.tsx`                 | Middleware component used to run Phaser in client mode.                    |
-| `src/PhaserGame.tsx`          | The React component that initializes the Phaser Game and serves as a bridge between React and Phaser. |
-| `src/game/EventBus.ts`        | A simple event bus to communicate between React and Phaser.                |
-| `src/game`                    | Contains the game source code.                                             |
-| `src/game/main.tsx`           | The main **game** entry point. This contains the game configuration and starts the game. |
-| `src/game/scenes/`            | The Phaser Scenes are in this folder.                                      |
-| `public/favicon.png`          | The default favicon for the project.                                       |
-| `public/assets`               | Contains the static assets used by the game.                               |
+### Utility Functions
+- `get_current_grid()` - Get info about current tile
+- `get_position()` - Get current coordinates
+- `get_energy()` - Check energy levels
+- `get_inventory()` - View inventory
+- `wait(seconds)` - Pause execution
+- `print(message)` - Debug output
 
+## 🚀 Getting Started
 
-## React Bridge
+### Prerequisites
+- Node.js 18+
+- npm or yarn
 
-The `PhaserGame.tsx` component is the bridge between React and Phaser. It initializes the Phaser game and passes events between the two.
+### Installation
 
-To communicate between React and Phaser, you can use the **EventBus.js** file. This is a simple event bus that allows you to emit and listen for events from both React and Phaser.
+1. **Clone and install dependencies:**
+```bash
+git clone <repository-url>
+cd binary-coven
+npm install
+```
 
-```js
-// In React
-import { EventBus } from './EventBus';
+2. **Start the development server:**
+```bash
+npm run dev
+```
 
-// Emit an event
-EventBus.emit('event-name', data);
+3. **Open your browser:**
+Navigate to `http://localhost:8080`
 
-// In Phaser
-// Listen for an event
-EventBus.on('event-name', (data) => {
-    // Do something with the data
+### Basic Usage
+
+1. **Write Code**: Use the main function window to write your code
+2. **Create Functions**: Click "+ New Function" to create additional functions
+3. **Run Code**: Click the "▶ Run" button to execute your program
+4. **Control Qubit**: Watch as your code controls the qubit in real-time
+
+### Example Code
+
+```python
+# Main function - execution starts here
+def main():
+    print("Testing move_to function...")
+    
+    # Print starting position
+    start_pos = get_position()
+    print(f"Starting position: {start_pos}")
+    
+    # Test move_to function
+    print("Moving to (3, 3)...")
+    move_to(3, 3)
+    
+    # Verify new position
+    new_pos = get_position()
+    print(f"New position: {new_pos}")
+    
+    # Move to mining terminal and test
+    mine_initiate()
+    wait(5)
+    collect()
+    
+    # Move to wallet and store
+    move_to(9, 3)
+    store(1)
+    
+    print("Move test complete!")
+
+# Helper function example
+def go_to_dynamo():
+    move_to(6, 3)
+    crank()
+```
+
+## 🏗️ Project Structure
+
+```
+src/
+├── components/           # React UI components
+│   ├── CodeWindow.tsx   # Draggable code editor windows
+│   └── GameInterface.tsx # Main game interface
+├── game/
+│   ├── scenes/          # Phaser game scenes
+│   │   └── ProgrammingGame.ts # Main game scene
+│   └── systems/         # Game systems
+│       ├── GridSystem.ts      # Grid management
+│       ├── BuiltInFunctions.ts # Built-in functions
+│       └── CodeExecutor.ts    # Code interpretation
+├── stores/
+│   └── gameStore.ts     # Zustand state management
+├── types/
+│   └── game.ts          # TypeScript type definitions
+└── App.tsx              # Main React app
+```
+
+## 🔄 Extensibility
+
+The game is designed to be highly extensible:
+
+### Adding New Grid Types
+
+```typescript
+// Register a new grid type
+GridTypeRegistry.registerGridType({
+  type: 'new_machine',
+  name: 'New Machine',
+  description: 'A custom machine',
+  defaultProperties: { /* ... */ },
+  defaultState: { /* ... */ },
+  functions: [
+    {
+      name: 'custom_function',
+      description: 'Does something custom',
+      parameters: []
+    }
+  ],
+  spriteKey: 'new_machine_sprite',
+  energyRequired: 15
 });
 ```
 
-In addition to this, the `PhaserGame` component exposes the Phaser game instance along with the most recently active Phaser Scene using React forwardRef.
+### Adding New Built-in Functions
 
-Once exposed, you can access them like any regular react reference.
-
-## Phaser Scene Handling
-
-In Phaser, the Scene is the lifeblood of your game. It is where you sprites, game logic and all of the Phaser systems live. You can also have multiple scenes running at the same time. This template provides a way to obtain the current active scene from React.
-
-You can get the current Phaser Scene from the component event `"current-active-scene"`. In order to do this, you need to emit the event `"current-scene-ready"` from the Phaser Scene class. This event should be emitted when the scene is ready to be used. You can see this done in all of the Scenes in our template.
-
-**Important**: When you add a new Scene to your game, make sure you expose to React by emitting the `"current-scene-ready"` event via the `EventBus`, like this:
-
-
-```ts
-class MyScene extends Phaser.Scene
-{
-    constructor ()
-    {
-        super('MyScene');
-    }
-
-    create ()
-    {
-        // Your Game Objects and logic here
-
-        // At the end of create method:
-        EventBus.emit('current-scene-ready', this);
-    }
-}
+```typescript
+// Register a new built-in function
+BuiltInFunctionRegistry.registerFunction({
+  name: 'new_function',
+  description: 'A new built-in function',
+  category: 'utility',
+  parameters: [],
+  execute: async (context) => {
+    // Implementation
+    return { success: true, message: 'Function executed' };
+  }
+});
 ```
 
-You don't have to emit this event if you don't need to access the specific scene from React. Also, you don't have to emit it at the end of `create`, you can emit it at any point. For example, should your Scene be waiting for a network request or API call to complete, it could emit the event once that data is ready.
+### Adding New Entity Types
 
-### React Component Example
-
-Here's an example of how to access Phaser data for use in a React Component:
-
-```ts
-import { useRef } from 'react';
-import { IRefPhaserGame } from "./game/PhaserGame";
-
-// In a parent component
-const ReactComponent = () => {
-
-    const phaserRef = useRef<IRefPhaserGame>(); // you can access to this ref from phaserRef.current
-
-    const onCurrentActiveScene = (scene: Phaser.Scene) => {
-    
-        // This is invoked
-
-    }
-
-    return (
-        ...
-        <PhaserGame ref={phaserRef} currentActiveScene={onCurrentActiveScene} />
-        ...
-    );
-
-}
+```typescript
+// Create new entity via game store
+const entityId = gameStore.addEntity({
+  name: 'New Bot',
+  type: 'advanced_bot',
+  position: { x: 10, y: 10 },
+  stats: {
+    walkingSpeed: 2.0,
+    energy: 150,
+    maxEnergy: 150,
+    // Custom stats
+    processingPower: 100
+  },
+  inventory: { items: [], capacity: 20 },
+  isActive: true
+});
 ```
 
-In the code above, you can get a reference to the current Phaser Game instance and the current Scene by creating a reference with `useRef()` and assign to PhaserGame component.
+## 🎛️ Controls
 
-From this state reference, the game instance is available via `phaserRef.current.game` and the most recently active Scene via `phaserRef.current.scene`.
+- **Arrow Keys**: Manual movement (for testing)
+- **Mouse**: Drag code windows, resize, click buttons
+- **Code Editor**: Full VS Code-like editing experience
 
-The `onCurrentActiveScene` callback will also be invoked whenever the the Phaser Scene changes, as long as you emit the event via the EventBus, as outlined above.
+## 🐛 Development
 
-## Handling Assets
+### Available Scripts
 
-To load your static games files such as audio files, images, videos, etc place them into the `public/assets` folder. Then you can use this path in the Loader calls within Phaser:
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run dev-nolog` - Development without logging
 
-```js
-preload ()
-{
-    //  This is an example of loading a static image
-    //  from the public/assets folder:
-    this.load.image('background', 'assets/bg.png');
-}
-```
+### Key Dependencies
 
-When you issue the `npm run build` command, all static assets are automatically copied to the `dist/assets` folder.
+- **Phaser**: 2D game engine
+- **NextJS**: React framework
+- **Monaco Editor**: Code editor
+- **Zustand**: State management
+- **TypeScript**: Type safety
 
-## Deploying to Production
+## 🤝 Contributing
 
-After you run the `npm run build` command, your code will be built into a single bundle and saved to the `dist` folder, along with any other assets your project imported, or stored in the public assets folder.
+1. Fork the repository
+2. Create a feature branch
+3. Add new grids, functions, or features
+4. Test thoroughly
+5. Submit a pull request
 
-In order to deploy your game, you will need to upload *all* of the contents of the `dist` folder to a public facing web server.
+## 📝 License
 
-## Customizing the Template
+This project is licensed under the MIT License.
 
-### Next.js
+## 🎯 Future Enhancements
 
-If you want to customize your build, such as adding plugin (i.e. for loading CSS or fonts), you can modify the `next.config.mjs` file for cross-project changes, or you can modify and/or create new configuration files and target them in specific npm tasks inside of `package.json`. Please see the [Next.js documentation](https://nextjs.org/docs) for more information.
+- **Advanced Python Features**: Loops, conditionals, variables
+- **Multiplayer Support**: Multiple programmable entities
+- **Level Editor**: Create custom worlds
+- **Achievement System**: Programming challenges
+- **Advanced Grids**: More complex machines and interactions
+- **Visual Debugger**: Step-through code execution
+- **Code Sharing**: Share and import functions
+- **Performance Metrics**: Code efficiency scoring
 
-## About log.js
+---
 
-If you inspect our node scripts you will see there is a file called `log.js`. This file makes a single silent API call to a domain called `gryzor.co`. This domain is owned by Phaser Studio Inc. The domain name is a homage to one of our favorite retro games.
-
-We send the following 3 pieces of data to this API: The name of the template being used (vue, react, etc). If the build was 'dev' or 'prod' and finally the version of Phaser being used.
-
-At no point is any personal data collected or sent. We don't know about your project files, device, browser or anything else. Feel free to inspect the `log.js` file to confirm this.
-
-Why do we do this? Because being open source means we have no visible metrics about which of our templates are being used. We work hard to maintain a large and diverse set of templates for Phaser developers and this is our small anonymous way to determine if that work is actually paying off, or not. In short, it helps us ensure we're building the tools for you.
-
-However, if you don't want to send any data, you can use these commands instead:
-
-Dev:
-
-```bash
-npm run dev-nolog
-```
-
-Build:
-
-```bash
-npm run build-nolog
-```
-
-Or, to disable the log entirely, simply delete the file `log.js` and remove the call to it in the `scripts` section of `package.json`:
-
-Before:
-
-```json
-"scripts": {
-    "dev": "node log.js dev & dev-template-script",
-    "build": "node log.js build & build-template-script"
-},
-```
-
-After:
-
-```json
-"scripts": {
-    "dev": "dev-template-script",
-    "build": "build-template-script"
-},
-```
-
-Either of these will stop `log.js` from running. If you do decide to do this, please could you at least join our Discord and tell us which template you're using! Or send us a quick email. Either will be super-helpful, thank you.
-
-## Join the Phaser Community!
-
-We love to see what developers like you create with Phaser! It really motivates us to keep improving. So please join our community and show-off your work 😄
-
-**Visit:** The [Phaser website](https://phaser.io) and follow on [Phaser Twitter](https://twitter.com/phaser_)<br />
-**Play:** Some of the amazing games [#madewithphaser](https://twitter.com/search?q=%23madewithphaser&src=typed_query&f=live)<br />
-**Learn:** [API Docs](https://newdocs.phaser.io), [Support Forum](https://phaser.discourse.group/) and [StackOverflow](https://stackoverflow.com/questions/tagged/phaser-framework)<br />
-**Discord:** Join us on [Discord](https://discord.gg/phaser)<br />
-**Code:** 2000+ [Examples](https://labs.phaser.io)<br />
-**Read:** The [Phaser World](https://phaser.io/community/newsletter) Newsletter<br />
-
-Created by [Phaser Studio](mailto:support@phaser.io). Powered by coffee, anime, pixels and love.
-
-The Phaser logo and characters are &copy; 2011 - 2025 Phaser Studio Inc.
-
-All rights reserved.
+**Happy Coding! 🚀**

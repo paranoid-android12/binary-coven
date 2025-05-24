@@ -79,8 +79,23 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame
         }
     }, [currentActiveScene, ref]);
 
+    // Start the programming game scene
+    useEffect(() => {
+        if (game.current) {
+            // Wait a bit for the game to initialize, then start our scene
+            const timer = setTimeout(() => {
+                if (game.current) {
+                    game.current.scene.start('ProgrammingGame');
+                    game.current.scene.stop('MainMenu'); // Stop the default scene
+                }
+            }, 100);
+
+            return () => clearTimeout(timer);
+        }
+    }, []);
+
     return (
-        <div id="game-container"></div>
+        <div id="game-container" style={{ width: '100%', height: '100%' }}></div>
     );
 
 });
