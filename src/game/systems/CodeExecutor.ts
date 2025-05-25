@@ -41,11 +41,7 @@ export class CodeExecutor {
 
   // Main execution entry point
   async executeMain(): Promise<ExecutionResult> {
-    console.log('CodeExecutor.executeMain() called');
-    console.log('Available user functions:', Array.from(this.userFunctions.keys()));
-    
     const mainFunction = this.userFunctions.get('main');
-    console.log('mainFunction:', mainFunction);
     
     if (!mainFunction) {
       return {
@@ -57,15 +53,11 @@ export class CodeExecutor {
     this.executionState.isRunning = true;
     this.executionState.variables = { ...this.context.globalVariables };
 
-    console.log('Starting execution of main function with code:', mainFunction.code);
-
     try {
       const result = await this.executeFunction('main', []);
-      console.log('executeFunction result:', result);
       this.executionState.isRunning = false;
       return result;
     } catch (error) {
-      console.error('executeMain error:', error);
       this.executionState.isRunning = false;
       return {
         success: false,
@@ -76,6 +68,16 @@ export class CodeExecutor {
 
   // Execute a specific function
   async executeFunction(functionName: string, args: any[]): Promise<ExecutionResult> {
+    // Check if entity is blocked by a task
+    const store = useGameStore.getState();
+    const currentEntity = store.entities.get(this.context.entity.id);
+    if (currentEntity?.taskState.isBlocked) {
+      return {
+        success: false,
+        message: `Entity is currently busy: ${currentEntity.taskState.progress?.description || 'Unknown task'}`
+      };
+    }
+
     // Check if it's a built-in function
     const builtInFunction = BuiltInFunctionRegistry.getFunction(functionName);
     if (builtInFunction) {
@@ -83,7 +85,6 @@ export class CodeExecutor {
       
       // Handle energy consumption if the function has an energy cost
       if (result.success && result.energyCost && result.energyCost > 0) {
-        const store = useGameStore.getState();
         const currentEntity = store.entities.get(this.context.entity.id);
         if (currentEntity && currentEntity.stats.energy >= result.energyCost) {
           // Consume energy
@@ -114,30 +115,25 @@ export class CodeExecutor {
     }
 
     // Check if it's a grid function
-    const currentGrid = useGameStore.getState().getGridAt(this.context.entity.position);
+    const currentGrid = store.getGridAt(this.context.entity.position);
     if (currentGrid) {
       const gridFunction = currentGrid.functions.find(f => f.name === functionName);
       if (gridFunction) {
-        const result = await gridFunction.execute(this.context.entity, args, currentGrid);
+        // Get fresh entity data
+        const freshEntity = store.entities.get(this.context.entity.id);
+        if (!freshEntity) {
+          return {
+            success: false,
+            message: 'Entity not found'
+          };
+        }
+
+        const result = await gridFunction.execute(freshEntity, args, currentGrid);
         
-        // Handle energy consumption for grid functions too
-        if (result.success && result.energyCost && result.energyCost > 0) {
-          const store = useGameStore.getState();
-          const currentEntity = store.entities.get(this.context.entity.id);
-          if (currentEntity && currentEntity.stats.energy >= result.energyCost) {
-            store.updateEntity(this.context.entity.id, {
-              stats: {
-                ...currentEntity.stats,
-                energy: currentEntity.stats.energy - result.energyCost
-              }
-            });
-            this.context.entity.stats.energy = currentEntity.stats.energy - result.energyCost;
-          } else {
-            return {
-              success: false,
-              message: `Not enough energy. Required: ${result.energyCost}, Available: ${currentEntity?.stats.energy || 0}`
-            };
-          }
+        // Update context entity with fresh data after grid function execution
+        const updatedEntity = store.entities.get(this.context.entity.id);
+        if (updatedEntity) {
+          this.context.entity = updatedEntity;
         }
         
         return result;

@@ -9,6 +9,21 @@ export interface GridSize {
   height: number;
 }
 
+// Progress and Task Management
+export interface ProgressInfo {
+  isActive: boolean;
+  startTime: number;
+  duration: number;
+  description: string;
+  entityId?: string;
+}
+
+export interface TaskState {
+  isBlocked: boolean;
+  currentTask?: string;
+  progress?: ProgressInfo;
+}
+
 // Entity System
 export interface EntityStats {
   walkingSpeed: number;
@@ -26,6 +41,7 @@ export interface Entity {
   inventory: Inventory;
   sprite?: Phaser.GameObjects.Sprite;
   isActive: boolean;
+  taskState: TaskState;
 }
 
 // Inventory System
@@ -54,6 +70,9 @@ export interface GridFunction {
     default?: any;
   }>;
   execute: (entity: Entity, params: any[], grid: GridTile) => Promise<ExecutionResult>;
+  requiresEntityOnGrid?: boolean;
+  blocksEntity?: boolean;
+  blocksGrid?: boolean;
 }
 
 export interface GridTile {
@@ -68,6 +87,7 @@ export interface GridTile {
   sprite?: Phaser.GameObjects.Sprite;
   isActive: boolean;
   energyRequired?: number;
+  taskState: TaskState;
 }
 
 // Code Execution System
@@ -87,6 +107,8 @@ export interface ExecutionResult {
   data?: any;
   duration?: number;
   energyCost?: number;
+  blocksEntity?: boolean;
+  blocksGrid?: boolean;
 }
 
 export interface ExecutionContext {
@@ -165,4 +187,22 @@ export interface Resource {
   type: string;
   value: number;
   icon?: string;
+}
+
+// Grid State Enums for better type safety
+export enum MiningTerminalState {
+  IDLE = 'idle',
+  INITIATING = 'initiating',
+  MINING = 'mining',
+  READY = 'ready'
+}
+
+export enum DynamoState {
+  IDLE = 'idle',
+  CRANKING = 'cranking'
+}
+
+export enum WalletState {
+  IDLE = 'idle',
+  STORING = 'storing'
 } 

@@ -1,75 +1,82 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { PhaserGame, IRefPhaserGame } from '../PhaserGame';
-import CodeWindow from './CodeWindow';
+import StatusModal from './StatusModal';
 import { useGameStore } from '../stores/gameStore';
 import { ProgrammingGame } from '../game/scenes/ProgrammingGame';
 import { BuiltInFunctionRegistry } from '../game/systems/BuiltInFunctions';
+import { EventBus } from '../game/EventBus';
+import { Entity, GridTile } from '../types/game';
 
 export const GameInterface: React.FC = () => {
   const phaserRef = useRef<IRefPhaserGame | null>(null);
-  const [activeWindowId, setActiveWindowId] = useState<string>('');
+  
+  // Modal state
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean;
+    entity?: Entity;
+    grid?: GridTile;
+    position: { x: number; y: number };
+  }>({
+    isOpen: false,
+    position: { x: 100, y: 100 }
+  });
   
   // Game store state
   const {
-    codeWindows,
     entities,
     activeEntityId,
     globalResources,
     isPaused,
-    addCodeWindow,
-    removeCodeWindow,
-    setMainWindow,
     startExecution,
     stopExecution
   } = useGameStore();
 
   const [isCodeRunning, setIsCodeRunning] = useState(false);
 
-  // Initialize Monaco editor language features
+  // Handle entity/grid clicks from Phaser
   useEffect(() => {
-    // This would be where we set up custom language features for our Python-like language
-    // For now, we'll use the standard Python language support
+    const handleEntityClick = (entity: Entity) => {
+      setModalState({
+        isOpen: true,
+        entity,
+        grid: undefined,
+        position: { x: 100, y: 100 }
+      });
+    };
+
+    const handleGridClick = (grid: GridTile) => {
+      setModalState({
+        isOpen: true,
+        entity: undefined,
+        grid,
+        position: { x: 100, y: 100 }
+      });
+    };
+
+    EventBus.on('entity-clicked', handleEntityClick);
+    EventBus.on('grid-clicked', handleGridClick);
+
+    return () => {
+      EventBus.removeListener('entity-clicked');
+      EventBus.removeListener('grid-clicked');
+    };
   }, []);
 
-  const handleCreateNewWindow = () => {
-    const windowName = prompt('Enter function name:');
-    if (windowName && windowName.trim()) {
-      const newWindowId = addCodeWindow({
-        name: windowName.trim(),
-        code: `# ${windowName} function\ndef ${windowName}():\n    # Your code here\n    pass`,
-        isMain: false,
-        isActive: true,
-        position: { x: 100 + Math.random() * 200, y: 100 + Math.random() * 200 },
-        size: { width: 400, height: 300 }
-      });
-      setActiveWindowId(newWindowId);
-    }
+  const handleCloseModal = () => {
+    setModalState(prev => ({ ...prev, isOpen: false }));
   };
 
-  const handleCloseWindow = (windowId: string) => {
-    const window = codeWindows.get(windowId);
-    if (window?.isMain) {
-      alert('Cannot close the main function window');
-      return;
-    }
-    removeCodeWindow(windowId);
-    if (activeWindowId === windowId) {
-      setActiveWindowId('');
-    }
+  const handleModalPositionChange = (position: { x: number; y: number }) => {
+    setModalState(prev => ({ ...prev, position }));
   };
 
   const handleRunCode = () => {
-    console.log('handleRunCode called, isCodeRunning:', isCodeRunning);
-    console.log('phaserRef.current:', phaserRef.current);
-    console.log('activeEntityId:', activeEntityId);
-    
     if (isCodeRunning) {
       // Stop execution
       setIsCodeRunning(false);
       stopExecution();
       
       const scene = phaserRef.current?.scene as ProgrammingGame;
-      console.log('Stop - scene:', scene);
       if (scene && scene.stopCodeExecution) {
         scene.stopCodeExecution();
       }
@@ -79,14 +86,8 @@ export const GameInterface: React.FC = () => {
       startExecution(activeEntityId);
       
       const scene = phaserRef.current?.scene as ProgrammingGame;
-      console.log('Start - scene:', scene);
-      console.log('Start - scene.startCodeExecution:', scene?.startCodeExecution);
-      
       if (scene && scene.startCodeExecution) {
-        console.log('Calling scene.startCodeExecution()');
         scene.startCodeExecution();
-      } else {
-        console.warn('Scene or startCodeExecution method not available');
       }
     }
   };
@@ -131,21 +132,6 @@ export const GameInterface: React.FC = () => {
           </h1>
           
           <div style={{ display: 'flex', gap: '8px' }}>
-            <button
-              onClick={handleCreateNewWindow}
-              style={{
-                backgroundColor: '#007acc',
-                color: 'white',
-                border: 'none',
-                padding: '6px 12px',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '14px'
-              }}
-            >
-              + New Function
-            </button>
-            
             <button
               onClick={handleRunCode}
               style={{
@@ -193,28 +179,6 @@ export const GameInterface: React.FC = () => {
         {/* Game Area */}
         <div style={{ flex: 1, position: 'relative' }}>
           <PhaserGame ref={phaserRef} currentActiveScene={currentActiveScene} />
-          
-          {/* Code Windows Overlay */}
-          <div style={{ 
-            position: 'absolute', 
-            top: 0, 
-            left: 0, 
-            right: 0, 
-            bottom: 0, 
-            pointerEvents: 'none',
-            zIndex: 100
-          }}>
-            {Array.from(codeWindows.values()).map(window => (
-              <div key={window.id} style={{ pointerEvents: 'auto' }}>
-                <CodeWindow
-                  window={window}
-                  onClose={() => handleCloseWindow(window.id)}
-                  onFocus={() => setActiveWindowId(window.id)}
-                  isActive={activeWindowId === window.id}
-                />
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Side Panel */}
@@ -227,6 +191,25 @@ export const GameInterface: React.FC = () => {
           overflow: 'auto'
         }}>
           <h3 style={{ margin: '0 0 16px 0', fontSize: '16px' }}>Game Info</h3>
+          
+          {/* Instructions */}
+          <div style={{ marginBottom: '20px' }}>
+            <h4 style={{ margin: '0 0 8px 0', color: '#007acc' }}>How to Play</h4>
+            <div style={{ fontSize: '12px', lineHeight: '1.4', color: '#ccc' }}>
+              <div style={{ marginBottom: '8px' }}>
+                🤖 <strong>Click on the blue qubit</strong> to open its programming interface
+              </div>
+              <div style={{ marginBottom: '8px' }}>
+                🏭 <strong>Click on colored grids</strong> to view their status and functions
+              </div>
+              <div style={{ marginBottom: '8px' }}>
+                ▶️ <strong>Use the Run button</strong> to execute your code
+              </div>
+              <div>
+                ⌨️ <strong>Write Python-like code</strong> to control the qubit
+              </div>
+            </div>
+          </div>
           
           {/* Entity Info */}
           {activeEntity && (
@@ -284,31 +267,18 @@ export const GameInterface: React.FC = () => {
               </div>
             </div>
           </div>
-
-          {/* Code Windows */}
-          <div>
-            <h4 style={{ margin: '0 0 8px 0', color: '#007acc' }}>Code Windows</h4>
-            <div style={{ fontSize: '14px' }}>
-              {Array.from(codeWindows.values()).map(window => (
-                <div 
-                  key={window.id}
-                  style={{ 
-                    marginBottom: '4px',
-                    padding: '4px 8px',
-                    backgroundColor: activeWindowId === window.id ? '#007acc' : '#1e1e1e',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => setActiveWindowId(window.id)}
-                >
-                  <span>{window.name}</span>
-                  {window.isMain && <span style={{ color: '#f5a623' }}> (MAIN)</span>}
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
+
+      {/* Status Modal */}
+      <StatusModal
+        isOpen={modalState.isOpen}
+        onClose={handleCloseModal}
+        entity={modalState.entity}
+        grid={modalState.grid}
+        position={modalState.position}
+        onPositionChange={handleModalPositionChange}
+      />
     </div>
   );
 };

@@ -1,5 +1,9 @@
 import { BuiltInFunction, ExecutionContext, ExecutionResult, Position } from '../../types/game';
 import { useGameStore } from '../../stores/gameStore';
+import GridSystem from './GridSystem';
+
+// Initialize grid system for scanner function
+const gridSystem = new GridSystem();
 
 // Helper function to sync context entity with game store
 const syncContextEntity = (context: ExecutionContext): void => {
@@ -338,26 +342,79 @@ export const systemFunctions: BuiltInFunction[] = [
   }
 ];
 
+// Utility Functions
+export const utilityFunctions: BuiltInFunction[] = [
+  {
+    name: 'scanner',
+    description: 'Scan a grid at specific coordinates to check its state',
+    category: 'utility',
+    parameters: [
+      { name: 'x', type: 'number', required: true, description: 'X coordinate to scan' },
+      { name: 'y', type: 'number', required: true, description: 'Y coordinate to scan' }
+    ],
+    execute: async (context: ExecutionContext, x: number, y: number): Promise<ExecutionResult> => {
+      const store = useGameStore.getState();
+      const grid = store.getGridAt({ x, y });
+      
+      if (!grid) {
+        return {
+          success: true,
+          message: `No grid found at (${x}, ${y})`,
+          data: { empty: true, position: { x, y } }
+        };
+      }
+      
+      // Get detailed grid status using GridSystem
+      const gridStatus = gridSystem.getGridStatus(grid);
+      
+      return {
+        success: true,
+        message: `Scanned ${grid.name} at (${x}, ${y})`,
+        data: {
+          name: grid.name,
+          type: grid.type,
+          position: { x, y },
+          status: gridStatus,
+          functions: grid.functions.map(f => f.name)
+        },
+        energyCost: 2
+      };
+    }
+  }
+];
+
 // Registry for all built-in functions
 export class BuiltInFunctionRegistry {
   private static functions: Map<string, BuiltInFunction> = new Map();
+  private static categories: Map<string, BuiltInFunction[]> = new Map();
 
   static initialize() {
     this.registerFunctions([
       ...movementFunctions,
       ...interactionFunctions,
-      ...systemFunctions
+      ...systemFunctions,
+      ...utilityFunctions
     ]);
   }
 
   static registerFunctions(functions: BuiltInFunction[]) {
     functions.forEach(func => {
       this.functions.set(func.name, func);
+      
+      if (!this.categories.has(func.category)) {
+        this.categories.set(func.category, []);
+      }
+      this.categories.get(func.category)!.push(func);
     });
   }
 
   static registerFunction(func: BuiltInFunction) {
     this.functions.set(func.name, func);
+    
+    if (!this.categories.has(func.category)) {
+      this.categories.set(func.category, []);
+    }
+    this.categories.get(func.category)!.push(func);
   }
 
   static getFunction(name: string): BuiltInFunction | undefined {
@@ -368,8 +425,8 @@ export class BuiltInFunctionRegistry {
     return Array.from(this.functions.values());
   }
 
-  static getFunctionsByCategory(category: BuiltInFunction['category']): BuiltInFunction[] {
-    return Array.from(this.functions.values()).filter(func => func.category === category);
+  static getFunctionsByCategory(category: string): BuiltInFunction[] {
+    return this.categories.get(category) || [];
   }
 
   static getFunctionNames(): string[] {

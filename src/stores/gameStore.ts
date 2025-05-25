@@ -40,6 +40,7 @@ interface GameStore extends GameState {
   addResource: (resourceType: string, amount: number) => void;
   consumeResource: (resourceType: string, amount: number) => boolean;
   getResource: (resourceType: string) => number;
+  updateGlobalResources: (updates: Record<string, number>) => void;
   
   // Execution Management
   startExecution: (entityId: string) => void;
@@ -313,6 +314,15 @@ export const useGameStore = create<GameStore>()((set, get) => ({
     return globalResources[resourceType] || 0;
   },
 
+  updateGlobalResources: (updates: Record<string, number>) => {
+    set((state: GameState) => ({
+      globalResources: {
+        ...state.globalResources,
+        ...updates
+      }
+    }));
+  },
+
   // Execution Management
   startExecution: (entityId: string) => {
     const { entities } = get();
@@ -378,7 +388,12 @@ export const useGameStore = create<GameStore>()((set, get) => ({
         items: [],
         capacity: 10
       },
-      isActive: true
+      isActive: true,
+      taskState: {
+        isBlocked: false,
+        currentTask: undefined,
+        progress: undefined
+      }
     });
     
     console.log('Game initialized with main window:', mainWindowId, 'and qubit:', qubitId);

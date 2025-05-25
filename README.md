@@ -57,7 +57,7 @@ In Binary Coven, you control a robot called "Qubit" by writing actual code in a 
 - `wait(seconds)` - Pause execution
 - `print(message)` - Debug output
 
-## 🚀 Getting Started
+## 🎮 Getting Started
 
 ### Prerequisites
 - Node.js 18+
@@ -82,10 +82,11 @@ Navigate to `http://localhost:8080`
 
 ### Basic Usage
 
-1. **Write Code**: Use the main function window to write your code
-2. **Create Functions**: Click "+ New Function" to create additional functions
-3. **Run Code**: Click the "▶ Run" button to execute your program
-4. **Control Qubit**: Watch as your code controls the qubit in real-time
+1. **Click on the Qubit**: Click the blue square (qubit) to open its status and programming interface
+2. **Program Tab**: Switch to the "Program" tab to access the code editor
+3. **Create Functions**: Use the "+" button to create new functions, edit them in the Monaco editor
+4. **Run Code**: Click the "▶ Run" button to execute your program
+5. **Inspect Grids**: Click on colored grid tiles to view their status and available functions
 
 ### Example Code
 

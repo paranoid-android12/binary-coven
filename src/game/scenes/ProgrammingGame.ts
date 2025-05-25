@@ -5,19 +5,22 @@ import { CodeExecutor } from '../systems/CodeExecutor';
 import { BuiltInFunctionRegistry } from '../systems/BuiltInFunctions';
 import { Entity, GridTile, Position } from '../../types/game';
 import { EventBus } from '../EventBus';
+import TaskManager from '../systems/TaskManager';
 
 export class ProgrammingGame extends Scene {
   private gameStore: ReturnType<typeof useGameStore.getState>;
   private gridSystem: GridSystem;
   private codeExecutor?: CodeExecutor;
+  private taskManager: TaskManager;
   
   // Visual elements
   private gridGraphics!: Phaser.GameObjects.Graphics;
   private entitySprites: Map<string, Phaser.GameObjects.Sprite> = new Map();
   private gridSprites: Map<string, Phaser.GameObjects.Sprite> = new Map();
+  private progressBars: Map<string, Phaser.GameObjects.Graphics> = new Map();
   
   // Constants
-  private readonly GRID_SIZE = 32;
+  private readonly GRID_SIZE = 64;
   private readonly GRID_COLOR = 0x444444;
   private readonly GRID_ALPHA = 0.3;
 
@@ -25,6 +28,7 @@ export class ProgrammingGame extends Scene {
     super({ key: 'ProgrammingGame' });
     this.gameStore = useGameStore.getState();
     this.gridSystem = new GridSystem();
+    this.taskManager = TaskManager.getInstance();
   }
 
   preload() {
@@ -119,38 +123,56 @@ export class ProgrammingGame extends Scene {
   private createSampleWorld() {
     const store = useGameStore.getState();
     
-    // Add some sample grids
+    // Add some sample grids with proper initialization
+    const miningTerminalData = this.gridSystem.initializeGrid('mining_terminal', '');
     const miningTerminalId = store.addGrid({
       type: 'mining_terminal',
       position: { x: 3, y: 3 },
       name: 'Mining Terminal #1',
       description: 'A bitcoin mining terminal',
-      functions: [],
       properties: {},
-      state: {},
-      isActive: true
+      isActive: true,
+      functions: miningTerminalData.functions || [],
+      state: miningTerminalData.state || {},
+      taskState: miningTerminalData.taskState || {
+        isBlocked: false,
+        currentTask: undefined,
+        progress: undefined
+      }
     });
     
+    const dynamoData = this.gridSystem.initializeGrid('dynamo', '');
     const dynamoId = store.addGrid({
       type: 'dynamo',
       position: { x: 6, y: 3 },
       name: 'Power Dynamo',
       description: 'Manual energy generator',
-      functions: [],
       properties: {},
-      state: {},
-      isActive: true
+      isActive: true,
+      functions: dynamoData.functions || [],
+      state: dynamoData.state || {},
+      taskState: dynamoData.taskState || {
+        isBlocked: false,
+        currentTask: undefined,
+        progress: undefined
+      }
     });
     
+    const walletData = this.gridSystem.initializeGrid('wallet', '');
     const walletId = store.addGrid({
       type: 'wallet',
       position: { x: 9, y: 3 },
       name: 'Storage Wallet',
       description: 'Secure bitcoin storage',
-      functions: [],
       properties: {},
-      state: {},
-      isActive: true
+      isActive: true,
+      functions: walletData.functions || [],
+      state: walletData.state || {},
+      taskState: walletData.taskState || {
+        isBlocked: false,
+        currentTask: undefined,
+        progress: undefined
+      }
     });
     
     // Update visual representation
@@ -242,6 +264,14 @@ export class ProgrammingGame extends Scene {
         entity.type
       );
       sprite.setDisplaySize(this.GRID_SIZE - 4, this.GRID_SIZE - 4);
+      sprite.setInteractive();
+      
+      // Add click handler for entity
+      sprite.on('pointerdown', () => {
+        console.log('Entity clicked:', entity.name);
+        EventBus.emit('entity-clicked', entity);
+      });
+      
       this.entitySprites.set(entity.id, sprite);
     } else {
       // Update position
@@ -254,9 +284,14 @@ export class ProgrammingGame extends Scene {
     // Update sprite properties based on entity state
     if (entity.stats.energy <= 0) {
       sprite.setTint(0x888888); // Gray tint for low energy
+    } else if (entity.taskState.isBlocked) {
+      sprite.setTint(0xffaa00); // Orange tint for busy
     } else {
       sprite.clearTint();
     }
+
+    // Update progress bar for entity
+    this.updateProgressBar(entity.id, entity.taskState.progress, sprite.x, sprite.y - 40);
   }
 
   private updateGridSprite(grid: GridTile) {
@@ -269,29 +304,65 @@ export class ProgrammingGame extends Scene {
         grid.type
       );
       sprite.setDisplaySize(this.GRID_SIZE - 4, this.GRID_SIZE - 4);
+      sprite.setInteractive();
+      
+      // Add click handler for grid
+      sprite.on('pointerdown', () => {
+        console.log('Grid clicked:', grid.name);
+        EventBus.emit('grid-clicked', grid);
+      });
+      
       this.gridSprites.set(grid.id, sprite);
     }
     
     // Update sprite based on grid state
-    if (grid.state.isMining || grid.state.isCranking) {
+    if (grid.state.isMining || grid.state.isCranking || grid.taskState.isBlocked) {
       sprite.setTint(0xffff00); // Yellow tint for active state
     } else if (grid.state.bitcoinReady) {
       sprite.setTint(0x00ff00); // Green tint for ready state
     } else {
       sprite.clearTint();
     }
+
+    // Update progress bar for grid
+    this.updateProgressBar(grid.id, grid.taskState.progress, sprite.x, sprite.y - 40);
+  }
+
+  private updateProgressBar(id: string, progress: any, x: number, y: number) {
+    let progressBar = this.progressBars.get(id);
+
+    if (progress?.isActive) {
+      const progressPercent = this.taskManager.getEntityProgress(id) || this.taskManager.getGridProgress(id);
+      
+      if (!progressBar) {
+        progressBar = this.add.graphics();
+        this.progressBars.set(id, progressBar);
+      }
+
+      progressBar.clear();
+      
+      // Background
+      progressBar.fillStyle(0x444444);
+      progressBar.fillRect(x - 25, y, 50, 6);
+      
+      // Progress fill
+      progressBar.fillStyle(0xf5a623);
+      progressBar.fillRect(x - 25, y, (50 * progressPercent) / 100, 6);
+      
+      // Border
+      progressBar.lineStyle(1, 0x666666);
+      progressBar.strokeRect(x - 25, y, 50, 6);
+    } else {
+      if (progressBar) {
+        progressBar.clear();
+      }
+    }
   }
 
   // Public methods for external control
   startCodeExecution() {
-    console.log('ProgrammingGame.startCodeExecution() called');
-    
     const gameState = useGameStore.getState();
     const activeEntity = gameState.entities.get(gameState.activeEntityId);
-    
-    console.log('gameState:', gameState);
-    console.log('activeEntity:', activeEntity);
-    console.log('codeWindows:', gameState.codeWindows);
     
     if (!activeEntity) {
       console.warn('No active entity for code execution');
@@ -306,12 +377,8 @@ export class ProgrammingGame extends Scene {
       currentGrid: gameState.getGridAt(activeEntity.position)
     };
     
-    console.log('executionContext:', executionContext);
-    
     this.codeExecutor = new CodeExecutor(executionContext, this.gridSystem);
     this.codeExecutor.setUserFunctions(gameState.codeWindows);
-    
-    console.log('codeExecutor created, calling executeMain()');
     
     this.codeExecutor.executeMain().then(result => {
       console.log('Code execution result:', result);
@@ -329,6 +396,9 @@ export class ProgrammingGame extends Scene {
       this.codeExecutor.stop();
       this.codeExecutor = undefined;
     }
+    
+    // Cancel all active tasks
+    this.taskManager.cancelAllTasks();
   }
 
   private showExecutionError(message: string) {
