@@ -330,12 +330,20 @@ export const useGameStore = create<GameStore>()((set, get) => ({
     
     if (!entity) return;
     
+    // Dynamically import to avoid circular dependency issues
+    const { BuiltInFunctionRegistry } = require('../game/systems/BuiltInFunctions');
+    
+    const availableFunctions = BuiltInFunctionRegistry.createFunctionMap();
+    console.log('Available functions:', availableFunctions.size, Array.from(availableFunctions.keys()));
+    
     const executionContext: ExecutionContext = {
       entity,
-      availableFunctions: new Map(),
+      availableFunctions,
       globalVariables: {},
       isRunning: true
     };
+
+    console.log('Starting execution', executionContext);
     
     set({ executionContext });
   },

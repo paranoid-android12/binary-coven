@@ -389,12 +389,14 @@ export class BuiltInFunctionRegistry {
   private static categories: Map<string, BuiltInFunction[]> = new Map();
 
   static initialize() {
+    console.log('Initializing BuiltInFunctionRegistry...');
     this.registerFunctions([
       ...movementFunctions,
       ...interactionFunctions,
       ...systemFunctions,
       ...utilityFunctions
     ]);
+    console.log(`Registered ${this.functions.size} built-in functions:`, Array.from(this.functions.keys()));
   }
 
   static registerFunctions(functions: BuiltInFunction[]) {
@@ -434,12 +436,14 @@ export class BuiltInFunctionRegistry {
   }
 
   static createFunctionMap(): Map<string, Function> {
+    console.log(`Creating function map from ${this.functions.size} registered functions`);
     const functionMap = new Map<string, Function>();
     
     this.functions.forEach((func, name) => {
       functionMap.set(name, func.execute);
     });
 
+    console.log(`Created function map with ${functionMap.size} functions:`, Array.from(functionMap.keys()));
     return functionMap;
   }
 }

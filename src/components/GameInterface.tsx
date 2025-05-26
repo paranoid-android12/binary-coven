@@ -72,6 +72,7 @@ export const GameInterface: React.FC = () => {
 
   const handleRunCode = () => {
     if (isCodeRunning) {
+      console.log('Stopping execution');
       // Stop execution
       setIsCodeRunning(false);
       stopExecution();
@@ -82,6 +83,7 @@ export const GameInterface: React.FC = () => {
       }
     } else {
       // Start execution
+      console.log('Starting execution', activeEntityId);  
       setIsCodeRunning(true);
       startExecution(activeEntityId);
       
