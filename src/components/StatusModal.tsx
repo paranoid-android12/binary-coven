@@ -3,6 +3,7 @@ import { Entity, GridTile } from '../types/game';
 import ProgrammingInterface from './ProgrammingInterface';
 import ProgressBar from './ProgressBar';
 import TaskManager from '../game/systems/TaskManager';
+import { useGameStore } from '../stores/gameStore';
 
 interface StatusModalProps {
   isOpen: boolean;
@@ -27,17 +28,22 @@ export const StatusModal: React.FC<StatusModalProps> = ({
   const [activeTab, setActiveTab] = useState<'profile' | 'program'>('profile');
   const [progress, setProgress] = useState(0);
   const taskManager = TaskManager.getInstance();
+  
+  // Get fresh data from game store to ensure real-time updates
+  const { entities, grids } = useGameStore();
+  const currentEntity = entity ? entities.get(entity.id) : undefined;
+  const currentGrid = grid ? grids.get(grid.id) : undefined;
 
   // Update progress periodically
   useEffect(() => {
     if (!isOpen) return;
 
     const updateProgress = () => {
-      if (entity?.taskState.progress?.isActive) {
-        const entityProgress = taskManager.getEntityProgress(entity.id);
+      if (currentEntity?.taskState.progress?.isActive) {
+        const entityProgress = taskManager.getEntityProgress(currentEntity.id);
         setProgress(entityProgress);
-      } else if (grid?.taskState.progress?.isActive) {
-        const gridProgress = taskManager.getGridProgress(grid.id);
+      } else if (currentGrid?.taskState.progress?.isActive) {
+        const gridProgress = taskManager.getGridProgress(currentGrid.id);
         setProgress(gridProgress);
       } else {
         setProgress(0);
@@ -48,7 +54,7 @@ export const StatusModal: React.FC<StatusModalProps> = ({
     const interval = setInterval(updateProgress, 100);
 
     return () => clearInterval(interval);
-  }, [isOpen, entity, grid, taskManager]);
+  }, [isOpen, currentEntity, currentGrid, taskManager]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).classList.contains('modal-header')) {
@@ -91,9 +97,9 @@ export const StatusModal: React.FC<StatusModalProps> = ({
 
   if (!isOpen) return null;
 
-  const title = entity ? entity.name : grid?.name || 'Unknown';
-  const isEntity = !!entity;
-  const hasActiveTask = entity?.taskState.progress?.isActive || grid?.taskState.progress?.isActive;
+  const title = currentEntity ? currentEntity.name : currentGrid?.name || 'Unknown';
+  const isEntity = !!currentEntity;
+  const hasActiveTask = currentEntity?.taskState.progress?.isActive || currentGrid?.taskState.progress?.isActive;
 
   return (
     <div
@@ -154,7 +160,7 @@ export const StatusModal: React.FC<StatusModalProps> = ({
               borderRadius: '12px',
               fontSize: '12px'
             }}>
-              {isEntity ? entity.type : grid?.type}
+              {isEntity ? currentEntity.type : currentGrid?.type}
             </span>
             {hasActiveTask && (
               <span style={{
@@ -200,7 +206,7 @@ export const StatusModal: React.FC<StatusModalProps> = ({
           }}>
             <ProgressBar
               progress={progress}
-              description={entity?.taskState.progress?.description || grid?.taskState.progress?.description}
+              description={currentEntity?.taskState.progress?.description || currentGrid?.taskState.progress?.description}
               color="#f5a623"
               height={16}
             />
@@ -248,10 +254,10 @@ export const StatusModal: React.FC<StatusModalProps> = ({
         {/* Content */}
         <div style={{ flex: 1, overflow: 'hidden' }}>
           {activeTab === 'profile' && (
-            <ProfileTab entity={entity} grid={grid} />
+            <ProfileTab entity={currentEntity} grid={currentGrid} />
           )}
           {activeTab === 'program' && isEntity && (
-            <ProgramTab entity={entity!} />
+            <ProgramTab entity={currentEntity!} />
           )}
         </div>
       </div>

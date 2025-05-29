@@ -366,6 +366,7 @@ export class ProgrammingGame extends Scene {
     
     if (!activeEntity) {
       console.warn('No active entity for code execution');
+      EventBus.emit('code-execution-failed', 'No active entity found');
       return;
     }
     
@@ -380,14 +381,24 @@ export class ProgrammingGame extends Scene {
     this.codeExecutor = new CodeExecutor(executionContext, this.gridSystem);
     this.codeExecutor.setUserFunctions(gameState.codeWindows);
     
+    // Emit execution started event
+    EventBus.emit('code-execution-started');
+    
     this.codeExecutor.executeMain().then(result => {
       console.log('Code execution result:', result);
-      if (!result.success) {
+      if (result.success) {
+        // Emit successful completion
+        EventBus.emit('code-execution-completed', result);
+      } else {
+        // Emit execution error
+        EventBus.emit('code-execution-failed', result.message || 'Unknown error');
         this.showExecutionError(result.message || 'Unknown error');
       }
     }).catch(error => {
       console.error('Code execution error:', error);
-      this.showExecutionError(error.message || 'Unknown error');
+      const errorMessage = error.message || 'Unknown error';
+      EventBus.emit('code-execution-failed', errorMessage);
+      this.showExecutionError(errorMessage);
     });
   }
 
@@ -399,6 +410,9 @@ export class ProgrammingGame extends Scene {
     
     // Cancel all active tasks
     this.taskManager.cancelAllTasks();
+    
+    // Emit execution stopped event
+    EventBus.emit('code-execution-stopped');
   }
 
   private showExecutionError(message: string) {

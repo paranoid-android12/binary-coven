@@ -3,149 +3,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { useGameStore } from '../../stores/gameStore';
 import TaskManager from './TaskManager';
 
-// Grid function implementations
-class GridFunctions {
-  // Bitcoin Mining Terminal Functions
-  static async mine_initiate(entity: Entity, params: any[], grid: GridTile): Promise<ExecutionResult> {
-    // Check if entity is on the correct grid
-    if (entity.position.x !== grid.position.x || entity.position.y !== grid.position.y) {
-      return {
-        success: false,
-        message: "Must be standing on the mining terminal to initiate mining"
-      };
-    }
-
-    // Check if terminal is already mining
-    if (grid.state.isMining) {
-      return {
-        success: false,
-        message: "Mining terminal is already in use"
-      };
-    }
-
-    // Start mining process
-    grid.state.isMining = true;
-    grid.state.miningStartTime = Date.now();
-    
-    // Simulate 5-second mining process
-    setTimeout(() => {
-      grid.state.isMining = false;
-      grid.state.bitcoinReady = true;
-      grid.state.bitcoinAmount = (grid.state.bitcoinAmount || 0) + 1;
-    }, 5000);
-
-    return {
-      success: true,
-      message: "Mining initiated. Bitcoin will be ready in 5 seconds.",
-      duration: 5000,
-      energyCost: 10
-    };
-  }
-
-  static async collect(entity: Entity, params: any[], grid: GridTile): Promise<ExecutionResult> {
-    if (entity.position.x !== grid.position.x || entity.position.y !== grid.position.y) {
-      return {
-        success: false,
-        message: "Must be standing on the mining terminal to collect"
-      };
-    }
-
-    if (!grid.state.bitcoinReady || !grid.state.bitcoinAmount) {
-      return {
-        success: false,
-        message: "No bitcoins ready for collection"
-      };
-    }
-
-    // Add bitcoin to entity's inventory
-    const bitcoinAmount = grid.state.bitcoinAmount;
-    
-    // Reset terminal state
-    grid.state.bitcoinReady = false;
-    grid.state.bitcoinAmount = 0;
-
-    return {
-      success: true,
-      message: `Collected ${bitcoinAmount} bitcoin(s)`,
-      data: { bitcoinAmount },
-      energyCost: 5
-    };
-  }
-
-  // Dynamo Functions
-  static async crank(entity: Entity, params: any[], grid: GridTile): Promise<ExecutionResult> {
-    if (entity.position.x !== grid.position.x || entity.position.y !== grid.position.y) {
-      return {
-        success: false,
-        message: "Must be standing on the dynamo to crank it"
-      };
-    }
-
-    if (grid.state.isCranking) {
-      return {
-        success: false,
-        message: "Dynamo is already being cranked"
-      };
-    }
-
-    // Start cranking process
-    grid.state.isCranking = true;
-    grid.state.crankStartTime = Date.now();
-
-    // Simulate 10-second cranking process
-    setTimeout(() => {
-      grid.state.isCranking = false;
-      grid.state.energyProduced = (grid.state.energyProduced || 0) + 10;
-    }, 10000);
-
-    return {
-      success: true,
-      message: "Cranking dynamo. 10 energy points will be generated in 10 seconds.",
-      duration: 10000,
-      energyCost: 5
-    };
-  }
-
-  // Wallet Functions
-  static async store(entity: Entity, params: any[], grid: GridTile): Promise<ExecutionResult> {
-    if (entity.position.x !== grid.position.x || entity.position.y !== grid.position.y) {
-      return {
-        success: false,
-        message: "Must be standing on the wallet to store items"
-      };
-    }
-
-    const [amount] = params;
-    if (typeof amount !== 'number' || amount <= 0) {
-      return {
-        success: false,
-        message: "Invalid amount specified"
-      };
-    }
-
-    // Find bitcoins in entity's inventory
-    const bitcoinItem = entity.inventory.items.find(item => item.type === 'bitcoin');
-    if (!bitcoinItem || bitcoinItem.quantity < amount) {
-      return {
-        success: false,
-        message: `Not enough bitcoins. Have ${bitcoinItem?.quantity || 0}, need ${amount}`
-      };
-    }
-
-    // Store bitcoins in wallet
-    grid.state.storedBitcoins = (grid.state.storedBitcoins || 0) + amount;
-    
-    // Remove bitcoins from entity inventory (this would be handled by the game store)
-    
-    return {
-      success: true,
-      message: `Stored ${amount} bitcoin(s) in wallet`,
-      data: { storedAmount: amount },
-      energyCost: 2
-    };
-  }
-}
-
 // Grid type definitions
 export class GridTypeRegistry {
   private static gridTypes: Map<string, GridTypeDefinition> = new Map();
@@ -191,23 +48,20 @@ export class GridTypeRegistry {
   }
 
   private static getFunctionImplementation(gridType: string, functionName: string): GridFunction['execute'] {
-    const key = `${gridType}_${functionName}`;
+    // Create a temporary GridSystem instance to access the new function implementations
+    const gridSystem = new GridSystem();
+    const functions = gridSystem.getFunctionsForGridType(gridType);
     
-    switch (key) {
-      case 'mining_terminal_mine_initiate':
-        return GridFunctions.mine_initiate;
-      case 'mining_terminal_collect':
-        return GridFunctions.collect;
-      case 'dynamo_crank':
-        return GridFunctions.crank;
-      case 'wallet_store':
-        return GridFunctions.store;
-      default:
-        return async () => ({
-          success: false,
-          message: `Function ${functionName} not implemented for ${gridType}`
-        });
+    const matchingFunction = functions.find(func => func.name === functionName);
+    if (matchingFunction) {
+      return matchingFunction.execute;
     }
+    
+    // Fallback for unknown functions
+    return async () => ({
+      success: false,
+      message: `Function ${functionName} not implemented for ${gridType}`
+    });
   }
 }
 
