@@ -29,6 +29,13 @@ export const StatusModal: React.FC<StatusModalProps> = ({
   const [progress, setProgress] = useState(0);
   const taskManager = TaskManager.getInstance();
   
+  // Reset tab to 'profile' when modal opens or entity/grid changes
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab('profile');
+    }
+  }, [isOpen, entity?.id, grid?.id]);
+  
   // Get fresh data from game store to ensure real-time updates
   const { entities, grids } = useGameStore();
   const currentEntity = entity ? entities.get(entity.id) : undefined;

@@ -52,10 +52,13 @@ interface GameStore extends GameState {
   // Game Control
   resetGame: () => void;
   initializeGame: () => void;
+
+  // Debug method to force unblock entity
+  forceUnblockEntity: (entityId: string) => void;
 }
 
 const createInitialState = (): GameState => ({
-  gridSize: { width: 20, height: 15 },
+  gridSize: { width: 24, height: 16 },
   grids: new Map(),
   entities: new Map(),
   activeEntityId: '',
@@ -366,7 +369,39 @@ export const useGameStore = create<GameStore>()((set, get) => ({
 
   // Game Control
   resetGame: () => {
-    set(createInitialState());
+    set({
+      entities: new Map(),
+      grids: new Map(),
+      codeWindows: new Map(),
+      activeEntityId: '',
+      executionContext: undefined,
+      isPaused: false,
+      gridSize: { width: 24, height: 16 },
+      globalResources: {
+        bitcoin: 0,
+        currency: 0,
+        energy: 0
+      }
+    });
+  },
+
+  // Debug method to force unblock entity
+  forceUnblockEntity: (entityId: string) => {
+    const { entities } = get();
+    const entity = entities.get(entityId);
+    if (entity) {
+      const updatedEntity = {
+        ...entity,
+        taskState: {
+          isBlocked: false,
+          currentTask: undefined,
+          progress: undefined
+        }
+      };
+      entities.set(entityId, updatedEntity);
+      set({ entities: new Map(entities) });
+      console.log(`Force unblocked entity: ${entity.name}`);
+    }
   },
 
   initializeGame: () => {
@@ -386,7 +421,7 @@ export const useGameStore = create<GameStore>()((set, get) => ({
     const qubitId = store.addEntity({
       name: 'Qubit',
       type: 'qubit',
-      position: { x: 5, y: 5 },
+      position: { x: 12, y: 8 },
       stats: {
         walkingSpeed: 1.0,
         energy: 100,

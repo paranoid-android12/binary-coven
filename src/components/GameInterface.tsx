@@ -24,6 +24,9 @@ export const GameInterface: React.FC = () => {
   // Panel collapse state
   const [isPanelCollapsed, setIsPanelCollapsed] = useState(false);
   
+  // Camera lock state
+  const [isCameraLocked, setIsCameraLocked] = useState(true);
+  
   // Game store state
   const {
     entities,
@@ -77,12 +80,25 @@ export const GameInterface: React.FC = () => {
       setIsCodeRunning(false);
     };
 
+    // Handle camera lock status changes
+    const handleCameraLockChanged = (isLocked: boolean) => {
+      setIsCameraLocked(isLocked);
+    };
+
+    // Handle scene ready event
+    const handleSceneReady = (scene: any) => {
+      console.log('Scene ready, camera should be locked to qubit');
+      setIsCameraLocked(true);
+    };
+
     EventBus.on('entity-clicked', handleEntityClick);
     EventBus.on('grid-clicked', handleGridClick);
     EventBus.on('code-execution-started', handleExecutionStarted);
     EventBus.on('code-execution-completed', handleExecutionCompleted);
     EventBus.on('code-execution-failed', handleExecutionFailed);
     EventBus.on('code-execution-stopped', handleExecutionStopped);
+    EventBus.on('camera-locked-to-qubit', handleCameraLockChanged);
+    EventBus.on('current-scene-ready', handleSceneReady);
 
     return () => {
       EventBus.removeListener('entity-clicked');
@@ -91,6 +107,8 @@ export const GameInterface: React.FC = () => {
       EventBus.removeListener('code-execution-completed');
       EventBus.removeListener('code-execution-failed');
       EventBus.removeListener('code-execution-stopped');
+      EventBus.removeListener('camera-locked-to-qubit');
+      EventBus.removeListener('current-scene-ready');
     };
   }, []);
 
@@ -129,6 +147,13 @@ export const GameInterface: React.FC = () => {
       useGameStore.getState().resetGame();
       useGameStore.getState().initializeGame();
       setIsCodeRunning(false);
+    }
+  };
+
+  const handleLockCamera = () => {
+    const scene = phaserRef.current?.scene as ProgrammingGame;
+    if (scene && typeof scene.lockCameraToQubit === 'function') {
+      scene.lockCameraToQubit();
     }
   };
 
@@ -251,6 +276,24 @@ export const GameInterface: React.FC = () => {
                   </button>
                   
                   <button
+                    onClick={handleLockCamera}
+                    disabled={isCameraLocked}
+                    style={{
+                      backgroundColor: isCameraLocked ? '#666666' : '#007acc',
+                      color: 'white',
+                      border: 'none',
+                      padding: '8px 16px',
+                      borderRadius: '4px',
+                      cursor: isCameraLocked ? 'not-allowed' : 'pointer',
+                      fontSize: '14px',
+                      width: '100%',
+                      opacity: isCameraLocked ? 0.6 : 1
+                    }}
+                  >
+                    {isCameraLocked ? '🔒 Camera Locked' : '🔓 Lock to Qubit'}
+                  </button>
+            
+                  <button
                     onClick={handleResetGame}
                     style={{
                       backgroundColor: '#f5a623',
@@ -281,8 +324,14 @@ export const GameInterface: React.FC = () => {
                   <div style={{ marginBottom: '8px' }}>
                     ▶️ <strong>Use the Run button</strong> to execute your code
                   </div>
-                  <div>
+                  <div style={{ marginBottom: '8px' }}>
                     ⌨️ <strong>Write Python-like code</strong> to control the qubit
+                  </div>
+                  <div style={{ marginBottom: '8px' }}>
+                    📹 <strong>Camera:</strong> WASD to explore the world (unlocks from qubit)
+                  </div>
+                  <div>
+                    🎮 <strong>Arrow keys:</strong> Move qubit (when camera locked) OR explore (when unlocked)
                   </div>
                 </div>
               </div>
@@ -315,6 +364,33 @@ export const GameInterface: React.FC = () => {
                       </div>
                     </div>
                   ))}
+                  <div style={{ marginTop: '8px', marginBottom: '4px', color: '#f5a623', fontWeight: 'bold' }}>
+                    System:
+                  </div>
+                  <div style={{ marginBottom: '4px' }}>
+                    <code style={{ backgroundColor: '#1e1e1e', padding: '2px 4px', borderRadius: '2px' }}>
+                      wait(seconds)
+                    </code>
+                    <div style={{ color: '#cccccc', fontSize: '11px', marginLeft: '8px' }}>
+                      Wait for specified seconds
+                    </div>
+                  </div>
+                  <div style={{ marginBottom: '4px' }}>
+                    <code style={{ backgroundColor: '#1e1e1e', padding: '2px 4px', borderRadius: '2px' }}>
+                      sleep(milliseconds)
+                    </code>
+                    <div style={{ color: '#cccccc', fontSize: '11px', marginLeft: '8px' }}>
+                      Sleep for specified milliseconds
+                    </div>
+                  </div>
+                  <div style={{ marginBottom: '4px' }}>
+                    <code style={{ backgroundColor: '#1e1e1e', padding: '2px 4px', borderRadius: '2px' }}>
+                      print(message)
+                    </code>
+                    <div style={{ color: '#cccccc', fontSize: '11px', marginLeft: '8px' }}>
+                      Print message to console
+                    </div>
+                  </div>
                 </div>
               </div>
 

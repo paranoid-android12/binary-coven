@@ -50,6 +50,16 @@ export class CodeExecutor {
       };
     }
 
+    // Debug: Check initial entity state
+    const store = useGameStore.getState();
+    const initialEntity = store.entities.get(this.context.entity.id);
+    console.log(`[DEBUG] Starting executeMain - Entity state:`, {
+      id: this.context.entity.id,
+      blocked: initialEntity?.taskState.isBlocked,
+      task: initialEntity?.taskState.currentTask,
+      description: initialEntity?.taskState.progress?.description
+    });
+
     this.executionState.isRunning = true;
     this.executionState.variables = { ...this.context.globalVariables };
 
@@ -71,6 +81,9 @@ export class CodeExecutor {
     // Check if entity is blocked by a task
     const store = useGameStore.getState();
     const currentEntity = store.entities.get(this.context.entity.id);
+    
+    console.log(`Executing function: ${functionName}, Entity blocked: ${currentEntity?.taskState.isBlocked}, Task: ${currentEntity?.taskState.progress?.description || 'none'}`);
+    
     if (currentEntity?.taskState.isBlocked) {
       return {
         success: false,
@@ -276,13 +289,66 @@ export class CodeExecutor {
       const [, functionName, argsString] = match;
       const args = argsString ? this.parseArguments(argsString, scope) : [];
 
-      return await this.executeFunction(functionName, args);
+      const result = await this.executeFunction(functionName, args);
+      
+      // If the function blocks the entity, wait until the entity is no longer blocked
+      if (result.success && result.blocksEntity) {
+        console.log(`Function ${functionName} blocks entity, waiting for completion...`);
+        await this.waitForEntityUnblocked();
+        
+        // Refresh the context entity state after waiting
+        const store = useGameStore.getState();
+        const freshEntity = store.entities.get(this.context.entity.id);
+        if (freshEntity) {
+          this.context.entity = freshEntity;
+          console.log(`Entity is now unblocked, context updated. Entity blocked: ${freshEntity.taskState.isBlocked}`);
+        }
+        console.log(`Continuing execution...`);
+      }
+      
+      return result;
     } catch (error) {
       return {
         success: false,
         message: `Function call error: ${error instanceof Error ? error.message : 'Unknown error'}`
       };
     }
+  }
+
+  // Wait for the entity to become unblocked
+  private async waitForEntityUnblocked(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const startTime = Date.now();
+      const maxWaitTime = 30000; // 30 seconds maximum wait time
+      
+      const checkBlocked = () => {
+        const store = useGameStore.getState();
+        const currentEntity = store.entities.get(this.context.entity.id);
+        
+        console.log(`Checking entity blocked status: ${currentEntity?.taskState.isBlocked}, Task: ${currentEntity?.taskState.progress?.description || 'none'}`);
+        
+        // Check if we've been waiting too long
+        if (Date.now() - startTime > maxWaitTime) {
+          console.warn('Entity blocking timeout - continuing execution anyway');
+          resolve();
+          return;
+        }
+        
+        if (!currentEntity?.taskState.isBlocked) {
+          // Entity is no longer blocked, wait a tiny bit more to ensure state consistency
+          console.log('Entity is now unblocked! Waiting 50ms for state to propagate...');
+          setTimeout(() => {
+            resolve();
+          }, 50);
+        } else {
+          // Still blocked, check again in 100ms
+          setTimeout(checkBlocked, 100);
+        }
+      };
+      
+      // Start checking
+      checkBlocked();
+    });
   }
 
   // Parse code into lines (simplified)

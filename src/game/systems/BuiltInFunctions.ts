@@ -320,6 +320,37 @@ export const systemFunctions: BuiltInFunction[] = [
     }
   },
   {
+    name: 'sleep',
+    description: 'Sleep for a specified number of milliseconds',
+    category: 'system',
+    parameters: [
+      {
+        name: 'milliseconds',
+        type: 'number',
+        required: true,
+        description: 'Number of milliseconds to sleep'
+      }
+    ],
+    execute: async (context: ExecutionContext, milliseconds: number): Promise<ExecutionResult> => {
+      if (typeof milliseconds !== 'number' || milliseconds < 0) {
+        return {
+          success: false,
+          message: 'Invalid sleep time - must be a positive number'
+        };
+      }
+
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({
+            success: true,
+            message: `Slept for ${milliseconds} milliseconds`,
+            duration: milliseconds
+          });
+        }, milliseconds);
+      });
+    }
+  },
+  {
     name: 'print',
     description: 'Print a message to the console',
     category: 'system',

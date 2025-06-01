@@ -19,6 +19,12 @@ export class ProgrammingGame extends Scene {
   private gridSprites: Map<string, Phaser.GameObjects.Sprite> = new Map();
   private progressBars: Map<string, Phaser.GameObjects.Graphics> = new Map();
   
+  // Camera controls
+  private cameraKeys!: Phaser.Types.Input.Keyboard.CursorKeys;
+  private wasdKeys!: { W: Phaser.Input.Keyboard.Key, A: Phaser.Input.Keyboard.Key, S: Phaser.Input.Keyboard.Key, D: Phaser.Input.Keyboard.Key };
+  private isLockedToQubit: boolean = true;
+  private cameraSpeed: number = 300;
+  
   // Constants
   private readonly GRID_SIZE = 64;
   private readonly GRID_COLOR = 0x444444;
@@ -127,7 +133,7 @@ export class ProgrammingGame extends Scene {
     const miningTerminalData = this.gridSystem.initializeGrid('mining_terminal', '');
     const miningTerminalId = store.addGrid({
       type: 'mining_terminal',
-      position: { x: 3, y: 3 },
+      position: { x: 8, y: 6 },
       name: 'Mining Terminal #1',
       description: 'A bitcoin mining terminal',
       properties: {},
@@ -144,7 +150,7 @@ export class ProgrammingGame extends Scene {
     const dynamoData = this.gridSystem.initializeGrid('dynamo', '');
     const dynamoId = store.addGrid({
       type: 'dynamo',
-      position: { x: 6, y: 3 },
+      position: { x: 12, y: 6 },
       name: 'Power Dynamo',
       description: 'Manual energy generator',
       properties: {},
@@ -161,7 +167,7 @@ export class ProgrammingGame extends Scene {
     const walletData = this.gridSystem.initializeGrid('wallet', '');
     const walletId = store.addGrid({
       type: 'wallet',
-      position: { x: 9, y: 3 },
+      position: { x: 16, y: 6 },
       name: 'Storage Wallet',
       description: 'Secure bitcoin storage',
       properties: {},
@@ -183,16 +189,80 @@ export class ProgrammingGame extends Scene {
     const gameState = useGameStore.getState();
     const { width, height } = gameState.gridSize;
     
-    // Set world bounds
+    // Set world bounds to the grid size
     this.cameras.main.setBounds(0, 0, width * this.GRID_SIZE, height * this.GRID_SIZE);
     
-    // Follow the active entity
+    // Set camera to show only part of the world (make world bigger than screen)
+    const camera = this.cameras.main;
+    camera.setZoom(1);
+    
+    // Calculate zoom to show about 60% of the world, making it larger than screen
+    const gameWidth = this.scale.width;
+    const gameHeight = this.scale.height;
+    const worldWidth = width * this.GRID_SIZE;
+    const worldHeight = height * this.GRID_SIZE;
+    
+    // Make the world larger than the viewport
+    const zoomX = gameWidth / worldWidth;
+    const zoomY = gameHeight / worldHeight;
+    const baseZoom = Math.min(zoomX, zoomY);
+    const targetZoom = baseZoom * 1.8; // Show more of the world than fits on screen
+    
+    camera.setZoom(targetZoom);
+    
+    // Center camera on the grid initially
+    camera.centerOn(worldWidth / 2, worldHeight / 2);
+    
+    // Set up smooth camera following
+    this.setupCameraControls();
+    
+    // Start following the active entity if available
+    this.lockCameraToQubit();
+  }
+
+  private setupCameraControls() {
+    // Set up WASD keys for camera movement
+    this.wasdKeys = {
+      W: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+      A: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+      S: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.S),
+      D: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.D)
+    };
+    
+    // Also set up arrow keys as backup
+    this.cameraKeys = this.input.keyboard!.createCursorKeys();
+    
+    // Add event listeners for WASD manual camera movement only
+    // Arrow keys will be handled in update() for qubit movement when locked
+    this.input.keyboard!.on('keydown-W', () => this.unlockCamera());
+    this.input.keyboard!.on('keydown-A', () => this.unlockCamera());
+    this.input.keyboard!.on('keydown-S', () => this.unlockCamera());
+    this.input.keyboard!.on('keydown-D', () => this.unlockCamera());
+  }
+
+  public lockCameraToQubit() {
+    this.isLockedToQubit = true;
+    const gameState = useGameStore.getState();
     const activeEntity = gameState.entities.get(gameState.activeEntityId);
+    
     if (activeEntity) {
       const sprite = this.entitySprites.get(activeEntity.id);
       if (sprite) {
-        this.cameras.main.startFollow(sprite);
+        // Set up smooth camera following with lerp
+        this.cameras.main.stopFollow();
+        this.cameras.main.startFollow(sprite, true, 0.05, 0.05); // Smooth following with 0.05 lerp
       }
+    }
+    
+    // Emit event so UI can update
+    EventBus.emit('camera-locked-to-qubit', true);
+  }
+
+  private unlockCamera() {
+    if (this.isLockedToQubit) {
+      this.isLockedToQubit = false;
+      this.cameras.main.stopFollow();
+      EventBus.emit('camera-locked-to-qubit', false);
     }
   }
 
@@ -370,12 +440,29 @@ export class ProgrammingGame extends Scene {
       return;
     }
     
+    // Cancel any existing tasks and reset entity state
+    this.taskManager.cancelAllTasks();
+    
+    // Force unblock the active entity if it's stuck
+    if (activeEntity.taskState.isBlocked) {
+      console.log('Entity was blocked, force unblocking before execution...');
+      gameState.forceUnblockEntity(activeEntity.id);
+    }
+    
+    // Get fresh entity data after potential unblocking
+    const freshEntity = gameState.entities.get(gameState.activeEntityId);
+    if (!freshEntity) {
+      console.warn('No active entity for code execution');
+      EventBus.emit('code-execution-failed', 'No active entity found');
+      return;
+    }
+    
     const executionContext = {
-      entity: activeEntity,
+      entity: freshEntity,
       availableFunctions: BuiltInFunctionRegistry.createFunctionMap(),
       globalVariables: {},
       isRunning: true,
-      currentGrid: gameState.getGridAt(activeEntity.position)
+      currentGrid: gameState.getGridAt(freshEntity.position)
     };
     
     this.codeExecutor = new CodeExecutor(executionContext, this.gridSystem);
@@ -440,27 +527,63 @@ export class ProgrammingGame extends Scene {
   }
 
   // Manual control for testing (can be removed later)
-  update() {
+  update(time: number, delta: number) {
     const cursors = this.input.keyboard?.createCursorKeys();
     if (!cursors) return;
     
     const gameState = useGameStore.getState();
     const activeEntity = gameState.entities.get(gameState.activeEntityId);
     
+    // Handle camera movement when not locked to qubit
+    if (!this.isLockedToQubit) {
+      const camera = this.cameras.main;
+      const moveSpeed = this.cameraSpeed * (delta / 1000); // Smooth movement based on delta time
+      
+      // WASD camera movement (only when unlocked)
+      if (this.wasdKeys.W.isDown) {
+        camera.scrollY -= moveSpeed;
+      }
+      if (this.wasdKeys.S.isDown) {
+        camera.scrollY += moveSpeed;
+      }
+      if (this.wasdKeys.A.isDown) {
+        camera.scrollX -= moveSpeed;
+      }
+      if (this.wasdKeys.D.isDown) {
+        camera.scrollX += moveSpeed;
+      }
+      
+      // Arrow keys also move camera when unlocked
+      if (cursors.up!.isDown) {
+        camera.scrollY -= moveSpeed;
+      }
+      if (cursors.down!.isDown) {
+        camera.scrollY += moveSpeed;
+      }
+      if (cursors.left!.isDown) {
+        camera.scrollX -= moveSpeed;
+      }
+      if (cursors.right!.isDown) {
+        camera.scrollX += moveSpeed;
+      }
+    }
+    
     if (!activeEntity) return;
     
-    // Manual movement controls for testing
-    if (Phaser.Input.Keyboard.JustDown(cursors.up!)) {
-      gameState.moveEntity(activeEntity.id, { x: activeEntity.position.x, y: activeEntity.position.y - 1 });
-    }
-    if (Phaser.Input.Keyboard.JustDown(cursors.down!)) {
-      gameState.moveEntity(activeEntity.id, { x: activeEntity.position.x, y: activeEntity.position.y + 1 });
-    }
-    if (Phaser.Input.Keyboard.JustDown(cursors.left!)) {
-      gameState.moveEntity(activeEntity.id, { x: activeEntity.position.x - 1, y: activeEntity.position.y });
-    }
-    if (Phaser.Input.Keyboard.JustDown(cursors.right!)) {
-      gameState.moveEntity(activeEntity.id, { x: activeEntity.position.x + 1, y: activeEntity.position.y });
+    // Arrow key qubit movement (only when camera is locked and not in unlocked mode)
+    if (this.isLockedToQubit) {
+      if (Phaser.Input.Keyboard.JustDown(cursors.up!)) {
+        gameState.moveEntity(activeEntity.id, { x: activeEntity.position.x, y: activeEntity.position.y - 1 });
+      }
+      if (Phaser.Input.Keyboard.JustDown(cursors.down!)) {
+        gameState.moveEntity(activeEntity.id, { x: activeEntity.position.x, y: activeEntity.position.y + 1 });
+      }
+      if (Phaser.Input.Keyboard.JustDown(cursors.left!)) {
+        gameState.moveEntity(activeEntity.id, { x: activeEntity.position.x - 1, y: activeEntity.position.y });
+      }
+      if (Phaser.Input.Keyboard.JustDown(cursors.right!)) {
+        gameState.moveEntity(activeEntity.id, { x: activeEntity.position.x + 1, y: activeEntity.position.y });
+      }
     }
   }
 } 
