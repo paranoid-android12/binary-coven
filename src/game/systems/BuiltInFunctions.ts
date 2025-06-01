@@ -1,6 +1,7 @@
 import { BuiltInFunction, ExecutionContext, ExecutionResult, Position } from '../../types/game';
 import { useGameStore } from '../../stores/gameStore';
 import GridSystem from './GridSystem';
+import { EventBus } from '../EventBus';
 
 // Initialize grid system for scanner function
 const gridSystem = new GridSystem();
@@ -13,6 +14,16 @@ const syncContextEntity = (context: ExecutionContext): void => {
     // Update the context entity to match the game store
     Object.assign(context.entity, updatedEntity);
   }
+};
+
+// Helper function to get MovementManager from scene
+const getMovementManager = (): any => {
+  // Access the current scene via EventBus
+  return new Promise((resolve) => {
+    EventBus.emit('request-movement-manager', (movementManager: any) => {
+      resolve(movementManager);
+    });
+  });
 };
 
 // Movement Functions
@@ -29,24 +40,41 @@ export const movementFunctions: BuiltInFunction[] = [
         y: entity.position.y - 1
       };
 
+      // Check bounds first
       const store = useGameStore.getState();
-      const success = store.moveEntity(entity.id, newPosition);
-
-      if (success) {
-        // Sync context entity with updated game store
-        syncContextEntity(context);
-        return {
-          success: true,
-          message: `Moved to (${newPosition.x}, ${newPosition.y})`,
-          energyCost: 5,
-          duration: 1000 / entity.stats.walkingSpeed
-        };
-      } else {
+      const { width, height } = store.gridSize;
+      if (newPosition.x < 0 || newPosition.x >= width || 
+          newPosition.y < 0 || newPosition.y >= height) {
         return {
           success: false,
-          message: 'Cannot move up - blocked or out of bounds'
+          message: 'Cannot move up - out of bounds'
         };
       }
+
+      // Get MovementManager from scene and perform smooth movement
+      return new Promise((resolve) => {
+        EventBus.emit('request-smooth-movement', {
+          entityId: entity.id,
+          targetPosition: newPosition,
+          callback: (success: boolean) => {
+            if (success) {
+              // Sync context entity with updated game store
+              syncContextEntity(context);
+              resolve({
+                success: true,
+                message: `Moved to (${newPosition.x}, ${newPosition.y})`,
+                energyCost: 5,
+                duration: 1000 / entity.stats.walkingSpeed
+              });
+            } else {
+              resolve({
+                success: false,
+                message: 'Cannot move up - blocked or invalid position'
+              });
+            }
+          }
+        });
+      });
     }
   },
   {
@@ -61,23 +89,40 @@ export const movementFunctions: BuiltInFunction[] = [
         y: entity.position.y + 1
       };
 
+      // Check bounds first
       const store = useGameStore.getState();
-      const success = store.moveEntity(entity.id, newPosition);
-
-      if (success) {
-        syncContextEntity(context);
-        return {
-          success: true,
-          message: `Moved to (${newPosition.x}, ${newPosition.y})`,
-          energyCost: 5,
-          duration: 1000 / entity.stats.walkingSpeed
-        };
-      } else {
+      const { width, height } = store.gridSize;
+      if (newPosition.x < 0 || newPosition.x >= width || 
+          newPosition.y < 0 || newPosition.y >= height) {
         return {
           success: false,
-          message: 'Cannot move down - blocked or out of bounds'
+          message: 'Cannot move down - out of bounds'
         };
       }
+
+      // Get MovementManager from scene and perform smooth movement
+      return new Promise((resolve) => {
+        EventBus.emit('request-smooth-movement', {
+          entityId: entity.id,
+          targetPosition: newPosition,
+          callback: (success: boolean) => {
+            if (success) {
+              syncContextEntity(context);
+              resolve({
+                success: true,
+                message: `Moved to (${newPosition.x}, ${newPosition.y})`,
+                energyCost: 5,
+                duration: 1000 / entity.stats.walkingSpeed
+              });
+            } else {
+              resolve({
+                success: false,
+                message: 'Cannot move down - blocked or invalid position'
+              });
+            }
+          }
+        });
+      });
     }
   },
   {
@@ -92,23 +137,40 @@ export const movementFunctions: BuiltInFunction[] = [
         y: entity.position.y
       };
 
+      // Check bounds first
       const store = useGameStore.getState();
-      const success = store.moveEntity(entity.id, newPosition);
-
-      if (success) {
-        syncContextEntity(context);
-        return {
-          success: true,
-          message: `Moved to (${newPosition.x}, ${newPosition.y})`,
-          energyCost: 5,
-          duration: 1000 / entity.stats.walkingSpeed
-        };
-      } else {
+      const { width, height } = store.gridSize;
+      if (newPosition.x < 0 || newPosition.x >= width || 
+          newPosition.y < 0 || newPosition.y >= height) {
         return {
           success: false,
-          message: 'Cannot move left - blocked or out of bounds'
+          message: 'Cannot move left - out of bounds'
         };
       }
+
+      // Get MovementManager from scene and perform smooth movement
+      return new Promise((resolve) => {
+        EventBus.emit('request-smooth-movement', {
+          entityId: entity.id,
+          targetPosition: newPosition,
+          callback: (success: boolean) => {
+            if (success) {
+              syncContextEntity(context);
+              resolve({
+                success: true,
+                message: `Moved to (${newPosition.x}, ${newPosition.y})`,
+                energyCost: 5,
+                duration: 1000 / entity.stats.walkingSpeed
+              });
+            } else {
+              resolve({
+                success: false,
+                message: 'Cannot move left - blocked or invalid position'
+              });
+            }
+          }
+        });
+      });
     }
   },
   {
@@ -123,23 +185,40 @@ export const movementFunctions: BuiltInFunction[] = [
         y: entity.position.y
       };
 
+      // Check bounds first
       const store = useGameStore.getState();
-      const success = store.moveEntity(entity.id, newPosition);
-
-      if (success) {
-        syncContextEntity(context);
-        return {
-          success: true,
-          message: `Moved to (${newPosition.x}, ${newPosition.y})`,
-          energyCost: 5,
-          duration: 1000 / entity.stats.walkingSpeed
-        };
-      } else {
+      const { width, height } = store.gridSize;
+      if (newPosition.x < 0 || newPosition.x >= width || 
+          newPosition.y < 0 || newPosition.y >= height) {
         return {
           success: false,
-          message: 'Cannot move right - blocked or out of bounds'
+          message: 'Cannot move right - out of bounds'
         };
       }
+
+      // Get MovementManager from scene and perform smooth movement
+      return new Promise((resolve) => {
+        EventBus.emit('request-smooth-movement', {
+          entityId: entity.id,
+          targetPosition: newPosition,
+          callback: (success: boolean) => {
+            if (success) {
+              syncContextEntity(context);
+              resolve({
+                success: true,
+                message: `Moved to (${newPosition.x}, ${newPosition.y})`,
+                energyCost: 5,
+                duration: 1000 / entity.stats.walkingSpeed
+              });
+            } else {
+              resolve({
+                success: false,
+                message: 'Cannot move right - blocked or invalid position'
+              });
+            }
+          }
+        });
+      });
     }
   },
   {
@@ -175,25 +254,42 @@ export const movementFunctions: BuiltInFunction[] = [
       // Calculate distance for energy cost and duration BEFORE moving
       const distance = Math.abs(entity.position.x - newPosition.x) + Math.abs(entity.position.y - newPosition.y);
       
+      // Check bounds first
       const store = useGameStore.getState();
-      const success = store.moveEntity(entity.id, newPosition);
-
-      if (success) {
-        // Sync context entity with updated game store
-        syncContextEntity(context);
-        
-        return {
-          success: true,
-          message: `Moved to (${newPosition.x}, ${newPosition.y})`,
-          energyCost: distance * 5,
-          duration: (distance * 1000) / entity.stats.walkingSpeed
-        };
-      } else {
+      const { width, height } = store.gridSize;
+      if (newPosition.x < 0 || newPosition.x >= width || 
+          newPosition.y < 0 || newPosition.y >= height) {
         return {
           success: false,
-          message: `Cannot move to (${newPosition.x}, ${newPosition.y}) - blocked or out of bounds`
+          message: `Cannot move to (${newPosition.x}, ${newPosition.y}) - out of bounds`
         };
       }
+
+      // Get MovementManager from scene and perform smooth movement
+      return new Promise((resolve) => {
+        EventBus.emit('request-smooth-movement', {
+          entityId: entity.id,
+          targetPosition: newPosition,
+          callback: (success: boolean) => {
+            if (success) {
+              // Sync context entity with updated game store
+              syncContextEntity(context);
+              
+              resolve({
+                success: true,
+                message: `Moved to (${newPosition.x}, ${newPosition.y})`,
+                energyCost: distance * 5,
+                duration: (distance * 1000) / entity.stats.walkingSpeed
+              });
+            } else {
+              resolve({
+                success: false,
+                message: `Cannot move to (${newPosition.x}, ${newPosition.y}) - blocked or invalid position`
+              });
+            }
+          }
+        });
+      });
     }
   }
 ];

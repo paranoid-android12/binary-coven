@@ -37,11 +37,20 @@ export interface Entity {
   name: string;
   type: string;
   position: Position;
+  visualPosition?: Position;
   stats: EntityStats;
   inventory: Inventory;
   sprite?: Phaser.GameObjects.Sprite;
   isActive: boolean;
   taskState: TaskState;
+  movementState?: {
+    isMoving: boolean;
+    fromPosition: Position;
+    toPosition: Position;
+    startTime?: number;
+    duration?: number;
+    tween?: Phaser.Tweens.Tween;
+  };
 }
 
 // Inventory System
