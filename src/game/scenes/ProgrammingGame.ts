@@ -203,6 +203,7 @@ export class ProgrammingGame extends Scene {
   private readonly GRID_COLOR = 0x444444;
   private readonly GRID_ALPHA = 0.3;
   private readonly QUBIT_SCALE_FACTOR = 1.5; // Qubit is 1.5x larger than grid cells
+  private readonly CAMERA_ZOOM_FACTOR = 0.9; // Camera zoom level (lower = more zoomed out)
   
   // Animation tracking
   private lastQubitPosition: Position | null = null;
@@ -415,7 +416,7 @@ export class ProgrammingGame extends Scene {
     const zoomX = gameWidth / worldWidth;
     const zoomY = gameHeight / worldHeight;
     const baseZoom = Math.min(zoomX, zoomY);
-    const targetZoom = baseZoom * 1.8; // Show more of the world than fits on screen
+    const targetZoom = baseZoom * this.CAMERA_ZOOM_FACTOR; // Use configurable zoom factor
     
     camera.setZoom(targetZoom);
     
