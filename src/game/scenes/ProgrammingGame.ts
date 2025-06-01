@@ -20,7 +20,12 @@ export class ProgrammingGame extends Scene {
   private progressBars: Map<string, Phaser.GameObjects.Graphics> = new Map();
   
   // Camera controls
-  private cameraKeys!: Phaser.Types.Input.Keyboard.CursorKeys;
+  private cameraKeys!: {
+    up: Phaser.Input.Keyboard.Key;
+    down: Phaser.Input.Keyboard.Key;
+    left: Phaser.Input.Keyboard.Key;
+    right: Phaser.Input.Keyboard.Key;
+  };
   private wasdKeys!: { W: Phaser.Input.Keyboard.Key, A: Phaser.Input.Keyboard.Key, S: Phaser.Input.Keyboard.Key, D: Phaser.Input.Keyboard.Key };
   private isLockedToQubit: boolean = true;
   private cameraSpeed: number = 300;
@@ -223,21 +228,56 @@ export class ProgrammingGame extends Scene {
   private setupCameraControls() {
     // Set up WASD keys for camera movement
     this.wasdKeys = {
-      W: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.W),
-      A: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.A),
-      S: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.S),
-      D: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.D)
+      W: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.W, false),
+      A: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.A, false),
+      S: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.S, false),
+      D: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.D, false)
     };
     
-    // Also set up arrow keys as backup
-    this.cameraKeys = this.input.keyboard!.createCursorKeys();
+    // Set up arrow keys individually (instead of createCursorKeys to avoid spacebar capture)
+    this.cameraKeys = {
+      up: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.UP, false),
+      down: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN, false),
+      left: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT, false),
+      right: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT, false)
+    };
     
-    // Add event listeners for WASD manual camera movement only
+    // Helper function to check if an input element has focus
+    const isTypingInInput = () => {
+      const activeElement = document.activeElement;
+      if (!activeElement) return false;
+      
+      const tagName = activeElement.tagName.toLowerCase();
+      const hasContentEditable = activeElement.getAttribute('contenteditable') === 'true';
+      const isInput = ['input', 'textarea', 'select'].includes(tagName);
+      const isMonacoEditor = activeElement.classList.contains('monaco-editor') || 
+                           activeElement.closest('.monaco-editor') !== null;
+      
+      return isInput || hasContentEditable || isMonacoEditor;
+    };
+    
+    // Add event listeners for WASD manual camera movement only when not typing
     // Arrow keys will be handled in update() for qubit movement when locked
-    this.input.keyboard!.on('keydown-W', () => this.unlockCamera());
-    this.input.keyboard!.on('keydown-A', () => this.unlockCamera());
-    this.input.keyboard!.on('keydown-S', () => this.unlockCamera());
-    this.input.keyboard!.on('keydown-D', () => this.unlockCamera());
+    this.input.keyboard!.on('keydown-W', () => {
+      if (!isTypingInInput()) {
+        this.unlockCamera();
+      }
+    });
+    this.input.keyboard!.on('keydown-A', () => {
+      if (!isTypingInInput()) {
+        this.unlockCamera();
+      }
+    });
+    this.input.keyboard!.on('keydown-S', () => {
+      if (!isTypingInInput()) {
+        this.unlockCamera();
+      }
+    });
+    this.input.keyboard!.on('keydown-D', () => {
+      if (!isTypingInInput()) {
+        this.unlockCamera();
+      }
+    });
   }
 
   public lockCameraToQubit() {
@@ -528,60 +568,75 @@ export class ProgrammingGame extends Scene {
 
   // Manual control for testing (can be removed later)
   update(time: number, delta: number) {
-    const cursors = this.input.keyboard?.createCursorKeys();
-    if (!cursors) return;
-    
+    // Don't use createCursorKeys() as it captures spacebar - use our custom keys
     const gameState = useGameStore.getState();
     const activeEntity = gameState.entities.get(gameState.activeEntityId);
+    
+    // Helper function to check if an input element has focus
+    const isTypingInInput = () => {
+      const activeElement = document.activeElement;
+      if (!activeElement) return false;
+      
+      const tagName = activeElement.tagName.toLowerCase();
+      const hasContentEditable = activeElement.getAttribute('contenteditable') === 'true';
+      const isInput = ['input', 'textarea', 'select'].includes(tagName);
+      const isMonacoEditor = activeElement.classList.contains('monaco-editor') || 
+                           activeElement.closest('.monaco-editor') !== null;
+      
+      return isInput || hasContentEditable || isMonacoEditor;
+    };
     
     // Handle camera movement when not locked to qubit
     if (!this.isLockedToQubit) {
       const camera = this.cameras.main;
       const moveSpeed = this.cameraSpeed * (delta / 1000); // Smooth movement based on delta time
       
-      // WASD camera movement (only when unlocked)
-      if (this.wasdKeys.W.isDown) {
-        camera.scrollY -= moveSpeed;
-      }
-      if (this.wasdKeys.S.isDown) {
-        camera.scrollY += moveSpeed;
-      }
-      if (this.wasdKeys.A.isDown) {
-        camera.scrollX -= moveSpeed;
-      }
-      if (this.wasdKeys.D.isDown) {
-        camera.scrollX += moveSpeed;
-      }
-      
-      // Arrow keys also move camera when unlocked
-      if (cursors.up!.isDown) {
-        camera.scrollY -= moveSpeed;
-      }
-      if (cursors.down!.isDown) {
-        camera.scrollY += moveSpeed;
-      }
-      if (cursors.left!.isDown) {
-        camera.scrollX -= moveSpeed;
-      }
-      if (cursors.right!.isDown) {
-        camera.scrollX += moveSpeed;
+      // Only handle camera movement if not typing in input fields
+      if (!isTypingInInput()) {
+        // WASD camera movement (only when unlocked)
+        if (this.wasdKeys.W.isDown) {
+          camera.scrollY -= moveSpeed;
+        }
+        if (this.wasdKeys.S.isDown) {
+          camera.scrollY += moveSpeed;
+        }
+        if (this.wasdKeys.A.isDown) {
+          camera.scrollX -= moveSpeed;
+        }
+        if (this.wasdKeys.D.isDown) {
+          camera.scrollX += moveSpeed;
+        }
+        
+        // Arrow keys also move camera when unlocked (using our custom keys)
+        if (this.cameraKeys.up.isDown) {
+          camera.scrollY -= moveSpeed;
+        }
+        if (this.cameraKeys.down.isDown) {
+          camera.scrollY += moveSpeed;
+        }
+        if (this.cameraKeys.left.isDown) {
+          camera.scrollX -= moveSpeed;
+        }
+        if (this.cameraKeys.right.isDown) {
+          camera.scrollX += moveSpeed;
+        }
       }
     }
     
     if (!activeEntity) return;
     
     // Arrow key qubit movement (only when camera is locked and not in unlocked mode)
-    if (this.isLockedToQubit) {
-      if (Phaser.Input.Keyboard.JustDown(cursors.up!)) {
+    if (this.isLockedToQubit && !isTypingInInput()) {
+      if (Phaser.Input.Keyboard.JustDown(this.cameraKeys.up)) {
         gameState.moveEntity(activeEntity.id, { x: activeEntity.position.x, y: activeEntity.position.y - 1 });
       }
-      if (Phaser.Input.Keyboard.JustDown(cursors.down!)) {
+      if (Phaser.Input.Keyboard.JustDown(this.cameraKeys.down)) {
         gameState.moveEntity(activeEntity.id, { x: activeEntity.position.x, y: activeEntity.position.y + 1 });
       }
-      if (Phaser.Input.Keyboard.JustDown(cursors.left!)) {
+      if (Phaser.Input.Keyboard.JustDown(this.cameraKeys.left)) {
         gameState.moveEntity(activeEntity.id, { x: activeEntity.position.x - 1, y: activeEntity.position.y });
       }
-      if (Phaser.Input.Keyboard.JustDown(cursors.right!)) {
+      if (Phaser.Input.Keyboard.JustDown(this.cameraKeys.right)) {
         gameState.moveEntity(activeEntity.id, { x: activeEntity.position.x + 1, y: activeEntity.position.y });
       }
     }

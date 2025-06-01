@@ -411,6 +411,229 @@ export const utilityFunctions: BuiltInFunction[] = [
         energyCost: 2
       };
     }
+  },
+  {
+    name: 'range',
+    description: 'Generate a sequence of numbers (Python-like range function)',
+    category: 'utility',
+    parameters: [
+      { name: 'start_or_stop', type: 'number', required: true, description: 'Start value (if two args) or stop value (if one arg)' },
+      { name: 'stop', type: 'number', required: false, description: 'Stop value (exclusive)' },
+      { name: 'step', type: 'number', required: false, description: 'Step size (default: 1)' }
+    ],
+    execute: async (context: ExecutionContext, ...args: number[]): Promise<ExecutionResult> => {
+      let start: number, stop: number, step: number;
+      
+      if (args.length === 1) {
+        // range(stop)
+        start = 0;
+        stop = args[0];
+        step = 1;
+      } else if (args.length === 2) {
+        // range(start, stop)
+        start = args[0];
+        stop = args[1];
+        step = 1;
+      } else if (args.length === 3) {
+        // range(start, stop, step)
+        start = args[0];
+        stop = args[1];
+        step = args[2];
+      } else {
+        return {
+          success: false,
+          message: 'range() takes 1 to 3 arguments'
+        };
+      }
+      
+      if (step === 0) {
+        return {
+          success: false,
+          message: 'range() step argument must not be zero'
+        };
+      }
+      
+      const result: number[] = [];
+      if (step > 0) {
+        for (let i = start; i < stop; i += step) {
+          result.push(i);
+        }
+      } else {
+        for (let i = start; i > stop; i += step) {
+          result.push(i);
+        }
+      }
+      
+      return {
+        success: true,
+        message: `Generated range(${args.join(', ')}) with ${result.length} items`,
+        data: result
+      };
+    }
+  },
+  {
+    name: 'len',
+    description: 'Get the length of a string, array, or other iterable',
+    category: 'utility',
+    parameters: [
+      { name: 'iterable', type: 'any', required: true, description: 'The iterable to get length of' }
+    ],
+    execute: async (context: ExecutionContext, iterable: any): Promise<ExecutionResult> => {
+      let length: number;
+      
+      if (typeof iterable === 'string') {
+        length = iterable.length;
+      } else if (Array.isArray(iterable)) {
+        length = iterable.length;
+      } else if (iterable != null && typeof iterable.length === 'number') {
+        length = iterable.length;
+      } else {
+        return {
+          success: false,
+          message: `Object of type '${typeof iterable}' has no len()`
+        };
+      }
+      
+      return {
+        success: true,
+        message: `Length: ${length}`,
+        data: length
+      };
+    }
+  },
+  {
+    name: 'abs',
+    description: 'Return the absolute value of a number',
+    category: 'utility',
+    parameters: [
+      { name: 'number', type: 'number', required: true, description: 'The number to get absolute value of' }
+    ],
+    execute: async (context: ExecutionContext, number: number): Promise<ExecutionResult> => {
+      if (typeof number !== 'number') {
+        return {
+          success: false,
+          message: 'abs() requires a number argument'
+        };
+      }
+      
+      const result = Math.abs(number);
+      
+      return {
+        success: true,
+        message: `abs(${number}) = ${result}`,
+        data: result
+      };
+    }
+  },
+  {
+    name: 'min',
+    description: 'Return the minimum value from arguments',
+    category: 'utility',
+    parameters: [
+      { name: 'values', type: 'any', required: true, description: 'Values to compare (can be multiple arguments or an array)' }
+    ],
+    execute: async (context: ExecutionContext, ...args: any[]): Promise<ExecutionResult> => {
+      let values: any[];
+      
+      if (args.length === 1 && Array.isArray(args[0])) {
+        values = args[0];
+      } else {
+        values = args;
+      }
+      
+      if (values.length === 0) {
+        return {
+          success: false,
+          message: 'min() expected at least 1 argument, got 0'
+        };
+      }
+      
+      const result = Math.min(...values.map(v => Number(v)));
+      
+      if (isNaN(result)) {
+        return {
+          success: false,
+          message: 'min() arguments must be numbers'
+        };
+      }
+      
+      return {
+        success: true,
+        message: `min(${values.join(', ')}) = ${result}`,
+        data: result
+      };
+    }
+  },
+  {
+    name: 'max',
+    description: 'Return the maximum value from arguments',
+    category: 'utility',
+    parameters: [
+      { name: 'values', type: 'any', required: true, description: 'Values to compare (can be multiple arguments or an array)' }
+    ],
+    execute: async (context: ExecutionContext, ...args: any[]): Promise<ExecutionResult> => {
+      let values: any[];
+      
+      if (args.length === 1 && Array.isArray(args[0])) {
+        values = args[0];
+      } else {
+        values = args;
+      }
+      
+      if (values.length === 0) {
+        return {
+          success: false,
+          message: 'max() expected at least 1 argument, got 0'
+        };
+      }
+      
+      const result = Math.max(...values.map(v => Number(v)));
+      
+      if (isNaN(result)) {
+        return {
+          success: false,
+          message: 'max() arguments must be numbers'
+        };
+      }
+      
+      return {
+        success: true,
+        message: `max(${values.join(', ')}) = ${result}`,
+        data: result
+      };
+    }
+  },
+  {
+    name: 'sum',
+    description: 'Return the sum of an iterable of numbers',
+    category: 'utility',
+    parameters: [
+      { name: 'iterable', type: 'any', required: true, description: 'Iterable of numbers to sum' }
+    ],
+    execute: async (context: ExecutionContext, iterable: any[]): Promise<ExecutionResult> => {
+      if (!Array.isArray(iterable)) {
+        return {
+          success: false,
+          message: 'sum() requires an iterable argument'
+        };
+      }
+      
+      const numbers = iterable.map(v => Number(v));
+      if (numbers.some(n => isNaN(n))) {
+        return {
+          success: false,
+          message: 'sum() requires all elements to be numbers'
+        };
+      }
+      
+      const result = numbers.reduce((acc, num) => acc + num, 0);
+      
+      return {
+        success: true,
+        message: `sum([${iterable.join(', ')}]) = ${result}`,
+        data: result
+      };
+    }
   }
 ];
 
