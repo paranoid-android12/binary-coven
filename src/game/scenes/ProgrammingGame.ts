@@ -187,6 +187,10 @@ export class ProgrammingGame extends Scene {
   private gridSprites: Map<string, Phaser.GameObjects.Sprite> = new Map();
   private progressBars: Map<string, Phaser.GameObjects.Graphics> = new Map();
   
+  // Floating text system for code execution
+  private executionTexts: Phaser.GameObjects.Text[] = [];
+  private executionTextContainer!: Phaser.GameObjects.Container;
+  
   // Camera controls
   private cameraKeys!: {
     up: Phaser.Input.Keyboard.Key;
@@ -203,7 +207,7 @@ export class ProgrammingGame extends Scene {
   private readonly GRID_COLOR = 0x444444;
   private readonly GRID_ALPHA = 0.3;
   private readonly QUBIT_SCALE_FACTOR = 1.5; // Qubit is 1.5x larger than grid cells
-  private readonly CAMERA_ZOOM_FACTOR = 0.9; // Camera zoom level (lower = more zoomed out)
+  private readonly CAMERA_ZOOM_FACTOR = 1.5; // Camera zoom level (lower = more zoomed out)
   
   // Animation tracking
   private lastQubitPosition: Position | null = null;
@@ -267,6 +271,9 @@ export class ProgrammingGame extends Scene {
     
     // Set up EventBus handlers for movement system
     this.setupMovementEventHandlers();
+    
+    // Set up execution text system
+    this.setupExecutionTextSystem();
     
     // Create UI elements
     this.createUI();
@@ -690,7 +697,7 @@ export class ProgrammingGame extends Scene {
       } else if (deltaX < 0) {
         // Moving left (use right sprites but flipped)
         this.qubitDirection = 'left';
-        walkAnimationKey = 'qubit_walk_left';
+        walkAnimationKey = 'qubit_walk_right';
         shouldFlip = true;
       } else if (deltaX > 0) {
         // Moving right
@@ -720,7 +727,7 @@ export class ProgrammingGame extends Scene {
           idleAnimationKey = 'qubit_idle_up';
           break;
         case 'left':
-          idleAnimationKey = 'qubit_idle_left';
+          idleAnimationKey = 'qubit_idle_right';
           shouldFlip = true;
           break;
         case 'right':
@@ -1060,7 +1067,7 @@ export class ProgrammingGame extends Scene {
     // Walking down (first row of walk sheet)
     this.anims.create({
       key: 'qubit_walk_down',
-      frames: this.anims.generateFrameNumbers('qubit_walk', { start: 0, end: 3 }),
+      frames: this.anims.generateFrameNumbers('qubit_walk', { start: 0, end: 5 }),
       frameRate: 8,
       repeat: -1
     });
@@ -1068,7 +1075,7 @@ export class ProgrammingGame extends Scene {
     // Walking up (second row of walk sheet)
     this.anims.create({
       key: 'qubit_walk_up',
-      frames: this.anims.generateFrameNumbers('qubit_walk', { start: 4, end: 7 }),
+      frames: this.anims.generateFrameNumbers('qubit_walk', { start: 6, end: 11 }),
       frameRate: 8,
       repeat: -1
     });
@@ -1076,7 +1083,7 @@ export class ProgrammingGame extends Scene {
     // Walking right (third row of walk sheet)
     this.anims.create({
       key: 'qubit_walk_right',
-      frames: this.anims.generateFrameNumbers('qubit_walk', { start: 8, end: 11 }),
+      frames: this.anims.generateFrameNumbers('qubit_walk', { start: 12, end: 17 }),
       frameRate: 8,
       repeat: -1
     });
@@ -1084,7 +1091,7 @@ export class ProgrammingGame extends Scene {
     // Walking left (third row of walk sheet, flipped)
     this.anims.create({
       key: 'qubit_walk_left',
-      frames: this.anims.generateFrameNumbers('qubit_walk', { start: 8, end: 11 }),
+      frames: this.anims.generateFrameNumbers('qubit_walk', { start: 12, end: 17 }),
       frameRate: 8,
       repeat: -1
     });
@@ -1134,5 +1141,162 @@ export class ProgrammingGame extends Scene {
     EventBus.on('request-movement-manager', (callback: (manager: MovementManager) => void) => {
       callback(this.movementManager);
     });
+  }
+
+  private setupExecutionTextSystem() {
+    // Create container for execution texts
+    this.executionTextContainer = this.add.container(0, 0);
+    
+    // Listen for code execution line events
+    EventBus.on('code-execution-line', (data: {
+      line: string;
+      lineNumber: number;
+      functionName: string;
+      entityId: string;
+    }) => {
+      this.showExecutionLine(data.line, data.functionName);
+    });
+    
+    // Listen for function call events 
+    EventBus.on('code-execution-function-call', (data: {
+      functionName: string;
+      args: any[];
+      entityId: string;
+    }) => {
+      const argsString = data.args.length > 0 ? `(${data.args.join(', ')})` : '()';
+      this.showExecutionLine(`${data.functionName}${argsString}`, 'function');
+    });
+    
+    // Clear execution texts when execution stops or completes
+    EventBus.on('code-execution-stopped', () => {
+      this.clearExecutionTexts();
+    });
+    
+    EventBus.on('code-execution-completed', () => {
+      this.clearExecutionTexts();
+    });
+    
+    EventBus.on('code-execution-failed', () => {
+      this.clearExecutionTexts();
+    });
+  }
+
+  private showExecutionLine(line: string, context: string) {
+    const gameState = useGameStore.getState();
+    const activeEntity = gameState.entities.get(gameState.activeEntityId);
+    
+    if (!activeEntity) return;
+    
+    const entitySprite = this.entitySprites.get(activeEntity.id);
+    if (!entitySprite) return;
+    
+    // Limit text length for better display
+    const displayText = line.length > 30 ? line.substring(0, 27) + '...' : line;
+    
+    // Create floating text above the entity
+    const textY = entitySprite.y - (this.GRID_SIZE * this.QUBIT_SCALE_FACTOR / 2) - 60;
+    const executionText = this.add.text(entitySprite.x, textY, displayText, {
+      fontSize: '12px',
+      color: '#00ff00',
+      backgroundColor: '#000000',
+      padding: { x: 8, y: 4 },
+      align: 'center',
+      stroke: '#000000',
+      strokeThickness: 2
+    });
+    
+    executionText.setOrigin(0.5);
+    
+    // Add to container
+    this.executionTextContainer.add(executionText);
+    this.executionTexts.push(executionText);
+    
+    // Slide existing texts up
+    this.executionTexts.forEach((text, index) => {
+      if (text !== executionText) {
+        // Move older texts up
+        this.tweens.add({
+          targets: text,
+          y: text.y - 20,
+          alpha: Math.max(0.1, text.alpha - 0.3), // Fade out older texts
+          duration: 300,
+          ease: 'Power2'
+        });
+      }
+    });
+    
+    // Animate the new text sliding in
+    executionText.setAlpha(0);
+    executionText.setScale(0.8);
+    
+    this.tweens.add({
+      targets: executionText,
+      alpha: 1,
+      scaleX: 1,
+      scaleY: 1,
+      duration: 200,
+      ease: 'Back.easeOut',
+      onComplete: () => {
+        // Auto-remove text after a delay
+        this.time.delayedCall(2000, () => {
+          if (executionText && executionText.active) {
+            this.tweens.add({
+              targets: executionText,
+              alpha: 0,
+              y: executionText.y - 10,
+              duration: 500,
+              ease: 'Power2',
+              onComplete: () => {
+                this.removeExecutionText(executionText);
+              }
+            });
+          }
+        });
+      }
+    });
+    
+    // Limit the number of visible texts (keep only the last 3)
+    if (this.executionTexts.length > 3) {
+      const oldestText = this.executionTexts.shift();
+      if (oldestText) {
+        this.tweens.add({
+          targets: oldestText,
+          alpha: 0,
+          duration: 200,
+          onComplete: () => {
+            oldestText.destroy();
+          }
+        });
+      }
+    }
+  }
+
+  private removeExecutionText(text: Phaser.GameObjects.Text) {
+    const index = this.executionTexts.indexOf(text);
+    if (index > -1) {
+      this.executionTexts.splice(index, 1);
+    }
+    
+    if (text.active) {
+      text.destroy();
+    }
+  }
+
+  private clearExecutionTexts() {
+    // Clear all execution texts with a fade out animation
+    this.executionTexts.forEach(text => {
+      if (text.active) {
+        this.tweens.add({
+          targets: text,
+          alpha: 0,
+          duration: 300,
+          onComplete: () => {
+            text.destroy();
+          }
+        });
+      }
+    });
+    
+    this.executionTexts = [];
   }
 } 

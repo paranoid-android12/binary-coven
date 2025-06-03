@@ -2,6 +2,7 @@ import { ExecutionContext, ExecutionResult, CodeWindow } from '../../types/game'
 import { BuiltInFunctionRegistry } from './BuiltInFunctions';
 import { GridSystem } from './GridSystem';
 import { useGameStore } from '../../stores/gameStore';
+import { EventBus } from '../EventBus';
 
 interface CodeExecutionState {
   isRunning: boolean;
@@ -244,6 +245,22 @@ export class CodeExecutor {
   private async executeLine(line: ParsedLine, allLines: ParsedLine[], lineIndex: number, scope: Record<string, any>): Promise<ExecutionResult> {
     const content = line.content.trim();
 
+    // Update execution state and emit current line event
+    this.executionState.currentLine = line.lineNumber;
+    
+    // Get current function name from call stack
+    const currentFunction = this.executionState.callStack.length > 0 
+      ? this.executionState.callStack[this.executionState.callStack.length - 1].functionName
+      : 'main';
+    
+    // Emit execution state event for UI to display
+    EventBus.emit('code-execution-line', {
+      line: content,
+      lineNumber: line.lineNumber,
+      functionName: currentFunction,
+      entityId: this.context.entity.id
+    });
+
     // Handle function definitions (skip them as they're already registered)
     if (content.startsWith('def ')) {
       return { success: true, message: 'Function definition processed' };
@@ -343,6 +360,13 @@ export class CodeExecutor {
 
       const [, functionName, argsString] = match;
       const args = argsString ? this.parseArguments(argsString, scope) : [];
+
+      // Emit function call event for UI
+      EventBus.emit('code-execution-function-call', {
+        functionName,
+        args,
+        entityId: this.context.entity.id
+      });
 
       const result = await this.executeFunction(functionName, args);
       
