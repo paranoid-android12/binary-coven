@@ -60,6 +60,7 @@ export interface InventoryItem {
   type: string;
   quantity: number;
   icon?: string;
+  description?: string;
   properties?: Record<string, any>;
 }
 
@@ -173,6 +174,7 @@ export interface GridTypeDefinition {
   type: string;
   name: string;
   description: string;
+  category?: string;
   defaultProperties: Record<string, any>;
   defaultState: Record<string, any>;
   functions: Omit<GridFunction, 'execute'>[];
@@ -212,6 +214,24 @@ export enum DynamoState {
 }
 
 export enum WalletState {
+  IDLE = 'idle',
+  STORING = 'storing'
+}
+
+// Farming State Enums
+export enum FarmlandState {
+  IDLE = 'idle',
+  PLANTING = 'planting',
+  GROWING = 'growing',
+  READY = 'ready'
+}
+
+export enum FoodState {
+  IDLE = 'idle',
+  EATING = 'eating'
+}
+
+export enum SiloState {
   IDLE = 'idle',
   STORING = 'storing'
 } 

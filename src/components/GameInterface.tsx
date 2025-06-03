@@ -163,6 +163,35 @@ export const GameInterface: React.FC = () => {
 
   const activeEntity = entities.get(activeEntityId);
 
+  // New state for function guide
+  const [showFunctionGuide, setShowFunctionGuide] = useState(false);
+  const [showUpgrades, setShowUpgrades] = useState(false);
+  const [errorMessages, setErrorMessages] = useState<Array<{id: string, message: string, timestamp: number}>>([]);
+
+  // Handle error messages
+  useEffect(() => {
+    const handleExecutionError = (error: string) => {
+      const newError = {
+        id: Date.now().toString(),
+        message: error,
+        timestamp: Date.now()
+      };
+      
+      setErrorMessages(prev => [...prev, newError]);
+      
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        setErrorMessages(prev => prev.filter(err => err.id !== newError.id));
+      }, 5000);
+    };
+
+    EventBus.on('show-execution-error', handleExecutionError);
+    
+    return () => {
+      EventBus.removeListener('show-execution-error');
+    };
+  }, []);
+
   return (
     <div style={{ 
       width: '100vw', 
@@ -235,16 +264,12 @@ export const GameInterface: React.FC = () => {
                 <h4 style={{ margin: '0 0 12px 0', color: '#007acc' }}>Resources</h4>
                 <div style={{ fontSize: '14px', lineHeight: '1.6' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span>🌾 Wheat:</span>
+                    <span>{globalResources.wheat || 0}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                     <span>⚡ Energy:</span>
-                    <span>{activeEntity?.stats.energy || 0}/{activeEntity?.stats.maxEnergy || 0}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <span>₿ Bitcoin:</span>
-                    <span>{globalResources.bitcoin || 0}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <span>💰 Currency:</span>
-                    <span>{globalResources.currency || 0}</span>
+                    <span>{globalResources.energy || 0}</span>
                   </div>
                   {isPaused && (
                     <div style={{ color: '#f5a623', textAlign: 'center', marginTop: '8px' }}>
@@ -396,25 +421,25 @@ export const GameInterface: React.FC = () => {
 
               {/* Grid Functions */}
               <div style={{ marginBottom: '20px' }}>
-                <h4 style={{ margin: '0 0 8px 0', color: '#007acc' }}>Grid Functions</h4>
+                <h4 style={{ margin: '0 0 8px 0', color: '#007acc' }}>Farm Functions</h4>
                 <div style={{ fontSize: '12px' }}>
                   <div style={{ marginBottom: '8px' }}>
-                    <strong>Mining Terminal:</strong>
+                    <strong>Farmland:</strong>
                     <div style={{ marginLeft: '8px', color: '#cccccc' }}>
-                      <div>mine_initiate() - Start mining</div>
-                      <div>collect() - Collect bitcoins</div>
+                      <div>plant(crop_type) - Plant crops</div>
+                      <div>harvest() - Harvest grown crops</div>
                     </div>
                   </div>
                   <div style={{ marginBottom: '8px' }}>
-                    <strong>Dynamo:</strong>
+                    <strong>Food Station:</strong>
                     <div style={{ marginLeft: '8px', color: '#cccccc' }}>
-                      <div>crank() - Generate energy</div>
+                      <div>eat() - Restore energy</div>
                     </div>
                   </div>
                   <div style={{ marginBottom: '8px' }}>
-                    <strong>Wallet:</strong>
+                    <strong>Silo:</strong>
                     <div style={{ marginLeft: '8px', color: '#cccccc' }}>
-                      <div>store(amount) - Store bitcoins</div>
+                      <div>store(item_type, amount) - Store crops</div>
                     </div>
                   </div>
                 </div>
@@ -433,6 +458,302 @@ export const GameInterface: React.FC = () => {
         position={modalState.position}
         onPositionChange={handleModalPositionChange}
       />
+
+      {/* Fixed UI System */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        pointerEvents: 'none',
+        zIndex: 1000
+      }}>
+        {/* Top Left - Energy Bar */}
+        {activeEntity && (
+          <div style={{
+            position: 'absolute',
+            top: '20px',
+            left: '20px',
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            border: '2px solid #007acc',
+            borderRadius: '8px',
+            padding: '12px',
+            pointerEvents: 'auto',
+            minWidth: '200px'
+          }}>
+            <div style={{ color: '#ffffff', fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+              {activeEntity.name}
+            </div>
+            
+            {/* Energy Bar */}
+            <div style={{ marginBottom: '8px' }}>
+              <div style={{ color: '#cccccc', fontSize: '12px', marginBottom: '4px' }}>
+                Energy: {activeEntity.stats.energy}/{activeEntity.stats.maxEnergy}
+              </div>
+              <div style={{
+                width: '100%',
+                height: '8px',
+                backgroundColor: '#444444',
+                borderRadius: '4px',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  width: `${(activeEntity.stats.energy / activeEntity.stats.maxEnergy) * 100}%`,
+                  height: '100%',
+                  backgroundColor: activeEntity.stats.energy > 20 ? '#00ff00' : '#ff4444',
+                  transition: 'width 0.3s ease'
+                }} />
+              </div>
+            </div>
+
+            {/* Inventory Quick View */}
+            <div style={{ color: '#cccccc', fontSize: '12px' }}>
+              Inventory: {activeEntity.inventory.items.length}/{activeEntity.inventory.capacity}
+            </div>
+          </div>
+        )}
+
+        {/* Top Right - Resources & Controls */}
+        <div style={{
+          position: 'absolute',
+          top: '20px',
+          right: '20px',
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          border: '2px solid #007acc',
+          borderRadius: '8px',
+          padding: '12px',
+          pointerEvents: 'auto',
+          minWidth: '180px'
+        }}>
+          {/* Global Resources */}
+          <div style={{ marginBottom: '12px' }}>
+            <div style={{ color: '#ffffff', fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+              Resources
+            </div>
+            <div style={{ fontSize: '12px', color: '#cccccc' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <span>🌾 Wheat:</span>
+                <span>{globalResources.wheat || 0}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Controls */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <button
+              onClick={handleRunCode}
+              style={{
+                backgroundColor: isCodeRunning ? '#e81123' : '#16c60c',
+                color: 'white',
+                border: 'none',
+                padding: '6px 12px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px',
+                fontWeight: 'bold'
+              }}
+            >
+              {isCodeRunning ? '⏹ Stop' : '▶ Run'}
+            </button>
+            
+            <button
+              onClick={() => setShowFunctionGuide(!showFunctionGuide)}
+              style={{
+                backgroundColor: '#007acc',
+                color: 'white',
+                border: 'none',
+                padding: '6px 12px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px'
+              }}
+            >
+              📚 Guide
+            </button>
+
+            <button
+              onClick={() => setShowUpgrades(!showUpgrades)}
+              style={{
+                backgroundColor: '#f5a623',
+                color: 'white',
+                border: 'none',
+                padding: '6px 12px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px'
+              }}
+            >
+              ⬆️ Upgrades
+            </button>
+          </div>
+        </div>
+
+        {/* Bottom Left - Error Messages */}
+        <div style={{
+          position: 'absolute',
+          bottom: '20px',
+          left: '20px',
+          pointerEvents: 'auto',
+          maxWidth: '400px'
+        }}>
+          {errorMessages.map(error => (
+            <div
+              key={error.id}
+              style={{
+                backgroundColor: 'rgba(200, 50, 50, 0.95)',
+                border: '2px solid #ff4444',
+                borderRadius: '8px',
+                padding: '12px',
+                marginBottom: '8px',
+                color: '#ffffff',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                animation: 'slideInLeft 0.3s ease-out'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '16px' }}>❌</span>
+                <span>Execution Error:</span>
+              </div>
+              <div style={{ marginTop: '4px', fontWeight: 'normal', fontSize: '12px' }}>
+                {error.message}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Function Guide Dropdown */}
+      {showFunctionGuide && (
+        <div style={{
+          position: 'fixed',
+          top: '80px',
+          right: '20px',
+          backgroundColor: 'rgba(0, 0, 0, 0.95)',
+          border: '2px solid #007acc',
+          borderRadius: '8px',
+          padding: '16px',
+          zIndex: 1001,
+          maxWidth: '350px',
+          maxHeight: '500px',
+          overflowY: 'auto'
+        }}>
+          <h4 style={{ margin: '0 0 12px 0', color: '#007acc' }}>Function Guide</h4>
+          
+          {/* Farm Functions */}
+          <div style={{ marginBottom: '16px' }}>
+            <h5 style={{ margin: '0 0 8px 0', color: '#f5a623' }}>Farm Functions</h5>
+            <div style={{ fontSize: '12px', color: '#cccccc', lineHeight: '1.4' }}>
+              <div style={{ marginBottom: '6px' }}>
+                <strong>Farmland:</strong> plant(crop_type), harvest()
+              </div>
+              <div style={{ marginBottom: '6px' }}>
+                <strong>Food Station:</strong> eat()
+              </div>
+              <div style={{ marginBottom: '6px' }}>
+                <strong>Silo:</strong> store(item_type, amount)
+              </div>
+            </div>
+          </div>
+
+          {/* Movement Functions */}
+          <div style={{ marginBottom: '16px' }}>
+            <h5 style={{ margin: '0 0 8px 0', color: '#f5a623' }}>Movement</h5>
+            <div style={{ fontSize: '12px', color: '#cccccc', lineHeight: '1.4' }}>
+              {BuiltInFunctionRegistry.getFunctionsByCategory('movement').map(func => (
+                <div key={func.name} style={{ marginBottom: '4px' }}>
+                  <code>{func.name}()</code> - {func.description}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={() => setShowFunctionGuide(false)}
+            style={{
+              backgroundColor: '#666666',
+              color: 'white',
+              border: 'none',
+              padding: '6px 12px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '12px',
+              marginTop: '8px'
+            }}
+          >
+            Close
+          </button>
+        </div>
+      )}
+
+      {/* Upgrades Modal */}
+      {showUpgrades && (
+        <div style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          backgroundColor: 'rgba(0, 0, 0, 0.95)',
+          border: '2px solid #f5a623',
+          borderRadius: '8px',
+          padding: '20px',
+          zIndex: 1001,
+          minWidth: '400px'
+        }}>
+          <h4 style={{ margin: '0 0 16px 0', color: '#f5a623' }}>Upgrades</h4>
+          
+          <div style={{ color: '#cccccc', fontSize: '14px', marginBottom: '16px' }}>
+            <p>Use stored crops to upgrade your capabilities!</p>
+            <p style={{ fontSize: '12px', fontStyle: 'italic' }}>
+              Available Wheat: {globalResources.wheat || 0}
+            </p>
+          </div>
+
+          <div style={{ marginBottom: '16px' }}>
+            <div style={{
+              padding: '12px',
+              border: '1px solid #666666',
+              borderRadius: '4px',
+              marginBottom: '8px'
+            }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Energy Capacity +20</div>
+              <div style={{ fontSize: '12px', color: '#cccccc', marginBottom: '8px' }}>
+                Cost: 10 Wheat
+              </div>
+              <button
+                disabled={(globalResources.wheat || 0) < 10}
+                style={{
+                  backgroundColor: (globalResources.wheat || 0) >= 10 ? '#16c60c' : '#666666',
+                  color: 'white',
+                  border: 'none',
+                  padding: '6px 12px',
+                  borderRadius: '4px',
+                  cursor: (globalResources.wheat || 0) >= 10 ? 'pointer' : 'not-allowed',
+                  fontSize: '12px'
+                }}
+              >
+                Upgrade
+              </button>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setShowUpgrades(false)}
+            style={{
+              backgroundColor: '#666666',
+              color: 'white',
+              border: 'none',
+              padding: '8px 16px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '12px'
+            }}
+          >
+            Close
+          </button>
+        </div>
+      )}
     </div>
   );
 };

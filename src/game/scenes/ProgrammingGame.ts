@@ -1,6 +1,6 @@
 import { Scene } from 'phaser';
 import { useGameStore } from '../../stores/gameStore';
-import { GridSystem } from '../systems/GridSystem';
+import { GridSystem, initializeDefaultGridTypes } from '../systems/GridSystem';
 import { CodeExecutor } from '../systems/CodeExecutor';
 import { BuiltInFunctionRegistry } from '../systems/BuiltInFunctions';
 import { Entity, GridTile, Position } from '../../types/game';
@@ -219,6 +219,9 @@ export class ProgrammingGame extends Scene {
     this.gridSystem = new GridSystem();
     this.taskManager = TaskManager.getInstance();
     this.movementManager = new MovementManager(this, this.GRID_SIZE);
+    
+    // Initialize farming grid types
+    initializeDefaultGridTypes();
   }
 
   preload() {
@@ -294,22 +297,22 @@ export class ProgrammingGame extends Scene {
     graphics.generateTexture('qubit', this.GRID_SIZE - 4, this.GRID_SIZE - 4);
     graphics.clear();
     
-    // Mining Terminal - Yellow square
-    graphics.fillStyle(0xf5a623);
+    // Farmland - Brown square
+    graphics.fillStyle(0x8B4513);
     graphics.fillRect(0, 0, this.GRID_SIZE - 4, this.GRID_SIZE - 4);
-    graphics.generateTexture('mining_terminal', this.GRID_SIZE - 4, this.GRID_SIZE - 4);
+    graphics.generateTexture('farmland', this.GRID_SIZE - 4, this.GRID_SIZE - 4);
     graphics.clear();
     
-    // Dynamo - Green square
-    graphics.fillStyle(0x7ed321);
+    // Food Station - Orange square
+    graphics.fillStyle(0xFF6600);
     graphics.fillRect(0, 0, this.GRID_SIZE - 4, this.GRID_SIZE - 4);
-    graphics.generateTexture('dynamo', this.GRID_SIZE - 4, this.GRID_SIZE - 4);
+    graphics.generateTexture('food', this.GRID_SIZE - 4, this.GRID_SIZE - 4);
     graphics.clear();
     
-    // Wallet - Purple square
-    graphics.fillStyle(0x9013fe);
+    // Silo - Gray square
+    graphics.fillStyle(0x808080);
     graphics.fillRect(0, 0, this.GRID_SIZE - 4, this.GRID_SIZE - 4);
-    graphics.generateTexture('wallet', this.GRID_SIZE - 4, this.GRID_SIZE - 4);
+    graphics.generateTexture('silo', this.GRID_SIZE - 4, this.GRID_SIZE - 4);
     graphics.clear();
     
     graphics.destroy();
@@ -347,51 +350,51 @@ export class ProgrammingGame extends Scene {
     const store = useGameStore.getState();
     
     // Add some sample grids with proper initialization
-    const miningTerminalData = this.gridSystem.initializeGrid('mining_terminal', '');
-    const miningTerminalId = store.addGrid({
-      type: 'mining_terminal',
+    const farmlandData = this.gridSystem.initializeGrid('farmland', '');
+    const farmlandId = store.addGrid({
+      type: 'farmland',
       position: { x: 8, y: 6 },
-      name: 'Mining Terminal #1',
-      description: 'A bitcoin mining terminal',
+      name: 'Farmland Plot #1',
+      description: 'A fertile plot of land for growing crops',
       properties: {},
       isActive: true,
-      functions: miningTerminalData.functions || [],
-      state: miningTerminalData.state || {},
-      taskState: miningTerminalData.taskState || {
+      functions: farmlandData.functions || [],
+      state: farmlandData.state || {},
+      taskState: farmlandData.taskState || {
         isBlocked: false,
         currentTask: undefined,
         progress: undefined
       }
     });
     
-    const dynamoData = this.gridSystem.initializeGrid('dynamo', '');
-    const dynamoId = store.addGrid({
-      type: 'dynamo',
+    const foodData = this.gridSystem.initializeGrid('food', '');
+    const foodId = store.addGrid({
+      type: 'food',
       position: { x: 12, y: 6 },
-      name: 'Power Dynamo',
-      description: 'Manual energy generator',
+      name: 'Food Station',
+      description: 'A station for eating and restoring energy',
       properties: {},
       isActive: true,
-      functions: dynamoData.functions || [],
-      state: dynamoData.state || {},
-      taskState: dynamoData.taskState || {
+      functions: foodData.functions || [],
+      state: foodData.state || {},
+      taskState: foodData.taskState || {
         isBlocked: false,
         currentTask: undefined,
         progress: undefined
       }
     });
     
-    const walletData = this.gridSystem.initializeGrid('wallet', '');
-    const walletId = store.addGrid({
-      type: 'wallet',
+    const siloData = this.gridSystem.initializeGrid('silo', '');
+    const siloId = store.addGrid({
+      type: 'silo',
       position: { x: 16, y: 6 },
-      name: 'Storage Wallet',
-      description: 'Secure bitcoin storage',
+      name: 'Storage Silo',
+      description: 'Secure storage for crops and farm items',
       properties: {},
       isActive: true,
-      functions: walletData.functions || [],
-      state: walletData.state || {},
-      taskState: walletData.taskState || {
+      functions: siloData.functions || [],
+      state: siloData.state || {},
+      taskState: siloData.taskState || {
         isBlocked: false,
         currentTask: undefined,
         progress: undefined
@@ -773,9 +776,9 @@ export class ProgrammingGame extends Scene {
     }
     
     // Update sprite based on grid state
-    if (grid.state.isMining || grid.state.isCranking || grid.taskState.isBlocked) {
+    if (grid.state.isPlanted || grid.state.isEating || grid.taskState.isBlocked) {
       sprite.setTint(0xffff00); // Yellow tint for active state
-    } else if (grid.state.bitcoinReady) {
+    } else if (grid.state.cropReady || grid.state.isGrown) {
       sprite.setTint(0x00ff00); // Green tint for ready state
     } else {
       sprite.clearTint();
@@ -905,27 +908,8 @@ export class ProgrammingGame extends Scene {
   }
 
   private showExecutionError(message: string) {
-    // Create error message display
-    const errorText = this.add.text(
-      this.cameras.main.width / 2,
-      this.cameras.main.height / 2,
-      `Execution Error:\n${message}`,
-      {
-        fontSize: '16px',
-        color: '#ff0000',
-        backgroundColor: '#000000',
-        padding: { x: 20, y: 10 },
-        align: 'center'
-      }
-    );
-    
-    errorText.setOrigin(0.5);
-    errorText.setScrollFactor(0); // Keep fixed on screen
-    
-    // Auto-hide after 3 seconds
-    this.time.delayedCall(3000, () => {
-      errorText.destroy();
-    });
+    // Emit error event for the UI to handle
+    EventBus.emit('show-execution-error', message);
   }
 
   // Manual control for testing (can be removed later)

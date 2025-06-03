@@ -297,6 +297,154 @@ export const movementFunctions: BuiltInFunction[] = [
 // Interaction Functions
 export const interactionFunctions: BuiltInFunction[] = [
   {
+    name: 'plant',
+    description: 'Plant crops on the current farmland',
+    category: 'interaction',
+    parameters: [
+      {
+        name: 'crop_type',
+        type: 'string',
+        required: false,
+        description: 'Type of crop to plant (default: wheat)'
+      }
+    ],
+    execute: async (context: ExecutionContext, cropType?: string): Promise<ExecutionResult> => {
+      const { entity } = context;
+      const store = useGameStore.getState();
+      const grid = store.getGridAt(entity.position);
+
+      if (!grid) {
+        return {
+          success: false,
+          message: 'No grid found at current position'
+        };
+      }
+
+      if (grid.type !== 'farmland') {
+        return {
+          success: false,
+          message: 'Can only plant crops on farmland'
+        };
+      }
+
+      const result = await gridSystem.executeGridFunction(grid.id, 'plant', entity, [cropType || 'wheat']);
+      
+      // Sync context entity with updated game store after grid function
+      syncContextEntity(context);
+      
+      return result;
+    }
+  },
+  {
+    name: 'harvest',
+    description: 'Harvest crops from the current farmland',
+    category: 'interaction',
+    parameters: [],
+    execute: async (context: ExecutionContext): Promise<ExecutionResult> => {
+      const { entity } = context;
+      const store = useGameStore.getState();
+      const grid = store.getGridAt(entity.position);
+
+      if (!grid) {
+        return {
+          success: false,
+          message: 'No grid found at current position'
+        };
+      }
+
+      if (grid.type !== 'farmland') {
+        return {
+          success: false,
+          message: 'Can only harvest crops from farmland'
+        };
+      }
+
+      const result = await gridSystem.executeGridFunction(grid.id, 'harvest', entity);
+      
+      // Sync context entity with updated game store after grid function
+      syncContextEntity(context);
+      
+      return result;
+    }
+  },
+  {
+    name: 'eat',
+    description: 'Eat food to restore energy at the current food station',
+    category: 'interaction',
+    parameters: [],
+    execute: async (context: ExecutionContext): Promise<ExecutionResult> => {
+      const { entity } = context;
+      const store = useGameStore.getState();
+      const grid = store.getGridAt(entity.position);
+
+      if (!grid) {
+        return {
+          success: false,
+          message: 'No grid found at current position'
+        };
+      }
+
+      if (grid.type !== 'food') {
+        return {
+          success: false,
+          message: 'Can only eat at food stations'
+        };
+      }
+
+      const result = await gridSystem.executeGridFunction(grid.id, 'eat', entity);
+      
+      // Sync context entity with updated game store after grid function
+      syncContextEntity(context);
+      
+      return result;
+    }
+  },
+  {
+    name: 'store',
+    description: 'Store items from inventory to the current silo',
+    category: 'interaction',
+    parameters: [
+      {
+        name: 'item_type',
+        type: 'string',
+        required: true,
+        description: 'Type of item to store'
+      },
+      {
+        name: 'amount',
+        type: 'number',
+        required: false,
+        description: 'Amount to store (default: 1)'
+      }
+    ],
+    execute: async (context: ExecutionContext, itemType: string, amount?: number): Promise<ExecutionResult> => {
+      const { entity } = context;
+      const store = useGameStore.getState();
+      const grid = store.getGridAt(entity.position);
+
+      if (!grid) {
+        return {
+          success: false,
+          message: 'No grid found at current position'
+        };
+      }
+
+      if (grid.type !== 'silo') {
+        return {
+          success: false,
+          message: 'Can only store items at storage silos'
+        };
+      }
+
+      const result = await gridSystem.executeGridFunction(grid.id, 'store', entity, [itemType, amount || 1]);
+      
+      // Sync context entity with updated game store after grid function
+      syncContextEntity(context);
+      
+      return result;
+    }
+  },
+  {
     name: 'get_current_grid',
     description: 'Get information about the grid the entity is currently standing on',
     category: 'interaction',

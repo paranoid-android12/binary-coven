@@ -65,9 +65,8 @@ const createInitialState = (): GameState => ({
   codeWindows: new Map(),
   mainWindowId: '',
   globalResources: {
-    bitcoin: 0,
-    energy: 100,
-    currency: 0
+    wheat: 0,
+    energy: 100
   },
   executionContext: undefined,
   selectedCodeWindow: undefined,
@@ -378,8 +377,7 @@ export const useGameStore = create<GameStore>()((set, get) => ({
       isPaused: false,
       gridSize: { width: 24, height: 16 },
       globalResources: {
-        bitcoin: 0,
-        currency: 0,
+        wheat: 0,
         energy: 0
       }
     });
