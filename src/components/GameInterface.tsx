@@ -6,6 +6,7 @@ import { ProgrammingGame } from '../game/scenes/ProgrammingGame';
 import { BuiltInFunctionRegistry } from '../game/systems/BuiltInFunctions';
 import { EventBus } from '../game/EventBus';
 import { Entity, GridTile } from '../types/game';
+import { MapEditorUI } from './MapEditorUI';
 
 export const GameInterface: React.FC = () => {
   const phaserRef = useRef<IRefPhaserGame | null>(null);
@@ -26,6 +27,17 @@ export const GameInterface: React.FC = () => {
   
   // Camera lock state
   const [isCameraLocked, setIsCameraLocked] = useState(true);
+  
+  // Map editor state
+  const [mapEditorState, setMapEditorState] = useState({
+    isActive: false,
+    tilesetInfo: {
+      key: 'Ground_Tileset',
+      tileSize: 16,
+      columns: 16,
+      rows: 16
+    }
+  });
   
   // Game store state
   const {
@@ -205,6 +217,28 @@ export const GameInterface: React.FC = () => {
         {/* Game Area */}
         <div style={{ flex: 1, position: 'relative' }}>
           <PhaserGame ref={phaserRef} currentActiveScene={currentActiveScene} />
+          
+          {/* Map Editor UI Overlay */}
+          <MapEditorUI
+            tilesetInfo={mapEditorState.tilesetInfo}
+            onTileSelect={(tile) => {
+              EventBus.emit('tile-selected', tile);
+            }}
+            onSave={() => {
+              EventBus.emit('save-map');
+            }}
+            onLoad={() => {
+              EventBus.emit('load-map');
+            }}
+            onToggleEditor={() => {
+              setMapEditorState(prev => ({
+                ...prev,
+                isActive: !prev.isActive
+              }));
+              EventBus.emit('toggle-map-editor');
+            }}
+            isActive={mapEditorState.isActive}
+          />
         </div>
 
         {/* Collapsible Side Panel */}

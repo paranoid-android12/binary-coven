@@ -6,6 +6,7 @@ import { BuiltInFunctionRegistry } from '../systems/BuiltInFunctions';
 import { Entity, GridTile, Position } from '../../types/game';
 import { EventBus } from '../EventBus';
 import TaskManager from '../systems/TaskManager';
+import { MapEditor } from '../systems/MapEditor';
 
 // Movement Manager for smooth entity transitions
 export class MovementManager {
@@ -180,6 +181,8 @@ export class ProgrammingGame extends Scene {
   private codeExecutor?: CodeExecutor;
   private taskManager: TaskManager;
   private movementManager: MovementManager;
+  private mapEditor: MapEditor;
+  private mapEditorUI: React.ComponentType<any> | null = null;
   
   // Visual elements
   private gridGraphics!: Phaser.GameObjects.Graphics;
@@ -219,6 +222,7 @@ export class ProgrammingGame extends Scene {
     this.gridSystem = new GridSystem();
     this.taskManager = TaskManager.getInstance();
     this.movementManager = new MovementManager(this, this.GRID_SIZE);
+    this.mapEditor = new MapEditor(this);
     
     // Initialize farming grid types
     initializeDefaultGridTypes();
@@ -244,6 +248,12 @@ export class ProgrammingGame extends Scene {
     this.load.spritesheet('qubit_idle', 'Idle.png', {
       frameWidth: 32,  // Same dimensions as walk sprite
       frameHeight: 32
+    });
+
+    // Load the Ground_Tileset for map editor (16x16 tiles in a spritesheet)
+    this.load.spritesheet('Ground_Tileset', 'Ground_Tileset.png', {
+      frameWidth: 16,
+      frameHeight: 16
     });
     
     // Create simple colored rectangles as sprites for prototyping (other entities)
@@ -528,6 +538,56 @@ export class ProgrammingGame extends Scene {
       delay: 100,
       callback: () => this.updateVisuals(),
       loop: true
+    });
+
+    // Handle map editor events
+    EventBus.on('tile-selected', (tile: any) => {
+      if (this.mapEditor) {
+        this.mapEditor.selectTile(tile);
+      }
+    });
+
+    EventBus.on('save-map', () => {
+      if (this.mapEditor) {
+        this.mapEditor.saveMap();
+      }
+    });
+
+    EventBus.on('load-map', () => {
+      if (this.mapEditor) {
+        this.mapEditor.loadMap();
+      }
+    });
+
+    EventBus.on('toggle-map-editor', () => {
+      if (this.mapEditor) {
+        if (this.mapEditor.isActive) {
+          this.mapEditor.deactivate();
+        } else {
+          this.mapEditor.activate();
+        }
+      }
+    });
+
+    // Handle debug requests from map editor UI
+    EventBus.on('map-editor-debug-request', () => {
+      if (this.mapEditor) {
+        console.log('=== MAP EDITOR DEBUG (Scene) ===');
+        console.log('Map editor exists:', !!this.mapEditor);
+        console.log('Map editor active:', this.mapEditor?.isActive);
+        console.log('Ground_Tileset loaded:', this.textures.exists('Ground_Tileset'));
+        
+        if (this.textures.exists('Ground_Tileset')) {
+          const texture = this.textures.get('Ground_Tileset');
+          console.log('Ground_Tileset dimensions:', texture.source[0].width, 'x', texture.source[0].height);
+          console.log('Ground_Tileset frames:', texture.frameTotal);
+        }
+        
+        if (this.mapEditor.getDebugInfo) {
+          this.mapEditor.logDebugInfo();
+        }
+        console.log('================================');
+      }
     });
   }
 

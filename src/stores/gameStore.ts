@@ -421,7 +421,7 @@ export const useGameStore = create<GameStore>()((set, get) => ({
       type: 'qubit',
       position: { x: 12, y: 8 },
       stats: {
-        walkingSpeed: 1.0,
+        walkingSpeed: 4.0,
         energy: 100,
         maxEnergy: 100
       },
