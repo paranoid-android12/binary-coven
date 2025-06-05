@@ -210,7 +210,7 @@ export class ProgrammingGame extends Scene {
   private readonly GRID_COLOR = 0x444444;
   private readonly GRID_ALPHA = 0.3;
   private readonly QUBIT_SCALE_FACTOR = 1.5; // Qubit is 1.5x larger than grid cells
-  private readonly CAMERA_ZOOM_FACTOR = 1.5; // Camera zoom level (lower = more zoomed out)
+  private readonly CAMERA_ZOOM_FACTOR = 1; // Camera zoom level (lower = more zoomed out)
   
   // Animation tracking
   private lastQubitPosition: Position | null = null;
@@ -273,6 +273,9 @@ export class ProgrammingGame extends Scene {
     // Create visual grid
     this.createVisualGrid();
     
+    // Load and render ground tiles from MapEditor
+    this.mapEditor.loadMap();
+    
     // Create some sample grids
     this.createSampleWorld();
     
@@ -330,10 +333,25 @@ export class ProgrammingGame extends Scene {
 
   private createVisualGrid() {
     this.gridGraphics = this.add.graphics();
-    this.gridGraphics.lineStyle(1, this.GRID_COLOR, this.GRID_ALPHA);
     
     const gameState = useGameStore.getState();
     const { width, height } = gameState.gridSize;
+    
+    // Draw background for normal grid cells using RGB(110, 189, 60)
+    this.gridGraphics.fillStyle(0x6ebd3c); // RGB(110, 189, 60) converted to hex
+    for (let x = 0; x < width; x++) {
+      for (let y = 0; y < height; y++) {
+        this.gridGraphics.fillRect(
+          x * this.GRID_SIZE,
+          y * this.GRID_SIZE,
+          this.GRID_SIZE,
+          this.GRID_SIZE
+        );
+      }
+    }
+    
+    // Draw grid lines
+    this.gridGraphics.lineStyle(1, this.GRID_COLOR, this.GRID_ALPHA);
     
     // Draw vertical lines
     for (let x = 0; x <= width; x++) {
@@ -354,6 +372,9 @@ export class ProgrammingGame extends Scene {
         y * this.GRID_SIZE
       );
     }
+    
+    // Set background grid color to lowest depth
+    this.gridGraphics.setDepth(-10);
   }
 
   private createSampleWorld() {
@@ -687,6 +708,9 @@ export class ProgrammingGame extends Scene {
       
       sprite.setInteractive();
       
+      // Set depth for entity sprites (qubit on top)
+      sprite.setDepth(2);
+      
       // Add click handler for entity
       sprite.on('pointerdown', () => {
         console.log('Entity clicked:', entity.name);
@@ -826,6 +850,9 @@ export class ProgrammingGame extends Scene {
       sprite.setDisplaySize(this.GRID_SIZE - 4, this.GRID_SIZE - 4);
       sprite.setInteractive();
       
+      // Set depth for unique grid sprites (above ground tiles)
+      sprite.setDepth(1);
+      
       // Add click handler for grid
       sprite.on('pointerdown', () => {
         console.log('Grid clicked:', grid.name);
@@ -856,6 +883,7 @@ export class ProgrammingGame extends Scene {
       
       if (!progressBar) {
         progressBar = this.add.graphics();
+        progressBar.setDepth(3); // Progress bars on top of everything
         this.progressBars.set(id, progressBar);
       }
 
