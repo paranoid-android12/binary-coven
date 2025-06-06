@@ -58,7 +58,7 @@ interface GameStore extends GameState {
 }
 
 const createInitialState = (): GameState => ({
-  gridSize: { width: 24, height: 16 },
+  gridSize: { width: 52, height: 32 },
   grids: new Map(),
   entities: new Map(),
   activeEntityId: '',
@@ -375,7 +375,7 @@ export const useGameStore = create<GameStore>()((set, get) => ({
       activeEntityId: '',
       executionContext: undefined,
       isPaused: false,
-      gridSize: { width: 24, height: 16 },
+      gridSize: { width: 72, height: 48 },
       globalResources: {
         wheat: 0,
         energy: 0

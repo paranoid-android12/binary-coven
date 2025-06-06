@@ -39,6 +39,12 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
   const [status, setStatus] = useState<string>('Ready');
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
+  
+  // Draggable functionality
+  const [position, setPosition] = useState({ x: window.innerWidth - 420, y: 10 });
+  const isDragging = useRef(false);
+  const dragOffset = useRef({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Constants
   const TILE_SIZE = 16; // Each tile in the tileset is 16x16 pixels
@@ -75,6 +81,47 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
       loadTilesetImage();
     }
   }, [isActive]);
+  
+  // Dragging event handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).classList.contains('map-editor-header')) {
+      isDragging.current = true;
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (rect) {
+        dragOffset.current = {
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top
+        };
+      }
+    }
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDragging.current && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const newX = e.clientX - dragOffset.current.x;
+      const newY = e.clientY - dragOffset.current.y;
+      
+      setPosition({
+        x: Math.max(0, Math.min(newX, window.innerWidth - rect.width)),
+        y: Math.max(0, Math.min(newY, window.innerHeight - rect.height))
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, []);
 
   const loadTilesetImage = () => {
     const img = new Image();
@@ -290,25 +337,33 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
   }
 
   return (
-    <div style={{
-      position: 'absolute',
-      top: '10px',
-      right: '150px',
-      backgroundColor: 'rgba(0, 0, 0, 0.9)',
-      padding: '15px',
-      borderRadius: '8px',
-      color: 'white',
-      maxWidth: '400px',
-      border: '2px solid #007acc',
-      zIndex: 1000
-    }}>
-      {/* Header */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        marginBottom: '10px'
+    <div 
+      ref={containerRef}
+      onMouseDown={handleMouseDown}
+      style={{
+        position: 'absolute',
+        top: `${position.y}px`,
+        left: `${position.x}px`,
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        padding: '15px',
+        borderRadius: '8px',
+        color: 'white',
+        width: '400px',
+        minWidth: '400px',
+        border: '2px solid #007acc',
+        zIndex: 1000,
+        cursor: 'move'
       }}>
+      {/* Header */}
+      <div 
+        className="map-editor-header"
+        style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          marginBottom: '10px',
+          cursor: 'move'
+        }}>
         <h3 style={{ margin: 0, color: '#007acc' }}>Map Editor</h3>
         <button
           onClick={onToggleEditor}

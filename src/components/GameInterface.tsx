@@ -8,6 +8,53 @@ import { EventBus } from '../game/EventBus';
 import { Entity, GridTile } from '../types/game';
 import { MapEditorUI } from './MapEditorUI';
 
+// Custom hook for draggable functionality
+const useDraggable = (initialPosition: { x: number; y: number }) => {
+  const [position, setPosition] = useState(initialPosition);
+  const isDragging = useRef(false);
+  const dragOffset = useRef({ x: 0, y: 0 });
+  const elementRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    isDragging.current = true;
+    const rect = elementRef.current?.getBoundingClientRect();
+    if (rect) {
+      dragOffset.current = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    }
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDragging.current) {
+      const newX = e.clientX - dragOffset.current.x;
+      const newY = e.clientY - dragOffset.current.y;
+      
+      setPosition({
+        x: Math.max(0, Math.min(newX, window.innerWidth - 250)),
+        y: Math.max(0, Math.min(newY, window.innerHeight - 200))
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, []);
+
+  return { position, elementRef, handleMouseDown };
+};
+
 export const GameInterface: React.FC = () => {
   const phaserRef = useRef<IRefPhaserGame | null>(null);
   
@@ -50,6 +97,10 @@ export const GameInterface: React.FC = () => {
   } = useGameStore();
 
   const [isCodeRunning, setIsCodeRunning] = useState(false);
+  
+  // Draggable UI elements
+  const energyPanel = useDraggable({ x: 20, y: 20 });
+  const resourcesPanel = useDraggable({ x: window.innerWidth - 220, y: 20 });
 
   // Handle entity/grid clicks from Phaser
   useEffect(() => {
@@ -505,17 +556,21 @@ export const GameInterface: React.FC = () => {
       }}>
         {/* Top Left - Energy Bar */}
         {activeEntity && (
-          <div style={{
-            position: 'absolute',
-            top: '20px',
-            left: '20px',
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            border: '2px solid #007acc',
-            borderRadius: '8px',
-            padding: '12px',
-            pointerEvents: 'auto',
-            minWidth: '200px'
-          }}>
+          <div 
+            ref={energyPanel.elementRef}
+            onMouseDown={energyPanel.handleMouseDown}
+            style={{
+              position: 'absolute',
+              top: `${energyPanel.position.y}px`,
+              left: `${energyPanel.position.x}px`,
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              border: '2px solid #007acc',
+              borderRadius: '8px',
+              padding: '12px',
+              pointerEvents: 'auto',
+              minWidth: '200px',
+              cursor: 'move'
+            }}>
             <div style={{ color: '#ffffff', fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
               {activeEntity.name}
             </div>
@@ -549,17 +604,21 @@ export const GameInterface: React.FC = () => {
         )}
 
         {/* Top Right - Resources & Controls */}
-        <div style={{
-          position: 'absolute',
-          top: '20px',
-          right: '20px',
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          border: '2px solid #007acc',
-          borderRadius: '8px',
-          padding: '12px',
-          pointerEvents: 'auto',
-          minWidth: '180px'
-        }}>
+        <div 
+          ref={resourcesPanel.elementRef}
+          onMouseDown={resourcesPanel.handleMouseDown}
+          style={{
+            position: 'absolute',
+            top: `${resourcesPanel.position.y}px`,
+            left: `${resourcesPanel.position.x}px`,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            border: '2px solid #007acc',
+            borderRadius: '8px',
+            padding: '12px',
+            pointerEvents: 'auto',
+            minWidth: '180px',
+            cursor: 'move'
+          }}>
           {/* Global Resources */}
           <div style={{ marginBottom: '12px' }}>
             <div style={{ color: '#ffffff', fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>

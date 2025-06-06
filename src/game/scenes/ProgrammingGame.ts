@@ -210,7 +210,7 @@ export class ProgrammingGame extends Scene {
   private readonly GRID_COLOR = 0x444444;
   private readonly GRID_ALPHA = 0.3;
   private readonly QUBIT_SCALE_FACTOR = 1.5; // Qubit is 1.5x larger than grid cells
-  private readonly CAMERA_ZOOM_FACTOR = 1; // Camera zoom level (lower = more zoomed out)
+  private readonly CAMERA_ZOOM_FACTOR = 3; // Camera zoom level (lower = more zoomed out)
   
   // Animation tracking
   private lastQubitPosition: Position | null = null;
@@ -332,49 +332,45 @@ export class ProgrammingGame extends Scene {
   }
 
   private createVisualGrid() {
-    this.gridGraphics = this.add.graphics();
-    
     const gameState = useGameStore.getState();
     const { width, height } = gameState.gridSize;
     
-    // Draw background for normal grid cells using RGB(110, 189, 60)
-    this.gridGraphics.fillStyle(0x6ebd3c); // RGB(110, 189, 60) converted to hex
-    for (let x = 0; x < width; x++) {
-      for (let y = 0; y < height; y++) {
-        this.gridGraphics.fillRect(
-          x * this.GRID_SIZE,
-          y * this.GRID_SIZE,
-          this.GRID_SIZE,
-          this.GRID_SIZE
-        );
+    // Create solid color background layer using RGB(240, 162, 84)
+    const backgroundGraphics = this.add.graphics();
+    backgroundGraphics.fillStyle(0xF0A254); // RGB(240, 162, 84) converted to hex
+    backgroundGraphics.fillRect(0, 0, width * this.GRID_SIZE, height * this.GRID_SIZE);
+    backgroundGraphics.setDepth(-20); // Below everything else
+    
+    // Create background sprites for normal grid cells using sprite 13, 2 from Ground_Tileset
+    // Frame calculation: row * columns + column = 2 * 16 + 13 = 45
+    const defaultTileFrame = 4 * 16 + 13; // Sprite at position (13, 2)
+    
+    if (this.textures.exists('Ground_Tileset')) {
+      for (let x = 0; x < width; x++) {
+        for (let y = 0; y < height; y++) {
+          // Position sprites at exact integer coordinates
+          const worldX = Math.floor(x * this.GRID_SIZE);
+          const worldY = Math.floor(y * this.GRID_SIZE);
+          
+          const sprite = this.add.sprite(worldX, worldY, 'Ground_Tileset');
+          sprite.setFrame(63);
+          
+          // Set origin to top-left to eliminate gaps
+          sprite.setOrigin(0, 0);
+          
+          // Use setDisplaySize for exact pixel dimensions (no scaling issues)
+          sprite.setDisplaySize(this.GRID_SIZE, this.GRID_SIZE);
+          
+          // Set pixel-perfect rendering
+          sprite.texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+          
+          // Set to lowest depth (behind everything)
+          sprite.setDepth(-10);
+        }
       }
     }
     
-    // Draw grid lines
-    this.gridGraphics.lineStyle(1, this.GRID_COLOR, this.GRID_ALPHA);
-    
-    // Draw vertical lines
-    for (let x = 0; x <= width; x++) {
-      this.gridGraphics.lineBetween(
-        x * this.GRID_SIZE, 
-        0, 
-        x * this.GRID_SIZE, 
-        height * this.GRID_SIZE
-      );
-    }
-    
-    // Draw horizontal lines
-    for (let y = 0; y <= height; y++) {
-      this.gridGraphics.lineBetween(
-        0, 
-        y * this.GRID_SIZE, 
-        width * this.GRID_SIZE, 
-        y * this.GRID_SIZE
-      );
-    }
-    
-    // Set background grid color to lowest depth
-    this.gridGraphics.setDepth(-10);
+    // Grid lines removed for cleaner appearance
   }
 
   private createSampleWorld() {
@@ -467,6 +463,9 @@ export class ProgrammingGame extends Scene {
     // Set up smooth camera following
     this.setupCameraControls();
     
+    // Set up zoom controls
+    this.setupZoomControls();
+    
     // Start following the active entity if available
     this.lockCameraToQubit();
   }
@@ -522,6 +521,56 @@ export class ProgrammingGame extends Scene {
     this.input.keyboard!.on('keydown-D', () => {
       if (!isTypingInInput()) {
         this.unlockCamera();
+      }
+    });
+  }
+
+  private setupZoomControls() {
+    // Add wheel zoom functionality
+    this.input.on('wheel', (pointer: Phaser.Input.Pointer, gameObjects: any, deltaX: number, deltaY: number, deltaZ: number) => {
+      const camera = this.cameras.main;
+      const zoomSpeed = 0.2;
+      const minZoom = 0.3;
+      const maxZoom = 10;
+      
+      // Calculate new zoom based on wheel direction
+      let newZoom = camera.zoom;
+      if (deltaY > 0) {
+        newZoom = Math.max(minZoom, camera.zoom - zoomSpeed);
+      } else if (deltaY < 0) {
+        newZoom = Math.min(maxZoom, camera.zoom + zoomSpeed);
+      }
+      
+      // Apply smooth zoom
+      this.tweens.add({
+        targets: camera,
+        zoom: newZoom,
+        duration: 100,
+        ease: 'Power2'
+      });
+      
+      // Temporarily unlock camera from qubit during zoom
+      if (this.isLockedToQubit) {
+        const gameState = useGameStore.getState();
+        const activeEntity = gameState.entities.get(gameState.activeEntityId);
+        if (activeEntity && activeEntity.sprite) {
+          // Keep camera centered on qubit during zoom
+          camera.centerOn(activeEntity.sprite.x, activeEntity.sprite.y);
+        }
+      }
+    });
+    
+    // Add pinch zoom functionality for trackpads/touch devices
+    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      // Handle trackpad pinch gestures if supported
+      if (pointer.event && (pointer.event as any).scale) {
+        const camera = this.cameras.main;
+        const scale = (pointer.event as any).scale;
+        const minZoom = 0.3;
+        const maxZoom = 10;
+        
+        const newZoom = Phaser.Math.Clamp(scale, minZoom, maxZoom);
+        camera.setZoom(newZoom);
       }
     });
   }
