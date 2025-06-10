@@ -10,6 +10,8 @@ export interface GroundTileData {
   tilesetX: number;
   tilesetY: number;
   frame: number;
+  tilesetKey: string;
+  layer: number;
 }
 
 export class MapEditor {
@@ -35,11 +37,23 @@ export class MapEditor {
     this.state = {
       isActive: false,
       selectedTile: null,
-      tileset: {
-        key: 'Ground_Tileset',
-        tileSize: this.TILE_SIZE,
-        columns: this.TILESET_COLUMNS,
-        rows: this.TILESET_ROWS
+      activeTileset: 'Ground_Tileset',
+      selectedLayer: 1,
+      tilesets: {
+        'Ground_Tileset': {
+          key: 'Ground_Tileset',
+          name: 'Ground Tiles',
+          tileSize: this.TILE_SIZE,
+          columns: this.TILESET_COLUMNS,
+          rows: this.TILESET_ROWS
+        },
+        'Fence_Wood': {
+          key: 'Fence_Wood',
+          name: 'Fence Wood',
+          tileSize: this.TILE_SIZE,
+          columns: 16, // Assuming similar structure
+          rows: 16
+        }
       }
     };
 
@@ -52,6 +66,16 @@ export class MapEditor {
     EventBus.on('map-editor-tile-selected', (tileData: TileData) => {
       this.selectTile(tileData);
       this.debug('Tile selected:', tileData);
+    });
+
+    // Listen for tileset changes
+    EventBus.on('map-editor-tileset-changed', (tilesetKey: string) => {
+      this.setActiveTileset(tilesetKey);
+    });
+
+    // Listen for layer changes
+    EventBus.on('map-editor-layer-changed', (layer: number) => {
+      this.setSelectedLayer(layer);
     });
 
     // Listen for save/load requests
@@ -85,7 +109,9 @@ export class MapEditor {
     
     // Notify UI
     EventBus.emit('map-editor-activated', {
-      tileset: this.state.tileset
+      tilesets: this.state.tilesets,
+      activeTileset: this.state.activeTileset,
+      selectedLayer: this.state.selectedLayer
     });
   }
 
@@ -130,10 +156,11 @@ export class MapEditor {
       return;
     }
 
-    const tileId = `ground_${position.x}_${position.y}`;
+    const layer = this.state.selectedLayer;
+    const tileId = `ground_${position.x}_${position.y}_${layer}`;
     
-    // Remove existing ground tile if any
-    this.removeGroundTile(position);
+    // Remove existing ground tile on the same layer and position if any
+    this.removeGroundTileAtLayer(position, layer);
 
     // Create new ground tile data
     const groundTile: GroundTileData = {
@@ -141,7 +168,9 @@ export class MapEditor {
       position,
       tilesetX: this.selectedTile.spriteX,
       tilesetY: this.selectedTile.spriteY,
-      frame: this.selectedTile.frame
+      frame: this.selectedTile.frame,
+      tilesetKey: this.state.activeTileset,
+      layer: layer
     };
 
     // Store ground tile data
@@ -152,6 +181,8 @@ export class MapEditor {
 
     this.debug('Ground tile placed:', {
       position,
+      layer,
+      tileset: this.state.activeTileset,
       tilesetCoords: { x: this.selectedTile.spriteX, y: this.selectedTile.spriteY },
       frame: this.selectedTile.frame
     });
@@ -175,9 +206,27 @@ export class MapEditor {
     }
   }
 
+  private removeGroundTileAtLayer(position: Position, layer: number): void {
+    const tileId = `ground_${position.x}_${position.y}_${layer}`;
+    const existingTile = this.groundTiles.get(tileId);
+    
+    if (existingTile) {
+      // Remove sprite
+      const sprite = this.groundTileSprites.get(tileId);
+      if (sprite) {
+        sprite.destroy();
+        this.groundTileSprites.delete(tileId);
+      }
+      
+      // Remove data
+      this.groundTiles.delete(tileId);
+      this.debug('Ground tile removed at layer:', { position, layer });
+    }
+  }
+
   private createGroundTileSprite(groundTile: GroundTileData): void {
-    if (!this.scene.textures.exists('Ground_Tileset')) {
-      this.debug('ERROR: Ground_Tileset texture not found');
+    if (!this.scene.textures.exists(groundTile.tilesetKey)) {
+      this.debug('ERROR: Tileset texture not found:', groundTile.tilesetKey);
       return;
     }
 
@@ -185,7 +234,7 @@ export class MapEditor {
     const worldX = groundTile.position.x * this.GAME_GRID_SIZE + this.GAME_GRID_SIZE / 2;
     const worldY = groundTile.position.y * this.GAME_GRID_SIZE + this.GAME_GRID_SIZE / 2;
 
-    const sprite = this.scene.add.sprite(worldX, worldY, 'Ground_Tileset');
+    const sprite = this.scene.add.sprite(worldX, worldY, groundTile.tilesetKey);
     
     // Set the specific frame from the tileset
     sprite.setFrame(groundTile.frame);
@@ -197,8 +246,9 @@ export class MapEditor {
     // Set pixel-perfect rendering
     sprite.texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
     
-    // Make it non-interactive and behind other sprites
-    sprite.setDepth(-1);
+    // Set depth based on layer (higher layer = higher depth)
+    // Base depth of -5, then add layer number to ensure proper layering
+    sprite.setDepth(-5 + groundTile.layer);
     
     this.groundTileSprites.set(groundTile.id, sprite);
     
@@ -206,7 +256,10 @@ export class MapEditor {
       id: groundTile.id,
       worldPos: { x: worldX, y: worldY },
       scale,
-      frame: groundTile.frame
+      frame: groundTile.frame,
+      tileset: groundTile.tilesetKey,
+      layer: groundTile.layer,
+      depth: -5 + groundTile.layer
     });
   }
 
@@ -222,6 +275,19 @@ export class MapEditor {
   public selectTile(tileData: TileData): void {
     this.selectedTile = tileData;
     this.debug('Tile selected for painting:', tileData);
+  }
+
+  public setActiveTileset(tilesetKey: string): void {
+    if (this.state.tilesets[tilesetKey]) {
+      this.state.activeTileset = tilesetKey;
+      this.selectedTile = null; // Clear selection when switching tilesets
+      this.debug('Active tileset changed to:', tilesetKey);
+    }
+  }
+
+  public setSelectedLayer(layer: number): void {
+    this.state.selectedLayer = layer;
+    this.debug('Selected layer changed to:', layer);
   }
 
   public saveMap(): void {
@@ -273,10 +339,24 @@ export class MapEditor {
       // Clear existing ground tiles
       this.clearAllGroundTiles();
       
-      // Load ground tiles
+      // Load ground tiles with backward compatibility
       if (mapData.groundTiles) {
-        mapData.groundTiles.forEach((tileData: GroundTileData) => {
-          this.groundTiles.set(tileData.id, tileData);
+        mapData.groundTiles.forEach((tileData: any) => {
+          // Check if this is old format (missing layer and tilesetKey)
+          if (!tileData.layer || !tileData.tilesetKey) {
+            // Migrate old format to new format
+            const migratedTile: GroundTileData = {
+              ...tileData,
+              tilesetKey: tileData.tilesetKey || 'Ground_Tileset', // Default to Ground_Tileset
+              layer: tileData.layer || 1, // Default to layer 1
+              id: tileData.id.includes('_1') ? tileData.id : `${tileData.id}_1` // Add layer suffix if missing
+            };
+            this.groundTiles.set(migratedTile.id, migratedTile);
+            this.debug('Migrated old tile format:', { old: tileData, new: migratedTile });
+          } else {
+            // New format, use as is
+            this.groundTiles.set(tileData.id, tileData);
+          }
         });
       }
       

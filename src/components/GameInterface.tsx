@@ -78,12 +78,24 @@ export const GameInterface: React.FC = () => {
   // Map editor state
   const [mapEditorState, setMapEditorState] = useState({
     isActive: false,
-    tilesetInfo: {
-      key: 'Ground_Tileset',
-      tileSize: 16,
-      columns: 16,
-      rows: 16
-    }
+    tilesets: {
+      'Ground_Tileset': {
+        key: 'Ground_Tileset',
+        name: 'Ground Tiles',
+        tileSize: 16,
+        columns: 16,
+        rows: 16
+      },
+      'Fence_Wood': {
+        key: 'Fence_Wood',
+        name: 'Fence Wood',
+        tileSize: 16,
+        columns: 16,
+        rows: 16
+      }
+    },
+    activeTileset: 'Ground_Tileset',
+    selectedLayer: 1
   });
   
   // Game store state
@@ -271,7 +283,9 @@ export const GameInterface: React.FC = () => {
           
           {/* Map Editor UI Overlay */}
           <MapEditorUI
-            tilesetInfo={mapEditorState.tilesetInfo}
+            tilesets={mapEditorState.tilesets}
+            activeTileset={mapEditorState.activeTileset}
+            selectedLayer={mapEditorState.selectedLayer}
             onTileSelect={(tile) => {
               EventBus.emit('tile-selected', tile);
             }}

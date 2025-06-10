@@ -6,6 +6,7 @@ interface TilesetInfo {
   tileSize: number;
   columns: number;
   rows: number;
+  name: string;
 }
 
 interface TileData {
@@ -14,10 +15,13 @@ interface TileData {
   frame: number;
   spriteX: number;
   spriteY: number;
+  layer: number;
 }
 
 interface MapEditorUIProps {
-  tilesetInfo: TilesetInfo;
+  tilesets: { [key: string]: TilesetInfo };
+  activeTileset: string;
+  selectedLayer: number;
   onTileSelect: (tile: TileData) => void;
   onSave: () => void;
   onLoad: () => void;
@@ -26,7 +30,9 @@ interface MapEditorUIProps {
 }
 
 export const MapEditorUI: React.FC<MapEditorUIProps> = ({
-  tilesetInfo,
+  tilesets,
+  activeTileset,
+  selectedLayer,
   onTileSelect,
   onSave,
   onLoad,
@@ -37,6 +43,7 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
   const [selectedCoords, setSelectedCoords] = useState<{x: number, y: number} | null>(null);
   const [debugMode, setDebugMode] = useState(false);
   const [status, setStatus] = useState<string>('Ready');
+  const [currentLayer, setCurrentLayer] = useState(selectedLayer);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   
@@ -146,7 +153,7 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
       setStatus('ERROR: Failed to load Ground_Tileset.png');
       console.error('Failed to load Ground_Tileset.png');
     };
-    img.src = '/Ground_Tileset.png'; // Assuming it's in the public folder
+    img.src = `/${activeTileset}.png`; // Load based on active tileset
   };
 
   const drawTileset = (img: HTMLImageElement) => {
@@ -240,10 +247,11 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
       
       const tileData: TileData = {
         type: `ground_tile`,
-        spriteKey: 'Ground_Tileset',
+        spriteKey: activeTileset,
         frame: frame,
         spriteX: tileX * TILE_SIZE,
-        spriteY: tileY * TILE_SIZE
+        spriteY: tileY * TILE_SIZE,
+        layer: currentLayer
       };
 
       setSelectedTileIndex(frame);
@@ -284,7 +292,8 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
     console.log('=== MAP EDITOR UI DEBUG ===');
     console.log('Selected tile index:', selectedTileIndex);
     console.log('Selected coordinates:', selectedCoords);
-    console.log('Tileset info (passed):', tilesetInfo);
+    console.log('Tilesets (passed):', tilesets);
+    console.log('Active tileset:', activeTileset);
     console.log('Actual tileset dimensions:', { columns: actualTilesetColumns, rows: actualTilesetRows });
     console.log('Tile size:', TILE_SIZE);
     console.log('Display scale:', DISPLAY_SCALE);
@@ -391,6 +400,62 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
         border: '1px solid #007acc'
       }}>
         Status: {status}
+      </div>
+
+      {/* Tileset Tabs */}
+      <div style={{ marginBottom: '10px' }}>
+        <div style={{ display: 'flex', gap: '2px', marginBottom: '8px' }}>
+          {Object.entries(tilesets).map(([key, tileset]) => (
+            <button
+              key={key}
+              onClick={() => {
+                EventBus.emit('map-editor-tileset-changed', key);
+                setStatus(`Switched to ${tileset.name}`);
+                loadTilesetImage();
+              }}
+              style={{
+                backgroundColor: activeTileset === key ? '#007acc' : '#444',
+                color: 'white',
+                border: 'none',
+                padding: '4px 8px',
+                borderRadius: '3px',
+                cursor: 'pointer',
+                fontSize: '11px',
+                flex: 1
+              }}
+            >
+              {tileset.name}
+            </button>
+          ))}
+        </div>
+
+        {/* Layer Selector */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '12px', color: '#ccc' }}>Layer:</span>
+          <input
+            type="number"
+            value={currentLayer}
+            onChange={(e) => {
+              const layer = parseInt(e.target.value) || 1;
+              setCurrentLayer(layer);
+              EventBus.emit('map-editor-layer-changed', layer);
+            }}
+            min="1"
+            max="10"
+            style={{
+              width: '50px',
+              padding: '2px 6px',
+              backgroundColor: '#333',
+              border: '1px solid #007acc',
+              borderRadius: '3px',
+              color: 'white',
+              fontSize: '12px'
+            }}
+          />
+          <span style={{ fontSize: '11px', color: '#888' }}>
+            Higher = Above
+          </span>
+        </div>
       </div>
 
       {/* Controls */}

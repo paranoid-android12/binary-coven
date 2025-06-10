@@ -3,6 +3,7 @@ export interface TilesetInfo {
   tileSize: number;
   columns: number;
   rows: number;
+  name: string;
 }
 
 export interface TileData {
@@ -11,10 +12,13 @@ export interface TileData {
   frame: number;
   spriteX: number;
   spriteY: number;
+  layer: number;
 }
 
 export interface MapEditorState {
   isActive: boolean;
   selectedTile: TileData | null;
-  tileset: TilesetInfo;
+  activeTileset: string;
+  selectedLayer: number;
+  tilesets: { [key: string]: TilesetInfo };
 } 
