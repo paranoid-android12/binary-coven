@@ -44,15 +44,15 @@ export class MapEditor {
           key: 'Ground_Tileset',
           name: 'Ground Tiles',
           tileSize: this.TILE_SIZE,
-          columns: this.TILESET_COLUMNS,
-          rows: this.TILESET_ROWS
+          columns: 25, // 400px ÷ 16px = 25 columns
+          rows: 27    // 432px ÷ 16px = 27 rows
         },
         'Fence_Wood': {
           key: 'Fence_Wood',
           name: 'Fence Wood',
           tileSize: this.TILE_SIZE,
-          columns: 16, // Assuming similar structure
-          rows: 16
+          columns: 12, // 192px ÷ 16px = 12 columns
+          rows: 14     // 224px ÷ 16px = 14 rows
         }
       }
     };
@@ -282,6 +282,12 @@ export class MapEditor {
       this.state.activeTileset = tilesetKey;
       this.selectedTile = null; // Clear selection when switching tilesets
       this.debug('Active tileset changed to:', tilesetKey);
+      
+      // Notify UI of the tileset change
+      EventBus.emit('map-editor-tileset-updated', {
+        activeTileset: tilesetKey,
+        tilesets: this.state.tilesets
+      });
     }
   }
 

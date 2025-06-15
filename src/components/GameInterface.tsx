@@ -166,6 +166,15 @@ export const GameInterface: React.FC = () => {
       setIsCameraLocked(true);
     };
 
+    // Handle tileset updates from map editor
+    const handleTilesetUpdated = (data: { activeTileset: string, tilesets: any }) => {
+      setMapEditorState(prev => ({
+        ...prev,
+        activeTileset: data.activeTileset,
+        tilesets: data.tilesets
+      }));
+    };
+
     EventBus.on('entity-clicked', handleEntityClick);
     EventBus.on('grid-clicked', handleGridClick);
     EventBus.on('code-execution-started', handleExecutionStarted);
@@ -174,6 +183,7 @@ export const GameInterface: React.FC = () => {
     EventBus.on('code-execution-stopped', handleExecutionStopped);
     EventBus.on('camera-locked-to-qubit', handleCameraLockChanged);
     EventBus.on('current-scene-ready', handleSceneReady);
+    EventBus.on('map-editor-tileset-updated', handleTilesetUpdated);
 
     return () => {
       EventBus.removeListener('entity-clicked');
@@ -184,6 +194,7 @@ export const GameInterface: React.FC = () => {
       EventBus.removeListener('code-execution-stopped');
       EventBus.removeListener('camera-locked-to-qubit');
       EventBus.removeListener('current-scene-ready');
+      EventBus.removeListener('map-editor-tileset-updated');
     };
   }, []);
 

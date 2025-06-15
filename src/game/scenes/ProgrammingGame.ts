@@ -255,6 +255,18 @@ export class ProgrammingGame extends Scene {
       frameWidth: 16,
       frameHeight: 16
     });
+
+    // Load the Fence_Wood tileset for map editor (16x16 tiles in a spritesheet)
+    this.load.spritesheet('Fence_Wood', 'Fence Wood.png', {
+      frameWidth: 16,
+      frameHeight: 16
+    });
+
+    // Load the Fence_Wood tileset for map editor (16x16 tiles in a spritesheet)
+    this.load.spritesheet('Fence_Wood', 'Fence Wood.png', {
+      frameWidth: 16,
+      frameHeight: 16
+    });
     
     // Create simple colored rectangles as sprites for prototyping (other entities)
     this.createPlaceholderSprites();
@@ -653,7 +665,7 @@ export class ProgrammingGame extends Scene {
           console.log('Ground_Tileset frames:', texture.frameTotal);
         }
         
-        if (this.mapEditor.getDebugInfo) {
+        if (this.mapEditor.logDebugInfo) {
           this.mapEditor.logDebugInfo();
         }
         console.log('================================');

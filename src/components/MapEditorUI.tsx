@@ -55,7 +55,7 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
 
   // Constants
   const TILE_SIZE = 16; // Each tile in the tileset is 16x16 pixels
-  const DISPLAY_SCALE = 1; // Scale up the tileset display for better visibility
+  const DISPLAY_SCALE = 1.5; // Scale up the tileset display for better visibility
   
   // These will be calculated from the loaded image
   const [actualTilesetColumns, setActualTilesetColumns] = useState(16);
@@ -82,13 +82,33 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
     };
   }, []);
 
+  // Initial load effect - only runs when component becomes active
   useEffect(() => {
-    // Load and draw the tileset image when component mounts
-    if (isActive) {
+    if (isActive && activeTileset) {
+      console.log('Map editor activated, loading initial tileset:', activeTileset);
       loadTilesetImage();
     }
   }, [isActive]);
-  
+
+  // Tileset change effect - only runs when tileset changes (not on initial load)
+  useEffect(() => {
+    // Skip if not active or if this is the initial load
+    if (!isActive || !activeTileset) return;
+    
+    console.log('Active tileset changed to:', activeTileset);
+    
+    // Clear selection when switching tilesets
+    setSelectedTileIndex(null);
+    setSelectedCoords(null);
+    
+    // Small delay to ensure state updates are processed
+    const timeoutId = setTimeout(() => {
+      loadTilesetImage();
+    }, 50);
+    
+    return () => clearTimeout(timeoutId);
+  }, [activeTileset]);
+
   // Dragging event handlers
   const handleMouseDown = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).classList.contains('map-editor-header')) {
@@ -131,69 +151,120 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
   }, []);
 
   const loadTilesetImage = () => {
+    // Map tileset keys to actual filenames
+    const tilesetFilenames: { [key: string]: string } = {
+      'Ground_Tileset': 'Ground_Tileset.png',
+      'Fence_Wood': 'Fence Wood.png'
+    };
+    
+    const filename = tilesetFilenames[activeTileset] || `${activeTileset}.png`;
+    
+    console.log(`Loading tileset: ${activeTileset} -> ${filename}`);
+    
     const img = new Image();
     img.onload = () => {
-      // Calculate actual tileset dimensions from the image
-      const calculatedColumns = Math.floor(img.width / TILE_SIZE);
-      const calculatedRows = Math.floor(img.height / TILE_SIZE);
-      
-      setActualTilesetColumns(calculatedColumns);
-      setActualTilesetRows(calculatedRows);
-      
       console.log(`Tileset loaded: ${img.width}x${img.height} pixels`);
-      console.log(`Calculated grid: ${calculatedColumns}x${calculatedRows} tiles (${TILE_SIZE}x${TILE_SIZE} each)`);
       
-      if (imageRef.current) {
-        imageRef.current = img;
+      // Calculate actual dimensions based on image size and 16px tile size
+      const actualColumns = Math.floor(img.width / TILE_SIZE);
+      const actualRows = Math.floor(img.height / TILE_SIZE);
+      
+      console.log(`Calculated tileset dimensions: ${actualColumns}x${actualRows} tiles`);
+      
+      // Set actual dimensions based on the loaded image
+      setActualTilesetColumns(actualColumns);
+      setActualTilesetRows(actualRows);
+      
+      // Store the image reference
+      imageRef.current = img;
+      
+      // Use setTimeout to ensure state is updated before drawing
+      setTimeout(() => {
+        drawTileset(img, actualColumns, actualRows);
+      }, 0);
+      
+      setStatus(`${tilesets[activeTileset]?.name || activeTileset} loaded: ${actualColumns}x${actualRows} tiles`);
+    };
+    
+    img.onerror = (error) => {
+      console.error(`Failed to load tileset: ${filename}`, error);
+      setStatus(`ERROR: Failed to load ${filename}`);
+      
+      // Clear the canvas on error and show error message
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          canvas.width = 400;
+          canvas.height = 300;
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = '#333';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = '#fff';
+          ctx.font = '14px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText(`Failed to load ${filename}`, canvas.width / 2, canvas.height / 2);
+        }
       }
-      drawTileset(img);
-      setStatus(`Tileset loaded: ${calculatedColumns}x${calculatedRows} tiles`);
     };
-    img.onerror = () => {
-      setStatus('ERROR: Failed to load Ground_Tileset.png');
-      console.error('Failed to load Ground_Tileset.png');
-    };
-    img.src = `/${activeTileset}.png`; // Load based on active tileset
+    
+    img.src = `/${filename}`;
   };
 
-  const drawTileset = (img: HTMLImageElement) => {
+  const drawTileset = (img: HTMLImageElement, columns?: number, rows?: number) => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || !img) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Use passed dimensions or current state, with fallback to consistent values
+    const useColumns = columns || actualTilesetColumns || 16;
+    const useRows = rows || actualTilesetRows || 16;
+    
+    // Calculate consistent canvas size
+    const canvasWidth = useColumns * TILE_SIZE * DISPLAY_SCALE;
+    const canvasHeight = useRows * TILE_SIZE * DISPLAY_SCALE;
+    
+    console.log(`Drawing tileset: ${useColumns}x${useRows}, canvas: ${canvasWidth}x${canvasHeight}`);
+    
     // Set canvas size
-    canvas.width = actualTilesetColumns * TILE_SIZE * DISPLAY_SCALE;
-    canvas.height = actualTilesetRows * TILE_SIZE * DISPLAY_SCALE;
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
 
     // Enable pixel-perfect rendering
     ctx.imageSmoothingEnabled = false;
 
-    // Draw the tileset scaled up
+    // Clear canvas first
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+    // Draw the tileset scaled to fit consistently
+    // This ensures all tilesets display at the same scale regardless of actual image size
     ctx.drawImage(
       img,
       0, 0, img.width, img.height,
-      0, 0, canvas.width, canvas.height
+      0, 0, canvasWidth, canvasHeight
     );
 
     // Draw grid lines for easier tile selection
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
     ctx.lineWidth = 1;
 
-    for (let x = 0; x <= actualTilesetColumns; x++) {
+    // Draw vertical grid lines
+    for (let x = 0; x <= useColumns; x++) {
       const pixelX = x * TILE_SIZE * DISPLAY_SCALE;
       ctx.beginPath();
       ctx.moveTo(pixelX, 0);
-      ctx.lineTo(pixelX, canvas.height);
+      ctx.lineTo(pixelX, canvasHeight);
       ctx.stroke();
     }
 
-    for (let y = 0; y <= actualTilesetRows; y++) {
+    // Draw horizontal grid lines
+    for (let y = 0; y <= useRows; y++) {
       const pixelY = y * TILE_SIZE * DISPLAY_SCALE;
       ctx.beginPath();
       ctx.moveTo(0, pixelY);
-      ctx.lineTo(canvas.width, pixelY);
+      ctx.lineTo(canvasWidth, pixelY);
       ctx.stroke();
     }
 
@@ -212,11 +283,20 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
 
   const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || !imageRef.current) {
+      console.warn('Canvas or image not ready for click handling');
+      return;
+    }
 
     const rect = canvas.getBoundingClientRect();
     const clickX = event.clientX - rect.left;
     const clickY = event.clientY - rect.top;
+
+    // Validate click coordinates
+    if (clickX < 0 || clickY < 0 || clickX > rect.width || clickY > rect.height) {
+      console.warn('Click outside canvas bounds');
+      return;
+    }
 
     // Calculate the scale factor between displayed canvas and actual canvas
     const scaleX = canvas.width / rect.width;
@@ -225,6 +305,10 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
     // Get the actual coordinates on the canvas
     const canvasX = clickX * scaleX;
     const canvasY = clickY * scaleY;
+
+    // Use consistent dimensions for coordinate calculation
+    const useColumns = actualTilesetColumns || 16;
+    const useRows = actualTilesetRows || 16;
 
     // Calculate which tile was clicked (taking into account DISPLAY_SCALE)
     const tileX = Math.floor(canvasX / (TILE_SIZE * DISPLAY_SCALE));
@@ -237,13 +321,14 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
       tileX, tileY,
       canvasSize: { width: canvas.width, height: canvas.height },
       displaySize: { width: rect.width, height: rect.height },
+      useColumns, useRows,
       tileSize: TILE_SIZE,
       displayScale: DISPLAY_SCALE
     });
 
-    // Validate coordinates
-    if (tileX >= 0 && tileX < actualTilesetColumns && tileY >= 0 && tileY < actualTilesetRows) {
-      const frame = tileY * actualTilesetColumns + tileX;
+    // Validate tile coordinates with defensive bounds checking
+    if (tileX >= 0 && tileX < useColumns && tileY >= 0 && tileY < useRows) {
+      const frame = tileY * useColumns + tileX;
       
       const tileData: TileData = {
         type: `ground_tile`,
@@ -263,9 +348,9 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
       // Emit event for the map editor
       EventBus.emit('map-editor-tile-selected', tileData);
       
-      // Redraw to show selection
+      // Redraw to show selection (use defensive check)
       if (imageRef.current) {
-        drawTileset(imageRef.current);
+        drawTileset(imageRef.current, useColumns, useRows);
       }
       
       setStatus(`Tile selected: (${tileX}, ${tileY}) Frame: ${frame}`);
@@ -280,7 +365,10 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
         });
       }
     } else {
-      console.log('Click outside valid tile area:', { tileX, tileY, actualTilesetColumns, actualTilesetRows });
+      console.log('Click outside valid tile area:', { 
+        tileX, tileY, 
+        bounds: { columns: useColumns, rows: useRows }
+      });
     }
   };
 
@@ -306,8 +394,11 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
     setSelectedTileIndex(null);
     setSelectedCoords(null);
     
-    if (imageRef.current) {
-      drawTileset(imageRef.current);
+    // Redraw with consistent dimensions
+    if (imageRef.current && canvasRef.current) {
+      const useColumns = actualTilesetColumns || 16;
+      const useRows = actualTilesetRows || 16;
+      drawTileset(imageRef.current, useColumns, useRows);
     }
     
     setStatus('Selection cleared');
@@ -411,7 +502,6 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
               onClick={() => {
                 EventBus.emit('map-editor-tileset-changed', key);
                 setStatus(`Switched to ${tileset.name}`);
-                loadTilesetImage();
               }}
               style={{
                 backgroundColor: activeTileset === key ? '#007acc' : '#444',
@@ -517,7 +607,7 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
           alignItems: 'center',
           marginBottom: '5px'
         }}>
-          <span style={{ fontSize: '14px', fontWeight: 'bold' }}>Ground Tileset:</span>
+          <span style={{ fontSize: '14px', fontWeight: 'bold' }}>{tilesets[activeTileset]?.name || activeTileset}:</span>
           {selectedCoords && (
             <span style={{ 
               fontSize: '12px', 
@@ -543,7 +633,7 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
             style={{
               cursor: 'crosshair',
               display: 'block',
-              maxWidth: '100%',
+              width: 'auto',
               height: 'auto'
             }}
           />
