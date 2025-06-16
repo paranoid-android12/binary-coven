@@ -25,6 +25,14 @@ export class MapEditor {
   private groundTileSprites: Map<string, Phaser.GameObjects.Sprite> = new Map();
   private clickHandler: ((pointer: Phaser.Input.Pointer) => void) | null = null;
   
+  // Map editor grid types
+  private farmlandGrids: Map<string, Position> = new Map();
+  private farmlandGridSprites: Map<string, Phaser.GameObjects.Sprite> = new Map();
+  private wallGrids: Map<string, Position> = new Map();
+  private wallGridSprites: Map<string, Phaser.GameObjects.Sprite> = new Map();
+  private wallsVisible: boolean = false;
+  private currentGridType: 'ground' | 'farmland' | 'wall' = 'ground';
+  
   // Constants
   private readonly TILE_SIZE = 16; // Each tile in the tileset is 16x16 pixels
   private readonly GAME_GRID_SIZE = 128; // The game grid size (each cell is 128x128 pixels)
@@ -53,6 +61,20 @@ export class MapEditor {
           tileSize: this.TILE_SIZE,
           columns: 12, // 192px ÷ 16px = 12 columns
           rows: 14     // 224px ÷ 16px = 14 rows
+        },
+        'Farmland_Grid': {
+          key: 'editor_farmland',
+          name: 'Farmland Grids',
+          tileSize: this.GAME_GRID_SIZE,
+          columns: 1,
+          rows: 1
+        },
+        'Wall_Grid': {
+          key: 'editor_wall',
+          name: 'Wall Grids',
+          tileSize: this.GAME_GRID_SIZE,
+          columns: 1,
+          rows: 1
         }
       }
     };
@@ -85,6 +107,11 @@ export class MapEditor {
 
     EventBus.on('map-editor-load', () => {
       this.loadMap();
+    });
+
+    // Listen for wall visibility toggle
+    EventBus.on('map-editor-toggle-walls', () => {
+      this.toggleWallVisibility();
     });
   }
 
@@ -127,7 +154,7 @@ export class MapEditor {
 
   private setupInputHandlers(): void {
     this.clickHandler = (pointer: Phaser.Input.Pointer) => {
-      if (!this._isActive || !this.selectedTile) return;
+      if (!this._isActive) return;
 
       const worldPoint = this.scene.cameras.main.getWorldPoint(pointer.x, pointer.y);
       const gridX = Math.floor(worldPoint.x / this.GAME_GRID_SIZE);
@@ -136,7 +163,16 @@ export class MapEditor {
       // Check if click is within grid bounds
       const { width, height } = this.gameStore.gridSize;
       if (gridX >= 0 && gridX < width && gridY >= 0 && gridY < height) {
-        this.placeGroundTile({ x: gridX, y: gridY });
+        const position = { x: gridX, y: gridY };
+        
+        // Determine what to place based on active tileset
+        if (this.state.activeTileset === 'Farmland_Grid') {
+          this.toggleFarmlandGrid(position);
+        } else if (this.state.activeTileset === 'Wall_Grid') {
+          this.toggleWallGrid(position);
+        } else if (this.selectedTile) {
+          this.placeGroundTile(position);
+        }
       }
     };
 
@@ -272,6 +308,121 @@ export class MapEditor {
     });
   }
 
+  private toggleFarmlandGrid(position: Position): void {
+    const gridId = `farmland_${position.x}_${position.y}`;
+    
+    if (this.farmlandGrids.has(gridId)) {
+      // Remove existing farmland grid
+      this.removeFarmlandGrid(position);
+    } else {
+      // Add new farmland grid
+      this.addFarmlandGrid(position);
+    }
+  }
+
+  private addFarmlandGrid(position: Position): void {
+    const gridId = `farmland_${position.x}_${position.y}`;
+    this.farmlandGrids.set(gridId, position);
+    
+    // Create visual sprite
+    const worldX = position.x * this.GAME_GRID_SIZE + this.GAME_GRID_SIZE / 2;
+    const worldY = position.y * this.GAME_GRID_SIZE + this.GAME_GRID_SIZE / 2;
+    
+    const sprite = this.scene.add.sprite(worldX, worldY, 'editor_farmland');
+    sprite.setDisplaySize(this.GAME_GRID_SIZE - 4, this.GAME_GRID_SIZE - 4);
+    sprite.setAlpha(0.5); // 50% opacity
+    sprite.setDepth(0.5); // Above ground tiles, below regular grids
+    
+    this.farmlandGridSprites.set(gridId, sprite);
+    
+    this.debug('Farmland grid added:', position);
+  }
+
+  private removeFarmlandGrid(position: Position): void {
+    const gridId = `farmland_${position.x}_${position.y}`;
+    
+    // Remove sprite
+    const sprite = this.farmlandGridSprites.get(gridId);
+    if (sprite) {
+      sprite.destroy();
+      this.farmlandGridSprites.delete(gridId);
+    }
+    
+    // Remove data
+    this.farmlandGrids.delete(gridId);
+    
+    this.debug('Farmland grid removed:', position);
+  }
+
+  private toggleWallGrid(position: Position): void {
+    const gridId = `wall_${position.x}_${position.y}`;
+    
+    if (this.wallGrids.has(gridId)) {
+      // Remove existing wall grid
+      this.removeWallGrid(position);
+    } else {
+      // Add new wall grid
+      this.addWallGrid(position);
+    }
+  }
+
+  private addWallGrid(position: Position): void {
+    const gridId = `wall_${position.x}_${position.y}`;
+    this.wallGrids.set(gridId, position);
+    
+    // Create visual sprite
+    const worldX = position.x * this.GAME_GRID_SIZE + this.GAME_GRID_SIZE / 2;
+    const worldY = position.y * this.GAME_GRID_SIZE + this.GAME_GRID_SIZE / 2;
+    
+    const sprite = this.scene.add.sprite(worldX, worldY, 'editor_wall');
+    sprite.setDisplaySize(this.GAME_GRID_SIZE - 4, this.GAME_GRID_SIZE - 4);
+    sprite.setDepth(0.5); // Above ground tiles, below regular grids
+    sprite.setVisible(this.wallsVisible); // Respect wall visibility setting
+    
+    this.wallGridSprites.set(gridId, sprite);
+    
+    this.debug('Wall grid added:', position);
+  }
+
+  private removeWallGrid(position: Position): void {
+    const gridId = `wall_${position.x}_${position.y}`;
+    
+    // Remove sprite
+    const sprite = this.wallGridSprites.get(gridId);
+    if (sprite) {
+      sprite.destroy();
+      this.wallGridSprites.delete(gridId);
+    }
+    
+    // Remove data
+    this.wallGrids.delete(gridId);
+    
+    this.debug('Wall grid removed:', position);
+  }
+
+  public toggleWallVisibility(): void {
+    this.wallsVisible = !this.wallsVisible;
+    
+    // Update all wall sprites visibility
+    this.wallGridSprites.forEach(sprite => {
+      sprite.setVisible(this.wallsVisible);
+    });
+    
+    this.debug('Wall visibility toggled:', this.wallsVisible);
+  }
+
+  // Utility method to check if a position has a wall (for collision detection)
+  public hasWallAt(position: Position): boolean {
+    const gridId = `wall_${position.x}_${position.y}`;
+    return this.wallGrids.has(gridId);
+  }
+
+  // Utility method to check if a position has a farmland grid
+  public hasFarmlandAt(position: Position): boolean {
+    const gridId = `farmland_${position.x}_${position.y}`;
+    return this.farmlandGrids.has(gridId);
+  }
+
   public selectTile(tileData: TileData): void {
     this.selectedTile = tileData;
     this.debug('Tile selected for painting:', tileData);
@@ -301,6 +452,8 @@ export class MapEditor {
       version: '1.0',
       gridSize: this.gameStore.gridSize,
       groundTiles: Array.from(this.groundTiles.values()),
+      farmlandGrids: Array.from(this.farmlandGrids.values()),
+      wallGrids: Array.from(this.wallGrids.values()),
       gameGrids: Array.from(this.gameStore.grids.entries()).map(([id, tile]) => ({
         id,
         position: tile.position,
@@ -342,8 +495,10 @@ export class MapEditor {
       const mapData = JSON.parse(savedData);
       this.debug('Loading map data:', mapData);
       
-      // Clear existing ground tiles
+      // Clear existing ground tiles and grids
       this.clearAllGroundTiles();
+      this.clearAllFarmlandGrids();
+      this.clearAllWallGrids();
       
       // Load ground tiles with backward compatibility
       if (mapData.groundTiles) {
@@ -363,6 +518,20 @@ export class MapEditor {
             // New format, use as is
             this.groundTiles.set(tileData.id, tileData);
           }
+        });
+      }
+      
+      // Load farmland grids
+      if (mapData.farmlandGrids) {
+        mapData.farmlandGrids.forEach((position: Position) => {
+          this.addFarmlandGrid(position);
+        });
+      }
+      
+      // Load wall grids
+      if (mapData.wallGrids) {
+        mapData.wallGrids.forEach((position: Position) => {
+          this.addWallGrid(position);
         });
       }
       
@@ -441,6 +610,32 @@ export class MapEditor {
     this.groundTiles.clear();
     
     this.debug('All ground tiles cleared');
+  }
+
+  private clearAllFarmlandGrids(): void {
+    // Destroy all sprites
+    this.farmlandGridSprites.forEach(sprite => {
+      sprite.destroy();
+    });
+    
+    // Clear collections
+    this.farmlandGridSprites.clear();
+    this.farmlandGrids.clear();
+    
+    this.debug('All farmland grids cleared');
+  }
+
+  private clearAllWallGrids(): void {
+    // Destroy all sprites
+    this.wallGridSprites.forEach(sprite => {
+      sprite.destroy();
+    });
+    
+    // Clear collections
+    this.wallGridSprites.clear();
+    this.wallGrids.clear();
+    
+    this.debug('All wall grids cleared');
   }
 
   private downloadMapData(mapData: any): void {

@@ -3,7 +3,7 @@ import { useGameStore } from '../../stores/gameStore';
 import { GridSystem, initializeDefaultGridTypes } from '../systems/GridSystem';
 import { CodeExecutor } from '../systems/CodeExecutor';
 import { BuiltInFunctionRegistry } from '../systems/BuiltInFunctions';
-import { Entity, GridTile, Position } from '../../types/game';
+import { Entity, GridTile, Position, FarmlandState } from '../../types/game';
 import { EventBus } from '../EventBus';
 import TaskManager from '../systems/TaskManager';
 import { MapEditor } from '../systems/MapEditor';
@@ -35,6 +35,14 @@ export class MovementManager {
     if (targetPosition.x < 0 || targetPosition.x >= width || 
         targetPosition.y < 0 || targetPosition.y >= height) {
       console.warn(`Target position (${targetPosition.x}, ${targetPosition.y}) is out of bounds`);
+      return false;
+    }
+
+    // Check for wall collision using MapEditor
+    // Get the scene's MapEditor instance to check for walls
+    const programmingGameScene = this.scene as any;
+    if (programmingGameScene.mapEditor && programmingGameScene.mapEditor.hasWallAt(targetPosition)) {
+      console.warn(`Cannot move to (${targetPosition.x}, ${targetPosition.y}) - wall blocking path`);
       return false;
     }
 
@@ -189,6 +197,7 @@ export class ProgrammingGame extends Scene {
   private entitySprites: Map<string, Phaser.GameObjects.Sprite> = new Map();
   private gridSprites: Map<string, Phaser.GameObjects.Sprite> = new Map();
   private progressBars: Map<string, Phaser.GameObjects.Graphics> = new Map();
+  private progressTexts: Map<string, Phaser.GameObjects.Text> = new Map();
   
   // Floating text system for code execution
   private executionTexts: Phaser.GameObjects.Text[] = [];
@@ -215,6 +224,15 @@ export class ProgrammingGame extends Scene {
   // Animation tracking
   private lastQubitPosition: Position | null = null;
   private qubitDirection: 'idle' | 'down' | 'up' | 'left' | 'right' = 'idle';
+  
+  // Wheat sprite management
+  private wheatSprites: Map<string, Phaser.GameObjects.Sprite> = new Map();
+  private wheatSpriteKey: string = 'wheat_growth'; // Can be changed easily
+  
+  // Map editor grid management
+  private editorFarmlandSprites: Map<string, Phaser.GameObjects.Sprite> = new Map();
+  private editorWallSprites: Map<string, Phaser.GameObjects.Sprite> = new Map();
+  private wallsVisible: boolean = false;
 
   constructor() {
     super({ key: 'ProgrammingGame' });
@@ -262,8 +280,9 @@ export class ProgrammingGame extends Scene {
       frameHeight: 16
     });
 
-    // Load the Fence_Wood tileset for map editor (16x16 tiles in a spritesheet)
-    this.load.spritesheet('Fence_Wood', 'Fence Wood.png', {
+    // Load wheat growth sprites (5 frames side by side, 16x16 each)
+    // For now, we'll create a placeholder. User will provide the actual spritesheet later
+    this.load.spritesheet('wheat_growth', 'wheat_growth.png', {
       frameWidth: 16,
       frameHeight: 16
     });
@@ -339,6 +358,29 @@ export class ProgrammingGame extends Scene {
     graphics.fillRect(0, 0, this.GRID_SIZE - 4, this.GRID_SIZE - 4);
     graphics.generateTexture('silo', this.GRID_SIZE - 4, this.GRID_SIZE - 4);
     graphics.clear();
+    
+    // Map Editor Grid Types
+    // Farmland Grid (for map editor) - Brown with 50% opacity
+    graphics.fillStyle(0x8B4513);
+    graphics.fillRect(0, 0, this.GRID_SIZE - 4, this.GRID_SIZE - 4);
+    graphics.generateTexture('editor_farmland', this.GRID_SIZE - 4, this.GRID_SIZE - 4);
+    graphics.clear();
+    
+    // Wall Grid (for map editor) - Yellow (toggleable visibility)
+    graphics.fillStyle(0xFFFF00);
+    graphics.fillRect(0, 0, this.GRID_SIZE - 4, this.GRID_SIZE - 4);
+    graphics.generateTexture('editor_wall', this.GRID_SIZE - 4, this.GRID_SIZE - 4);
+    graphics.clear();
+    
+    // Create wheat growth sprites as placeholders (5 frames)
+    // These will be replaced when user provides the actual spritesheet
+    const wheatColors = [0x8B4513, 0x9ACD32, 0x7CFC00, 0x32CD32, 0xFFD700]; // Brown to gold progression
+    for (let i = 0; i < 5; i++) {
+      graphics.fillStyle(wheatColors[i]);
+      graphics.fillRect(0, 0, 16, 16);
+      graphics.generateTexture(`wheat_${i}`, 16, 16);
+      graphics.clear();
+    }
     
     graphics.destroy();
   }
@@ -932,8 +974,74 @@ export class ProgrammingGame extends Scene {
       sprite.clearTint();
     }
 
+    // Handle wheat sprites for farmland
+    if (grid.type === 'farmland') {
+      this.updateWheatSprite(grid);
+    }
+
     // Update progress bar for grid
     this.updateProgressBar(grid.id, grid.taskState.progress, sprite.x, sprite.y - 40);
+  }
+
+  private updateWheatSprite(grid: GridTile) {
+    const wheatSpriteId = `wheat_${grid.id}`;
+    let wheatSprite = this.wheatSprites.get(wheatSpriteId);
+    
+    // Determine which wheat frame to show based on farmland state
+    let wheatFrame = -1; // -1 means no wheat sprite
+    
+    if (grid.state.status === FarmlandState.PLANTING) {
+      wheatFrame = 0; // Seed planted
+    } else if (grid.state.status === FarmlandState.GROWING) {
+      // Animate through growth stages based on progress
+      let progressValue = 0;
+      if (typeof grid.taskState.progress === 'number') {
+        progressValue = grid.taskState.progress;
+      } else if (grid.taskState.progress) {
+        // Calculate progress percentage from ProgressInfo
+        const elapsed = Date.now() - grid.taskState.progress.startTime;
+        progressValue = Math.min(1, elapsed / grid.taskState.progress.duration);
+      }
+      
+      if (progressValue < 0.25) wheatFrame = 1;
+      else if (progressValue < 0.5) wheatFrame = 2;
+      else if (progressValue < 0.75) wheatFrame = 3;
+      else wheatFrame = 4;
+    } else if (grid.state.status === FarmlandState.READY) {
+      wheatFrame = 4; // Fully grown
+    }
+    
+    if (wheatFrame >= 0) {
+      // Create or update wheat sprite
+      if (!wheatSprite) {
+        wheatSprite = this.add.sprite(
+          grid.position.x * this.GRID_SIZE + this.GRID_SIZE / 2,
+          grid.position.y * this.GRID_SIZE + this.GRID_SIZE / 2,
+          this.wheatSpriteKey.includes('wheat_growth') ? `wheat_${wheatFrame}` : this.wheatSpriteKey
+        );
+        
+        // Scale wheat sprite to fit grid
+        wheatSprite.setDisplaySize(this.GRID_SIZE - 8, this.GRID_SIZE - 8);
+        wheatSprite.setDepth(2); // Above grid sprites
+        wheatSprite.texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+        
+        this.wheatSprites.set(wheatSpriteId, wheatSprite);
+      } else {
+        // Update existing sprite frame
+        if (this.wheatSpriteKey.includes('wheat_growth')) {
+          wheatSprite.setTexture(`wheat_${wheatFrame}`);
+        } else {
+          wheatSprite.setFrame(wheatFrame);
+        }
+      }
+      
+      wheatSprite.setVisible(true);
+    } else {
+      // Hide or remove wheat sprite
+      if (wheatSprite) {
+        wheatSprite.setVisible(false);
+      }
+    }
   }
 
   private updateProgressBar(id: string, progress: any, x: number, y: number) {
@@ -1431,5 +1539,21 @@ export class ProgrammingGame extends Scene {
     });
     
     this.executionTexts = [];
+  }
+
+  // Method to easily change wheat sprite key (for when user provides actual spritesheet)
+  public setWheatSpriteKey(spriteKey: string): void {
+    this.wheatSpriteKey = spriteKey;
+    
+    // Update all existing wheat sprites
+    this.wheatSprites.forEach((sprite, id) => {
+      const gridId = id.replace('wheat_', '');
+      const grid = this.gameStore.grids.get(gridId);
+      if (grid) {
+        this.updateWheatSprite(grid);
+      }
+    });
+    
+    console.log(`Wheat sprite key changed to: ${spriteKey}`);
   }
 } 

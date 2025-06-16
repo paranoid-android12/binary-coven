@@ -597,6 +597,23 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
         >
           🗑️ Clear
         </button>
+        <button
+          onClick={() => {
+            EventBus.emit('map-editor-toggle-walls');
+            setStatus('Wall visibility toggled');
+          }}
+          style={{
+            backgroundColor: '#ffaa00',
+            color: 'white',
+            border: 'none',
+            padding: '6px 12px',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '12px'
+          }}
+        >
+          👁️ Walls
+        </button>
       </div>
 
       {/* Tileset Display */}
@@ -627,16 +644,43 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
           overflow: 'hidden',
           backgroundColor: '#222'
         }}>
-          <canvas
-            ref={canvasRef}
-            onClick={handleCanvasClick}
-            style={{
-              cursor: 'crosshair',
-              display: 'block',
-              width: 'auto',
-              height: 'auto'
-            }}
-          />
+          {/* Show canvas for tile-based tilesets, instructions for grid-based ones */}
+          {activeTileset === 'Farmland_Grid' ? (
+            <div style={{
+              padding: '20px',
+              textAlign: 'center',
+              color: '#ccc'
+            }}>
+              <div style={{ fontSize: '24px', marginBottom: '8px' }}>🌾</div>
+              <div style={{ fontSize: '12px' }}>Click on the map to place/remove farmland grids</div>
+              <div style={{ fontSize: '10px', color: '#888', marginTop: '4px' }}>
+                Brown squares with 50% opacity
+              </div>
+            </div>
+          ) : activeTileset === 'Wall_Grid' ? (
+            <div style={{
+              padding: '20px',
+              textAlign: 'center',
+              color: '#ccc'
+            }}>
+              <div style={{ fontSize: '24px', marginBottom: '8px' }}>🧱</div>
+              <div style={{ fontSize: '12px' }}>Click on the map to place/remove wall grids</div>
+              <div style={{ fontSize: '10px', color: '#888', marginTop: '4px' }}>
+                Yellow squares (toggle visibility with Walls button)
+              </div>
+            </div>
+          ) : (
+            <canvas
+              ref={canvasRef}
+              onClick={handleCanvasClick}
+              style={{
+                cursor: 'crosshair',
+                display: 'block',
+                width: 'auto',
+                height: 'auto'
+              }}
+            />
+          )}
         </div>
       </div>
 
