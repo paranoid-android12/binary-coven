@@ -775,6 +775,25 @@ export const GameInterface: React.FC = () => {
             </div>
           </div>
 
+          {/* Debug Functions */}
+          <div style={{ marginBottom: '16px' }}>
+            <h5 style={{ margin: '0 0 8px 0', color: '#f5a623' }}>Debug & Utility</h5>
+            <div style={{ fontSize: '12px', color: '#cccccc', lineHeight: '1.4' }}>
+              <div style={{ marginBottom: '4px' }}>
+                <code>debug_grid_info()</code> - Show position and nearby grids
+              </div>
+              <div style={{ marginBottom: '4px' }}>
+                <code>debug_farmland_states()</code> - Show all farmland states and tasks
+              </div>
+              <div style={{ marginBottom: '4px' }}>
+                <code>scanner(x, y)</code> - Scan grid at coordinates
+              </div>
+              <div style={{ marginBottom: '4px' }}>
+                <code>get_position()</code> - Get current position
+              </div>
+            </div>
+          </div>
+
           {/* Movement Functions */}
           <div style={{ marginBottom: '16px' }}>
             <h5 style={{ margin: '0 0 8px 0', color: '#f5a623' }}>Movement</h5>

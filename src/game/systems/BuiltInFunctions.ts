@@ -2,6 +2,7 @@ import { BuiltInFunction, ExecutionContext, ExecutionResult, Position } from '..
 import { useGameStore } from '../../stores/gameStore';
 import GridSystem from './GridSystem';
 import { EventBus } from '../EventBus';
+import TaskManager from './TaskManager';
 
 // Initialize grid system for scanner function
 const gridSystem = new GridSystem();
@@ -311,12 +312,26 @@ export const interactionFunctions: BuiltInFunction[] = [
     execute: async (context: ExecutionContext, cropType?: string): Promise<ExecutionResult> => {
       const { entity } = context;
       const store = useGameStore.getState();
-      const grid = store.getGridAt(entity.position);
+      
+      // Ensure we have the latest entity position from the game store
+      const latestEntity = store.entities.get(entity.id);
+      if (!latestEntity) {
+        return {
+          success: false,
+          message: 'Entity not found in game store'
+        };
+      }
+      
+      // Update context entity with latest data
+      syncContextEntity(context);
+      
+      // Use the latest position to find the grid
+      const grid = store.getGridAt(latestEntity.position);
 
       if (!grid) {
         return {
           success: false,
-          message: 'No grid found at current position'
+          message: `No grid found at current position (${latestEntity.position.x}, ${latestEntity.position.y}). Make sure you're standing on a farmland.`
         };
       }
 
@@ -327,7 +342,7 @@ export const interactionFunctions: BuiltInFunction[] = [
         };
       }
 
-      const result = await gridSystem.executeGridFunction(grid.id, 'plant', entity, [cropType || 'wheat']);
+      const result = await gridSystem.executeGridFunction(grid.id, 'plant', latestEntity, [cropType || 'wheat']);
       
       // Sync context entity with updated game store after grid function
       syncContextEntity(context);
@@ -343,12 +358,26 @@ export const interactionFunctions: BuiltInFunction[] = [
     execute: async (context: ExecutionContext): Promise<ExecutionResult> => {
       const { entity } = context;
       const store = useGameStore.getState();
-      const grid = store.getGridAt(entity.position);
+      
+      // Ensure we have the latest entity position from the game store
+      const latestEntity = store.entities.get(entity.id);
+      if (!latestEntity) {
+        return {
+          success: false,
+          message: 'Entity not found in game store'
+        };
+      }
+      
+      // Update context entity with latest data
+      syncContextEntity(context);
+      
+      // Use the latest position to find the grid
+      const grid = store.getGridAt(latestEntity.position);
 
       if (!grid) {
         return {
           success: false,
-          message: 'No grid found at current position'
+          message: `No grid found at current position (${latestEntity.position.x}, ${latestEntity.position.y})`
         };
       }
 
@@ -359,7 +388,7 @@ export const interactionFunctions: BuiltInFunction[] = [
         };
       }
 
-      const result = await gridSystem.executeGridFunction(grid.id, 'harvest', entity);
+      const result = await gridSystem.executeGridFunction(grid.id, 'harvest', latestEntity);
       
       // Sync context entity with updated game store after grid function
       syncContextEntity(context);
@@ -525,6 +554,80 @@ export const interactionFunctions: BuiltInFunction[] = [
           capacity: entity.inventory.capacity,
           usedSlots: entity.inventory.items.length
         }
+      };
+    }
+  },
+  {
+    name: 'debug_grid_info',
+    description: 'Debug function to show current position and nearby grids',
+    category: 'utility',
+    parameters: [],
+    execute: async (context: ExecutionContext): Promise<ExecutionResult> => {
+      const { entity } = context;
+      const store = useGameStore.getState();
+      
+      // Get current position
+      const currentPos = entity.position;
+      const currentGrid = store.getGridAt(currentPos);
+      
+      // Get all grids for debugging
+      const allGrids = Array.from(store.grids.values()).map(grid => ({
+        id: grid.id,
+        type: grid.type,
+        name: grid.name,
+        position: grid.position
+      }));
+      
+      // Find nearby grids (within 2 units)
+      const nearbyGrids = allGrids.filter(grid => {
+        const dx = Math.abs(grid.position.x - currentPos.x);
+        const dy = Math.abs(grid.position.y - currentPos.y);
+        return dx <= 2 && dy <= 2;
+      });
+      
+      return {
+        success: true,
+        message: `Debug info for position (${currentPos.x}, ${currentPos.y})`,
+        data: {
+          currentPosition: currentPos,
+          currentGrid: currentGrid ? {
+            id: currentGrid.id,
+            type: currentGrid.type,
+            name: currentGrid.name,
+            position: currentGrid.position
+          } : null,
+          nearbyGrids: nearbyGrids,
+          totalGrids: allGrids.length
+        }
+      };
+    }
+  },
+  {
+    name: 'debug_farmland_states',
+    description: 'Debug function to show all farmland states and active tasks',
+    category: 'utility',
+    parameters: [],
+    execute: async (context: ExecutionContext): Promise<ExecutionResult> => {
+      const store = useGameStore.getState();
+      const taskManager = TaskManager.getInstance();
+      
+      // Get all farmland grids
+      const farmlands = Array.from(store.grids.values()).filter(grid => grid.type === 'farmland');
+      
+      const farmlandInfo = farmlands.map(grid => ({
+        id: grid.id,
+        position: grid.position,
+        state: grid.state,
+        taskState: grid.taskState,
+        progress: taskManager.getGridProgress(grid.id),
+        remainingTime: taskManager.getRemainingTime(undefined, grid.id)
+      }));
+      
+      console.log('Farmland Debug Info:', farmlandInfo);
+      
+      return {
+        success: true,
+        message: `Found ${farmlands.length} farmlands. Check console for details.`
       };
     }
   }

@@ -1,8 +1,12 @@
 import { Scene } from 'phaser';
 import { useGameStore } from '../../stores/gameStore';
-import { GridTile, Position } from '../../types/game';
-import { MapEditorState, TileData } from '../../types/mapEditor';
 import { EventBus } from '../EventBus';
+import { Position } from '../../types/game';
+import { 
+  MapEditorState, 
+  TileData, 
+  TilesetInfo
+} from '../../types/mapEditor';
 
 export interface GroundTileData {
   id: string;
@@ -324,24 +328,58 @@ export class MapEditor {
     const gridId = `farmland_${position.x}_${position.y}`;
     this.farmlandGrids.set(gridId, position);
     
-    // Create visual sprite
-    const worldX = position.x * this.GAME_GRID_SIZE + this.GAME_GRID_SIZE / 2;
-    const worldY = position.y * this.GAME_GRID_SIZE + this.GAME_GRID_SIZE / 2;
+    // Create actual functional GridTile instead of just visual sprite
+    const store = this.gameStore;
     
-    const sprite = this.scene.add.sprite(worldX, worldY, 'editor_farmland');
-    sprite.setDisplaySize(this.GAME_GRID_SIZE - 4, this.GAME_GRID_SIZE - 4);
-    sprite.setAlpha(0.5); // 50% opacity
-    sprite.setDepth(0.5); // Above ground tiles, below regular grids
+    // Check if there's already a grid at this position
+    const existingGrid = store.getGridAt(position);
+    if (existingGrid) {
+      this.debug('Grid already exists at position:', position);
+      return;
+    }
     
-    this.farmlandGridSprites.set(gridId, sprite);
+    // Initialize farmland grid with proper functionality
+    const farmlandData = (this.scene as any).gridSystem.initializeGrid('farmland', gridId);
+    const farmlandTileId = store.addGrid({
+      type: 'farmland',
+      position: position,
+      name: `Farmland Plot ${position.x},${position.y}`,
+      description: 'A fertile plot of land for growing crops',
+      properties: {
+        fertility: 1,
+        plantType: null
+      },
+      isActive: true,
+      functions: farmlandData.functions || [],
+      state: farmlandData.state || {},
+      taskState: farmlandData.taskState || {
+        isBlocked: false,
+        currentTask: undefined,
+        progress: undefined
+      }
+    });
     
-    this.debug('Farmland grid added:', position);
+    // The ProgrammingGame scene will handle creating the visual sprite and functionality
+    // through its updateVisuals() method, so we don't need to create a separate sprite here
+    
+    // Emit event to trigger visual update
+    EventBus.emit('farmland-grid-added', { position, id: farmlandTileId });
+    
+    this.debug('Functional farmland grid added:', position, 'with ID:', farmlandTileId);
   }
 
   private removeFarmlandGrid(position: Position): void {
     const gridId = `farmland_${position.x}_${position.y}`;
     
-    // Remove sprite
+    // Remove the actual GridTile from the game store
+    const store = this.gameStore;
+    const existingGrid = store.getGridAt(position);
+    if (existingGrid) {
+      store.removeGrid(existingGrid.id);
+      this.debug('Functional farmland grid removed:', position, 'with ID:', existingGrid.id);
+    }
+    
+    // Remove sprite if it exists (cleanup)
     const sprite = this.farmlandGridSprites.get(gridId);
     if (sprite) {
       sprite.destroy();
@@ -350,6 +388,9 @@ export class MapEditor {
     
     // Remove data
     this.farmlandGrids.delete(gridId);
+    
+    // Emit event to trigger visual update
+    EventBus.emit('farmland-grid-removed', { position });
     
     this.debug('Farmland grid removed:', position);
   }
@@ -419,8 +460,10 @@ export class MapEditor {
 
   // Utility method to check if a position has a farmland grid
   public hasFarmlandAt(position: Position): boolean {
-    const gridId = `farmland_${position.x}_${position.y}`;
-    return this.farmlandGrids.has(gridId);
+    // Check if there's an actual farmland GridTile at this position
+    const store = this.gameStore;
+    const existingGrid = store.getGridAt(position);
+    return existingGrid?.type === 'farmland';
   }
 
   public selectTile(tileData: TileData): void {
@@ -452,7 +495,17 @@ export class MapEditor {
       version: '1.0',
       gridSize: this.gameStore.gridSize,
       groundTiles: Array.from(this.groundTiles.values()),
-      farmlandGrids: Array.from(this.farmlandGrids.values()),
+      // Save functional farmland grids from the game store instead of just positions
+      farmlandGrids: Array.from(this.gameStore.grids.values())
+        .filter(grid => grid.type === 'farmland')
+        .map(grid => ({
+          position: grid.position,
+          name: grid.name,
+          description: grid.description,
+          properties: grid.properties,
+          state: grid.state,
+          taskState: grid.taskState
+        })),
       wallGrids: Array.from(this.wallGrids.values()),
       gameGrids: Array.from(this.gameStore.grids.entries()).map(([id, tile]) => ({
         id,
@@ -477,7 +530,8 @@ export class MapEditor {
     
     this.debug('Map saved successfully:', {
       groundTilesCount: this.groundTiles.size,
-      gameGridsCount: this.gameStore.grids.size
+      gameGridsCount: this.gameStore.grids.size,
+      farmlandGridsCount: mapData.farmlandGrids.length
     });
     
     // Notify UI
@@ -523,8 +577,36 @@ export class MapEditor {
       
       // Load farmland grids
       if (mapData.farmlandGrids) {
-        mapData.farmlandGrids.forEach((position: Position) => {
-          this.addFarmlandGrid(position);
+        mapData.farmlandGrids.forEach((farmlandData: any) => {
+          // For backward compatibility, handle both old format (just positions) and new format (full grid data)
+          if (farmlandData.position) {
+            // New format with full grid data - recreate functional farmland
+            const farmlandInitData = (this.scene as any).gridSystem.initializeGrid('farmland', '');
+            const farmlandId = this.gameStore.addGrid({
+              type: 'farmland',
+              position: farmlandData.position,
+              name: farmlandData.name || `Farmland Plot ${farmlandData.position.x},${farmlandData.position.y}`,
+              description: farmlandData.description || 'A fertile plot of land for growing crops',
+              properties: farmlandData.properties || { fertility: 1, plantType: null },
+              isActive: true,
+              functions: farmlandInitData.functions || [],
+              state: farmlandData.state || farmlandInitData.state || {},
+              taskState: farmlandData.taskState || farmlandInitData.taskState || {
+                isBlocked: false,
+                currentTask: undefined,
+                progress: undefined
+              }
+            });
+            
+            // Track in our map for consistency
+            const gridId = `farmland_${farmlandData.position.x}_${farmlandData.position.y}`;
+            this.farmlandGrids.set(gridId, farmlandData.position);
+            
+            this.debug('Loaded functional farmland:', farmlandData.position, 'with ID:', farmlandId);
+          } else {
+            // Old format (just position) - convert to functional farmland
+            this.addFarmlandGrid(farmlandData);
+          }
         });
       }
       
@@ -613,7 +695,21 @@ export class MapEditor {
   }
 
   private clearAllFarmlandGrids(): void {
-    // Destroy all sprites
+    // Remove all functional farmland grids from the game store
+    const store = this.gameStore;
+    const farmlandGridsToRemove: string[] = [];
+    
+    store.grids.forEach((grid, id) => {
+      if (grid.type === 'farmland') {
+        farmlandGridsToRemove.push(id);
+      }
+    });
+    
+    farmlandGridsToRemove.forEach(id => {
+      store.removeGrid(id);
+    });
+    
+    // Destroy all visual sprites
     this.farmlandGridSprites.forEach(sprite => {
       sprite.destroy();
     });
@@ -622,7 +718,7 @@ export class MapEditor {
     this.farmlandGridSprites.clear();
     this.farmlandGrids.clear();
     
-    this.debug('All farmland grids cleared');
+    this.debug('All farmland grids cleared (functional and visual):', farmlandGridsToRemove.length);
   }
 
   private clearAllWallGrids(): void {

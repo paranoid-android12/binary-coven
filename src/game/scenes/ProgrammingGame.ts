@@ -244,6 +244,19 @@ export class ProgrammingGame extends Scene {
     
     // Initialize farming grid types
     initializeDefaultGridTypes();
+    
+    // Listen for map editor events to update visuals
+    EventBus.on('farmland-grid-added', () => {
+      this.updateVisuals();
+    });
+    
+    EventBus.on('farmland-grid-removed', () => {
+      this.updateVisuals();
+    });
+    
+    EventBus.on('map-editor-loaded', () => {
+      this.updateVisuals();
+    });
   }
 
   preload() {
@@ -434,7 +447,7 @@ export class ProgrammingGame extends Scene {
     const farmlandData = this.gridSystem.initializeGrid('farmland', '');
     const farmlandId = store.addGrid({
       type: 'farmland',
-      position: { x: 8, y: 6 },
+      position: { x: 8, y: 7 },
       name: 'Farmland Plot #1',
       description: 'A fertile plot of land for growing crops',
       properties: {},
@@ -451,7 +464,7 @@ export class ProgrammingGame extends Scene {
     const foodData = this.gridSystem.initializeGrid('food', '');
     const foodId = store.addGrid({
       type: 'food',
-      position: { x: 12, y: 6 },
+      position: { x: 12, y: 7 },
       name: 'Food Station',
       description: 'A station for eating and restoring energy',
       properties: {},
@@ -468,7 +481,7 @@ export class ProgrammingGame extends Scene {
     const siloData = this.gridSystem.initializeGrid('silo', '');
     const siloId = store.addGrid({
       type: 'silo',
-      position: { x: 16, y: 6 },
+      position: { x: 16, y: 7 },
       name: 'Storage Silo',
       description: 'Secure storage for crops and farm items',
       properties: {},

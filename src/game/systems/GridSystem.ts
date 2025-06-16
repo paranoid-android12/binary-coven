@@ -153,7 +153,16 @@ export class GridSystem {
   }
 
   getGrid(gridId: string): GridTile | undefined {
-    return this.grids.get(gridId);
+    // First check internal Map (for backwards compatibility)
+    let grid = this.grids.get(gridId);
+    
+    // If not found, check game store
+    if (!grid) {
+      const store = useGameStore.getState();
+      grid = store.grids.get(gridId);
+    }
+    
+    return grid;
   }
 
   getGrids(): GridTile[] {
@@ -180,7 +189,10 @@ export class GridSystem {
   }
 
   async executeGridFunction(gridId: string, functionName: string, entity: Entity, params: any[] = []): Promise<ExecutionResult> {
-    const grid = this.getGrid(gridId);
+    // Look up grid from game store instead of internal Map
+    const store = useGameStore.getState();
+    const grid = store.grids.get(gridId);
+    
     if (!grid) {
       return {
         success: false,
@@ -310,10 +322,16 @@ export class GridSystem {
             3,
             `Planting ${plantData.displayName}...`,
             () => {
+              // Get fresh store reference for planting completion
+              const freshStore = useGameStore.getState();
+              const currentGrid = freshStore.grids.get(grid.id);
+              
+              if (!currentGrid) return; // Grid was deleted
+              
               // After planting, start crop growth
-              store.updateGrid(grid.id, {
+              freshStore.updateGrid(grid.id, {
                 state: {
-                  ...grid.state,
+                  ...currentGrid.state,
                   status: FarmlandState.GROWING,
                   isPlanted: true
                 }
@@ -327,16 +345,29 @@ export class GridSystem {
                 `${plantData.displayName} growing...`,
                 entity.id,
                 () => {
+                  // Get fresh store reference for growth completion
+                  const growthStore = useGameStore.getState();
+                  const growthGrid = growthStore.grids.get(grid.id);
+                  
+                  if (!growthGrid) {
+                    console.log('Growth completion: Grid not found', grid.id);
+                    return; // Grid was deleted
+                  }
+                  
+                  console.log('Growth completion callback executing for grid:', grid.id, 'Current state:', growthGrid.state.status);
+                  
                   // Growth complete - crop ready
-                  store.updateGrid(grid.id, {
+                  growthStore.updateGrid(grid.id, {
                     state: {
-                      ...grid.state,
+                      ...growthGrid.state,
                       status: FarmlandState.READY,
                       isGrown: true,
                       cropReady: true,
                       cropAmount: plantData.harvestAmount
                     }
                   });
+                  
+                  console.log('Growth completion: Updated grid to READY state');
                 }
               );
             }
