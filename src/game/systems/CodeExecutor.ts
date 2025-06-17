@@ -1,6 +1,6 @@
 import { ExecutionContext, ExecutionResult, CodeWindow } from '../../types/game';
 import { BuiltInFunctionRegistry } from './BuiltInFunctions';
-import { GridSystem } from './GridSystem';
+import GridSystem from './GridSystem';
 import { useGameStore } from '../../stores/gameStore';
 import { EventBus } from '../EventBus';
 

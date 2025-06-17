@@ -1,7 +1,6 @@
 import { GridTypeDefinition, GridTile, GridFunction, Entity, ExecutionResult, FarmlandState, FoodState, SiloState } from '../../types/game';
 import { v4 as uuidv4 } from 'uuid';
 import { useGameStore } from '../../stores/gameStore';
-import TaskManager from './TaskManager';
 
 // Grid type definitions
 export class GridTypeRegistry {
@@ -24,172 +23,52 @@ export class GridTypeRegistry {
   }
 }
 
-// Constants for farming
-const PLANT_TYPES: Record<string, {
-  name: string;
-  displayName: string;
-  growthTime: number;
-  harvestAmount: number;
-}> = {
+// Plant data for farming
+const PLANT_DATA = {
   wheat: {
-    name: 'wheat',
     displayName: 'Wheat',
-    growthTime: 10, // 10 seconds to grow
-    harvestAmount: 1
+    growthTime: 10, // seconds
+    harvestAmount: 1,
+    energyCost: 2
   }
 };
 
-// Initialize default grid types for farming
-export function initializeDefaultGridTypes() {
-  // Farmland (was Mining Terminal)
-  GridTypeRegistry.registerGridType({
-    type: 'farmland',
-    name: 'Farmland Plot',
-    description: 'A plot of land for growing crops. Requires energy to plant and harvest.',
-    defaultProperties: {
-      fertility: 1,
-      plantType: null
-    },
-    defaultState: {
-      isPlanted: false,
-      isGrown: false,
-      cropReady: false,
-      plantType: null,
-      cropAmount: 0,
-      plantStartTime: 0
-    },
-    functions: [
-      {
-        name: 'plant',
-        description: 'Plant crops on the farmland. Takes time to grow.',
-        parameters: [
-          {
-            name: 'crop_type',
-            type: 'string',
-            required: false,
-            default: 'wheat'
-          }
-        ]
-      },
-      {
-        name: 'harvest',
-        description: 'Harvest grown crops and add them to inventory.',
-        parameters: []
-      }
-    ],
-    spriteKey: 'farmland',
-    energyRequired: 5
-  });
-
-  // Food (was Dynamo)
-  GridTypeRegistry.registerGridType({
-    type: 'food',
-    name: 'Food Station',
-    description: 'A food station that restores energy when eaten.',
-    defaultProperties: {
-      nutritionValue: 10,
-      consumeTime: 3000
-    },
-    defaultState: {
-      isEating: false,
-      energyRestored: 0,
-      eatStartTime: 0
-    },
-    functions: [
-      {
-        name: 'eat',
-        description: 'Eat food to restore energy. Takes 3 seconds.',
-        parameters: []
-      }
-    ],
-    spriteKey: 'food',
-    energyRequired: 0
-  });
-
-  // Silo (was Wallet)
-  GridTypeRegistry.registerGridType({
-    type: 'silo',
-    name: 'Storage Silo',
-    description: 'A storage silo for crops and other farm items.',
-    defaultProperties: {
-      capacity: 1000,
-      storageType: 'crops'
-    },
-    defaultState: {
-      storedItems: {},
-      totalStored: 0
-    },
-    functions: [
-      {
-        name: 'store',
-        description: 'Store crops from inventory to silo. Makes them available for upgrades.',
-        parameters: [
-          {
-            name: 'item_type',
-            type: 'string',
-            required: true,
-            default: 'wheat'
-          },
-          {
-            name: 'amount',
-            type: 'number',
-            required: false,
-            default: 1
-          }
-        ]
-      }
-    ],
-    spriteKey: 'silo',
-    energyRequired: 0
-  });
-}
-
+// =====================================================================
+// PURE GRID SYSTEM - NO INTERNAL STATE
+// =====================================================================
 export class GridSystem {
-  private grids: Map<string, GridTile> = new Map();
-  private taskManager: TaskManager;
-
+  // No more internal state - everything goes through GameStore
   constructor() {
-    this.taskManager = TaskManager.getInstance();
+    // Pure function provider - no state to initialize
   }
 
+  // =====================================================================
+  // GRID ACCESS METHODS (SINGLE SOURCE OF TRUTH)
+  // =====================================================================
   getGrid(gridId: string): GridTile | undefined {
-    // First check internal Map (for backwards compatibility)
-    let grid = this.grids.get(gridId);
-    
-    // If not found, check game store
-    if (!grid) {
-      const store = useGameStore.getState();
-      grid = store.grids.get(gridId);
-    }
-    
-    return grid;
+    const store = useGameStore.getState();
+    return store.grids.get(gridId);
   }
 
   getGrids(): GridTile[] {
-    return Array.from(this.grids.values());
+    const store = useGameStore.getState();
+    return Array.from(store.grids.values());
   }
 
   getGridsByType(type: string): GridTile[] {
-    return Array.from(this.grids.values()).filter(grid => grid.type === type);
+    const store = useGameStore.getState();
+    return store.getGridsByType(type);
   }
 
-  addGrid(grid: GridTile): void {
-    this.grids.set(grid.id, grid);
+  getGridAt(x: number, y: number): GridTile | undefined {
+    const store = useGameStore.getState();
+    return store.getGridAt({ x, y });
   }
 
-  removeGrid(gridId: string): void {
-    this.grids.delete(gridId);
-  }
-
-  updateGrid(gridId: string, updates: Partial<GridTile>): void {
-    const grid = this.grids.get(gridId);
-    if (grid) {
-      this.grids.set(gridId, { ...grid, ...updates });
-    }
-  }
-
+  // =====================================================================
+  // GRID FUNCTION EXECUTION (CENTRALIZED TASK MANAGEMENT)
+  // =====================================================================
   async executeGridFunction(gridId: string, functionName: string, entity: Entity, params: any[] = []): Promise<ExecutionResult> {
-    // Look up grid from game store instead of internal Map
     const store = useGameStore.getState();
     const grid = store.grids.get(gridId);
     
@@ -219,154 +98,123 @@ export class GridSystem {
     return await gridFunction.execute(entity, params, grid);
   }
 
-  // Farmland Functions
+  // =====================================================================
+  // FARMLAND FUNCTIONS (USING CENTRALIZED TASK SYSTEM)
+  // =====================================================================
   private createFarmlandFunctions(): GridFunction[] {
     return [
       {
         name: 'plant',
-        description: 'Plants crops on the farmland',
+        description: 'Plant seeds on this farmland',
         parameters: [
           {
-            name: 'crop_type',
+            name: 'seedType',
             type: 'string',
-            required: false,
-            default: 'wheat'
+            required: true
           }
         ],
         requiresEntityOnGrid: true,
         blocksEntity: true,
+        blocksGrid: true,
         execute: async (entity: Entity, params: any[], grid: GridTile): Promise<ExecutionResult> => {
-          // Validate entity is on grid
-          if (!this.taskManager.validateEntityOnGrid(entity, grid)) {
-            return {
-              success: false,
-              message: 'Entity must be standing on the farmland to plant crops'
-            };
-          }
-
-          // Check if entity can act
-          if (!this.taskManager.canEntityAct(entity.id)) {
-            return {
-              success: false,
-              message: 'Entity is currently busy with another task'
-            };
-          }
-
-          // Check if grid can act
-          if (!this.taskManager.canGridAct(grid.id)) {
-            return {
-              success: false,
-              message: 'Farmland is currently busy'
-            };
-          }
-
-          // Check if already planted
-          if (grid.state.isPlanted) {
-            return {
-              success: false,
-              message: 'Farmland already has crops planted'
-            };
-          }
-
-          // Get crop type parameter
-          const cropType = params[0] || 'wheat';
+          const store = useGameStore.getState();
+          const seedType = params[0];
           
-          // Only allow wheat for now
-          if (cropType !== 'wheat') {
+          console.log(`[GRID-SYSTEM] Plant function called: ${seedType} on grid ${grid.id}`);
+          
+          // Validate farmland state
+          if (grid.state.status !== FarmlandState.IDLE) {
             return {
               success: false,
-              message: 'Only wheat can be planted currently'
+              message: `Cannot plant on farmland in ${grid.state.status} state`
             };
           }
-
-          const plantData = PLANT_TYPES[cropType as keyof typeof PLANT_TYPES];
+          
+          // Validate seed type
+          const plantData = PLANT_DATA[seedType as keyof typeof PLANT_DATA];
           if (!plantData) {
             return {
               success: false,
-              message: `Unknown crop type: ${cropType}`
+              message: `Unknown seed type: ${seedType}`
             };
           }
-
-          // Check energy requirement
-          const energyCost = 10;
-          if (entity.stats.energy < energyCost) {
+          
+          // Check entity energy
+          if (entity.stats.energy < plantData.energyCost) {
             return {
               success: false,
-              message: `Not enough energy. Required: ${energyCost}, Available: ${entity.stats.energy}`
+              message: `Not enough energy to plant. Required: ${plantData.energyCost}, Available: ${entity.stats.energy}`
             };
           }
-
-          // Consume energy immediately
-          const store = useGameStore.getState();
-          store.updateEntity(entity.id, {
-            stats: {
-              ...entity.stats,
-              energy: entity.stats.energy - energyCost
-            }
-          });
-
-          // Set grid state to planting
-          store.updateGrid(grid.id, {
-            state: {
-              ...grid.state,
-              status: FarmlandState.PLANTING,
-              isPlanted: false,
-              plantType: cropType
-            }
-          });
-
-          // Start entity task for 3 seconds (planting)
-          const plantingSuccess = this.taskManager.startEntityTask(
-            entity.id,
-            'plant',
-            3,
-            `Planting ${plantData.displayName}...`,
-            () => {
-              // Get fresh store reference for planting completion
+          
+          console.log(`[GRID-SYSTEM] Starting planting task for ${seedType}`);
+          
+          // Start planting task using centralized system
+          const plantingSuccess = store.startTask({
+            type: 'entity',
+            targetId: entity.id,
+            taskName: 'planting',
+            duration: 3, // 3 seconds to plant
+            description: `Planting ${plantData.displayName}...`,
+            onComplete: () => {
+              console.log(`[GRID-SYSTEM] Planting completed for grid ${grid.id}`);
+              
+              // Get fresh references after task completion
               const freshStore = useGameStore.getState();
-              const currentGrid = freshStore.grids.get(grid.id);
+              const freshGrid = freshStore.grids.get(grid.id);
+              const freshEntity = freshStore.entities.get(entity.id);
               
-              if (!currentGrid) return; // Grid was deleted
+              if (!freshGrid || !freshEntity) {
+                console.error(`[GRID-SYSTEM] Grid or entity not found after planting completion`);
+                return;
+              }
               
-              // After planting, start crop growth
+              // Update farmland to growing state
               freshStore.updateGrid(grid.id, {
                 state: {
-                  ...currentGrid.state,
+                  ...freshGrid.state,
                   status: FarmlandState.GROWING,
-                  isPlanted: true
+                  isPlanted: true,
+                  plantType: seedType,
+                  isGrown: false,
+                  cropReady: false,
+                  cropAmount: 0
                 }
               });
-
-              // Start grid growing task
-              this.taskManager.startGridTask(
-                grid.id,
-                'growing',
-                plantData.growthTime,
-                `${plantData.displayName} growing...`,
-                entity.id,
-                () => {
-                  console.log(`[GROWTH-DEBUG] Growth completion callback starting for grid ${grid.id} at ${new Date().toISOString()}`);
+              
+              // Consume entity energy
+              freshStore.updateEntity(entity.id, {
+                stats: {
+                  ...freshEntity.stats,
+                  energy: freshEntity.stats.energy - plantData.energyCost
+                }
+              });
+              
+              console.log(`[GRID-SYSTEM] Starting growth task for ${seedType} (${plantData.growthTime}s)`);
+              
+              // Start growth task using centralized system
+              const growthTaskSuccess = freshStore.startTask({
+                type: 'grid',
+                targetId: grid.id,
+                taskName: 'growing',
+                duration: plantData.growthTime,
+                description: `${plantData.displayName} growing...`,
+                entityId: entity.id,
+                onComplete: () => {
+                  console.log(`[GRID-SYSTEM] Growth completed for grid ${grid.id}`);
                   
-                  // Get fresh store reference for growth completion
+                  // Get fresh reference for growth completion
                   const growthStore = useGameStore.getState();
                   const growthGrid = growthStore.grids.get(grid.id);
                   
                   if (!growthGrid) {
-                    console.log(`[GROWTH-DEBUG] Growth completion: Grid not found ${grid.id}`);
-                    return; // Grid was deleted
+                    console.error(`[GRID-SYSTEM] Grid not found after growth completion: ${grid.id}`);
+                    return;
                   }
                   
-                  console.log(`[GROWTH-DEBUG] Growth completion callback executing for grid ${grid.id}. Current state:`, {
-                    status: growthGrid.state.status,
-                    isPlanted: growthGrid.state.isPlanted,
-                    isGrown: growthGrid.state.isGrown,
-                    cropReady: growthGrid.state.cropReady,
-                    taskBlocked: growthGrid.taskState.isBlocked,
-                    taskActive: growthGrid.taskState.progress?.isActive
-                  });
+                  console.log(`[GRID-SYSTEM] Updating grid ${grid.id} to READY state`);
                   
-                  // Growth complete - crop ready
-                  console.log(`[GROWTH-DEBUG] Updating grid ${grid.id} to READY state`);
+                  // Update to ready state
                   growthStore.updateGrid(grid.id, {
                     state: {
                       ...growthGrid.state,
@@ -377,120 +225,116 @@ export class GridSystem {
                     }
                   });
                   
-                  // Verify the update worked
-                  const verifyGrid = growthStore.grids.get(grid.id);
-                  console.log(`[GROWTH-DEBUG] Grid ${grid.id} after update:`, {
-                    status: verifyGrid?.state.status,
-                    isGrown: verifyGrid?.state.isGrown,
-                    cropReady: verifyGrid?.state.cropReady,
-                    cropAmount: verifyGrid?.state.cropAmount
-                  });
+                  console.log(`[GRID-SYSTEM] Grid ${grid.id} growth completed successfully`);
                 }
-              );
+              });
+              
+              if (!growthTaskSuccess) {
+                console.error(`[GRID-SYSTEM] Failed to start growth task for grid ${grid.id}`);
+              } else {
+                console.log(`[GRID-SYSTEM] Growth task started successfully for grid ${grid.id}`);
+              }
             }
-          );
-
+          });
+          
           if (!plantingSuccess) {
             return {
               success: false,
-              message: 'Failed to start planting'
+              message: 'Cannot start planting task - entity may be busy'
             };
           }
-
+          
           return {
             success: true,
-            message: `Started planting ${plantData.displayName}`,
-            duration: 3000,
-            energyCost,
-            blocksEntity: true
+            message: `Started planting ${plantData.displayName}`
           };
         }
       },
       {
         name: 'harvest',
-        description: 'Harvests ready crops from the farmland',
+        description: 'Harvest crops from this farmland',
         parameters: [],
         requiresEntityOnGrid: true,
+        blocksEntity: true,
+        blocksGrid: true,
         execute: async (entity: Entity, params: any[], grid: GridTile): Promise<ExecutionResult> => {
-          // Validate entity is on grid
-          if (!this.taskManager.validateEntityOnGrid(entity, grid)) {
-            return {
-              success: false,
-              message: 'Entity must be standing on the farmland to harvest crops'
-            };
-          }
-
-          // Check if crops are ready
+          const store = useGameStore.getState();
+          
+          console.log(`[GRID-SYSTEM] Harvest function called on grid ${grid.id}`);
+          
+          // Validate farmland state
           if (grid.state.status !== FarmlandState.READY || !grid.state.cropReady) {
             return {
               success: false,
-              message: 'No crops ready for harvest. Growth may still be in progress.'
+              message: 'No crops ready for harvest'
             };
           }
-
-          // Check energy requirement
-          const energyCost = 5;
-          if (entity.stats.energy < energyCost) {
-            return {
-              success: false,
-              message: `Not enough energy. Required: ${energyCost}, Available: ${entity.stats.energy}`
-            };
-          }
-
-          // Harvest crops - add to entity inventory (not global resources)
-          const store = useGameStore.getState();
+          
           const cropAmount = grid.state.cropAmount || 1;
-          const cropType = grid.state.plantType || 'wheat';
-
-          // Add to entity's inventory
-          const cropDisplayName = PLANT_TYPES[cropType as keyof typeof PLANT_TYPES]?.displayName || cropType;
-          const success = store.addToInventory(entity.id, {
-            id: cropType,
-            name: cropDisplayName,
-            type: 'crop',
-            quantity: cropAmount,
-            description: `Freshly harvested ${cropDisplayName}`
+          const cropType = grid.state.plantType;
+          
+          console.log(`[GRID-SYSTEM] Starting harvest task for ${cropAmount} ${cropType}`);
+          
+          // Start harvesting task
+          const harvestSuccess = store.startTask({
+            type: 'entity',
+            targetId: entity.id,
+            taskName: 'harvesting',
+            duration: 2, // 2 seconds to harvest
+            description: `Harvesting ${cropType}...`,
+            onComplete: () => {
+              console.log(`[GRID-SYSTEM] Harvesting completed for grid ${grid.id}`);
+              
+              // Get fresh references
+              const freshStore = useGameStore.getState();
+              const freshGrid = freshStore.grids.get(grid.id);
+              
+              if (!freshGrid) {
+                console.error(`[GRID-SYSTEM] Grid not found after harvest completion`);
+                return;
+              }
+              
+              // Reset farmland to idle state
+              freshStore.updateGrid(grid.id, {
+                state: {
+                  ...freshGrid.state,
+                  status: FarmlandState.IDLE,
+                  isPlanted: false,
+                  isGrown: false,
+                  cropReady: false,
+                  plantType: null,
+                  cropAmount: 0
+                }
+              });
+              
+              // Add resources to global store
+              if (cropType === 'wheat') {
+                const currentWheat = freshStore.globalResources.wheat;
+                freshStore.updateResources({ wheat: currentWheat + cropAmount });
+                console.log(`[GRID-SYSTEM] Added ${cropAmount} wheat to resources`);
+              }
+            }
           });
-
-          if (!success) {
+          
+          if (!harvestSuccess) {
             return {
               success: false,
-              message: 'Inventory is full. Cannot harvest crops.'
+              message: 'Cannot start harvesting task - entity may be busy'
             };
           }
-
-          // Consume energy
-          store.updateEntity(entity.id, {
-            stats: {
-              ...entity.stats,
-              energy: entity.stats.energy - energyCost
-            }
-          });
-
-          // Reset grid state
-          store.updateGrid(grid.id, {
-            state: {
-              ...grid.state,
-              status: FarmlandState.IDLE,
-              isPlanted: false,
-              isGrown: false,
-              cropReady: false,
-              cropAmount: 0,
-              plantType: null
-            }
-          });
-
+          
           return {
             success: true,
-            message: `Harvested ${cropAmount} ${PLANT_TYPES[cropType as keyof typeof PLANT_TYPES]?.displayName || cropType}(s) to inventory`,
-            energyCost
+            message: `Started harvesting ${cropType}`
           };
         }
       }
     ];
   }
 
-  // Food Functions
+  // =====================================================================
+  // FOOD FUNCTIONS
+  // =====================================================================
   private createFoodFunctions(): GridFunction[] {
     return [
       {
@@ -500,115 +344,91 @@ export class GridSystem {
         requiresEntityOnGrid: true,
         blocksEntity: true,
         execute: async (entity: Entity, params: any[], grid: GridTile): Promise<ExecutionResult> => {
-          // Validate entity is on grid
-          if (!this.taskManager.validateEntityOnGrid(entity, grid)) {
-            return {
-              success: false,
-              message: 'Entity must be standing on the food station to eat'
-            };
-          }
-
-          // Check if entity can act
-          if (!this.taskManager.canEntityAct(entity.id)) {
-            return {
-              success: false,
-              message: 'Entity is currently busy with another task'
-            };
-          }
-
-          // Check if grid can act
-          if (!this.taskManager.canGridAct(grid.id)) {
-            return {
-              success: false,
-              message: 'Food station is currently being used'
-            };
-          }
-
-          // Check energy requirement (small cost to eat)
-          const energyCost = 5;
-          if (entity.stats.energy < energyCost) {
-            return {
-              success: false,
-              message: `Not enough energy. Required: ${energyCost}, Available: ${entity.stats.energy}`
-            };
-          }
-
-          // Consume energy immediately
           const store = useGameStore.getState();
-          store.updateEntity(entity.id, {
-            stats: {
-              ...entity.stats,
-              energy: entity.stats.energy - energyCost
-            }
-          });
-
-          // Set grid state to eating
-          store.updateGrid(grid.id, {
-            state: {
-              ...grid.state,
-              status: FoodState.EATING
-            }
-          });
-
-          // Start entity task for 3 seconds
-          const eatSuccess = this.taskManager.startEntityTask(
-            entity.id,
-            'eat',
-            3,
-            'Eating food to restore energy...',
-            () => {
-              // Restore entity to full energy
-              const currentEntity = store.entities.get(entity.id);
-              if (currentEntity) {
-                store.updateEntity(entity.id, {
-                  stats: {
-                    ...currentEntity.stats,
-                    energy: currentEntity.stats.maxEnergy
-                  }
-                });
+          
+          // Check if entity needs energy
+          if (entity.stats.energy >= entity.stats.maxEnergy) {
+            return {
+              success: false,
+              message: 'Energy is already full'
+            };
+          }
+          
+          // Check if we have wheat to consume
+          if (store.globalResources.wheat < 1) {
+            return {
+              success: false,
+              message: 'No wheat available to eat'
+            };
+          }
+          
+          console.log(`[GRID-SYSTEM] Starting eating task for entity ${entity.id}`);
+          
+          // Start eating task
+          const eatSuccess = store.startTask({
+            type: 'entity',
+            targetId: entity.id,
+            taskName: 'eating',
+            duration: 2, // 2 seconds to eat
+            description: 'Eating wheat...',
+            onComplete: () => {
+              console.log(`[GRID-SYSTEM] Eating completed for entity ${entity.id}`);
+              
+              // Get fresh references
+              const freshStore = useGameStore.getState();
+              const freshEntity = freshStore.entities.get(entity.id);
+              
+              if (!freshEntity) {
+                console.error(`[GRID-SYSTEM] Entity not found after eating completion`);
+                return;
               }
-
-              // Reset grid state
-              store.updateGrid(grid.id, {
-                state: {
-                  ...grid.state,
-                  status: FoodState.IDLE
+              
+              // Restore energy
+              const energyToRestore = Math.min(20, freshEntity.stats.maxEnergy - freshEntity.stats.energy);
+              freshStore.updateEntity(entity.id, {
+                stats: {
+                  ...freshEntity.stats,
+                  energy: freshEntity.stats.energy + energyToRestore
                 }
               });
+              
+              // Consume wheat
+              const currentWheat = freshStore.globalResources.wheat;
+              freshStore.updateResources({ wheat: Math.max(0, currentWheat - 1) });
+              
+              console.log(`[GRID-SYSTEM] Restored ${energyToRestore} energy, consumed 1 wheat`);
             }
-          );
-
+          });
+          
           if (!eatSuccess) {
             return {
               success: false,
-              message: 'Failed to start eating'
+              message: 'Cannot start eating task - entity may be busy'
             };
           }
-
+          
           return {
             success: true,
-            message: 'Started eating food',
-            duration: 3000,
-            energyCost,
-            blocksEntity: true
+            message: 'Started eating wheat'
           };
         }
       }
     ];
   }
 
-  // Silo Functions
+  // =====================================================================
+  // SILO FUNCTIONS
+  // =====================================================================
   private createSiloFunctions(): GridFunction[] {
     return [
       {
         name: 'store',
-        description: 'Stores crops from inventory to silo',
+        description: 'Store items in the silo',
         parameters: [
           {
-            name: 'item_type',
+            name: 'itemType',
             type: 'string',
-            required: true,
-            default: 'wheat'
+            required: true
           },
           {
             name: 'amount',
@@ -619,95 +439,53 @@ export class GridSystem {
         ],
         requiresEntityOnGrid: true,
         execute: async (entity: Entity, params: any[], grid: GridTile): Promise<ExecutionResult> => {
-          // Validate entity is on grid
-          if (!this.taskManager.validateEntityOnGrid(entity, grid)) {
-            return {
-              success: false,
-              message: 'Entity must be standing on the silo to store items'
-            };
-          }
-
-          // Parse parameters
-          const itemType = params[0] || 'wheat';
+          const itemType = params[0];
           const amount = params[1] || 1;
           
-          if (typeof amount !== 'number' || amount <= 0) {
-            return {
-              success: false,
-              message: 'Amount must be a positive number'
-            };
-          }
-
-          // Check energy requirement
-          const energyCost = 2;
-          if (entity.stats.energy < energyCost) {
-            return {
-              success: false,
-              message: `Not enough energy. Required: ${energyCost}, Available: ${entity.stats.energy}`
-            };
-          }
-
-          // Check if entity has the item in inventory
           const store = useGameStore.getState();
-          const inventoryItem = store.getInventoryItem(entity.id, itemType);
           
-          if (!inventoryItem || inventoryItem.quantity < amount) {
+          // Check if we have the resource to store
+          const currentAmount = store.globalResources[itemType as keyof typeof store.globalResources] || 0;
+          if (currentAmount < amount) {
             return {
               success: false,
-              message: `Not enough ${itemType}. Required: ${amount}, Available: ${inventoryItem?.quantity || 0}`
+              message: `Not enough ${itemType} to store. Available: ${currentAmount}, Requested: ${amount}`
             };
           }
-
-          // Remove from entity inventory
-          const removeSuccess = store.removeFromInventory(entity.id, itemType, amount);
-          if (!removeSuccess) {
-            return {
-              success: false,
-              message: 'Failed to remove items from inventory'
-            };
-          }
-
-          // Consume energy
-          store.updateEntity(entity.id, {
-            stats: {
-              ...entity.stats,
-              energy: entity.stats.energy - energyCost
-            }
-          });
-
-          // Add to global resources (this makes it available for upgrades)
-          store.addResource(itemType, amount);
-
-          // Update silo state
-          const currentStored = grid.state.storedItems?.[itemType] || 0;
+          
+          // Update silo storage
+          const newStoredItems = {
+            ...grid.state.storedItems,
+            [itemType]: (grid.state.storedItems[itemType] || 0) + amount
+          };
+          
+          const newTotalStored = grid.state.totalStored + amount;
+          
           store.updateGrid(grid.id, {
             state: {
               ...grid.state,
-              storedItems: {
-                ...grid.state.storedItems,
-                [itemType]: currentStored + amount
-              },
-              totalStored: (grid.state.totalStored || 0) + amount,
-              lastTransaction: {
-                itemType,
-                amount,
-                timestamp: Date.now(),
-                entityId: entity.id
-              }
+              storedItems: newStoredItems,
+              totalStored: newTotalStored
             }
           });
-
+          
+          // Remove from global resources
+          store.updateResources({
+            [itemType]: currentAmount - amount
+          } as any);
+          
           return {
             success: true,
-            message: `Stored ${amount} ${itemType}(s) in silo`,
-            energyCost
+            message: `Stored ${amount} ${itemType} in silo`
           };
         }
       }
     ];
   }
 
-  // Get functions for a specific grid type
+  // =====================================================================
+  // GRID TYPE FUNCTION MAPPING
+  // =====================================================================
   getFunctionsForGridType(gridType: string): GridFunction[] {
     switch (gridType) {
       case 'farmland':
@@ -721,7 +499,9 @@ export class GridSystem {
     }
   }
 
-  // Initialize a grid with its functions and default state
+  // =====================================================================
+  // GRID INITIALIZATION (PURE FUNCTION)
+  // =====================================================================
   initializeGrid(gridType: string, gridId: string): Partial<GridTile> {
     const functions = this.getFunctionsForGridType(gridType);
     
@@ -763,8 +543,12 @@ export class GridSystem {
     };
   }
 
-  // Get grid status for scanner function
+  // =====================================================================
+  // GRID STATUS FOR SCANNER (USING CENTRALIZED TASK PROGRESS)
+  // =====================================================================
   getGridStatus(grid: GridTile): any {
+    const store = useGameStore.getState();
+    
     switch (grid.type) {
       case 'farmland':
         return {
@@ -774,27 +558,141 @@ export class GridSystem {
           cropReady: grid.state.cropReady || false,
           plantType: grid.state.plantType || null,
           cropAmount: grid.state.cropAmount || 0,
-          progress: grid.taskState.progress ? this.taskManager.getGridProgress(grid.id) : 0
+          progress: grid.taskState.progress ? store.getTaskProgress(grid.id) : 0
         };
       case 'food':
         return {
           status: grid.state.status || FoodState.IDLE,
-          progress: grid.taskState.progress ? this.taskManager.getGridProgress(grid.id) : 0
+          progress: grid.taskState.progress ? store.getTaskProgress(grid.id) : 0
         };
       case 'silo':
         return {
           status: grid.state.status || SiloState.IDLE,
           storedItems: grid.state.storedItems || {},
           totalStored: grid.state.totalStored || 0,
-          lastTransaction: grid.state.lastTransaction
+          progress: grid.taskState.progress ? store.getTaskProgress(grid.id) : 0
         };
       default:
         return {
           status: 'unknown',
-          type: grid.type
+          progress: 0
         };
     }
   }
 }
 
-export default GridSystem; 
+// =====================================================================
+// DEFAULT GRID TYPE REGISTRATION
+// =====================================================================
+export function initializeDefaultGridTypes() {
+  // Register farmland grid type
+  GridTypeRegistry.registerGridType({
+    type: 'farmland',
+    name: 'Farmland',
+    description: 'A plot of land for growing crops',
+    category: 'farming',
+    defaultProperties: {
+      fertility: 1.0,
+      soilType: 'loam'
+    },
+    defaultState: {
+      status: FarmlandState.IDLE,
+      isPlanted: false,
+      isGrown: false,
+      cropReady: false,
+      plantType: null,
+      cropAmount: 0
+    },
+    functions: [
+      {
+        name: 'plant',
+        description: 'Plant seeds on this farmland',
+        parameters: [
+          {
+            name: 'seedType',
+            type: 'string',
+            required: true
+          }
+        ],
+        requiresEntityOnGrid: true,
+        blocksEntity: true,
+        blocksGrid: true
+      },
+      {
+        name: 'harvest',
+        description: 'Harvest crops from this farmland',
+        parameters: [],
+        requiresEntityOnGrid: true,
+        blocksEntity: true,
+        blocksGrid: true
+      }
+    ],
+    spriteKey: 'farmland_idle'
+  });
+
+  // Register food station grid type
+  GridTypeRegistry.registerGridType({
+    type: 'food',
+    name: 'Food Station',
+    description: 'A station for eating and restoring energy',
+    category: 'utility',
+    defaultProperties: {
+      capacity: 10
+    },
+    defaultState: {
+      status: FoodState.IDLE
+    },
+    functions: [
+      {
+        name: 'eat',
+        description: 'Eat food to restore energy',
+        parameters: [],
+        requiresEntityOnGrid: true,
+        blocksEntity: true
+      }
+    ],
+    spriteKey: 'food_station'
+  });
+
+  // Register silo grid type
+  GridTypeRegistry.registerGridType({
+    type: 'silo',
+    name: 'Storage Silo',
+    description: 'A large container for storing harvested crops',
+    category: 'storage',
+    defaultProperties: {
+      capacity: 1000
+    },
+    defaultState: {
+      status: SiloState.IDLE,
+      storedItems: {},
+      totalStored: 0
+    },
+    functions: [
+      {
+        name: 'store',
+        description: 'Store items in the silo',
+        parameters: [
+          {
+            name: 'itemType',
+            type: 'string',
+            required: true
+          },
+          {
+            name: 'amount',
+            type: 'number',
+            required: false,
+            default: 1
+          }
+        ],
+        requiresEntityOnGrid: true
+      }
+    ],
+    spriteKey: 'silo'
+  });
+
+  console.log('[GRID-SYSTEM] Default grid types registered');
+}
+
+// Export both named and default exports for compatibility
+export default GridSystem;

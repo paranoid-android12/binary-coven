@@ -1,6 +1,6 @@
 import { Scene } from 'phaser';
 import { useGameStore } from '../../stores/gameStore';
-import { GridSystem, initializeDefaultGridTypes } from '../systems/GridSystem';
+import GridSystem, { initializeDefaultGridTypes } from '../systems/GridSystem';
 import { CodeExecutor } from '../systems/CodeExecutor';
 import { BuiltInFunctionRegistry } from '../systems/BuiltInFunctions';
 import { Entity, GridTile, Position, FarmlandState } from '../../types/game';
@@ -308,10 +308,10 @@ export class ProgrammingGame extends Scene {
     // Configure pixel-perfect rendering for the entire scene
     this.cameras.main.setRoundPixels(true);
     
-    // Initialize the game
-    this.gameStore.initializeGame();
+    // Create placeholder sprites first (fallback sprites)
+    this.createPlaceholderSprites();
     
-    // Create animations first
+    // Create animations after placeholder sprites
     this.createAnimations();
     
     // Create visual grid
@@ -337,6 +337,9 @@ export class ProgrammingGame extends Scene {
     
     // Create UI elements
     this.createUI();
+    
+    // Force initial visual update to render any existing entities
+    this.updateVisuals();
     
     console.log('Programming Game Scene Created');
     
@@ -799,8 +802,7 @@ export class ProgrammingGame extends Scene {
         if (activeEntity) {
           resourceText.setText(
             `Energy: ${activeEntity.stats.energy}/${activeEntity.stats.maxEnergy}\n` +
-            `Bitcoin: ${gameState.globalResources.bitcoin || 0}\n` +
-            `Currency: ${gameState.globalResources.currency || 0}\n` +
+            `Wheat: ${gameState.globalResources.wheat || 0}\n` +
             `Position: (${activeEntity.position.x}, ${activeEntity.position.y})`
           );
         }
@@ -833,7 +835,7 @@ export class ProgrammingGame extends Scene {
       // Create different sprite types based on entity type
       if (entity.type === 'qubit') {
         // Check if animated spritesheets are available
-        if (this.textures.exists('qubit_walk') && this.anims.exists('qubit_idle')) {
+        if (this.textures.exists('qubit_walk') && this.textures.exists('qubit_idle')) {
           // Create animated sprite for qubit
           sprite = this.add.sprite(
             displayPosition.x * this.GRID_SIZE + this.GRID_SIZE / 2,
@@ -847,8 +849,10 @@ export class ProgrammingGame extends Scene {
           // Disable texture smoothing for crisp pixel art
           sprite.texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
           
-          // Start with idle animation facing down
-          sprite.play('qubit_idle');
+          // Start with idle animation facing down if it exists
+          if (this.anims.exists('qubit_idle')) {
+            sprite.play('qubit_idle');
+          }
         } else {
           // Fallback to static sprite if animation assets not available
           console.warn('Qubit animations not available, falling back to static sprite');
@@ -1053,15 +1057,12 @@ export class ProgrammingGame extends Scene {
     if (grid.state.status === FarmlandState.PLANTING) {
       wheatFrame = 0; // Seed planted
     } else if (grid.state.status === FarmlandState.GROWING) {
-      // Animate through growth stages based on progress
-      let progressValue = 0;
-      if (typeof grid.taskState.progress === 'number') {
-        progressValue = grid.taskState.progress;
-      } else if (grid.taskState.progress) {
-        // Calculate progress percentage from ProgressInfo
-        const elapsed = Date.now() - grid.taskState.progress.startTime;
-        progressValue = Math.min(1, elapsed / grid.taskState.progress.duration);
-      }
+      // Get progress from centralized task system
+      const gameState = useGameStore.getState();
+      const progressPercent = gameState.getTaskProgress(grid.id);
+      const progressValue = progressPercent / 100; // Convert to 0-1 range
+      
+
       
       if (progressValue < 0.25) wheatFrame = 1;
       else if (progressValue < 0.5) wheatFrame = 2;
@@ -1107,9 +1108,12 @@ export class ProgrammingGame extends Scene {
   private updateProgressBar(id: string, progress: any, x: number, y: number) {
     let progressBar = this.progressBars.get(id);
 
-    if (progress?.isActive) {
-      const progressPercent = this.taskManager.getEntityProgress(id) || this.taskManager.getGridProgress(id);
-      
+    // Check if there's an active task for this target using centralized system
+    const gameState = useGameStore.getState();
+    const progressPercent = gameState.getTaskProgress(id);
+    const hasActiveTask = progressPercent > 0;
+
+    if (hasActiveTask) {
       if (!progressBar) {
         progressBar = this.add.graphics();
         progressBar.setDepth(3); // Progress bars on top of everything
@@ -1147,14 +1151,9 @@ export class ProgrammingGame extends Scene {
       return;
     }
     
-    // Cancel any existing tasks and reset entity state
-    this.taskManager.cancelAllTasks();
-    
-    // Force unblock the active entity if it's stuck
-    if (activeEntity.taskState.isBlocked) {
-      console.log('Entity was blocked, force unblocking before execution...');
-      gameState.forceUnblockEntity(activeEntity.id);
-    }
+    // Force unblock the active entity before starting execution
+    console.log(`[CODE-EXECUTION] Entity ${activeEntity.id} blocked state before unblock: ${activeEntity.taskState.isBlocked}`);
+    gameState.forceUnblockEntity(activeEntity.id);
     
     // Get fresh entity data after potential unblocking
     const freshEntity = gameState.entities.get(gameState.activeEntityId);
@@ -1164,6 +1163,9 @@ export class ProgrammingGame extends Scene {
       return;
     }
     
+    console.log(`[CODE-EXECUTION] Entity ${freshEntity.id} blocked state after unblock: ${freshEntity.taskState.isBlocked}`);
+    console.log(`[CODE-EXECUTION] Entity can perform action: ${gameState.canPerformAction(freshEntity.id)}`);
+    
     const executionContext = {
       entity: freshEntity,
       availableFunctions: BuiltInFunctionRegistry.createFunctionMap(),
@@ -1172,11 +1174,14 @@ export class ProgrammingGame extends Scene {
       currentGrid: gameState.getGridAt(freshEntity.position)
     };
     
+    console.log(`[CODE-EXECUTION] Creating CodeExecutor with entity: ${freshEntity.id}`);
     this.codeExecutor = new CodeExecutor(executionContext, this.gridSystem);
     this.codeExecutor.setUserFunctions(gameState.codeWindows);
     
     // Emit execution started event
     EventBus.emit('code-execution-started');
+    
+    console.log(`[CODE-EXECUTION] Starting executeMain()`);
     
     this.codeExecutor.executeMain().then(result => {
       console.log('Code execution result:', result);
@@ -1202,15 +1207,15 @@ export class ProgrammingGame extends Scene {
       this.codeExecutor = undefined;
     }
     
-    // Cancel all active tasks
-    this.taskManager.cancelAllTasks();
+    // Cancel only entity-related tasks, leave grid tasks running
+    const currentGameState = useGameStore.getState();
+    currentGameState.forceUnblockEntity(currentGameState.activeEntityId);
     
     // Stop all entity movements
     this.movementManager.stopAllMovements();
     
     // Clean up movement states
-    const gameState = useGameStore.getState();
-    for (const [_, entity] of gameState.entities) {
+    for (const [_, entity] of currentGameState.entities) {
       if (entity.movementState?.isMoving) {
         entity.movementState = {
           isMoving: false,

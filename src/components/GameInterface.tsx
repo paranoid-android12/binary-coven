@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { PhaserGame, IRefPhaserGame } from '../PhaserGame';
 import StatusModal from './StatusModal';
 import { useGameStore } from '../stores/gameStore';
@@ -57,6 +57,7 @@ const useDraggable = (initialPosition: { x: number; y: number }) => {
 
 export const GameInterface: React.FC = () => {
   const phaserRef = useRef<IRefPhaserGame | null>(null);
+  const lastRunCodeCall = useRef<number>(0);
   
   // Modal state
   const [modalState, setModalState] = useState<{
@@ -103,9 +104,7 @@ export const GameInterface: React.FC = () => {
     entities,
     activeEntityId,
     globalResources,
-    isPaused,
-    startExecution,
-    stopExecution
+    isPaused
   } = useGameStore();
 
   const [isCodeRunning, setIsCodeRunning] = useState(false);
@@ -198,6 +197,53 @@ export const GameInterface: React.FC = () => {
     };
   }, []);
 
+  // Initialize game state on first load
+  useEffect(() => {
+    const store = useGameStore.getState();
+    
+    // Only initialize if there are no entities (first load)
+    if (store.entities.size === 0) {
+      console.log('Initializing game state...');
+      
+      // Create default code window
+      const mainWindowId = store.addCodeWindow({
+        name: 'main',
+        code: '# Main function - execution starts here\ndef main():\n    # Your code here\n    plant("wheat")\n    pass',
+        isMain: true,
+        isActive: true,
+        position: { x: 50, y: 50 },
+        size: { width: 400, height: 300 }
+      });
+      
+      store.setMainWindow(mainWindowId);
+      
+      // Create default qubit entity
+      const qubitId = store.addEntity({
+        name: 'Qubit',
+        type: 'qubit',
+        position: { x: 12, y: 8 },
+        stats: {
+          walkingSpeed: 4.0,
+          energy: 100,
+          maxEnergy: 100
+        },
+        inventory: {
+          items: [],
+          capacity: 10
+        },
+        isActive: true,
+        taskState: {
+          isBlocked: false,
+          currentTask: undefined,
+          progress: undefined
+        }
+      });
+      
+      store.setActiveEntity(qubitId);
+      console.log('Game state initialized with qubit entity:', qubitId);
+    }
+  }, []); // Empty dependency array means this runs once on mount
+
   const handleCloseModal = () => {
     setModalState(prev => ({ ...prev, isOpen: false }));
   };
@@ -206,32 +252,72 @@ export const GameInterface: React.FC = () => {
     setModalState(prev => ({ ...prev, position }));
   };
 
-  const handleRunCode = () => {
+  const handleRunCode = useCallback(() => {
+    // Prevent rapid successive calls
+    const now = Date.now();
+    if (now - lastRunCodeCall.current < 500) { // 500ms debounce
+      console.log('Ignoring rapid handleRunCode call');
+      return;
+    }
+    lastRunCodeCall.current = now;
+
+    const scene = phaserRef.current?.scene as ProgrammingGame;
+    
     if (isCodeRunning) {
       console.log('Stopping execution');
-      // Stop execution - the event listener will handle state change
-      stopExecution();
-      
-      const scene = phaserRef.current?.scene as ProgrammingGame;
+      // Stop execution via the scene
       if (scene && scene.stopCodeExecution) {
         scene.stopCodeExecution();
       }
     } else {
       console.log('Starting execution', activeEntityId);
-      // Start execution - the event listener will handle state change
-      startExecution(activeEntityId);
-      
-      const scene = phaserRef.current?.scene as ProgrammingGame;
+      // Start execution via the scene
       if (scene && scene.startCodeExecution) {
         scene.startCodeExecution();
       }
     }
-  };
+  }, [isCodeRunning, activeEntityId]);
 
   const handleResetGame = () => {
     if (confirm('Are you sure you want to reset the game? All progress will be lost.')) {
-      useGameStore.getState().resetGame();
-      useGameStore.getState().initializeGame();
+      const store = useGameStore.getState();
+      store.reset();
+      
+      // Create default entities and code windows
+      const mainWindowId = store.addCodeWindow({
+        name: 'main',
+        code: '# Main function - execution starts here\ndef main():\n    # Your code here\n    plant("wheat")\n    pass',
+        isMain: true,
+        isActive: true,
+        position: { x: 50, y: 50 },
+        size: { width: 400, height: 300 }
+      });
+      
+      store.setMainWindow(mainWindowId);
+      
+      // Create default qubit entity
+      const qubitId = store.addEntity({
+        name: 'Qubit',
+        type: 'qubit',
+        position: { x: 12, y: 8 },
+        stats: {
+          walkingSpeed: 4.0,
+          energy: 100,
+          maxEnergy: 100
+        },
+        inventory: {
+          items: [],
+          capacity: 10
+        },
+        isActive: true,
+        taskState: {
+          isBlocked: false,
+          currentTask: undefined,
+          progress: undefined
+        }
+      });
+      
+      store.setActiveEntity(qubitId);
       setIsCodeRunning(false);
     }
   };
