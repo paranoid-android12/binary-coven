@@ -344,6 +344,12 @@ export const interactionFunctions: BuiltInFunction[] = [
 
       const result = await gridSystem.executeGridFunction(grid.id, 'plant', latestEntity, [cropType || 'wheat']);
       
+      // Check if the grid function blocks the entity and propagate the flag
+      const gridFunction = grid.functions.find(f => f.name === 'plant');
+      if (gridFunction?.blocksEntity && result.success) {
+        result.blocksEntity = true;
+      }
+      
       // Sync context entity with updated game store after grid function
       syncContextEntity(context);
       
@@ -390,6 +396,12 @@ export const interactionFunctions: BuiltInFunction[] = [
 
       const result = await gridSystem.executeGridFunction(grid.id, 'harvest', latestEntity);
       
+      // Check if the grid function blocks the entity and propagate the flag
+      const gridFunction = grid.functions.find(f => f.name === 'harvest');
+      if (gridFunction?.blocksEntity && result.success) {
+        result.blocksEntity = true;
+      }
+      
       // Sync context entity with updated game store after grid function
       syncContextEntity(context);
       
@@ -421,6 +433,12 @@ export const interactionFunctions: BuiltInFunction[] = [
       }
 
       const result = await gridSystem.executeGridFunction(grid.id, 'eat', entity);
+      
+      // Check if the grid function blocks the entity and propagate the flag
+      const gridFunction = grid.functions.find(f => f.name === 'eat');
+      if (gridFunction?.blocksEntity && result.success) {
+        result.blocksEntity = true;
+      }
       
       // Sync context entity with updated game store after grid function
       syncContextEntity(context);
@@ -466,6 +484,12 @@ export const interactionFunctions: BuiltInFunction[] = [
       }
 
       const result = await gridSystem.executeGridFunction(grid.id, 'store', entity, [itemType, amount || 1]);
+      
+      // Check if the grid function blocks the entity and propagate the flag
+      const gridFunction = grid.functions.find(f => f.name === 'store');
+      if (gridFunction?.blocksEntity && result.success) {
+        result.blocksEntity = true;
+      }
       
       // Sync context entity with updated game store after grid function
       syncContextEntity(context);

@@ -57,6 +57,7 @@ export class CodeExecutor {
 
   // Main execution entry point
   async executeMain(): Promise<ExecutionResult> {
+    console.log('[DEBUG] executeMain: Method called, starting execution');
     console.log('[DEBUG] executeMain: Looking for main function. Available functions:', Array.from(this.userFunctions.keys()));
     const mainFunction = this.userFunctions.get('main');
     
@@ -84,7 +85,9 @@ export class CodeExecutor {
     this.executionState.variables = { ...this.context.globalVariables };
 
     try {
+      console.log('[DEBUG] executeMain: About to call executeFunction("main", [])');
       const result = await this.executeFunction('main', []);
+      console.log('[DEBUG] executeMain: executeFunction returned:', result);
       this.executionState.isRunning = false;
       return result;
     } catch (error) {
@@ -162,6 +165,11 @@ export class CodeExecutor {
         }
 
         const result = await gridFunction.execute(freshEntity, args, currentGrid);
+        
+        // Add blocksEntity flag from grid function definition to the result
+        if (gridFunction.blocksEntity && result.success) {
+          result.blocksEntity = true;
+        }
         
         // Update context entity with fresh data after grid function execution
         const updatedEntity = store.entities.get(this.context.entity.id);
@@ -376,6 +384,8 @@ export class CodeExecutor {
       });
 
       const result = await this.executeFunction(functionName, args);
+      
+      console.log(`[DEBUG] Function ${functionName} result:`, result);
       
       // If the function blocks the entity, wait until the entity is no longer blocked
       if (result.success && result.blocksEntity) {

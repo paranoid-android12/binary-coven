@@ -1183,8 +1183,12 @@ export class ProgrammingGame extends Scene {
     
     console.log(`[CODE-EXECUTION] Starting executeMain()`);
     
-    this.codeExecutor.executeMain().then(result => {
-      console.log('Code execution result:', result);
+    try {
+      const executePromise = this.codeExecutor.executeMain();
+      console.log(`[CODE-EXECUTION] executeMain() promise created`);
+      
+      executePromise.then(result => {
+        console.log('[CODE-EXECUTION] executeMain() resolved with result:', result);
       if (result.success) {
         // Emit successful completion
         EventBus.emit('code-execution-completed', result);
@@ -1193,12 +1197,16 @@ export class ProgrammingGame extends Scene {
         EventBus.emit('code-execution-failed', result.message || 'Unknown error');
         this.showExecutionError(result.message || 'Unknown error');
       }
-    }).catch(error => {
-      console.error('Code execution error:', error);
-      const errorMessage = error.message || 'Unknown error';
-      EventBus.emit('code-execution-failed', errorMessage);
-      this.showExecutionError(errorMessage);
-    });
+      }).catch(error => {
+        console.error('[CODE-EXECUTION] executeMain() rejected with error:', error);
+        const errorMessage = error.message || 'Unknown error';
+        EventBus.emit('code-execution-failed', errorMessage);
+        this.showExecutionError(errorMessage);
+      });
+    } catch (syncError) {
+      console.error('[CODE-EXECUTION] Synchronous error in startCodeExecution:', syncError);
+      EventBus.emit('code-execution-failed', 'Failed to start code execution');
+    }
   }
 
   stopCodeExecution() {
@@ -1295,8 +1303,8 @@ export class ProgrammingGame extends Scene {
     
     // Arrow key qubit movement (only when camera is locked and not in unlocked mode)
     if (this.isLockedToQubit && !isTypingInInput()) {
-      // Only allow movement if entity is not currently moving
-      if (!activeEntity.movementState?.isMoving) {
+      // Only allow movement if entity is not currently moving and not blocked by tasks
+      if (!activeEntity.movementState?.isMoving && !activeEntity.taskState.isBlocked) {
         // Handle movement with smooth transitions
         if (Phaser.Input.Keyboard.JustDown(this.cameraKeys.up)) {
           const targetPos = { x: activeEntity.position.x, y: activeEntity.position.y - 1 };
