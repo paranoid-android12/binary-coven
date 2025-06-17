@@ -47,21 +47,28 @@ export class CodeExecutor {
   // Set user-defined functions (from code windows)
   setUserFunctions(codeWindows: Map<string, CodeWindow>) {
     this.userFunctions.clear();
+    console.log('[DEBUG] setUserFunctions: Received codeWindows:', codeWindows.size);
     codeWindows.forEach((window, id) => {
+      console.log('[DEBUG] setUserFunctions: Adding function:', window.name, 'isMain:', window.isMain);
       this.userFunctions.set(window.name, window);
     });
+    console.log('[DEBUG] setUserFunctions: Final userFunctions:', Array.from(this.userFunctions.keys()));
   }
 
   // Main execution entry point
   async executeMain(): Promise<ExecutionResult> {
+    console.log('[DEBUG] executeMain: Looking for main function. Available functions:', Array.from(this.userFunctions.keys()));
     const mainFunction = this.userFunctions.get('main');
     
     if (!mainFunction) {
+      console.log('[DEBUG] executeMain: No main function found!');
       return {
         success: false,
         message: 'No main function found'
       };
     }
+    
+    console.log('[DEBUG] executeMain: Found main function:', mainFunction.name, 'Code length:', mainFunction.code.length);
 
     // Debug: Check initial entity state
     const store = useGameStore.getState();

@@ -460,6 +460,53 @@ export class ProgrammingGame extends Scene {
         progress: undefined
       }
     });
+
+    // Create farmlands in first rectangular area (11-14, 11-14)
+    let plotNumber = 2;
+    for (let x = 11; x <= 14; x++) {
+      for (let y = 11; y <= 14; y++) {
+        const farmlandData = this.gridSystem.initializeGrid('farmland', '');
+        store.addGrid({
+          type: 'farmland',
+          position: { x, y },
+          name: `Farmland Plot #${plotNumber}`,
+          description: 'A fertile plot of land for growing crops',
+          properties: {},
+          isActive: true,
+          functions: farmlandData.functions || [],
+          state: farmlandData.state || {},
+          taskState: farmlandData.taskState || {
+            isBlocked: false,
+            currentTask: undefined,
+            progress: undefined
+          }
+        });
+        plotNumber++;
+      }
+    }
+
+    // Create farmlands in second rectangular area (16-19, 11-14)
+    for (let x = 16; x <= 19; x++) {
+      for (let y = 11; y <= 14; y++) {
+        const farmlandData = this.gridSystem.initializeGrid('farmland', '');
+        store.addGrid({
+          type: 'farmland',
+          position: { x, y },
+          name: `Farmland Plot #${plotNumber}`,
+          description: 'A fertile plot of land for growing crops',
+          properties: {},
+          isActive: true,
+          functions: farmlandData.functions || [],
+          state: farmlandData.state || {},
+          taskState: farmlandData.taskState || {
+            isBlocked: false,
+            currentTask: undefined,
+            progress: undefined
+          }
+        });
+        plotNumber++;
+      }
+    }
     
     const foodData = this.gridSystem.initializeGrid('food', '');
     const foodId = store.addGrid({

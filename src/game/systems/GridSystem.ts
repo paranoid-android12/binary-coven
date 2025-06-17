@@ -345,18 +345,28 @@ export class GridSystem {
                 `${plantData.displayName} growing...`,
                 entity.id,
                 () => {
+                  console.log(`[GROWTH-DEBUG] Growth completion callback starting for grid ${grid.id} at ${new Date().toISOString()}`);
+                  
                   // Get fresh store reference for growth completion
                   const growthStore = useGameStore.getState();
                   const growthGrid = growthStore.grids.get(grid.id);
                   
                   if (!growthGrid) {
-                    console.log('Growth completion: Grid not found', grid.id);
+                    console.log(`[GROWTH-DEBUG] Growth completion: Grid not found ${grid.id}`);
                     return; // Grid was deleted
                   }
                   
-                  console.log('Growth completion callback executing for grid:', grid.id, 'Current state:', growthGrid.state.status);
+                  console.log(`[GROWTH-DEBUG] Growth completion callback executing for grid ${grid.id}. Current state:`, {
+                    status: growthGrid.state.status,
+                    isPlanted: growthGrid.state.isPlanted,
+                    isGrown: growthGrid.state.isGrown,
+                    cropReady: growthGrid.state.cropReady,
+                    taskBlocked: growthGrid.taskState.isBlocked,
+                    taskActive: growthGrid.taskState.progress?.isActive
+                  });
                   
                   // Growth complete - crop ready
+                  console.log(`[GROWTH-DEBUG] Updating grid ${grid.id} to READY state`);
                   growthStore.updateGrid(grid.id, {
                     state: {
                       ...growthGrid.state,
@@ -367,7 +377,14 @@ export class GridSystem {
                     }
                   });
                   
-                  console.log('Growth completion: Updated grid to READY state');
+                  // Verify the update worked
+                  const verifyGrid = growthStore.grids.get(grid.id);
+                  console.log(`[GROWTH-DEBUG] Grid ${grid.id} after update:`, {
+                    status: verifyGrid?.state.status,
+                    isGrown: verifyGrid?.state.isGrown,
+                    cropReady: verifyGrid?.state.cropReady,
+                    cropAmount: verifyGrid?.state.cropAmount
+                  });
                 }
               );
             }

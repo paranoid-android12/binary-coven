@@ -98,13 +98,43 @@ export const useGameStore = create<GameStore>()((set, get) => ({
   },
 
   updateGrid: (gridId: string, updates: Partial<GridTile>) => {
+    console.log(`[STORE-DEBUG] updateGrid called for ${gridId}:`, updates);
+    
     set((state: GameState) => {
       const grid = state.grids.get(gridId);
-      if (!grid) return state;
+      if (!grid) {
+        console.log(`[STORE-DEBUG] updateGrid: Grid ${gridId} not found`);
+        return state;
+      }
       
-      const updatedGrid = { ...grid, ...updates };
+      console.log(`[STORE-DEBUG] updateGrid: Updating grid ${gridId} from state:`, {
+        status: grid.state?.status,
+        isGrown: grid.state?.isGrown,
+        cropReady: grid.state?.cropReady
+      });
+      
+      // Deep merge to handle nested state updates properly
+      const updatedGrid = {
+        ...grid,
+        ...updates,
+        state: {
+          ...grid.state,
+          ...updates.state
+        },
+        taskState: {
+          ...grid.taskState,
+          ...updates.taskState
+        }
+      };
+      
       const newGrids = new Map(state.grids);
       newGrids.set(gridId, updatedGrid);
+      
+      console.log(`[STORE-DEBUG] updateGrid: Grid ${gridId} updated to:`, {
+        status: updatedGrid.state?.status,
+        isGrown: updatedGrid.state?.isGrown,
+        cropReady: updatedGrid.state?.cropReady
+      });
       
       return { grids: newGrids };
     });

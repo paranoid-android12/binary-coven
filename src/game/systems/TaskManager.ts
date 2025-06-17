@@ -96,9 +96,24 @@ export class TaskManager {
 
     // Set up completion timer
     const timeoutId = setTimeout(() => {
+      console.log(`[TASK-DEBUG] Grid task completing for ${gridId} at ${new Date().toISOString()}`);
+      
+      // Execute completion callback FIRST (while task is still active)
+      if (onComplete) {
+        console.log(`[TASK-DEBUG] Executing completion callback for grid ${gridId}`);
+        try {
+          onComplete();
+          console.log(`[TASK-DEBUG] Completion callback finished for grid ${gridId}`);
+        } catch (error) {
+          console.error(`[TASK-DEBUG] Completion callback error for grid ${gridId}:`, error);
+        }
+      }
+      
+      // Then clean up the task state
+      console.log(`[TASK-DEBUG] Cleaning up task state for grid ${gridId}`);
       this.completeGridTask(gridId);
-      if (onComplete) onComplete();
       this.activeProgressTasks.delete(`grid_${gridId}`);
+      console.log(`[TASK-DEBUG] Task cleanup complete for grid ${gridId}`);
     }, duration * 1000);
 
     this.activeProgressTasks.set(`grid_${gridId}`, timeoutId);
