@@ -443,6 +443,26 @@ export class ProgrammingGame extends Scene {
     // Grid lines removed for cleaner appearance
   }
 
+  private createFarmLand(x: number, y: number, plotNumber: number) {
+    const store = useGameStore.getState();
+    const farmlandData = this.gridSystem.initializeGrid('farmland', '');
+    store.addGrid({
+      type: 'farmland',
+      position: { x, y },
+      name: `Farmland Plot #${plotNumber}`,
+      description: 'A fertile plot of land for growing crops',
+      properties: {},
+      isActive: true,
+      functions: farmlandData.functions || [],
+      state: farmlandData.state || {},
+      taskState: farmlandData.taskState || {
+        isBlocked: false,
+        currentTask: undefined,
+        progress: undefined
+      }
+    });
+  }
+
   private createSampleWorld() {
     const store = useGameStore.getState();
     
@@ -491,25 +511,28 @@ export class ProgrammingGame extends Scene {
     // Create farmlands in second rectangular area (16-19, 11-14)
     for (let x = 16; x <= 19; x++) {
       for (let y = 11; y <= 14; y++) {
-        const farmlandData = this.gridSystem.initializeGrid('farmland', '');
-        store.addGrid({
-          type: 'farmland',
-          position: { x, y },
-          name: `Farmland Plot #${plotNumber}`,
-          description: 'A fertile plot of land for growing crops',
-          properties: {},
-          isActive: true,
-          functions: farmlandData.functions || [],
-          state: farmlandData.state || {},
-          taskState: farmlandData.taskState || {
-            isBlocked: false,
-            currentTask: undefined,
-            progress: undefined
-          }
-        });
+        this.createFarmLand(x, y, plotNumber);
         plotNumber++;
       }
     }
+
+    // Create them farmlands in the splintered area
+    this.createFarmLand(21, 11, 21);
+    this.createFarmLand(22, 11, 22);
+
+    this.createFarmLand(21, 12, 23);
+    this.createFarmLand(22, 12, 24);
+    this.createFarmLand(23, 12, 25);
+
+    this.createFarmLand(21, 13, 26);
+    this.createFarmLand(22, 13, 27);
+    this.createFarmLand(23, 13, 28);
+    this.createFarmLand(24, 13, 29);
+
+    this.createFarmLand(21, 14, 26);
+    this.createFarmLand(22, 14, 27);
+    this.createFarmLand(23, 14, 28);
+    this.createFarmLand(24, 14, 29);
     
     const foodData = this.gridSystem.initializeGrid('food', '');
     const foodId = store.addGrid({

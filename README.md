@@ -2,7 +2,7 @@
 
 A innovative block-based programming game where you control a robot (qubit) by writing Python-like code. Built with **PhaserJS**, **NextJS**, and **React**.
 
-## 🎮 Game Overview
+##  Game Overview
 
 In Binary Coven, you control a robot called "Qubit" by writing actual code in a Python-like syntax. The game features a grid-based world where you can:
 
@@ -12,9 +12,9 @@ In Binary Coven, you control a robot called "Qubit" by writing actual code in a 
 - **Program Multiple Functions** that can call each other
 - **Control Character Stats** like walking speed and energy
 
-## 🏗️ Architecture & Features
+## ️ Architecture & Features
 
-### ✨ Core Features
+###  Core Features
 
 - **Visual Code Editor**: Multiple draggable code windows with syntax highlighting
 - **Grid-Based World**: Tile-based movement and interaction system
@@ -23,7 +23,7 @@ In Binary Coven, you control a robot called "Qubit" by writing actual code in a 
 - **Resource Management**: Energy, Bitcoin, and currency systems
 - **Inventory System**: Store and manage items
 
-### 🔧 Technical Architecture
+###  Technical Architecture
 
 - **Frontend**: React + NextJS with TypeScript
 - **Game Engine**: PhaserJS for 2D game rendering
@@ -31,7 +31,7 @@ In Binary Coven, you control a robot called "Qubit" by writing actual code in a 
 - **Code Editor**: Monaco Editor (VS Code editor)
 - **Modular Systems**: Extensible grid, entity, and function systems
 
-## 🎯 Grid Types & Functions
+##  Grid Types & Functions
 
 ### Bitcoin Mining Terminal
 - `mine_initiate()` - Start mining (takes 5 seconds, costs 10 energy)
@@ -43,7 +43,7 @@ In Binary Coven, you control a robot called "Qubit" by writing actual code in a 
 ### Storage Wallet
 - `store(amount)` - Store bitcoins as spendable currency (costs 2 energy)
 
-## 🎮 Built-in Functions
+##  Built-in Functions
 
 ### Movement Functions
 - `move_up()`, `move_down()`, `move_left()`, `move_right()`
@@ -57,7 +57,7 @@ In Binary Coven, you control a robot called "Qubit" by writing actual code in a 
 - `wait(seconds)` - Pause execution
 - `print(message)` - Debug output
 
-## 🎮 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - Node.js 18+
@@ -124,7 +124,7 @@ def go_to_dynamo():
     crank()
 ```
 
-## 🏗️ Project Structure
+## ️ Project Structure
 
 ```
 src/
@@ -145,7 +145,7 @@ src/
 └── App.tsx              # Main React app
 ```
 
-## 🔄 Extensibility
+##  Extensibility
 
 The game is designed to be highly extensible:
 
@@ -207,13 +207,13 @@ const entityId = gameStore.addEntity({
 });
 ```
 
-## 🎛️ Controls
+## ️ Controls
 
 - **Arrow Keys**: Manual movement (for testing)
 - **Mouse**: Drag code windows, resize, click buttons
 - **Code Editor**: Full VS Code-like editing experience
 
-## 🐛 Development
+##  Development
 
 ### Available Scripts
 
@@ -229,7 +229,7 @@ const entityId = gameStore.addEntity({
 - **Zustand**: State management
 - **TypeScript**: Type safety
 
-## 🤝 Contributing
+##  Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -237,11 +237,11 @@ const entityId = gameStore.addEntity({
 4. Test thoroughly
 5. Submit a pull request
 
-## 📝 License
+##  License
 
 This project is licensed under the MIT License.
 
-## 🎯 Future Enhancements
+##  Future Enhancements
 
 - **Advanced Python Features**: Loops, conditionals, variables
 - **Multiplayer Support**: Multiple programmable entities
@@ -254,4 +254,4 @@ This project is licensed under the MIT License.
 
 ---
 
-**Happy Coding! 🚀**
+**Happy Coding! **

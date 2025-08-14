@@ -307,7 +307,7 @@ export const ProgrammingInterface: React.FC<ProgrammingInterfaceProps> = ({ enti
             color: '#888',
             fontSize: '16px'
           }}>
-            <div style={{ marginBottom: '16px', fontSize: '48px' }}>📝</div>
+            <div style={{ marginBottom: '16px', fontSize: '48px' }}></div>
             <div>No function selected</div>
             <div style={{ fontSize: '14px', marginTop: '8px' }}>
               Select a function from the left panel to edit its code

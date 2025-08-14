@@ -7,6 +7,7 @@ import { BuiltInFunctionRegistry } from '../game/systems/BuiltInFunctions';
 import { EventBus } from '../game/EventBus';
 import { Entity, GridTile } from '../types/game';
 import { MapEditorUI } from './MapEditorUI';
+import { SpriteEnergyDisplay } from './SpriteEnergyDisplay';
 
 // Custom hook for draggable functionality
 const useDraggable = (initialPosition: { x: number; y: number }) => {
@@ -109,9 +110,11 @@ export const GameInterface: React.FC = () => {
 
   const [isCodeRunning, setIsCodeRunning] = useState(false);
   
-  // Draggable UI elements
-  const energyPanel = useDraggable({ x: 20, y: 20 });
+  // Draggable UI elements  
   const resourcesPanel = useDraggable({ x: window.innerWidth - 220, y: 20 });
+  
+  // Static sprite-based energy display position
+  const spriteEnergyPosition = { x: 20, y: 20 };
 
   // Handle entity/grid clicks from Phaser
   useEffect(() => {
@@ -460,11 +463,11 @@ export const GameInterface: React.FC = () => {
                 <h4 style={{ margin: '0 0 12px 0', color: '#007acc' }}>Resources</h4>
                 <div style={{ fontSize: '14px', lineHeight: '1.6' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <span>🌾 Wheat:</span>
+                    <span>Wheat:</span>
                     <span>{globalResources.wheat || 0}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <span>⚡ Energy:</span>
+                    <span> Energy:</span>
                     <span>{globalResources.energy || 0}</span>
                   </div>
                   {isPaused && (
@@ -511,7 +514,7 @@ export const GameInterface: React.FC = () => {
                       opacity: isCameraLocked ? 0.6 : 1
                     }}
                   >
-                    {isCameraLocked ? '🔒 Camera Locked' : '🔓 Lock to Qubit'}
+                    {isCameraLocked ? ' Camera Locked' : ' Lock to Qubit'}
                   </button>
             
                   <button
@@ -527,7 +530,7 @@ export const GameInterface: React.FC = () => {
                       width: '100%'
                     }}
                   >
-                    🔄 Reset Game
+                     Reset Game
                   </button>
                 </div>
               </div>
@@ -537,22 +540,22 @@ export const GameInterface: React.FC = () => {
                 <h4 style={{ margin: '0 0 8px 0', color: '#007acc' }}>How to Play</h4>
                 <div style={{ fontSize: '12px', lineHeight: '1.4', color: '#ccc' }}>
                   <div style={{ marginBottom: '8px' }}>
-                    🤖 <strong>Click on the blue qubit</strong> to open its programming interface
+                    <strong>Click on the blue qubit</strong> to open its programming interface
                   </div>
                   <div style={{ marginBottom: '8px' }}>
-                    🏭 <strong>Click on colored grids</strong> to view their status and functions
+                    <strong>Click on colored grids</strong> to view their status and functions
                   </div>
                   <div style={{ marginBottom: '8px' }}>
-                    ▶️ <strong>Use the Run button</strong> to execute your code
+                    <strong>Use the Run button</strong> to execute your code
                   </div>
                   <div style={{ marginBottom: '8px' }}>
-                    ⌨️ <strong>Write Python-like code</strong> to control the qubit
+                    <strong>Write Python-like code</strong> to control the qubit
                   </div>
                   <div style={{ marginBottom: '8px' }}>
-                    📹 <strong>Camera:</strong> WASD to explore the world (unlocks from qubit)
+                    <strong>Camera:</strong> WASD to explore the world (unlocks from qubit)
                   </div>
                   <div>
-                    🎮 <strong>Arrow keys:</strong> Move qubit (when camera locked) OR explore (when unlocked)
+                    <strong>Arrow keys:</strong> Move qubit (when camera locked) OR explore (when unlocked)
                   </div>
                 </div>
               </div>
@@ -665,53 +668,21 @@ export const GameInterface: React.FC = () => {
         pointerEvents: 'none',
         zIndex: 1000
       }}>
-        {/* Top Left - Energy Bar */}
+        {/* Top Left - Sprite-based Energy Display */}
         {activeEntity && (
-          <div 
-            ref={energyPanel.elementRef}
-            onMouseDown={energyPanel.handleMouseDown}
-            style={{
-              position: 'absolute',
-              top: `${energyPanel.position.y}px`,
-              left: `${energyPanel.position.x}px`,
-              backgroundColor: 'rgba(0, 0, 0, 0.8)',
-              border: '2px solid #007acc',
-              borderRadius: '8px',
-              padding: '12px',
-              pointerEvents: 'auto',
-              minWidth: '200px',
-              cursor: 'move'
-            }}>
-            <div style={{ color: '#ffffff', fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
-              {activeEntity.name}
-            </div>
-            
-            {/* Energy Bar */}
-            <div style={{ marginBottom: '8px' }}>
-              <div style={{ color: '#cccccc', fontSize: '12px', marginBottom: '4px' }}>
-                Energy: {activeEntity.stats.energy}/{activeEntity.stats.maxEnergy}
-              </div>
-              <div style={{
-                width: '100%',
-                height: '8px',
-                backgroundColor: '#444444',
-                borderRadius: '4px',
-                overflow: 'hidden'
-              }}>
-                <div style={{
-                  width: `${(activeEntity.stats.energy / activeEntity.stats.maxEnergy) * 100}%`,
-                  height: '100%',
-                  backgroundColor: activeEntity.stats.energy > 20 ? '#00ff00' : '#ff4444',
-                  transition: 'width 0.3s ease'
-                }} />
-              </div>
-            </div>
-
-            {/* Inventory Quick View */}
-            <div style={{ color: '#cccccc', fontSize: '12px' }}>
-              Inventory: {activeEntity.inventory.items.length}/{activeEntity.inventory.capacity}
-            </div>
-          </div>
+          <SpriteEnergyDisplay
+            entity={activeEntity}
+            position={spriteEnergyPosition}
+            backgroundSprite="Bars.png" // Path to your sprite
+            energyBarConfig={{
+              x: 20, // X position on your sprite where energy bar starts
+              y: 50, // Y position on your sprite where energy bar starts
+              maxWidth: 20, // Maximum width when full energy (e.g., 2x10 pixels)
+              height: 2, // Height of energy bar (e.g., 2 pixels)
+              color: '#00ff00' // Color overlay for the energy bar
+            }}
+            scale={4} // Scale the entire sprite 2x for better visibility
+          />
         )}
 
         {/* Top Right - Resources & Controls */}
@@ -737,7 +708,7 @@ export const GameInterface: React.FC = () => {
             </div>
             <div style={{ fontSize: '12px', color: '#cccccc' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span>🌾 Wheat:</span>
+                <span> Wheat:</span>
                 <span>{globalResources.wheat || 0}</span>
               </div>
             </div>
@@ -773,7 +744,7 @@ export const GameInterface: React.FC = () => {
                 fontSize: '12px'
               }}
             >
-              📚 Guide
+               Guide
             </button>
 
             <button
@@ -788,7 +759,7 @@ export const GameInterface: React.FC = () => {
                 fontSize: '12px'
               }}
             >
-              ⬆️ Upgrades
+              Upgrades
             </button>
           </div>
         </div>
@@ -817,7 +788,7 @@ export const GameInterface: React.FC = () => {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '16px' }}>❌</span>
+                <span style={{ fontSize: '16px' }}></span>
                 <span>Execution Error:</span>
               </div>
               <div style={{ marginTop: '4px', fontWeight: 'normal', fontSize: '12px' }}>

@@ -1,8 +1,8 @@
-# 🎮 Binary Coven Demo Guide
+#  Binary Coven Demo Guide
 
 Welcome to Binary Coven! This guide will walk you through the new grid function system with progress tracking and task management.
 
-## 🚀 Quick Start
+##  Quick Start
 
 1. **Start the game**: Run `npm run dev` and open `http://localhost:8080`
 2. **Familiarize yourself**: You'll see:
@@ -14,9 +14,9 @@ Welcome to Binary Coven! This guide will walk you through the new grid function 
 3. **Open Programming Interface**: Click on the blue qubit to open its status modal
 4. **Switch to Program Tab**: Click the "Program" tab to access the code editor
 
-## 📝 New Grid Function System
+##  New Grid Function System
 
-### 🏭 Mining Terminal Functions
+###  Mining Terminal Functions
 - **`mine_initiate()`**: 
   - Entity blocks for 3 seconds (initiation)
   - Terminal then mines for 10 seconds independently
@@ -28,28 +28,28 @@ Welcome to Binary Coven! This guide will walk you through the new grid function 
   - Costs 5 energy
   - Only works when terminal shows "ready" status
 
-### ⚡ Dynamo Functions
+###  Dynamo Functions
 - **`crank()`**:
   - Entity blocks for 10 seconds
   - Restores energy to full
   - Costs 5 energy initially
   - Must be standing on the dynamo
 
-### 💰 Wallet Functions
+###  Wallet Functions
 - **`store(amount)`**:
   - Stores bitcoins as spendable currency
   - Costs 2 energy
   - Must be standing on the wallet
   - Example: `store(3)` stores 3 bitcoins
 
-### 🔍 Scanner Function
+###  Scanner Function
 - **`scanner(x, y)`**:
   - Scans any grid at coordinates
   - Returns detailed status information
   - Costs 2 energy
   - Works from any position
 
-## 🎯 Demo 1: Basic Mining with Progress Tracking
+##  Demo 1: Basic Mining with Progress Tracking
 
 1. **Open the qubit's programming interface**
 2. **Replace the main function** with this code:
@@ -104,7 +104,7 @@ def main():
    - Entity turns orange when busy, grids turn yellow when active
    - Scanner provides real-time status updates
 
-## 🎯 Demo 2: Advanced Automation with Error Handling
+##  Demo 2: Advanced Automation with Error Handling
 
 ```python
 def check_energy():
@@ -192,7 +192,7 @@ def main():
     print("\n=== All mining cycles complete! ===")
 ```
 
-## 🎯 Demo 3: Scanner and Status Monitoring
+##  Demo 3: Scanner and Status Monitoring
 
 ```python
 def scan_all_grids():
@@ -217,7 +217,7 @@ def main():
     print("Scanning complete!")
 ```
 
-## 🎮 Key Features to Test
+##  Key Features to Test
 
 ### Progress Tracking
 - **Visual Progress Bars**: Watch progress bars appear above entities and grids
@@ -239,7 +239,7 @@ def main():
 - **Grid States**: Normal color, Yellow (active), Green (ready)
 - **Progress Bars**: Real-time progress visualization
 
-## 🐛 Common Issues & Solutions
+##  Common Issues & Solutions
 
 **"Entity is currently busy"**: Wait for current task to complete or check progress
 **"Grid is currently busy"**: Another entity is using the grid, wait your turn
@@ -247,7 +247,7 @@ def main():
 **"No bitcoins ready"**: Mining hasn't completed yet, use scanner to check status
 **"Must be standing on grid"**: Move to the grid position before using its functions
 
-## 🎯 Advanced Challenges
+##  Advanced Challenges
 
 1. **Efficiency Challenge**: Mine 10 bitcoins using minimal energy
 2. **Parallel Processing**: Use scanner to monitor multiple operations
@@ -255,7 +255,7 @@ def main():
 4. **Resource Optimization**: Balance energy usage with bitcoin production
 5. **Status Dashboard**: Create a comprehensive monitoring system
 
-## 🌟 What's New
+##  What's New
 
 - **Progress Tracking**: Visual progress bars and real-time updates
 - **Task Management**: Proper blocking and error handling
@@ -263,13 +263,13 @@ def main():
 - **Enhanced Visuals**: Better visual feedback for all states
 - **Robust Error Handling**: Clear error messages and recovery
 
-Happy coding with the new grid function system! 🚀 
+Happy coding with the new grid function system!  
 
-## 🐍 Python Control Flow Features
+##  Python Control Flow Features
 
 Binary Coven now supports **full Python-like control flow** with proper indentation-based syntax!
 
-### 🔧 New Built-in Functions
+###  New Built-in Functions
 - **`range(start, stop, step)`**: Generate number sequences (like Python)
 - **`len(iterable)`**: Get length of strings, arrays, etc.
 - **`abs(number)`**: Get absolute value
@@ -277,7 +277,7 @@ Binary Coven now supports **full Python-like control flow** with proper indentat
 - **`max(values...)`**: Get maximum value
 - **`sum(iterable)`**: Sum all numbers in an array
 
-### 🎯 If/Else Statements
+###  If/Else Statements
 
 ```python
 def main():
@@ -302,7 +302,7 @@ def main():
     print("Demo complete!")
 ```
 
-### 🔄 For Loops
+###  For Loops
 
 ```python
 def main():
@@ -337,7 +337,7 @@ def main():
     print("For loop demo complete!")
 ```
 
-### ⚡ While Loops
+###  While Loops
 
 ```python
 def main():
@@ -380,7 +380,7 @@ def main():
     print(f"Goal achieved! Collected {bitcoins_collected} bitcoins!")
 ```
 
-### 🧮 Advanced Control Flow with Functions
+###  Advanced Control Flow with Functions
 
 ```python
 def move_in_square(size):
@@ -527,7 +527,7 @@ def main():
     print("\n=== Demo Complete! ===")
 ```
 
-### 🎮 Complex Example: Automated Base Builder
+###  Complex Example: Automated Base Builder
 
 ```python
 def scan_area(center_x, center_y, radius):
@@ -584,7 +584,7 @@ def main():
     print("Base building simulation complete!")
 ```
 
-### 🏆 Pro Tips for Control Flow
+###  Pro Tips for Control Flow
 
 1. **Indentation Matters**: Use 4 spaces for each level (like Python)
 2. **Break and Continue**: Use in loops for flow control
@@ -593,25 +593,25 @@ def main():
 5. **Variable Scope**: Variables are scoped to their function
 6. **Error Handling**: Syntax errors will show helpful messages
 
-### 🚨 Common Gotchas
+###  Common Gotchas
 
 ```python
 def main():
-    # ✅ GOOD: Proper indentation
+    #  GOOD: Proper indentation
     for i in range(3):
         print(f"Step {i}")
         if i == 1:
             print("Middle step!")
     
-    # ❌ BAD: Missing colon
+    #  BAD: Missing colon
     # for i in range(3)
     #     print(i)
     
-    # ✅ GOOD: Using range properly
+    #  GOOD: Using range properly
     for x in range(5, 10, 2):  # 5, 7, 9
         move_right()
     
-    # ✅ GOOD: Nested conditions
+    #  GOOD: Nested conditions
     energy = get_energy()
     if energy > 50:
         if energy > 80:
@@ -622,7 +622,7 @@ def main():
         print("Low energy")
 ```
 
-## 🎯 Demo 3: Original Scanner Demo
+##  Demo 3: Original Scanner Demo
 
 ```python
 def scan_all_grids():
@@ -647,16 +647,16 @@ def main():
     print("Scanning complete!")
 ```
 
-## 🎉 Conclusion
+##  Conclusion
 
 Binary Coven now features a **complete Python-like programming environment** with:
 
-✅ **Full Control Flow**: if/elif/else, while loops, for loops  
-✅ **Proper Indentation**: 4-space Python-style blocks  
-✅ **Rich Built-ins**: range(), len(), abs(), min(), max(), sum()  
-✅ **Expression Evaluation**: Comparisons, logical operators, arithmetic  
-✅ **Variable Scope**: Function-local variables  
-✅ **Error Handling**: Clear syntax error messages  
-✅ **Break/Continue**: Full loop control support  
+ **Full Control Flow**: if/elif/else, while loops, for loops  
+ **Proper Indentation**: 4-space Python-style blocks  
+ **Rich Built-ins**: range(), len(), abs(), min(), max(), sum()  
+ **Expression Evaluation**: Comparisons, logical operators, arithmetic  
+ **Variable Scope**: Function-local variables  
+ **Error Handling**: Clear syntax error messages  
+ **Break/Continue**: Full loop control support  
 
-Start simple with the basic demos, then work your way up to the complex automation examples. The sky's the limit for what you can program your qubits to do! 🚀 
+Start simple with the basic demos, then work your way up to the complex automation examples. The sky's the limit for what you can program your qubits to do!  

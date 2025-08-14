@@ -430,7 +430,7 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
             fontSize: '14px'
           }}
         >
-          🎨 Edit Map
+           Edit Map
         </button>
       </div>
     );
@@ -477,7 +477,7 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
             fontSize: '12px'
           }}
         >
-          ✕ Close
+           Close
         </button>
       </div>
 
@@ -567,7 +567,7 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
             fontSize: '12px'
           }}
         >
-          💾 Save
+           Save
         </button>
         <button
           onClick={onLoad}
@@ -581,7 +581,7 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
             fontSize: '12px'
           }}
         >
-          📁 Load
+           Load
         </button>
         <button
           onClick={clearSelection}
@@ -595,7 +595,7 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
             fontSize: '12px'
           }}
         >
-          🗑️ Clear
+          ️ Clear
         </button>
         <button
           onClick={() => {
@@ -612,7 +612,7 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
             fontSize: '12px'
           }}
         >
-          👁️ Walls
+          ️ Walls
         </button>
       </div>
 
@@ -651,7 +651,7 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
               textAlign: 'center',
               color: '#ccc'
             }}>
-              <div style={{ fontSize: '24px', marginBottom: '8px' }}>🌾</div>
+              <div style={{ fontSize: '24px', marginBottom: '8px' }}></div>
               <div style={{ fontSize: '12px' }}>Click on the map to place/remove farmland grids</div>
               <div style={{ fontSize: '10px', color: '#888', marginTop: '4px' }}>
                 Brown squares with 50% opacity
@@ -663,7 +663,7 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
               textAlign: 'center',
               color: '#ccc'
             }}>
-              <div style={{ fontSize: '24px', marginBottom: '8px' }}>🧱</div>
+              <div style={{ fontSize: '24px', marginBottom: '8px' }}></div>
               <div style={{ fontSize: '12px' }}>Click on the map to place/remove wall grids</div>
               <div style={{ fontSize: '10px', color: '#888', marginTop: '4px' }}>
                 Yellow squares (toggle visibility with Walls button)
@@ -714,7 +714,7 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
               fontSize: '10px'
             }}
           >
-            🐛 Debug
+             Debug
           </button>
           <button
             onClick={handleDebugMapEditor}
@@ -728,7 +728,7 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
               fontSize: '10px'
             }}
           >
-            📊 Log Info
+             Log Info
           </button>
         </div>
         
