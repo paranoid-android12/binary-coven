@@ -11,9 +11,10 @@ import { Types } from 'phaser';
 //  https://newdocs.phaser.io/docs/3.70.0/Phaser.Types.Core.GameConfig
 const config: Types.Core.GameConfig = {
     type: Phaser.AUTO,
-    width: 1024,
-    height: 768,
+    width: "100%",
+    height: "100%",
     parent: 'game-container',
+    pixelArt: true,
     backgroundColor: '#028af8',
     scene: [
         Boot,
