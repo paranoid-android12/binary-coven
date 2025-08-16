@@ -256,7 +256,7 @@ export const GameInterface: React.FC = () => {
     setModalState(prev => ({ ...prev, position }));
   };
 
-  const handleRunCode = useCallback(() => {
+  const handleRunCode = () => {
     // Prevent rapid successive calls
     const now = Date.now();
     if (now - lastRunCodeCall.current < 500) { // 500ms debounce
@@ -267,6 +267,7 @@ export const GameInterface: React.FC = () => {
 
     const scene = phaserRef.current?.scene as ProgrammingGame;
     
+    console.log(scene);
     if (isCodeRunning) {
       console.log('Stopping execution');
       // Stop execution via the scene
@@ -280,7 +281,7 @@ export const GameInterface: React.FC = () => {
         scene.startCodeExecution();
       }
     }
-  }, [isCodeRunning, activeEntityId]);
+  };
 
   const handleResetGame = () => {
     if (confirm('Are you sure you want to reset the game? All progress will be lost.')) {

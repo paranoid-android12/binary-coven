@@ -105,7 +105,7 @@ export class CodeExecutor {
     const store = useGameStore.getState();
     const currentEntity = store.entities.get(this.context.entity.id);
     
-    console.log(`Executing function: ${functionName}, Entity blocked: ${currentEntity?.taskState.isBlocked}, Task: ${currentEntity?.taskState.progress?.description || 'none'}`);
+    console.log(`[FUNCTION-LOOKUP] Executing function: ${functionName}, Entity blocked: ${currentEntity?.taskState.isBlocked}, Task: ${currentEntity?.taskState.progress?.description || 'none'}`);
     
     if (currentEntity?.taskState.isBlocked) {
       return {
@@ -115,7 +115,10 @@ export class CodeExecutor {
     }
 
     // Check if it's a built-in function
+    console.log(`[FUNCTION-LOOKUP] Looking for built-in function: ${functionName}`);
+    console.log(`[FUNCTION-LOOKUP] Available built-in functions:`, BuiltInFunctionRegistry.getFunctionNames());
     const builtInFunction = BuiltInFunctionRegistry.getFunction(functionName);
+    console.log(`[FUNCTION-LOOKUP] Built-in function found:`, !!builtInFunction);
     if (builtInFunction) {
       const result = await builtInFunction.execute(this.context, ...args);
       

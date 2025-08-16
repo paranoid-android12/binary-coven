@@ -262,7 +262,7 @@ export class ProgrammingGame extends Scene {
   preload() {
     // Configure pixel-perfect rendering for crisp sprites
     this.load.on('filecomplete', (key: string) => {
-      if (key === 'qubit_walk' || key === 'qubit_idle') {
+      if (key === 'qubit_walk' || key === 'qubit_idle' || key === 'wheat_growth') {
         const texture = this.textures.get(key);
         // Set texture filtering to nearest neighbor for pixel-perfect scaling
         texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
@@ -293,9 +293,9 @@ export class ProgrammingGame extends Scene {
       frameHeight: 16
     });
 
-    // Load wheat growth sprites (5 frames side by side, 16x16 each)
-    // For now, we'll create a placeholder. User will provide the actual spritesheet later
-    this.load.spritesheet('wheat_growth', 'wheat_growth.png', {
+    // Load wheat growth sprites (6 phases in the last row, 16x16 each)
+    // The wheat sprites are at the very last row with 6 phases: seed to fully grown
+    this.load.spritesheet('wheat_growth', 'summer_crops.png', {
       frameWidth: 16,
       frameHeight: 16
     });
@@ -388,10 +388,10 @@ export class ProgrammingGame extends Scene {
     graphics.generateTexture('editor_wall', this.GRID_SIZE - 4, this.GRID_SIZE - 4);
     graphics.clear();
     
-    // Create wheat growth sprites as placeholders (5 frames)
+    // Create wheat growth sprites as placeholders (6 phases)
     // These will be replaced when user provides the actual spritesheet
-    const wheatColors = [0x8B4513, 0x9ACD32, 0x7CFC00, 0x32CD32, 0xFFD700]; // Brown to gold progression
-    for (let i = 0; i < 5; i++) {
+    const wheatColors = [0x8B4513, 0x9ACD32, 0x7CFC00, 0x32CD32, 0xFFD700, 0xDAA520]; // Brown to gold progression (6 phases)
+    for (let i = 0; i < 6; i++) {
       graphics.fillStyle(wheatColors[i]);
       graphics.fillRect(0, 0, 16, 16);
       graphics.generateTexture(`wheat_${i}`, 16, 16);
@@ -1078,31 +1078,49 @@ export class ProgrammingGame extends Scene {
     let wheatFrame = -1; // -1 means no wheat sprite
     
     if (grid.state.status === FarmlandState.PLANTING) {
-      wheatFrame = 0; // Seed planted
+      wheatFrame = 0; // Phase 1: Seed planted
     } else if (grid.state.status === FarmlandState.GROWING) {
       // Get progress from centralized task system
       const gameState = useGameStore.getState();
       const progressPercent = gameState.getTaskProgress(grid.id);
       const progressValue = progressPercent / 100; // Convert to 0-1 range
       
-
-      
-      if (progressValue < 0.25) wheatFrame = 1;
-      else if (progressValue < 0.5) wheatFrame = 2;
-      else if (progressValue < 0.75) wheatFrame = 3;
-      else wheatFrame = 4;
+      // Map progress to 6 phases (0-5): seed, growth stages 1-4, fully grown
+      if (progressValue < 0.2) wheatFrame = 1;      // Phase 2: Early growth
+      else if (progressValue < 0.4) wheatFrame = 2; // Phase 3: Small growth
+      else if (progressValue < 0.6) wheatFrame = 3; // Phase 4: Medium growth
+      else if (progressValue < 0.8) wheatFrame = 4; // Phase 5: Large growth  
+      else wheatFrame = 5; // Phase 6: Nearly fully grown
     } else if (grid.state.status === FarmlandState.READY) {
-      wheatFrame = 4; // Fully grown
+      wheatFrame = 5; // Phase 6: Fully grown wheat
     }
     
     if (wheatFrame >= 0) {
       // Create or update wheat sprite
       if (!wheatSprite) {
-        wheatSprite = this.add.sprite(
-          grid.position.x * this.GRID_SIZE + this.GRID_SIZE / 2,
-          grid.position.y * this.GRID_SIZE + this.GRID_SIZE / 2,
-          this.wheatSpriteKey.includes('wheat_growth') ? `wheat_${wheatFrame}` : this.wheatSpriteKey
-        );
+        // For placeholder sprites, use individual wheat textures
+        // For the actual spritesheet, use frame-based approach
+        if (this.textures.exists('wheat_growth')) {
+          // Use the actual spritesheet - need to calculate frame number
+          // If wheat is in the last row with 6 phases, we need to know the spritesheet dimensions
+          // For now, assume we need to calculate the offset to the last row
+          wheatSprite = this.add.sprite(
+            grid.position.x * this.GRID_SIZE + this.GRID_SIZE / 2,
+            grid.position.y * this.GRID_SIZE + this.GRID_SIZE / 2,
+            'wheat_growth'
+          );
+          
+          // Set the correct frame using our calculation method
+          const actualFrameNumber = this.getWheatFrameNumber(wheatFrame);
+          wheatSprite.setFrame(actualFrameNumber);
+        } else {
+          // Fallback to placeholder individual textures
+          wheatSprite = this.add.sprite(
+            grid.position.x * this.GRID_SIZE + this.GRID_SIZE / 2,
+            grid.position.y * this.GRID_SIZE + this.GRID_SIZE / 2,
+            `wheat_${wheatFrame}`
+          );
+        }
         
         // Scale wheat sprite to fit grid
         wheatSprite.setDisplaySize(this.GRID_SIZE - 8, this.GRID_SIZE - 8);
@@ -1112,10 +1130,11 @@ export class ProgrammingGame extends Scene {
         this.wheatSprites.set(wheatSpriteId, wheatSprite);
       } else {
         // Update existing sprite frame
-        if (this.wheatSpriteKey.includes('wheat_growth')) {
-          wheatSprite.setTexture(`wheat_${wheatFrame}`);
+        if (this.textures.exists('wheat_growth')) {
+          const actualFrameNumber = this.getWheatFrameNumber(wheatFrame);
+          wheatSprite.setFrame(actualFrameNumber);
         } else {
-          wheatSprite.setFrame(wheatFrame);
+          wheatSprite.setTexture(`wheat_${wheatFrame}`);
         }
       }
       
@@ -1635,6 +1654,34 @@ export class ProgrammingGame extends Scene {
     });
     
     this.executionTexts = [];
+  }
+
+  /**
+   * Calculate the correct frame number for wheat sprites in the spritesheet
+   * @param wheatPhase - The wheat phase (0-5)
+   * @returns The frame number in the spritesheet
+   */
+  private getWheatFrameNumber(wheatPhase: number): number {
+    // Since the wheat is in the very last row with 6 phases
+    // We need to calculate the offset to the last row
+    if (this.textures.exists('wheat_growth')) {
+      const texture = this.textures.get('wheat_growth');
+      const sourceWidth = texture.source[0].width;
+      const sourceHeight = texture.source[0].height;
+      
+      // Calculate how many columns and rows are in the spritesheet
+      const columns = Math.floor(sourceWidth / 16);
+      const rows = Math.floor(sourceHeight / 16);
+      
+      // The wheat is in the last row (rows - 1) and starts from column 0
+      // Frame number = (row * columns) + column
+      const lastRowStartFrame = (rows - 1) * columns;
+      
+      return lastRowStartFrame + wheatPhase;
+    }
+    
+    // Fallback for placeholder sprites
+    return wheatPhase;
   }
 
   // Method to easily change wheat sprite key (for when user provides actual spritesheet)
