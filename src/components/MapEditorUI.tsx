@@ -84,10 +84,9 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
 
   // Initial load effect - only runs when component becomes active
   useEffect(() => {
-    if (isActive && activeTileset) {
       console.log('Map editor activated, loading initial tileset:', activeTileset);
       loadTilesetImage();
-    }
+    
   }, [isActive]);
 
   // Tileset change effect - only runs when tileset changes (not on initial load)
@@ -407,15 +406,16 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
   if (!isActive) {
     return (
       <div style={{
-        position: 'absolute',
-        top: '10px',
-        left: '250px',
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        padding: '10px',
-        borderRadius: '5px',
+        position: 'fixed',
+        top: '20px',
+        left: '20px',
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        padding: '12px',
+        borderRadius: '8px',
         color: 'white',
         minWidth: '150px',
-        zIndex: 1000
+        zIndex: 1001,
+        border: '2px solid #44ff44'
       }}>
         <button
           onClick={onToggleEditor}
@@ -427,10 +427,11 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
             borderRadius: '4px',
             cursor: 'pointer',
             width: '100%',
-            fontSize: '14px'
+            fontSize: '14px',
+            fontWeight: 'bold'
           }}
         >
-           Edit Map
+          🗺️ Edit Map
         </button>
       </div>
     );
@@ -451,7 +452,7 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
         width: '400px',
         minWidth: '400px',
         border: '2px solid #007acc',
-        zIndex: 1000,
+        zIndex: 1001,
         cursor: 'move'
       }}>
       {/* Header */}

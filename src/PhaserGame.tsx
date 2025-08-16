@@ -85,8 +85,8 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame
             // Wait a bit for the game to initialize, then start our scene
             const timer = setTimeout(() => {
                 if (game.current) {
-                    // game.current.scene.start('ProgrammingGame');
-                    // game.current.scene.stop('MainMenu'); // Stop the default scene
+                    game.current.scene.start('ProgrammingGame');
+                    game.current.scene.stop('MainMenu'); // Stop the default scene
                 }
             }, 100);
 
