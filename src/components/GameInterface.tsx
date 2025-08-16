@@ -8,6 +8,7 @@ import { EventBus } from '../game/EventBus';
 import { Entity, GridTile } from '../types/game';
 import { MapEditorUI } from './MapEditorUI';
 import { SpriteEnergyDisplay } from './SpriteEnergyDisplay';
+import ImageSpriteEnergyDisplay from './ImageSpriteEnergyDisplay';
 
 // Custom hook for draggable functionality
 const useDraggable = (initialPosition: { x: number; y: number }) => {
@@ -682,6 +683,14 @@ export const GameInterface: React.FC = () => {
               color: '#00ff00' // Color overlay for the energy bar
             }}
             scale={4} // Scale the entire sprite 2x for better visibility
+          />
+        )}
+
+        {/* Top Right - Image-based Energy Display */}
+        {activeEntity && (
+          <ImageSpriteEnergyDisplay
+            entity={activeEntity}
+            position={spriteEnergyPosition}
           />
         )}
 
