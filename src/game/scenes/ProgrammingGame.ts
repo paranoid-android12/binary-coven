@@ -227,7 +227,6 @@ export class ProgrammingGame extends Scene {
   
   // Wheat sprite management
   private wheatSprites: Map<string, Phaser.GameObjects.Sprite> = new Map();
-  private wheatSpriteKey: string = 'wheat_growth'; // Can be changed easily
   
   // Map editor grid management
   private editorFarmlandSprites: Map<string, Phaser.GameObjects.Sprite> = new Map();
@@ -357,8 +356,8 @@ export class ProgrammingGame extends Scene {
     graphics.generateTexture('qubit', this.GRID_SIZE - 4, this.GRID_SIZE - 4);
     graphics.clear();
     
-    // Farmland - Brown square
-    graphics.fillStyle(0x8B4513);
+    // Farmland - Invisible
+    graphics.fillStyle(0x8B4513, 0); // Set alpha to 0 for invisibility
     graphics.fillRect(0, 0, this.GRID_SIZE - 4, this.GRID_SIZE - 4);
     graphics.generateTexture('farmland', this.GRID_SIZE - 4, this.GRID_SIZE - 4);
     graphics.clear();
@@ -376,8 +375,8 @@ export class ProgrammingGame extends Scene {
     graphics.clear();
     
     // Map Editor Grid Types
-    // Farmland Grid (for map editor) - Brown with 50% opacity
-    graphics.fillStyle(0x8B4513);
+    // Farmland Grid (for map editor) - Invisible
+    graphics.fillStyle(0x8B4513, 0); // Set alpha to 0 for invisibility
     graphics.fillRect(0, 0, this.GRID_SIZE - 4, this.GRID_SIZE - 4);
     graphics.generateTexture('editor_farmland', this.GRID_SIZE - 4, this.GRID_SIZE - 4);
     graphics.clear();

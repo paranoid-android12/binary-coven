@@ -357,8 +357,11 @@ export class MapEditor {
         currentTask: undefined,
         progress: undefined
       }
+
+      // Make farmland invisible by default
+      
     });
-    
+
     // The ProgrammingGame scene will handle creating the visual sprite and functionality
     // through its updateVisuals() method, so we don't need to create a separate sprite here
     
@@ -448,6 +451,7 @@ export class MapEditor {
     this.wallGridSprites.forEach(sprite => {
       sprite.setVisible(this.wallsVisible);
     });
+    
     
     this.debug('Wall visibility toggled:', this.wallsVisible);
   }
