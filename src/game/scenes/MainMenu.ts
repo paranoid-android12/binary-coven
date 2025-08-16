@@ -56,7 +56,9 @@ export class MainMenu extends Scene
             this.mainButton.setFrame("startButtonDown");
         });
         this.mainButton.on("pointerup", () => {
+            // When pressed down, wait to be pressed up to change frame
             this.mainButton.setFrame("startButtonUp");
+            this.scene.start('ProgrammingGame');
         });
 
         this.optionsButton = this.add.sprite(width / 2, (height / 2) + 50 + 80, "mainButton", "startButtonUp").setScale(4);
