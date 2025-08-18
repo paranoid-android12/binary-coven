@@ -29,7 +29,9 @@ export interface EntityStats {
   walkingSpeed: number;
   energy: number;
   maxEnergy: number;
-  [key: string]: number;
+  harvestAmount?: number;
+  plantingSpeedMultiplier?: number;
+  [key: string]: number | undefined;
 }
 
 export interface Entity {

@@ -342,7 +342,7 @@ export const GameInterface: React.FC = () => {
 
   // New state for function guide
   const [showFunctionGuide, setShowFunctionGuide] = useState(false);
-  const [showUpgrades, setShowUpgrades] = useState(false);
+
   const [errorMessages, setErrorMessages] = useState<Array<{id: string, message: string, timestamp: number}>>([]);
 
   // Handle error messages
@@ -518,7 +518,7 @@ export const GameInterface: React.FC = () => {
             </button>
 
             <button
-              onClick={() => setShowUpgrades(!showUpgrades)}
+              onClick={() => console.log('Upgrades button clicked - now handled in ProgrammingGame')}
               style={{
                 backgroundColor: '#f5a623',
                 color: 'white',
@@ -651,73 +651,7 @@ export const GameInterface: React.FC = () => {
         </div>
       )}
 
-      {/* Upgrades Modal */}
-      {showUpgrades && (
-        <div style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: 'rgba(0, 0, 0, 0.95)',
-          border: '2px solid #f5a623',
-          borderRadius: '8px',
-          padding: '20px',
-          zIndex: 1001,
-          minWidth: '400px'
-        }}>
-          <h4 style={{ margin: '0 0 16px 0', color: '#f5a623' }}>Upgrades</h4>
-          
-          <div style={{ color: '#cccccc', fontSize: '14px', marginBottom: '16px' }}>
-            <p>Use stored crops to upgrade your capabilities!</p>
-            <p style={{ fontSize: '12px', fontStyle: 'italic' }}>
-              Available Wheat: {globalResources.wheat || 0}
-            </p>
-          </div>
 
-          <div style={{ marginBottom: '16px' }}>
-            <div style={{
-              padding: '12px',
-              border: '1px solid #666666',
-              borderRadius: '4px',
-              marginBottom: '8px'
-            }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Energy Capacity +20</div>
-              <div style={{ fontSize: '12px', color: '#cccccc', marginBottom: '8px' }}>
-                Cost: 10 Wheat
-              </div>
-              <button
-                disabled={(globalResources.wheat || 0) < 10}
-                style={{
-                  backgroundColor: (globalResources.wheat || 0) >= 10 ? '#16c60c' : '#666666',
-                  color: 'white',
-                  border: 'none',
-                  padding: '6px 12px',
-                  borderRadius: '4px',
-                  cursor: (globalResources.wheat || 0) >= 10 ? 'pointer' : 'not-allowed',
-                  fontSize: '12px'
-                }}
-              >
-                Upgrade
-              </button>
-            </div>
-          </div>
-
-          <button
-            onClick={() => setShowUpgrades(false)}
-            style={{
-              backgroundColor: '#666666',
-              color: 'white',
-              border: 'none',
-              padding: '8px 16px',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '12px'
-            }}
-          >
-            Close
-          </button>
-        </div>
-      )}
     </div>
   );
 };

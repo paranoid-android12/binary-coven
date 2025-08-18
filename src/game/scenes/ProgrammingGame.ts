@@ -191,6 +191,14 @@ export class ProgrammingGame extends Scene {
   private movementManager: MovementManager;
   private mapEditor: MapEditor;
   private mapEditorUI: React.ComponentType<any> | null = null;
+  private play_code: Phaser.GameObjects.Sprite;
+  private upgrade_game: Phaser.GameObjects.Sprite;
+  private save_game: Phaser.GameObjects.Sprite;
+  private load_game: Phaser.GameObjects.Sprite;
+  
+  // Upgrade system
+  private upgradeModal: Phaser.GameObjects.Container | null = null;
+  private isUpgradeModalOpen: boolean = false;
   
   // Visual elements
   private gridGraphics!: Phaser.GameObjects.Graphics;
@@ -273,6 +281,90 @@ export class ProgrammingGame extends Scene {
       frameWidth: 32,  // Updated to match user's adjustment
       frameHeight: 32  // Updated to match user's adjustment
     });
+
+    this.load.atlas("upgrade_game", "button.png", {
+      "frames": {
+        "upgrade_game_up": {
+          "frame": {
+            "x": 592,
+            "y": 256,
+            "w": 16,
+            "h": 16
+          }
+        },
+        "upgrade_game_down": {
+          "frame": {
+            "x": 592,
+            "y": 272,
+            "w": 16,
+            "h": 16
+          }
+        }
+      }
+    });
+
+    this.load.atlas("save_game", "button.png", {
+      "frames": {
+        "save_game_up": {
+          "frame": {
+            "x": 608,
+            "y": 256,
+            "w": 16,
+            "h": 16
+          }
+        },
+        "save_game_down": {
+          "frame": {
+            "x": 608,
+            "y": 272,
+            "w": 16,
+            "h": 16
+          }
+        }
+      }
+    });
+
+    this.load.atlas("load_game", "button.png", {
+      "frames": {
+        "load_game_up": {
+          "frame": {
+            "x": 624,
+            "y": 256,
+            "w": 16,
+            "h": 16
+          }
+        },
+        "load_game_down": {
+          "frame": {
+            "x": 624,
+            "y": 272,
+            "w": 16,
+            "h": 16
+          }
+        }
+      }
+    });
+
+    this.load.atlas("play_code", "button.png", {
+      "frames": {
+        "play_code_up": {
+          "frame": {
+            "x": 176,
+            "y": 16,
+            "w": 16,
+            "h": 16
+          }
+        },
+        "play_code_down": {
+          "frame": {
+            "x": 176,
+            "y": 32,
+            "w": 16,
+            "h": 16
+          }
+        }
+      }
+    });
     
     // Load the idle spritesheet for qubit
     this.load.spritesheet('qubit_idle', 'Idle.png', {
@@ -311,6 +403,88 @@ export class ProgrammingGame extends Scene {
   create() {
     // Configure pixel-perfect rendering for the entire scene
     this.cameras.main.setRoundPixels(true);
+
+         // Create play button in the top-right corner, fixed to camera
+     this.play_code = this.add.sprite(250, 250, "play_code", "play_code_up")
+       .setScale(5)
+       .setScrollFactor(0) // Fix to camera
+       .setInteractive()
+       .setDepth(1000);
+
+     // Position relative to camera bounds
+     const camera = this.cameras.main;
+     this.play_code.setPosition(
+       camera.width - this.play_code.displayWidth + 460,  // 20px from right edge
+       -180  // 20px from top
+     );
+
+     // Add button interactions
+     this.play_code.on('pointerdown', () => {
+       this.play_code.setFrame("play_code_down");
+     });
+     this.play_code.on('pointerup', () => {
+       this.play_code.setFrame("play_code_up");
+       this.startCodeExecution();  // Start code execution when button is clicked
+     });
+
+     this.upgrade_game = this.add.sprite(250, 250, "upgrade_game", "upgrade_game_up")
+       .setScale(5)
+       .setScrollFactor(0) // Fix to camera
+       .setInteractive()
+       .setDepth(1000);
+
+     this.upgrade_game.setPosition(
+       camera.width - this.upgrade_game.displayWidth + 550,  // 20px from right edge
+       -180  // 20px from top
+     );
+
+     this.upgrade_game.on('pointerdown', () => {
+      this.upgrade_game.setFrame("upgrade_game_down");
+     });
+     this.upgrade_game.on('pointerup', () => {
+      this.upgrade_game.setFrame("upgrade_game_up");
+      this.openUpgradeModal();
+     });
+
+     // Create save button
+     this.save_game = this.add.sprite(250, 250, "save_game", "save_game_up")
+       .setScale(5)
+       .setScrollFactor(0) // Fix to camera
+       .setInteractive()
+       .setDepth(1000);
+
+     this.save_game.setPosition(
+       camera.width - this.save_game.displayWidth + 640,  // 20px from right edge
+       -180  // 20px from top
+     );
+
+     this.save_game.on('pointerdown', () => {
+      this.save_game.setFrame("save_game_down");
+     });
+     this.save_game.on('pointerup', () => {
+      this.save_game.setFrame("save_game_up");
+      this.saveGameState();
+     });
+
+     // Create load button
+     this.load_game = this.add.sprite(250, 250, "load_game", "load_game_up")
+       .setScale(5)
+       .setScrollFactor(0) // Fix to camera
+       .setInteractive()
+       .setDepth(1000);
+
+     this.load_game.setPosition(
+       camera.width - this.load_game.displayWidth + 730,  // 20px from right edge
+       -180  // 20px from top
+     );
+
+     this.load_game.on('pointerdown', () => {
+      this.load_game.setFrame("load_game_down");
+     });
+     this.load_game.on('pointerup', () => {
+      this.load_game.setFrame("load_game_up");
+      this.loadGameState();
+     });
     
     // Create placeholder sprites first (fallback sprites)
     this.createPlaceholderSprites();
@@ -1713,7 +1887,6 @@ export class ProgrammingGame extends Scene {
 
   // Method to easily change wheat sprite key (for when user provides actual spritesheet)
   public setWheatSpriteKey(spriteKey: string): void {
-    this.wheatSpriteKey = spriteKey;
     
     // Update all existing wheat sprites
     this.wheatSprites.forEach((sprite, id) => {
@@ -1725,5 +1898,345 @@ export class ProgrammingGame extends Scene {
     });
     
     console.log(`Wheat sprite key changed to: ${spriteKey}`);
+  }
+
+  // =====================================================================
+  // UPGRADE SYSTEM
+  // =====================================================================
+
+  private openUpgradeModal(): void {
+    if (this.isUpgradeModalOpen) return;
+    
+    this.isUpgradeModalOpen = true;
+    this.createUpgradeModal();
+  }
+
+  private closeUpgradeModal(): void {
+    if (!this.isUpgradeModalOpen) return;
+    
+    this.isUpgradeModalOpen = false;
+    if (this.upgradeModal) {
+      this.upgradeModal.destroy();
+      this.upgradeModal = null;
+    }
+  }
+
+  private createUpgradeModal(): void {
+    const camera = this.cameras.main;
+    const modalWidth = 500;
+    const modalHeight = 400;
+    
+    // Create modal container
+    this.upgradeModal = this.add.container(camera.centerX, camera.centerY);
+    this.upgradeModal.setScrollFactor(0);
+    this.upgradeModal.setDepth(2000);
+
+    // Background
+    const bg = this.add.graphics();
+    bg.fillStyle(0x000000, 0.95);
+    bg.lineStyle(2, 0xf5a623);
+    bg.fillRoundedRect(-modalWidth/2, -modalHeight/2, modalWidth, modalHeight, 8);
+    bg.strokeRoundedRect(-modalWidth/2, -modalHeight/2, modalWidth, modalHeight, 8);
+    this.upgradeModal.add(bg);
+
+    // Title
+    const title = this.add.text(0, -modalHeight/2 + 30, 'UPGRADES', {
+      fontSize: '24px',
+      color: '#f5a623',
+      fontFamily: 'Arial, sans-serif'
+    });
+    title.setOrigin(0.5);
+    this.upgradeModal.add(title);
+
+    // Current wheat display
+    const gameState = useGameStore.getState();
+    const wheatText = this.add.text(0, -modalHeight/2 + 70, `Available Wheat: ${gameState.globalResources.wheat || 0}`, {
+      fontSize: '16px',
+      color: '#cccccc',
+      fontFamily: 'Arial, sans-serif'
+    });
+    wheatText.setOrigin(0.5);
+    this.upgradeModal.add(wheatText);
+
+    // Upgrade buttons
+    this.createUpgradeButtons();
+
+    // Close button
+    const closeBtn = this.add.text(0, modalHeight/2 - 30, 'CLOSE', {
+      fontSize: '16px',
+      color: '#ffffff',
+      backgroundColor: '#666666',
+      padding: { x: 20, y: 10 }
+    });
+    closeBtn.setOrigin(0.5);
+    closeBtn.setInteractive({ useHandCursor: true });
+    closeBtn.on('pointerdown', () => this.closeUpgradeModal());
+    closeBtn.on('pointerover', () => closeBtn.setTint(0xaaaaaa));
+    closeBtn.on('pointerout', () => closeBtn.clearTint());
+    this.upgradeModal.add(closeBtn);
+  }
+
+  private createUpgradeButtons(): void {
+    const gameState = useGameStore.getState();
+    const activeEntity = gameState.entities.get(gameState.activeEntityId);
+    
+    if (!activeEntity) return;
+
+    const upgrades = [
+      {
+        name: 'Movement Speed +0.5',
+        description: 'Increase walking speed',
+        cost: 15,
+        current: activeEntity.stats.walkingSpeed,
+        apply: () => {
+          gameState.updateEntity(activeEntity.id, {
+            stats: { ...activeEntity.stats, walkingSpeed: activeEntity.stats.walkingSpeed + 0.5 }
+          });
+        }
+      },
+      {
+        name: 'Max Energy +20',
+        description: 'Increase maximum energy capacity',
+        cost: 10,
+        current: activeEntity.stats.maxEnergy,
+        apply: () => {
+          const newMaxEnergy = activeEntity.stats.maxEnergy + 20;
+          gameState.updateEntity(activeEntity.id, {
+            stats: { 
+              ...activeEntity.stats, 
+              maxEnergy: newMaxEnergy,
+              energy: Math.min(activeEntity.stats.energy + 20, newMaxEnergy) // Also restore 20 energy
+            }
+          });
+        }
+      },
+      {
+        name: 'Harvest Amount +2',
+        description: 'Get more wheat per harvest',
+        cost: 25,
+        current: activeEntity.stats.harvestAmount || 1,
+        apply: () => {
+          gameState.updateEntity(activeEntity.id, {
+            stats: { ...activeEntity.stats, harvestAmount: (activeEntity.stats.harvestAmount || 1) + 2 }
+          });
+        }
+      },
+      {
+        name: 'Planting Speed +25%',
+        description: 'Reduce planting time',
+        cost: 20,
+        current: `${Math.round((1 - (activeEntity.stats.plantingSpeedMultiplier || 1)) * 100)}% faster`,
+        apply: () => {
+          const currentMultiplier = activeEntity.stats.plantingSpeedMultiplier || 1;
+          gameState.updateEntity(activeEntity.id, {
+            stats: { ...activeEntity.stats, plantingSpeedMultiplier: Math.max(0.1, currentMultiplier - 0.25) }
+          });
+        }
+      }
+    ];
+
+    upgrades.forEach((upgrade, index) => {
+      const yOffset = -80 + (index * 80);
+      const canAfford = (gameState.globalResources.wheat || 0) >= upgrade.cost;
+      
+      // Upgrade container
+      const upgradeContainer = this.add.container(0, yOffset);
+      
+      // Background for upgrade item
+      const itemBg = this.add.graphics();
+      itemBg.fillStyle(0x333333, 0.8);
+      itemBg.lineStyle(1, canAfford ? 0x16c60c : 0x666666);
+      itemBg.fillRoundedRect(-200, -25, 400, 50, 4);
+      itemBg.strokeRoundedRect(-200, -25, 400, 50, 4);
+      upgradeContainer.add(itemBg);
+      
+      // Upgrade name
+      const nameText = this.add.text(-180, -15, upgrade.name, {
+        fontSize: '14px',
+        color: '#ffffff',
+        fontFamily: 'Arial, sans-serif'
+      });
+      upgradeContainer.add(nameText);
+      
+      // Current value
+      const currentText = this.add.text(-180, 5, `Current: ${upgrade.current}`, {
+        fontSize: '10px',
+        color: '#cccccc',
+        fontFamily: 'Arial, sans-serif'
+      });
+      upgradeContainer.add(currentText);
+      
+      // Cost
+      const costText = this.add.text(0, -5, `Cost: ${upgrade.cost} Wheat`, {
+        fontSize: '12px',
+        color: '#f5a623',
+        fontFamily: 'Arial, sans-serif'
+      });
+      costText.setOrigin(0.5);
+      upgradeContainer.add(costText);
+      
+      // Buy button
+      const buyBtn = this.add.text(150, 0, 'BUY', {
+        fontSize: '12px',
+        color: canAfford ? '#ffffff' : '#888888',
+        backgroundColor: canAfford ? '#16c60c' : '#444444',
+        padding: { x: 15, y: 8 }
+      });
+      buyBtn.setOrigin(0.5);
+      
+      if (canAfford) {
+        buyBtn.setInteractive({ useHandCursor: true });
+        buyBtn.on('pointerdown', () => {
+          // Consume wheat
+          gameState.updateResources({ wheat: (gameState.globalResources.wheat || 0) - upgrade.cost });
+          
+          // Apply upgrade
+          upgrade.apply();
+          
+          console.log(`[UPGRADES] Applied upgrade: ${upgrade.name}`);
+          
+          // Close and reopen modal to refresh
+          this.closeUpgradeModal();
+          this.openUpgradeModal();
+        });
+        buyBtn.on('pointerover', () => buyBtn.setTint(0xaaaaaa));
+        buyBtn.on('pointerout', () => buyBtn.clearTint());
+      }
+      
+      upgradeContainer.add(buyBtn);
+      this.upgradeModal!.add(upgradeContainer);
+    });
+  }
+
+  // =====================================================================
+  // SAVE/LOAD SYSTEM
+  // =====================================================================
+
+  private saveGameState(): void {
+    try {
+      const gameState = useGameStore.getState();
+      
+      const saveData = {
+        version: '1.0',
+        timestamp: Date.now(),
+        gridSize: gameState.gridSize,
+        entities: Array.from(gameState.entities.entries()).map(([id, entity]) => ({
+          ...entity,
+          id,
+          // Convert Phaser sprite reference to null for serialization
+          sprite: null
+        })),
+        grids: Array.from(gameState.grids.entries()).map(([id, grid]) => ({
+          ...grid,
+          id
+        })),
+        activeEntityId: gameState.activeEntityId,
+        globalResources: gameState.globalResources,
+        codeWindows: Array.from(gameState.codeWindows.entries()).map(([id, window]) => ({
+          ...window,
+          id
+        })),
+        mainWindowId: gameState.mainWindowId
+      };
+      
+      localStorage.setItem('binary-coven-save', JSON.stringify(saveData));
+      console.log('[SAVE] Game state saved successfully');
+      
+      // Show save confirmation
+      this.showNotification('Game Saved!', 0x16c60c);
+      
+    } catch (error) {
+      console.error('[SAVE] Failed to save game state:', error);
+      this.showNotification('Save Failed!', 0xff0000);
+    }
+  }
+
+  private loadGameState(): void {
+    try {
+      const saveDataStr = localStorage.getItem('binary-coven-save');
+      if (!saveDataStr) {
+        this.showNotification('No Save Found!', 0xff6600);
+        return;
+      }
+      
+      const saveData = JSON.parse(saveDataStr);
+      const gameState = useGameStore.getState();
+      
+      // Clear current state
+      gameState.reset();
+      
+      // Restore entities
+      saveData.entities.forEach((entityData: any) => {
+        const { id, ...entity } = entityData;
+        gameState.addEntity(entity);
+        // Update the entity with the original ID
+        const newEntities = new Map(gameState.entities);
+        newEntities.delete(Array.from(newEntities.keys()).pop()!); // Remove auto-generated ID
+        newEntities.set(id, { ...entity, id });
+        useGameStore.setState({ entities: newEntities });
+      });
+      
+      // Restore grids
+      saveData.grids.forEach((gridData: any) => {
+        const { id, ...grid } = gridData;
+        gameState.addGrid(grid);
+        // Update the grid with the original ID
+        const newGrids = new Map(gameState.grids);
+        newGrids.delete(Array.from(newGrids.keys()).pop()!); // Remove auto-generated ID
+        newGrids.set(id, { ...grid, id });
+        useGameStore.setState({ grids: newGrids });
+      });
+      
+      // Restore code windows
+      saveData.codeWindows.forEach((windowData: any) => {
+        const { id, ...window } = windowData;
+        gameState.addCodeWindow(window);
+        // Update the window with the original ID
+        const newWindows = new Map(gameState.codeWindows);
+        newWindows.delete(Array.from(newWindows.keys()).pop()!); // Remove auto-generated ID
+        newWindows.set(id, { ...window, id });
+        useGameStore.setState({ codeWindows: newWindows });
+      });
+      
+      // Restore other state
+      useGameStore.setState({
+        activeEntityId: saveData.activeEntityId,
+        globalResources: saveData.globalResources,
+        mainWindowId: saveData.mainWindowId
+      });
+      
+      // Update visuals
+      this.updateVisuals();
+      
+      console.log('[LOAD] Game state loaded successfully');
+      this.showNotification('Game Loaded!', 0x16c60c);
+      
+    } catch (error) {
+      console.error('[LOAD] Failed to load game state:', error);
+      this.showNotification('Load Failed!', 0xff0000);
+    }
+  }
+
+  private showNotification(message: string, color: number): void {
+    const camera = this.cameras.main;
+    const notification = this.add.text(camera.centerX, camera.centerY - 200, message, {
+      fontSize: '20px',
+      color: '#ffffff',
+      backgroundColor: `#${color.toString(16).padStart(6, '0')}`,
+      padding: { x: 20, y: 10 }
+    });
+    notification.setOrigin(0.5);
+    notification.setScrollFactor(0);
+    notification.setDepth(3000);
+    
+    // Fade out animation
+    this.tweens.add({
+      targets: notification,
+      alpha: 0,
+      y: notification.y - 50,
+      duration: 2000,
+      ease: 'Power2',
+      onComplete: () => notification.destroy()
+    });
   }
 } 

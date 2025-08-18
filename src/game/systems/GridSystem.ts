@@ -149,12 +149,19 @@ export class GridSystem {
           
           console.log(`[GRID-SYSTEM] Starting planting task for ${seedType}`);
           
+          // Calculate planting duration with speed multiplier
+          const basePlantingDuration = 3; // 3 seconds base planting time
+          const speedMultiplier = entity.stats.plantingSpeedMultiplier || 1;
+          const actualPlantingDuration = basePlantingDuration * speedMultiplier;
+          
+          console.log(`[GRID-SYSTEM] Planting duration: ${actualPlantingDuration}s (base: ${basePlantingDuration}s, multiplier: ${speedMultiplier})`);
+          
           // Start planting task using centralized system
           const plantingSuccess = store.startTask({
             type: 'entity',
             targetId: entity.id,
             taskName: 'planting',
-            duration: 3, // 3 seconds to plant
+            duration: actualPlantingDuration,
             description: `Planting ${plantData.displayName}...`,
             onComplete: () => {
               console.log(`[GRID-SYSTEM] Planting completed for grid ${grid.id}`);
@@ -270,10 +277,13 @@ export class GridSystem {
             };
           }
           
-          const cropAmount = grid.state.cropAmount || 1;
+          const baseCropAmount = grid.state.cropAmount || 1;
           const cropType = grid.state.plantType;
+          // Apply entity's harvest amount upgrade
+          const entityHarvestBonus = entity.stats.harvestAmount || 1;
+          const cropAmount = baseCropAmount * entityHarvestBonus;
           
-          console.log(`[GRID-SYSTEM] Starting harvest task for ${cropAmount} ${cropType}`);
+          console.log(`[GRID-SYSTEM] Starting harvest task for ${cropAmount} ${cropType} (base: ${baseCropAmount}, entity bonus: ${entityHarvestBonus})`);
           
           // Start harvesting task
           const harvestSuccess = store.startTask({
