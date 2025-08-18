@@ -617,7 +617,6 @@ export class ProgrammingGame extends Scene {
         }
       }
     }
-    
     // Grid lines removed for cleaner appearance
   }
 
@@ -1109,7 +1108,7 @@ export class ProgrammingGame extends Scene {
     if (entity.stats.energy <= 0) {
       sprite.setTint(0x888888); // Gray tint for low energy
     } else if (entity.taskState.isBlocked || entity.movementState?.isMoving) {
-      sprite.setTint(0xffaa00); // Orange tint for busy/moving
+      // sprite.setTint(0xffaa00); // Orange tint for busy/moving
     } else {
       sprite.clearTint();
     }
