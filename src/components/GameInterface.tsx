@@ -384,7 +384,7 @@ export const GameInterface: React.FC = () => {
           <PhaserGame ref={phaserRef} currentActiveScene={currentActiveScene} />
           
           {/* Map Editor UI Overlay */}
-          <MapEditorUI
+          {/* <MapEditorUI
             tilesets={mapEditorState.tilesets}
             activeTileset={mapEditorState.activeTileset}
             selectedLayer={mapEditorState.selectedLayer}
@@ -405,7 +405,7 @@ export const GameInterface: React.FC = () => {
               EventBus.emit('toggle-map-editor');
             }}
             isActive={mapEditorState.isActive}
-          />
+          /> */}
         </div>
 
       </div>

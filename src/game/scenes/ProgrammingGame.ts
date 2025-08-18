@@ -280,6 +280,11 @@ export class ProgrammingGame extends Scene {
       frameHeight: 32
     });
 
+    this.load.spritesheet('qubit_planting', 'Hoe.png', {
+      frameWidth: 32,
+      frameHeight: 32
+    });
+
     // Load the Ground_Tileset for map editor (16x16 tiles in a spritesheet)
     this.load.spritesheet('Ground_Tileset', 'Ground_Tileset.png', {
       frameWidth: 16,
@@ -870,6 +875,7 @@ export class ProgrammingGame extends Scene {
           
           // Disable texture smoothing for crisp pixel art
           sprite.texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+          sprite.setDepth(1000); // Qubit should always be on top of everything
           
           // Start with idle animation facing down if it exists
           if (this.anims.exists('qubit_idle')) {
@@ -896,9 +902,7 @@ export class ProgrammingGame extends Scene {
       }
       
       sprite.setInteractive();
-      
-      // Set depth for entity sprites (qubit on top)
-      sprite.setDepth(2);
+    
       
       // Add click handler for entity
       sprite.on('pointerdown', () => {
@@ -949,6 +953,8 @@ export class ProgrammingGame extends Scene {
       console.warn('Sprite does not have animation component');
       return;
     }
+
+    console.log("Entity state: ", entity);
     
     // Check if entity is currently moving
     if (entity.movementState?.isMoving) {
@@ -989,6 +995,12 @@ export class ProgrammingGame extends Scene {
         if (!sprite.anims.isPlaying || sprite.anims.currentAnim?.key !== walkAnimationKey) {
           sprite.play(walkAnimationKey, true);
         }
+      }
+    } else if (entity.taskState.currentTask === "planting") {
+      // Play planting animation
+      let plantingAnimationKey = 'qubit_planting';
+      if (this.anims.exists(plantingAnimationKey)) {
+        sprite.play(plantingAnimationKey, true);
       }
     } else {
       // Entity is stationary - play appropriate idle animation
@@ -1108,6 +1120,8 @@ export class ProgrammingGame extends Scene {
             grid.position.y * this.GRID_SIZE + this.GRID_SIZE / 2,
             'wheat_growth'
           );
+
+          wheatSprite.setDepth(5); // Above grid sprites but below qubit
           
           // Set the correct frame using our calculation method
           const actualFrameNumber = this.getWheatFrameNumber(wheatFrame);
@@ -1119,11 +1133,12 @@ export class ProgrammingGame extends Scene {
             grid.position.y * this.GRID_SIZE + this.GRID_SIZE / 2,
             `wheat_${wheatFrame}`
           );
+          wheatSprite.setDepth(5); // Above grid sprites but below qubit
         }
         
         // Scale wheat sprite to fit grid
         wheatSprite.setDisplaySize(this.GRID_SIZE - 8, this.GRID_SIZE - 8);
-        wheatSprite.setDepth(2); // Above grid sprites
+        wheatSprite.setDepth(10); // Above grid sprites
         wheatSprite.texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
         
         this.wheatSprites.set(wheatSpriteId, wheatSprite);
@@ -1378,6 +1393,11 @@ export class ProgrammingGame extends Scene {
       console.warn('qubit_idle texture not found. Idle animations will not be created.');
       return;
     }
+
+    if (!this.textures.exists('qubit_planting')) {
+      console.warn('qubit_planting texture not found. Planting animations will not be created.');
+      return;
+    }
     
     // Log frame information for debugging
     const walkTexture = this.textures.get('qubit_walk');
@@ -1414,6 +1434,14 @@ export class ProgrammingGame extends Scene {
     this.anims.create({
       key: 'qubit_idle_left',
       frames: this.anims.generateFrameNumbers('qubit_idle', { start: 8, end: 11 }),
+      frameRate: 4,
+      repeat: -1
+    });
+    
+    // Planting animation
+    this.anims.create({
+      key: 'qubit_planting',
+      frames: this.anims.generateFrameNumbers('qubit_planting', { start: 0, end: 3 }),
       frameRate: 4,
       repeat: -1
     });
