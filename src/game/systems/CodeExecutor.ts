@@ -559,6 +559,8 @@ export class CodeExecutor {
               return this.handleMinFunction(args);
             } else if (functionName === 'max') {
               return this.handleMaxFunction(args);
+            } else if (functionName === 'can_harvest') {
+              return this.handleCanHarvestFunction();
             }
           } catch (error) {
             console.warn(`Error evaluating function ${functionName}:`, error);
@@ -737,6 +739,38 @@ export class CodeExecutor {
     }
     
     return Math.max(...numbers);
+  }
+
+  private handleCanHarvestFunction(): boolean {
+    // Get the current game store state
+    const store = useGameStore.getState();
+    
+    // Get the latest entity data
+    const currentEntity = store.entities.get(this.context.entity.id);
+    if (!currentEntity) {
+      return false;
+    }
+    
+    // Get the grid at the entity's current position
+    const grid = store.getGridAt(currentEntity.position);
+    
+    // Return false if no grid found at current position
+    if (!grid) {
+      return false;
+    }
+    
+    // Return false if not standing on farmland
+    if (grid.type !== 'farmland') {
+      return false;
+    }
+    
+    // Check if farmland has crops ready for harvest
+    // A farmland can be harvested if:
+    // 1. It has the status 'ready' (meaning crops are fully grown)
+    // 2. There's no active task blocking it
+    const canHarvest = grid.state.status === 'ready' && !grid.taskState.isBlocked;
+    
+    return canHarvest;
   }
 
   // Check if a value is truthy (Python-like truthiness)

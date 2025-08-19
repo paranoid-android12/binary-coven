@@ -1052,8 +1052,6 @@ export class ProgrammingGame extends Scene {
       console.warn('Sprite does not have animation component');
       return;
     }
-
-    console.log("Entity state: ", entity);
     
     // Check if entity is currently moving
     if (entity.movementState?.isMoving) {

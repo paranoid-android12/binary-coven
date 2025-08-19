@@ -395,7 +395,7 @@ export const GameInterface: React.FC = () => {
           <PhaserGame ref={phaserRef} currentActiveScene={currentActiveScene} />
           
           {/* Map Editor UI Overlay */}
-          <MapEditorUI
+          {/* <MapEditorUI
             tilesets={mapEditorState.tilesets}
             activeTileset={mapEditorState.activeTileset}
             selectedLayer={mapEditorState.selectedLayer}
@@ -416,7 +416,7 @@ export const GameInterface: React.FC = () => {
               EventBus.emit('toggle-map-editor');
             }}
             isActive={mapEditorState.isActive}
-          />
+          /> */}
         </div>
 
       </div>
@@ -486,68 +486,6 @@ export const GameInterface: React.FC = () => {
         />
 
         {/* Top Right - Resources & Controls */}
-        {/* <div 
-          ref={resourcesPanel.elementRef}
-          onMouseDown={resourcesPanel.handleMouseDown}
-          style={{
-            position: 'absolute',
-            top: `${resourcesPanel.position.y}px`,
-            left: `${resourcesPanel.position.x}px`,
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            border: '2px solid #007acc',
-            borderRadius: '8px',
-            padding: '12px',
-            pointerEvents: 'auto',
-            minWidth: '180px',
-            cursor: 'move'
-          }}>
-          <div style={{ marginBottom: '12px' }}>
-            <div style={{ color: '#ffffff', fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
-              Resources
-            </div>
-            <div style={{ fontSize: '12px', color: '#cccccc' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span> Wheat:</span>
-                <span>{globalResources.wheat || 0}</span>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <button
-              onClick={handleRunCode}
-              style={{
-                backgroundColor: isCodeRunning ? '#e81123' : '#16c60c',
-                color: 'white',
-                border: 'none',
-                padding: '6px 12px',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '12px',
-                fontWeight: 'bold'
-              }}
-            >
-              {isCodeRunning ? '⏹ Stop' : '▶ Run'}
-            </button>
-            
-            <button
-              onClick={() => setShowFunctionGuide(!showFunctionGuide)}
-              style={{
-                backgroundColor: '#007acc',
-                color: 'white',
-                border: 'none',
-                padding: '6px 12px',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '12px'
-              }}
-            >
-               Guide
-            </button>
-
-
-          </div>
-        </div> */}
 
         {/* Bottom Left - Error Messages */}
         <div style={{
@@ -585,86 +523,6 @@ export const GameInterface: React.FC = () => {
       </div>
 
       {/* Function Guide Dropdown */}
-      {showFunctionGuide && (
-        <div style={{
-          position: 'fixed',
-          top: '80px',
-          right: '20px',
-          backgroundColor: 'rgba(0, 0, 0, 0.95)',
-          border: '2px solid #007acc',
-          borderRadius: '8px',
-          padding: '16px',
-          zIndex: 1001,
-          maxWidth: '350px',
-          maxHeight: '500px',
-          overflowY: 'auto'
-        }}>
-          <h4 style={{ margin: '0 0 12px 0', color: '#007acc' }}>Function Guide</h4>
-          
-          {/* Farm Functions */}
-          <div style={{ marginBottom: '16px' }}>
-            <h5 style={{ margin: '0 0 8px 0', color: '#f5a623' }}>Farm Functions</h5>
-            <div style={{ fontSize: '12px', color: '#cccccc', lineHeight: '1.4' }}>
-              <div style={{ marginBottom: '6px' }}>
-                <strong>Farmland:</strong> plant(crop_type), harvest()
-              </div>
-              <div style={{ marginBottom: '6px' }}>
-                <strong>Food Station:</strong> eat()
-              </div>
-              <div style={{ marginBottom: '6px' }}>
-                <strong>Silo:</strong> store(item_type, amount)
-              </div>
-            </div>
-          </div>
-
-          {/* Debug Functions */}
-          <div style={{ marginBottom: '16px' }}>
-            <h5 style={{ margin: '0 0 8px 0', color: '#f5a623' }}>Debug & Utility</h5>
-            <div style={{ fontSize: '12px', color: '#cccccc', lineHeight: '1.4' }}>
-              <div style={{ marginBottom: '4px' }}>
-                <code>debug_grid_info()</code> - Show position and nearby grids
-              </div>
-              <div style={{ marginBottom: '4px' }}>
-                <code>debug_farmland_states()</code> - Show all farmland states and tasks
-              </div>
-              <div style={{ marginBottom: '4px' }}>
-                <code>scanner(x, y)</code> - Scan grid at coordinates
-              </div>
-              <div style={{ marginBottom: '4px' }}>
-                <code>get_position()</code> - Get current position
-              </div>
-            </div>
-          </div>
-
-          {/* Movement Functions */}
-          <div style={{ marginBottom: '16px' }}>
-            <h5 style={{ margin: '0 0 8px 0', color: '#f5a623' }}>Movement</h5>
-            <div style={{ fontSize: '12px', color: '#cccccc', lineHeight: '1.4' }}>
-              {BuiltInFunctionRegistry.getFunctionsByCategory('movement').map(func => (
-                <div key={func.name} style={{ marginBottom: '4px' }}>
-                  <code>{func.name}()</code> - {func.description}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <button
-            onClick={() => setShowFunctionGuide(false)}
-            style={{
-              backgroundColor: '#666666',
-              color: 'white',
-              border: 'none',
-              padding: '6px 12px',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '12px',
-              marginTop: '8px'
-            }}
-          >
-            Close
-          </button>
-        </div>
-      )}
 
 
     </div>

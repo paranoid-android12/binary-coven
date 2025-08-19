@@ -627,6 +627,62 @@ export const interactionFunctions: BuiltInFunction[] = [
     }
   },
   {
+    name: 'can_harvest',
+    description: 'Check if the current farmland grid can be harvested',
+    category: 'interaction',
+    parameters: [],
+    execute: async (context: ExecutionContext): Promise<ExecutionResult> => {
+      const { entity } = context;
+      const store = useGameStore.getState();
+      
+      // Ensure we have the latest entity position from the game store
+      const latestEntity = store.entities.get(entity.id);
+      if (!latestEntity) {
+        return {
+          success: true,
+          message: 'Entity not found',
+          data: false
+        };
+      }
+      
+      // Update context entity with latest data
+      syncContextEntity(context);
+      
+      // Use the latest position to find the grid
+      const grid = store.getGridAt(latestEntity.position);
+
+      // Return false if no grid found at current position
+      if (!grid) {
+        return {
+          success: true,
+          message: 'Not standing on any grid',
+          data: false
+        };
+      }
+
+      // Return false if not standing on farmland
+      if (grid.type !== 'farmland') {
+        return {
+          success: true,
+          message: 'Not standing on farmland',
+          data: false
+        };
+      }
+
+      // Check if farmland has crops ready for harvest
+      // A farmland can be harvested if:
+      // 1. It has the status 'ready' (meaning crops are fully grown)
+      // 2. There's no active task blocking it
+      const canHarvest = grid.state.status === 'ready' && !grid.taskState.isBlocked;
+
+      return {
+        success: true,
+        message: canHarvest ? 'Farmland can be harvested' : 'Farmland cannot be harvested',
+        data: canHarvest
+      };
+    }
+  },
+  {
     name: 'debug_farmland_states',
     description: 'Debug function to show all farmland states and active tasks',
     category: 'utility',
