@@ -406,7 +406,7 @@ export class ProgrammingGame extends Scene {
 
          // Create play button in the top-right corner, fixed to camera
      this.play_code = this.add.sprite(250, 250, "play_code", "play_code_up")
-       .setScale(5)
+       .setScale(7)
        .setScrollFactor(0) // Fix to camera
        .setInteractive()
        .setDepth(1000);
@@ -414,7 +414,7 @@ export class ProgrammingGame extends Scene {
      // Position relative to camera bounds
      const camera = this.cameras.main;
      this.play_code.setPosition(
-       camera.width - this.play_code.displayWidth + 460,  // 20px from right edge
+       camera.width - this.play_code.displayWidth + 400,  // 20px from right edge
        -180  // 20px from top
      );
 
@@ -428,7 +428,7 @@ export class ProgrammingGame extends Scene {
      });
 
      this.upgrade_game = this.add.sprite(250, 250, "upgrade_game", "upgrade_game_up")
-       .setScale(5)
+       .setScale(7)
        .setScrollFactor(0) // Fix to camera
        .setInteractive()
        .setDepth(1000);
@@ -447,24 +447,24 @@ export class ProgrammingGame extends Scene {
      });
 
      // Create save button
-     this.save_game = this.add.sprite(250, 250, "save_game", "save_game_up")
-       .setScale(5)
-       .setScrollFactor(0) // Fix to camera
-       .setInteractive()
-       .setDepth(1000);
+    //  this.save_game = this.add.sprite(250, 250, "save_game", "save_game_up")
+    //    .setScale(5)
+    //    .setScrollFactor(0) // Fix to camera
+    //    .setInteractive()
+    //    .setDepth(1000);
 
-     this.save_game.setPosition(
-       camera.width - this.save_game.displayWidth + 640,  // 20px from right edge
-       -180  // 20px from top
-     );
+    //  this.save_game.setPosition(
+    //    camera.width - this.save_game.displayWidth + 640,  // 20px from right edge
+    //    -180  // 20px from top
+    //  );
 
-     this.save_game.on('pointerdown', () => {
-      this.save_game.setFrame("save_game_down");
-     });
-     this.save_game.on('pointerup', () => {
-      this.save_game.setFrame("save_game_up");
-      this.saveGameState();
-     });
+    //  this.save_game.on('pointerdown', () => {
+    //   this.save_game.setFrame("save_game_down");
+    //  });
+    //  this.save_game.on('pointerup', () => {
+    //   this.save_game.setFrame("save_game_up");
+    //   this.saveGameState();
+    //  });
 
      // Create load button
      this.load_game = this.add.sprite(250, 250, "load_game", "load_game_up")
