@@ -9,6 +9,7 @@ import { Entity, GridTile } from '../types/game';
 import { MapEditorUI } from './MapEditorUI';
 import { SpriteEnergyDisplay } from './SpriteEnergyDisplay';
 import ImageSpriteEnergyDisplay from './ImageSpriteEnergyDisplay';
+import { SpriteButton } from './SpriteButton';
 
 // Custom hook for draggable functionality
 const useDraggable = (initialPosition: { x: number; y: number }) => {
@@ -116,6 +117,10 @@ export const GameInterface: React.FC = () => {
   
   // Static sprite-based energy display position
   const spriteEnergyPosition = { x: 20, y: 20 };
+  
+  // Button positions (top-right corner)
+  const playButtonPosition = { x: window.innerWidth - 180, y: 20 };
+  const upgradeButtonPosition = { x: window.innerWidth - 115, y: 20 };
 
   // Handle entity/grid clicks from Phaser
   useEffect(() => {
@@ -167,6 +172,12 @@ export const GameInterface: React.FC = () => {
     const handleSceneReady = (scene: any) => {
       console.log('Scene ready, camera should be locked to qubit');
       setIsCameraLocked(true);
+    };
+    
+    // Handle upgrade modal requests
+    const handleUpgradeModalRequest = () => {
+      // Emit event to ProgrammingGame to open upgrade modal
+      EventBus.emit('request-upgrade-modal');
     };
 
     // Handle tileset updates from map editor
@@ -384,7 +395,7 @@ export const GameInterface: React.FC = () => {
           <PhaserGame ref={phaserRef} currentActiveScene={currentActiveScene} />
           
           {/* Map Editor UI Overlay */}
-          <MapEditorUI
+          {/* <MapEditorUI
             tilesets={mapEditorState.tilesets}
             activeTileset={mapEditorState.activeTileset}
             selectedLayer={mapEditorState.selectedLayer}
@@ -405,7 +416,7 @@ export const GameInterface: React.FC = () => {
               EventBus.emit('toggle-map-editor');
             }}
             isActive={mapEditorState.isActive}
-          />
+          /> */}
         </div>
 
       </div>
@@ -454,9 +465,28 @@ export const GameInterface: React.FC = () => {
             position={spriteEnergyPosition}
           />
         )}
+        
+        {/* Top Right - Game Control Buttons */}
+        <SpriteButton
+          position={playButtonPosition}
+          backgroundSprite="button.png"
+          upFrame={{ x: 176, y: 16, w: 16, h: 16 }}
+          downFrame={{ x: 176, y: 32, w: 16, h: 16 }}
+          scale={4}
+          onClick={handleRunCode}
+        />
+        
+        <SpriteButton
+          position={upgradeButtonPosition}
+          backgroundSprite="button.png"
+          upFrame={{ x: 592, y: 256, w: 16, h: 16 }}
+          downFrame={{ x: 592, y: 272, w: 16, h: 16 }}
+          scale={4}
+          onClick={() => EventBus.emit('request-upgrade-modal')}
+        />
 
         {/* Top Right - Resources & Controls */}
-        <div 
+        {/* <div 
           ref={resourcesPanel.elementRef}
           onMouseDown={resourcesPanel.handleMouseDown}
           style={{
@@ -471,7 +501,6 @@ export const GameInterface: React.FC = () => {
             minWidth: '180px',
             cursor: 'move'
           }}>
-          {/* Global Resources */}
           <div style={{ marginBottom: '12px' }}>
             <div style={{ color: '#ffffff', fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
               Resources
@@ -484,7 +513,6 @@ export const GameInterface: React.FC = () => {
             </div>
           </div>
 
-          {/* Quick Controls */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <button
               onClick={handleRunCode}
@@ -517,22 +545,9 @@ export const GameInterface: React.FC = () => {
                Guide
             </button>
 
-            <button
-              onClick={() => console.log('Upgrades button clicked - now handled in ProgrammingGame')}
-              style={{
-                backgroundColor: '#f5a623',
-                color: 'white',
-                border: 'none',
-                padding: '6px 12px',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '12px'
-              }}
-            >
-              Upgrades
-            </button>
+
           </div>
-        </div>
+        </div> */}
 
         {/* Bottom Left - Error Messages */}
         <div style={{

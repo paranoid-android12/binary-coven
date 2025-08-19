@@ -191,8 +191,6 @@ export class ProgrammingGame extends Scene {
   private movementManager: MovementManager;
   private mapEditor: MapEditor;
   private mapEditorUI: React.ComponentType<any> | null = null;
-  private play_code: Phaser.GameObjects.Sprite;
-  private upgrade_game: Phaser.GameObjects.Sprite;
   private save_game: Phaser.GameObjects.Sprite;
   private load_game: Phaser.GameObjects.Sprite;
   
@@ -282,26 +280,7 @@ export class ProgrammingGame extends Scene {
       frameHeight: 32  // Updated to match user's adjustment
     });
 
-    this.load.atlas("upgrade_game", "button.png", {
-      "frames": {
-        "upgrade_game_up": {
-          "frame": {
-            "x": 592,
-            "y": 256,
-            "w": 16,
-            "h": 16
-          }
-        },
-        "upgrade_game_down": {
-          "frame": {
-            "x": 592,
-            "y": 272,
-            "w": 16,
-            "h": 16
-          }
-        }
-      }
-    });
+
 
     this.load.atlas("save_game", "button.png", {
       "frames": {
@@ -345,26 +324,7 @@ export class ProgrammingGame extends Scene {
       }
     });
 
-    this.load.atlas("play_code", "button.png", {
-      "frames": {
-        "play_code_up": {
-          "frame": {
-            "x": 176,
-            "y": 16,
-            "w": 16,
-            "h": 16
-          }
-        },
-        "play_code_down": {
-          "frame": {
-            "x": 176,
-            "y": 32,
-            "w": 16,
-            "h": 16
-          }
-        }
-      }
-    });
+
     
     // Load the idle spritesheet for qubit
     this.load.spritesheet('qubit_idle', 'Idle.png', {
@@ -404,47 +364,7 @@ export class ProgrammingGame extends Scene {
     // Configure pixel-perfect rendering for the entire scene
     this.cameras.main.setRoundPixels(true);
 
-         // Create play button in the top-right corner, fixed to camera
-     this.play_code = this.add.sprite(250, 250, "play_code", "play_code_up")
-       .setScale(7)
-       .setScrollFactor(0) // Fix to camera
-       .setInteractive()
-       .setDepth(1000);
 
-     // Position relative to camera bounds
-     const camera = this.cameras.main;
-     this.play_code.setPosition(
-       camera.width - this.play_code.displayWidth + 400,  // 20px from right edge
-       -180  // 20px from top
-     );
-
-     // Add button interactions
-     this.play_code.on('pointerdown', () => {
-       this.play_code.setFrame("play_code_down");
-     });
-     this.play_code.on('pointerup', () => {
-       this.play_code.setFrame("play_code_up");
-       this.startCodeExecution();  // Start code execution when button is clicked
-     });
-
-     this.upgrade_game = this.add.sprite(250, 250, "upgrade_game", "upgrade_game_up")
-       .setScale(7)
-       .setScrollFactor(0) // Fix to camera
-       .setInteractive()
-       .setDepth(1000);
-
-     this.upgrade_game.setPosition(
-       camera.width - this.upgrade_game.displayWidth + 550,  // 20px from right edge
-       -180  // 20px from top
-     );
-
-     this.upgrade_game.on('pointerdown', () => {
-      this.upgrade_game.setFrame("upgrade_game_down");
-     });
-     this.upgrade_game.on('pointerup', () => {
-      this.upgrade_game.setFrame("upgrade_game_up");
-      this.openUpgradeModal();
-     });
 
      // Create save button
     //  this.save_game = this.add.sprite(250, 250, "save_game", "save_game_up")
@@ -467,24 +387,25 @@ export class ProgrammingGame extends Scene {
     //  });
 
      // Create load button
-     this.load_game = this.add.sprite(250, 250, "load_game", "load_game_up")
-       .setScale(5)
-       .setScrollFactor(0) // Fix to camera
-       .setInteractive()
-       .setDepth(1000);
+     const camera = this.cameras.main;
+    //  this.load_game = this.add.sprite(250, 250, "load_game", "load_game_up")
+    //    .setScale(5)
+    //    .setScrollFactor(0) // Fix to camera
+    //    .setInteractive()
+    //    .setDepth(1000);
 
-     this.load_game.setPosition(
-       camera.width - this.load_game.displayWidth + 730,  // 20px from right edge
-       -180  // 20px from top
-     );
+    //  this.load_game.setPosition(
+    //    camera.width - this.load_game.displayWidth + 730,  // 20px from right edge
+    //    -180  // 20px from top
+    //  );
 
-     this.load_game.on('pointerdown', () => {
-      this.load_game.setFrame("load_game_down");
-     });
-     this.load_game.on('pointerup', () => {
-      this.load_game.setFrame("load_game_up");
-      this.loadGameState();
-     });
+    //  this.load_game.on('pointerdown', () => {
+    //   this.load_game.setFrame("load_game_down");
+    //  });
+    //  this.load_game.on('pointerup', () => {
+    //   this.load_game.setFrame("load_game_up");
+    //   this.loadGameState();
+    //  });
     
     // Create placeholder sprites first (fallback sprites)
     this.createPlaceholderSprites();
@@ -975,6 +896,11 @@ export class ProgrammingGame extends Scene {
         }
         console.log('================================');
       }
+    });
+
+    // Handle upgrade modal requests from GameInterface
+    EventBus.on('request-upgrade-modal', () => {
+      this.openUpgradeModal();
     });
   }
 
