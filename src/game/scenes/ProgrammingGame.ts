@@ -3,7 +3,7 @@ import { useGameStore } from '../../stores/gameStore';
 import GridSystem, { initializeDefaultGridTypes } from '../systems/GridSystem';
 import { CodeExecutor } from '../systems/CodeExecutor';
 import { BuiltInFunctionRegistry } from '../systems/BuiltInFunctions';
-import { Entity, GridTile, Position, FarmlandState } from '../../types/game';
+import { Entity, GridTile, Position, FarmlandState, CodeWindow } from '../../types/game';
 import { EventBus } from '../EventBus';
 import TaskManager from '../systems/TaskManager';
 import { MapEditor } from '../systems/MapEditor';
@@ -364,48 +364,48 @@ export class ProgrammingGame extends Scene {
     // Configure pixel-perfect rendering for the entire scene
     this.cameras.main.setRoundPixels(true);
 
-
+    const camera = this.cameras.main;
 
      // Create save button
-    //  this.save_game = this.add.sprite(250, 250, "save_game", "save_game_up")
-    //    .setScale(5)
-    //    .setScrollFactor(0) // Fix to camera
-    //    .setInteractive()
-    //    .setDepth(1000);
+     this.save_game = this.add.sprite(250, 250, "save_game", "save_game_up")
+      .setScale(5)
+      .setScrollFactor(0)
+      .setInteractive()
+      .setDepth(1000);
 
-    //  this.save_game.setPosition(
-    //    camera.width - this.save_game.displayWidth + 640,  // 20px from right edge
-    //    -180  // 20px from top
-    //  );
+     this.save_game.setPosition(
+       camera.width - this.save_game.displayWidth + 640,
+       -180
+     );
 
-    //  this.save_game.on('pointerdown', () => {
-    //   this.save_game.setFrame("save_game_down");
-    //  });
-    //  this.save_game.on('pointerup', () => {
-    //   this.save_game.setFrame("save_game_up");
-    //   this.saveGameState();
-    //  });
+     this.save_game.on('pointerdown', () => {
+      this.save_game.setFrame("save_game_down");
+     });
+
+     this.save_game.on('pointerup', () => {
+      this.save_game.setFrame("save_game_up");
+      this.saveGameState();
+     });
 
      // Create load button
-     const camera = this.cameras.main;
-    //  this.load_game = this.add.sprite(250, 250, "load_game", "load_game_up")
-    //    .setScale(5)
-    //    .setScrollFactor(0) // Fix to camera
-    //    .setInteractive()
-    //    .setDepth(1000);
+     this.load_game = this.add.sprite(250, 250, "load_game", "load_game_up")
+       .setScale(5)
+       .setScrollFactor(0) // Fix to camera
+       .setInteractive()
+       .setDepth(1000);
 
-    //  this.load_game.setPosition(
-    //    camera.width - this.load_game.displayWidth + 730,  // 20px from right edge
-    //    -180  // 20px from top
-    //  );
+     this.load_game.setPosition(
+       camera.width - this.load_game.displayWidth + 730,  // 20px from right edge
+       -180  // 20px from top
+     );
 
-    //  this.load_game.on('pointerdown', () => {
-    //   this.load_game.setFrame("load_game_down");
-    //  });
-    //  this.load_game.on('pointerup', () => {
-    //   this.load_game.setFrame("load_game_up");
-    //   this.loadGameState();
-    //  });
+     this.load_game.on('pointerdown', () => {
+      this.load_game.setFrame("load_game_down");
+     });
+     this.load_game.on('pointerup', () => {
+      this.load_game.setFrame("load_game_up");
+      this.loadGameState();
+     });
     
     // Create placeholder sprites first (fallback sprites)
     this.createPlaceholderSprites();
@@ -545,6 +545,7 @@ export class ProgrammingGame extends Scene {
     const store = useGameStore.getState();
     const farmlandData = this.gridSystem.initializeGrid('farmland', '');
     store.addGrid({
+      id: `farmland_${x}_${y}`,
       type: 'farmland',
       position: { x, y },
       name: `Farmland Plot #${plotNumber}`,
@@ -567,6 +568,7 @@ export class ProgrammingGame extends Scene {
     // Add some sample grids with proper initialization
     const farmlandData = this.gridSystem.initializeGrid('farmland', '');
     const farmlandId = store.addGrid({
+      id: 'farmland_8_7',
       type: 'farmland',
       position: { x: 8, y: 7 },
       name: 'Farmland Plot #1',
@@ -588,6 +590,7 @@ export class ProgrammingGame extends Scene {
       for (let y = 11; y <= 14; y++) {
         const farmlandData = this.gridSystem.initializeGrid('farmland', '');
         store.addGrid({
+          id: `farmland_${x}_${y}`,
           type: 'farmland',
           position: { x, y },
           name: `Farmland Plot #${plotNumber}`,
@@ -634,6 +637,7 @@ export class ProgrammingGame extends Scene {
     
     const foodData = this.gridSystem.initializeGrid('food', '');
     const foodId = store.addGrid({
+      id: 'food_station',
       type: 'food',
       position: { x: 12, y: 7 },
       name: 'Food Station',
@@ -651,6 +655,7 @@ export class ProgrammingGame extends Scene {
     
     const siloData = this.gridSystem.initializeGrid('silo', '');
     const siloId = store.addGrid({
+      id: 'storage_silo',
       type: 'silo',
       position: { x: 16, y: 7 },
       name: 'Storage Silo',
@@ -2035,9 +2040,59 @@ export class ProgrammingGame extends Scene {
   // SAVE/LOAD SYSTEM
   // =====================================================================
 
+  private clearAllSprites(): void {
+    // Destroy all entity sprites
+    this.entitySprites.forEach((sprite, id) => {
+      if (sprite && sprite.active) {
+        sprite.destroy();
+      }
+    });
+    this.entitySprites.clear();
+    
+    // Destroy all grid sprites
+    this.gridSprites.forEach((sprite, id) => {
+      if (sprite && sprite.active) {
+        sprite.destroy();
+      }
+    });
+    this.gridSprites.clear();
+    
+    // Destroy all wheat sprites
+    this.wheatSprites.forEach((sprite, id) => {
+      if (sprite && sprite.active) {
+        sprite.destroy();
+      }
+    });
+    this.wheatSprites.clear();
+    
+    // Clear progress bars
+    this.progressBars.forEach((graphics, id) => {
+      if (graphics && graphics.active) {
+        graphics.destroy();
+      }
+    });
+    this.progressBars.clear();
+    
+    // Clear progress texts
+    this.progressTexts.forEach((text, id) => {
+      if (text && text.active) {
+        text.destroy();
+      }
+    });
+    this.progressTexts.clear();
+    
+    // Clear execution texts
+    this.clearExecutionTexts();
+    
+    console.log('[SPRITES] All sprites cleared');
+  }
+
   private saveGameState(): void {
     try {
       const gameState = useGameStore.getState();
+
+      console.log('Saving game state');
+      console.log(gameState);
       
       const saveData = {
         version: '1.0',
@@ -2085,53 +2140,83 @@ export class ProgrammingGame extends Scene {
       const saveData = JSON.parse(saveDataStr);
       const gameState = useGameStore.getState();
       
-      // Clear current state
+      console.log('[LOAD] Starting game state load...');
+      
+      // Clear and destroy all existing sprites first
+      this.clearAllSprites();
+      
+      // Clear current state completely
       gameState.reset();
       
-      // Restore entities
+      // Create new Maps directly with the saved data
+      const newEntities = new Map<string, Entity>();
+      const newGrids = new Map<string, GridTile>();
+      const newCodeWindows = new Map<string, CodeWindow>();
+      
+      // Restore entities with their original IDs
       saveData.entities.forEach((entityData: any) => {
-        const { id, ...entity } = entityData;
-        gameState.addEntity(entity);
-        // Update the entity with the original ID
-        const newEntities = new Map(gameState.entities);
-        newEntities.delete(Array.from(newEntities.keys()).pop()!); // Remove auto-generated ID
-        newEntities.set(id, { ...entity, id });
-        useGameStore.setState({ entities: newEntities });
+        const entity = {
+          ...entityData,
+          // Ensure sprite reference is null for serialization safety
+          sprite: null,
+          // Reset movement state
+          movementState: {
+            isMoving: false,
+            fromPosition: entityData.position,
+            toPosition: entityData.position
+          }
+        };
+        newEntities.set(entityData.id, entity);
+        console.log(`[LOAD] Restored entity: ${entity.name} (${entity.id}) at (${entity.position.x}, ${entity.position.y})`);
       });
       
-      // Restore grids
+      // Restore grids with their original IDs
       saveData.grids.forEach((gridData: any) => {
-        const { id, ...grid } = gridData;
-        gameState.addGrid(grid);
-        // Update the grid with the original ID
-        const newGrids = new Map(gameState.grids);
-        newGrids.delete(Array.from(newGrids.keys()).pop()!); // Remove auto-generated ID
-        newGrids.set(id, { ...grid, id });
-        useGameStore.setState({ grids: newGrids });
+        const grid = {
+          ...gridData,
+          // Reset any runtime state if needed
+          taskState: {
+            ...gridData.taskState,
+            // Clear any active progress
+            progress: undefined
+          }
+        };
+        newGrids.set(gridData.id, grid);
+        console.log(`[LOAD] Restored grid: ${grid.name} (${grid.id}) at (${grid.position.x}, ${grid.position.y})`);
       });
       
-      // Restore code windows
+      // Restore code windows with their original IDs
       saveData.codeWindows.forEach((windowData: any) => {
-        const { id, ...window } = windowData;
-        gameState.addCodeWindow(window);
-        // Update the window with the original ID
-        const newWindows = new Map(gameState.codeWindows);
-        newWindows.delete(Array.from(newWindows.keys()).pop()!); // Remove auto-generated ID
-        newWindows.set(id, { ...window, id });
-        useGameStore.setState({ codeWindows: newWindows });
+        newCodeWindows.set(windowData.id, windowData);
+        console.log(`[LOAD] Restored code window: ${windowData.name} (${windowData.id})`);
       });
       
-      // Restore other state
+      // Apply all the restored data at once
       useGameStore.setState({
+        entities: newEntities,
+        grids: newGrids,
+        codeWindows: newCodeWindows,
         activeEntityId: saveData.activeEntityId,
         globalResources: saveData.globalResources,
-        mainWindowId: saveData.mainWindowId
+        mainWindowId: saveData.mainWindowId,
+        // Reset execution state
+        executionContext: undefined,
+        isPaused: false
       });
       
-      // Update visuals
+      // Recreate sprites for the loaded entities and grids
       this.updateVisuals();
       
+      // Ensure camera follows the active entity
+      if (saveData.activeEntityId) {
+        this.lockCameraToQubit();
+      }
+      
       console.log('[LOAD] Game state loaded successfully');
+      console.log('[LOAD] Active entity ID:', saveData.activeEntityId);
+      console.log('[LOAD] Entities loaded:', newEntities.size);
+      console.log('[LOAD] Grids loaded:', newGrids.size);
+      
       this.showNotification('Game Loaded!', 0x16c60c);
       
     } catch (error) {

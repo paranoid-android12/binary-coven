@@ -46,7 +46,7 @@ export interface GameStore extends GameState {
   // =====================================================================
   // GRID MANAGEMENT (SINGLE SOURCE OF TRUTH)
   // =====================================================================
-  addGrid: (gridData: Omit<GridTile, 'id'>) => string;
+  addGrid: (gridData: Omit<GridTile, 'id'> & { id?: string }) => string;
   removeGrid: (gridId: string) => void;
   updateGrid: (gridId: string, updates: Partial<GridTile>) => void;
   getGridAt: (position: Position) => GridTile | undefined;
@@ -55,7 +55,7 @@ export interface GameStore extends GameState {
   // =====================================================================
   // ENTITY MANAGEMENT
   // =====================================================================
-  addEntity: (entityData: Omit<Entity, 'id'>) => string;
+  addEntity: (entityData: Omit<Entity, 'id'> & { id?: string }) => string;
   removeEntity: (entityId: string) => void;
   updateEntity: (entityId: string, updates: Partial<Entity>) => void;
   setActiveEntity: (entityId: string) => void;
@@ -82,7 +82,7 @@ export interface GameStore extends GameState {
   // =====================================================================
   // CODE WINDOW MANAGEMENT
   // =====================================================================
-  addCodeWindow: (codeWindow: Omit<CodeWindow, 'id'>) => string;
+  addCodeWindow: (codeWindow: Omit<CodeWindow, 'id'> & { id?: string }) => string;
   removeCodeWindow: (windowId: string) => void;
   updateCodeWindow: (windowId: string, updates: Partial<CodeWindow>) => void;
   setMainWindow: (windowId: string) => void;
@@ -400,9 +400,10 @@ export const useGameStore = create<GameStore>()(
     // =====================================================================
     // GRID MANAGEMENT
     // =====================================================================
-    addGrid: (gridData: Omit<GridTile, 'id'>) => {
-      const id = uuidv4();
-      const grid: GridTile = { ...gridData, id };
+    addGrid: (gridData: Omit<GridTile, 'id'> & { id?: string }) => {
+      const id = gridData.id || uuidv4();
+      const { id: _, ...cleanGridData } = gridData;
+      const grid: GridTile = { ...cleanGridData, id };
       
       set((state: GameState) => ({
         grids: new Map(state.grids).set(id, grid)
@@ -479,9 +480,10 @@ export const useGameStore = create<GameStore>()(
     // =====================================================================
     // ENTITY MANAGEMENT
     // =====================================================================
-    addEntity: (entityData: Omit<Entity, 'id'>) => {
-      const id = uuidv4();
-      const entity: Entity = { ...entityData, id };
+    addEntity: (entityData: Omit<Entity, 'id'> & { id?: string }) => {
+      const id = entityData.id || uuidv4();
+      const { id: _, ...cleanEntityData } = entityData;
+      const entity: Entity = { ...cleanEntityData, id };
       
       set((state: GameState) => ({
         entities: new Map(state.entities).set(id, entity)
@@ -576,9 +578,10 @@ export const useGameStore = create<GameStore>()(
     // =====================================================================
     // CODE WINDOW MANAGEMENT
     // =====================================================================
-    addCodeWindow: (codeWindow: Omit<CodeWindow, 'id'>) => {
-      const id = uuidv4();
-      const window: CodeWindow = { ...codeWindow, id };
+    addCodeWindow: (codeWindow: Omit<CodeWindow, 'id'> & { id?: string }) => {
+      const id = codeWindow.id || uuidv4();
+      const { id: _, ...cleanWindowData } = codeWindow;
+      const window: CodeWindow = { ...cleanWindowData, id };
       
       set((state: GameState) => ({
         codeWindows: new Map(state.codeWindows).set(id, window)

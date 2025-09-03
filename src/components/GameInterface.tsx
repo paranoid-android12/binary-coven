@@ -222,6 +222,7 @@ export const GameInterface: React.FC = () => {
       
       // Create default code window
       const mainWindowId = store.addCodeWindow({
+        id: 'main',
         name: 'main',
         code: '# Main function - execution starts here\ndef main():\n    # Your code here\n    plant("wheat")\n    pass',
         isMain: true,
@@ -232,8 +233,9 @@ export const GameInterface: React.FC = () => {
       
       store.setMainWindow(mainWindowId);
       
-      // Create default qubit entity
+      // Create default qubit entity with constant ID
       const qubitId = store.addEntity({
+        id: 'qubit',
         name: 'Qubit',
         type: 'qubit',
         position: { x: 12, y: 8 },
@@ -301,6 +303,7 @@ export const GameInterface: React.FC = () => {
       
       // Create default entities and code windows
       const mainWindowId = store.addCodeWindow({
+        id: 'main',
         name: 'main',
         code: '# Main function - execution starts here\ndef main():\n    # Your code here\n    plant("wheat")\n    pass',
         isMain: true,
@@ -311,8 +314,9 @@ export const GameInterface: React.FC = () => {
       
       store.setMainWindow(mainWindowId);
       
-      // Create default qubit entity
+      // Create default qubit entity with constant ID
       const qubitId = store.addEntity({
+        id: 'qubit',
         name: 'Qubit',
         type: 'qubit',
         position: { x: 12, y: 8 },
