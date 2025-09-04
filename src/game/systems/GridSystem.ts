@@ -496,7 +496,7 @@ export class GridSystem {
   // =====================================================================
   // GRID TYPE FUNCTION MAPPING
   // =====================================================================
-  getFunctionsForGridType(gridType: string): GridFunction[] {
+  public getFunctionsForGridType(gridType: string): GridFunction[] {
     switch (gridType) {
       case 'farmland':
         return this.createFarmlandFunctions();

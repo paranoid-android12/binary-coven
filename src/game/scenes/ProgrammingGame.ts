@@ -2039,6 +2039,27 @@ export class ProgrammingGame extends Scene {
   // =====================================================================
   // SAVE/LOAD SYSTEM
   // =====================================================================
+  
+  private reinitializeGridFunctions(): void {
+    const gameState = useGameStore.getState();
+    
+    // Reinitialize functions for all grids
+    gameState.grids.forEach((grid, gridId) => {
+      // Get fresh function objects from GridSystem
+      const freshFunctions = this.gridSystem.getFunctionsForGridType(grid.type);
+      
+      if (freshFunctions.length > 0) {
+        // Update the grid with proper function objects
+        gameState.updateGrid(gridId, {
+          functions: freshFunctions
+        });
+        
+        console.log(`[LOAD] Reinitialized functions for ${grid.type} grid: ${gridId}`);
+      }
+    });
+    
+    console.log(`[LOAD] Reinitialized functions for ${gameState.grids.size} grids`);
+  }
 
   private clearAllSprites(): void {
     // Destroy all entity sprites
@@ -2102,11 +2123,23 @@ export class ProgrammingGame extends Scene {
           ...entity,
           id,
           // Convert Phaser sprite reference to null for serialization
-          sprite: null
+          sprite: null,
+          // Reset movement state for clean loading
+          movementState: {
+            isMoving: false,
+            fromPosition: entity.position,
+            toPosition: entity.position
+          }
         })),
         grids: Array.from(gameState.grids.entries()).map(([id, grid]) => ({
           ...grid,
-          id
+          id,
+          // Clear any active progress/runtime task state
+          taskState: {
+            isBlocked: false,
+            currentTask: undefined,
+            progress: undefined
+          }
         })),
         activeEntityId: gameState.activeEntityId,
         globalResources: gameState.globalResources,
@@ -2115,6 +2148,7 @@ export class ProgrammingGame extends Scene {
           id
         })),
         mainWindowId: gameState.mainWindowId
+        // Note: activeTasks and taskTimer are runtime-only and should NOT be saved
       };
       
       localStorage.setItem('binary-coven-save', JSON.stringify(saveData));
@@ -2122,7 +2156,7 @@ export class ProgrammingGame extends Scene {
       
       // Show save confirmation
       this.showNotification('Game Saved!', 0x16c60c);
-      
+      console.log("Finalized save", gameState)
     } catch (error) {
       console.error('[SAVE] Failed to save game state:', error);
       this.showNotification('Save Failed!', 0xff0000);
@@ -2146,7 +2180,7 @@ export class ProgrammingGame extends Scene {
       this.clearAllSprites();
       
       // Clear current state completely
-      gameState.reset();
+      // gameState.reset();
       
       // Create new Maps directly with the saved data
       const newEntities = new Map<string, Entity>();
@@ -2164,6 +2198,12 @@ export class ProgrammingGame extends Scene {
             isMoving: false,
             fromPosition: entityData.position,
             toPosition: entityData.position
+          },
+          // Reset task state to ensure clean startup
+          taskState: {
+            isBlocked: false,
+            currentTask: undefined,
+            progress: undefined
           }
         };
         newEntities.set(entityData.id, entity);
@@ -2201,8 +2241,18 @@ export class ProgrammingGame extends Scene {
         mainWindowId: saveData.mainWindowId,
         // Reset execution state
         executionContext: undefined,
-        isPaused: false
+        isPaused: false,
+        // Reset runtime task system state
+        activeTasks: new Map(),
+        taskTimer: undefined
       });
+      
+      // Reinitialize the task system after loading
+      const freshGameState = useGameStore.getState();
+      freshGameState.initializeTaskSystem();
+      
+      // Reinitialize grid functions that were lost during JSON serialization
+      this.reinitializeGridFunctions();
       
       // Recreate sprites for the loaded entities and grids
       this.updateVisuals();
@@ -2218,6 +2268,7 @@ export class ProgrammingGame extends Scene {
       console.log('[LOAD] Grids loaded:', newGrids.size);
       
       this.showNotification('Game Loaded!', 0x16c60c);
+      console.log("Finalized load", gameState)
       
     } catch (error) {
       console.error('[LOAD] Failed to load game state:', error);
