@@ -44,7 +44,7 @@ export const StatusModal: React.FC<StatusModalProps> = ({
   // Update progress periodically
   useEffect(() => {
     if (!isOpen) return;
-
+    console.log("Current Entity:", currentEntity);
     const updateProgress = () => {
       if (currentEntity?.taskState.progress?.isActive) {
         const entityProgress = taskManager.getEntityProgress(currentEntity.id);
@@ -281,6 +281,7 @@ export const StatusModal: React.FC<StatusModalProps> = ({
 // Profile Tab Component
 const ProfileTab: React.FC<{ entity?: Entity; grid?: GridTile }> = ({ entity, grid }) => {
   if (entity) {
+    console.log("Entity:", entity);
     return (
       <div style={{ padding: '20px', color: 'white', height: '100%', overflow: 'auto', fontFamily: 'BoldPixels' }}>
         <h3 style={{ margin: '0 0 20px 0', color: '#007acc', fontFamily: 'BoldPixels', fontSize: '26px' }}>Entity Information</h3>
@@ -322,6 +323,8 @@ const ProfileTab: React.FC<{ entity?: Entity; grid?: GridTile }> = ({ entity, gr
             </div>
           </div>
         </div>
+
+        {/* Available */}
 
         {/* Inventory */}
         <div style={{ marginTop: '20px' }}>

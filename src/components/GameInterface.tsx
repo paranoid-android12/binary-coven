@@ -118,6 +118,13 @@ export const GameInterface: React.FC = () => {
         tileSize: 16,
         columns: 16,
         rows: 16
+      },
+      'Well': {
+        key: 'Well',
+        name: 'Well',
+        tileSize: 16,
+        columns: 16,
+        rows: 16
       }
     },
     activeTileset: 'Ground_Tileset',
@@ -683,7 +690,7 @@ export const GameInterface: React.FC = () => {
                 color: '#ffffff',
                 fontSize: '12px',
                 textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)',
-                
+
               }}>
                 {dialogueState.currentIndex + 1} / {dialogueState.dialogues.length}
               </div>
@@ -707,6 +714,30 @@ export const GameInterface: React.FC = () => {
           </div>
         </div>
       )}
+
+      <MapEditorUI
+        tilesets={mapEditorState.tilesets}
+        activeTileset={mapEditorState.activeTileset}
+        selectedLayer={mapEditorState.selectedLayer}
+        onTileSelect={(tile) => {
+          EventBus.emit('tile-selected', tile);
+        }}
+        onSave={() => {
+          EventBus.emit('save-map');
+        }}
+        onLoad={() => {
+          EventBus.emit('load-map');
+        }}
+        onToggleEditor={() => {
+          setMapEditorState(prev => ({
+            ...prev,
+            isActive: !prev.isActive
+          }));
+          EventBus.emit('toggle-map-editor');
+        }}
+        isActive={mapEditorState.isActive}
+      />
+
 
       {/* Loading indicator for dialogue */}
       {dialogueState.isLoading && (

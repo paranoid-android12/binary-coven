@@ -193,6 +193,7 @@ export class ProgrammingGame extends Scene {
   private mapEditorUI: React.ComponentType<any> | null = null;
   private save_game: Phaser.GameObjects.Sprite;
   private load_game: Phaser.GameObjects.Sprite;
+  private well: Phaser.GameObjects.Sprite;
   
   // Upgrade system
   private upgradeModal: Phaser.GameObjects.Container | null = null;
@@ -349,6 +350,11 @@ export class ProgrammingGame extends Scene {
       frameHeight: 16
     });
 
+    this.load.spritesheet('Well', 'Well.png', {
+      frameWidth: 16,
+      frameHeight: 16
+    });
+
     // Load wheat growth sprites (6 phases in the last row, 16x16 each)
     // The wheat sprites are at the very last row with 6 phases: seed to fully grown
     this.load.spritesheet('wheat_growth', 'summer_crops.png', {
@@ -386,7 +392,7 @@ export class ProgrammingGame extends Scene {
       this.save_game.setFrame("save_game_up");
       this.saveGameState();
      });
-
+       
      // Create load button
      this.load_game = this.add.sprite(250, 250, "load_game", "load_game_up")
        .setScale(5)
@@ -562,6 +568,26 @@ export class ProgrammingGame extends Scene {
     });
   }
 
+  private createFoodStation(x: number, y: number) {
+    const store = useGameStore.getState();
+    const foodData = this.gridSystem.initializeGrid('food', '');
+    store.addGrid({
+      id: `food_station_${x}_${y}`,
+      type: 'food',
+      position: { x, y },
+      name: 'Food Station',
+      description: 'A station for eating and restoring energy',
+      properties: {},
+      isActive: true,
+      functions: foodData.functions || [],
+      state: foodData.state || {},
+      taskState: foodData.taskState || {
+        isBlocked: false,
+        currentTask: undefined,
+        progress: undefined
+      }
+    });
+  }
   private createSampleWorld() {
     const store = useGameStore.getState();
     
@@ -636,22 +662,12 @@ export class ProgrammingGame extends Scene {
     this.createFarmLand(24, 14, 29);
     
     const foodData = this.gridSystem.initializeGrid('food', '');
-    const foodId = store.addGrid({
-      id: 'food_station',
-      type: 'food',
-      position: { x: 12, y: 7 },
-      name: 'Food Station',
-      description: 'A station for eating and restoring energy',
-      properties: {},
-      isActive: true,
-      functions: foodData.functions || [],
-      state: foodData.state || {},
-      taskState: foodData.taskState || {
-        isBlocked: false,
-        currentTask: undefined,
-        progress: undefined
-      }
-    });
+
+    this.createFoodStation(10, 7);
+    this.createFoodStation(10, 8);
+    this.createFoodStation(9, 9);
+    this.createFoodStation(8, 9);
+    this.createFoodStation(7, 8);
     
     const siloData = this.gridSystem.initializeGrid('silo', '');
     const siloId = store.addGrid({

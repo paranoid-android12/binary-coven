@@ -8,6 +8,8 @@ import {
   TilesetInfo
 } from '../../types/mapEditor';
 
+import { MAP_EDITOR_DATA } from '../../../public/map/map_editor_data';
+
 export interface GroundTileData {
   id: string;
   position: Position;
@@ -544,13 +546,13 @@ export class MapEditor {
 
   public loadMap(): void {
     try {
-      const savedData = localStorage.getItem('mapEditorData');
+      const savedData = MAP_EDITOR_DATA;
       if (!savedData) {
         this.debug('No saved map data found');
         return;
       }
 
-      const mapData = JSON.parse(savedData);
+      const mapData = savedData;
       this.debug('Loading map data:', mapData);
       
       // Clear existing ground tiles and grids
@@ -670,7 +672,7 @@ export class MapEditor {
   private loadGroundTiles(): void {
     // Try to load existing ground tiles from localStorage
     try {
-      const savedData = localStorage.getItem('mapEditorData');
+      const savedData = MAP_EDITOR_DATA;
       if (savedData) {
         const mapData = JSON.parse(savedData);
         if (mapData.groundTiles) {
