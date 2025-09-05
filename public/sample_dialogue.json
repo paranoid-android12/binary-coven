@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Tutorial Guide",
+    "content": "Welcome to Binary Coven! This is your first dialogue. The dialogue system supports multiple speakers with different sprites and longer text content.",
+    "sprite": "logo.png"
+  },
+  {
+    "name": "System",
+    "content": "You can advance the dialogue by clicking anywhere on the dialogue box or pressing any key. The system automatically handles progression through the sequence.",
+    "sprite": "star.png"
+  },
+  {
+    "name": "Tutorial Guide", 
+    "content": "Each dialogue entry can have a different speaker name, content, and sprite image. The sprite should be placed in the assets folder.",
+    "sprite": "logo.png"
+  },
+  {
+    "name": "System",
+    "content": "When you reach the last dialogue entry, the system will automatically close and return control to the game. Try it now!",
+    "sprite": "star.png"
+  }
+]

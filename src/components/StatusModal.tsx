@@ -120,7 +120,8 @@ export const StatusModal: React.FC<StatusModalProps> = ({
         zIndex: 2000,
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        fontFamily: 'BoldPixels'
       }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
@@ -165,7 +166,7 @@ export const StatusModal: React.FC<StatusModalProps> = ({
               backgroundColor: 'rgba(255,255,255,0.2)',
               padding: '2px 8px',
               borderRadius: '12px',
-              fontSize: '12px'
+              fontSize: '18px'
             }}>
               {isEntity ? currentEntity.type : currentGrid?.type}
             </span>
@@ -224,7 +225,9 @@ export const StatusModal: React.FC<StatusModalProps> = ({
         <div style={{
           backgroundColor: '#252526',
           borderBottom: '1px solid #3c3c3c',
-          display: 'flex'
+          display: 'flex',
+          fontFamily: 'BoldPixels'
+
         }}>
           <button
             onClick={() => setActiveTab('profile')}
@@ -234,8 +237,10 @@ export const StatusModal: React.FC<StatusModalProps> = ({
               border: 'none',
               padding: '12px 24px',
               cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: activeTab === 'profile' ? 'bold' : 'normal'
+              fontSize: '18px',
+              fontWeight: activeTab === 'profile' ? 'bold' : 'normal',
+              fontFamily: 'BoldPixels'
+
             }}
           >
             Profile
@@ -249,7 +254,8 @@ export const StatusModal: React.FC<StatusModalProps> = ({
                 border: 'none',
                 padding: '12px 24px',
                 cursor: 'pointer',
-                fontSize: '14px',
+                fontSize: '18px',
+                fontFamily: 'BoldPixels',
                 fontWeight: activeTab === 'program' ? 'bold' : 'normal'
               }}
             >
@@ -276,14 +282,14 @@ export const StatusModal: React.FC<StatusModalProps> = ({
 const ProfileTab: React.FC<{ entity?: Entity; grid?: GridTile }> = ({ entity, grid }) => {
   if (entity) {
     return (
-      <div style={{ padding: '20px', color: 'white', height: '100%', overflow: 'auto' }}>
-        <h3 style={{ margin: '0 0 20px 0', color: '#007acc' }}>Entity Information</h3>
+      <div style={{ padding: '20px', color: 'white', height: '100%', overflow: 'auto', fontFamily: 'BoldPixels' }}>
+        <h3 style={{ margin: '0 0 20px 0', color: '#007acc', fontFamily: 'BoldPixels', fontSize: '26px' }}>Entity Information</h3>
         
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
           {/* Basic Info */}
           <div>
-            <h4 style={{ margin: '0 0 12px 0', color: '#f5a623' }}>Basic Info</h4>
-            <div style={{ fontSize: '14px', lineHeight: '1.6' }}>
+            <h4 style={{ margin: '0 0 12px 0', color: '#f5a623', fontSize: '24px' }}>Basic Info</h4>
+            <div style={{ fontSize: '20px', lineHeight: '1.6' }}>
               <div><strong>Name:</strong> {entity.name}</div>
               <div><strong>Type:</strong> {entity.type}</div>
               <div><strong>Position:</strong> ({entity.position.x}, {entity.position.y})</div>
@@ -293,8 +299,8 @@ const ProfileTab: React.FC<{ entity?: Entity; grid?: GridTile }> = ({ entity, gr
 
           {/* Stats */}
           <div>
-            <h4 style={{ margin: '0 0 12px 0', color: '#f5a623' }}>Stats</h4>
-            <div style={{ fontSize: '14px', lineHeight: '1.6' }}>
+            <h4 style={{ margin: '0 0 12px 0', color: '#f5a623', fontSize: '24px' }}>Stats</h4>
+            <div style={{ fontSize: '20px', lineHeight: '1.6' }}>
               <div><strong>Energy:</strong> {entity.stats.energy}/{entity.stats.maxEnergy}</div>
               <div><strong>Walking Speed:</strong> {entity.stats.walkingSpeed}x</div>
               <div style={{ marginTop: '8px' }}>

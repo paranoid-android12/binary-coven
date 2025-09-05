@@ -264,7 +264,9 @@ export const ProgrammingInterface: React.FC<ProgrammingInterfaceProps> = ({ enti
                 options={{
                   minimap: { enabled: false },
                   scrollBeyondLastLine: false,
-                  fontSize: 14,
+                  fontSize: 18,
+                  letterSpacing: 1,
+                  fontFamily: 'BoldPixels',
                   lineNumbers: 'on',
                   renderLineHighlight: 'line',
                   selectOnLineNumbers: true,
