@@ -8,6 +8,7 @@ import { Entity, GridTile, CodeWindow, Position, ExecutionContext, TaskState, Pr
 // =====================================================================
 
 export interface GameState {
+  isTutorialDone: boolean;
   gridSize: { width: number; height: number };
   grids: Map<string, GridTile>;
   entities: Map<string, Entity>;
@@ -113,6 +114,7 @@ export interface GameStore extends GameState {
 // INITIAL STATE FACTORY
 // =====================================================================
 const createInitialState = (): GameState => ({
+  isTutorialDone: false,
   gridSize: { width: 52, height: 32 },
   grids: new Map(),
   entities: new Map(),

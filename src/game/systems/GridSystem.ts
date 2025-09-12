@@ -528,11 +528,13 @@ export class GridSystem {
           cropAmount: 0
         };
         break;
+
       case 'food':
         defaultState = {
           status: FoodState.IDLE
         };
         break;
+        
       case 'silo':
         defaultState = {
           status: SiloState.IDLE,

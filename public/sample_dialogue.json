@@ -1,22 +1,71 @@
 [
   {
-    "name": "Tutorial Guide",
-    "content": "Welcome to Binary Coven! This is your first dialogue. The dialogue system supports multiple speakers with different sprites and longer text content.",
-    "sprite": "logo.png"
+    "name": "Lain",
+    "content": "Qubit! Wake up already. You can’t just sleep all day—we need to get the next batch of seeds into the soil.",
+    "sprite": "manu-angry.png"
+  },
+  {
+    "name": "Qubit",
+    "content": "Ughhh… just five more minutes. The farm will still be here, you know.",
+    "sprite": "qubit-defeated.png"
+  },
+  {
+    "name": "Lain",
+    "content": "Five more minutes won’t grow wheat! Now get moving. Use the arrow keys—up, down, left, right—to walk around the farmland.",
+    "sprite": "manu-angry.png"
   },
   {
     "name": "System",
-    "content": "You can advance the dialogue by clicking anywhere on the dialogue box or pressing any key. The system automatically handles progression through the sequence.",
+    "content": "Tip: You can also click on yourself to see your current status—like stamina, tools, and what seeds you’re carrying.",
     "sprite": "star.png"
   },
   {
-    "name": "Tutorial Guide", 
-    "content": "Each dialogue entry can have a different speaker name, content, and sprite image. The sprite should be placed in the assets folder.",
-    "sprite": "logo.png"
+    "name": "Qubit",
+    "content": "Alright, alright… walking, checking status, planting seeds. Got it. Happy now?",
+    "sprite": "qubit-defeated.png"
+  },
+  {
+    "name": "Lain",
+    "content": "Not until you’ve planted! Normally, you’d do it by hand—stand on farmland and type: plant(\"wheat\").",
+    "sprite": "manu-defeated.png"
   },
   {
     "name": "System",
-    "content": "When you reach the last dialogue entry, the system will automatically close and return control to the game. Try it now!",
+    "content": "Example: If you’re standing on a farmland tile, type plant(\"wheat\") to plant wheat seeds there.",
+    "sprite": "star.png"
+  },
+  {
+    "name": "Qubit",
+    "content": "Sounds like tedious work if you ask me. Plant, plant, plant… over and over.",
+    "sprite": "qubit-speaking.png"
+  },
+  {
+    "name": "Lain",
+    "content": "That’s why we automate, you lazy lump! You can move with commands like move_left(), move_right(), move_up(), move_down(). Combine them with plant() or harvest() to make scripts that do the work for you.",
+    "sprite": "manu-defeated.png"
+  },
+  {
+    "name": "System",
+    "content": "Automation Example: move_right(); plant(\"wheat\"); move_right(); plant(\"wheat\");",
+    "sprite": "star.png",
+    "camera": {
+      "x": 12,
+      "y": 8
+    }
+  },
+  {
+    "name": "Qubit",
+    "content": "Hmm… so if I get smart about it, I don’t have to break my back farming? Now we’re talking!",
+    "sprite": "qubit-pleased.png"
+  },
+  {
+    "name": "Lain",
+    "content": "Exactly. Work smarter, not lazier. Now get to it—we’ve got a whole field waiting for you.",
+    "sprite": "manu-pleased.png"
+  },
+  {
+    "name": "System",
+    "content": "End of Tutorial: You can now experiment with movement, planting, harvesting, and writing simple scripts to automate farming. The rest is up to you.",
     "sprite": "star.png"
   }
 ]

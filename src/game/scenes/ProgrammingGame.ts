@@ -195,9 +195,6 @@ export class ProgrammingGame extends Scene {
   private load_game: Phaser.GameObjects.Sprite;
   private well: Phaser.GameObjects.Sprite;
   
-  // Upgrade system
-  private upgradeModal: Phaser.GameObjects.Container | null = null;
-  private isUpgradeModalOpen: boolean = false;
   
   // Visual elements
   private gridGraphics!: Phaser.GameObjects.Graphics;
@@ -220,6 +217,7 @@ export class ProgrammingGame extends Scene {
   private wasdKeys!: { W: Phaser.Input.Keyboard.Key, A: Phaser.Input.Keyboard.Key, S: Phaser.Input.Keyboard.Key, D: Phaser.Input.Keyboard.Key };
   private isLockedToQubit: boolean = true;
   private cameraSpeed: number = 300;
+  private isCameraPanning: boolean = false;
   
   // Constants
   private readonly GRID_SIZE = 128; // About 1/3 of 128 for smaller, more detailed grids
@@ -450,6 +448,10 @@ export class ProgrammingGame extends Scene {
     
     // Emit event so React component can get scene reference
     EventBus.emit('current-scene-ready', this);
+
+    if (!this.gameStore.isTutorialDone) {
+      EventBus.emit('start-dialogue', 'sample_dialogue.json');
+    }
   }
 
   private createPlaceholderSprites() {
@@ -588,27 +590,9 @@ export class ProgrammingGame extends Scene {
       }
     });
   }
+
   private createSampleWorld() {
     const store = useGameStore.getState();
-    
-    // Add some sample grids with proper initialization
-    const farmlandData = this.gridSystem.initializeGrid('farmland', '');
-    const farmlandId = store.addGrid({
-      id: 'farmland_8_7',
-      type: 'farmland',
-      position: { x: 8, y: 7 },
-      name: 'Farmland Plot #1',
-      description: 'A fertile plot of land for growing crops',
-      properties: {},
-      isActive: true,
-      functions: farmlandData.functions || [],
-      state: farmlandData.state || {},
-      taskState: farmlandData.taskState || {
-        isBlocked: false,
-        currentTask: undefined,
-        progress: undefined
-      }
-    });
 
     // Create farmlands in first rectangular area (11-14, 11-14)
     let plotNumber = 2;
@@ -669,26 +653,26 @@ export class ProgrammingGame extends Scene {
     this.createFoodStation(8, 9);
     this.createFoodStation(7, 8);
     
-    const siloData = this.gridSystem.initializeGrid('silo', '');
-    const siloId = store.addGrid({
-      id: 'storage_silo',
-      type: 'silo',
-      position: { x: 16, y: 7 },
-      name: 'Storage Silo',
-      description: 'Secure storage for crops and farm items',
-      properties: {},
-      isActive: true,
-      functions: siloData.functions || [],
-      state: siloData.state || {},
-      taskState: siloData.taskState || {
-        isBlocked: false,
-        currentTask: undefined,
-        progress: undefined
-      }
-    });
+    // const siloData = this.gridSystem.initializeGrid('silo', '');
+    // const siloId = store.addGrid({
+    //   id: 'storage_silo',
+    //   type: 'silo',
+    //   position: { x: 16, y: 7 },
+    //   name: 'Storage Silo',
+    //   description: 'Secure storage for crops and farm items',
+    //   properties: {},
+    //   isActive: true,
+    //   functions: siloData.functions || [],
+    //   state: siloData.state || {},
+    //   taskState: siloData.taskState || {
+    //     isBlocked: false,
+    //     currentTask: undefined,
+    //     progress: undefined
+    //   }
+    // });
     
-    // Update visual representation
-    this.updateVisuals();
+    // // Update visual representation
+    // this.updateVisuals();
   }
 
   private setupCamera() {
@@ -860,6 +844,41 @@ export class ProgrammingGame extends Scene {
     }
   }
 
+  public panCameraTo(x: number, y: number, duration: number = 1000): Promise<void> {
+    return new Promise((resolve) => {
+      // Prevent multiple simultaneous camera pans
+      if (this.isCameraPanning) {
+        console.log('[CAMERA] Camera is already panning, ignoring request');
+        resolve();
+        return;
+      }
+
+      this.isCameraPanning = true;
+      console.log('[CAMERA] Starting camera pan to', x, y);
+
+      // Ensure camera is unlocked during dialogue-driven panning
+      this.unlockCamera();
+
+      // Convert grid coordinates to pixel coordinates
+      const pixelX = x * this.GRID_SIZE + this.GRID_SIZE / 2;
+      const pixelY = y * this.GRID_SIZE + this.GRID_SIZE / 2;
+
+      // Set up completion event listener
+      const onPanComplete = () => {
+        console.log('[CAMERA] Pan completed');
+        this.isCameraPanning = false;
+        this.cameras.main.off('camerapancomplete', onPanComplete);
+        resolve();
+      };
+
+      // Listen for pan completion
+      this.cameras.main.once('camerapancomplete', onPanComplete);
+
+      // Start the camera pan
+      this.cameras.main.pan(pixelX, pixelY, duration, 'Power2');
+    });
+  }
+
   private setupStateListeners() {
     // This would be implemented with proper state management
     // For now, we'll update visuals periodically
@@ -919,10 +938,6 @@ export class ProgrammingGame extends Scene {
       }
     });
 
-    // Handle upgrade modal requests from GameInterface
-    EventBus.on('request-upgrade-modal', () => {
-      this.openUpgradeModal();
-    });
   }
 
   private createUI() {
@@ -1642,6 +1657,11 @@ export class ProgrammingGame extends Scene {
     EventBus.on('request-movement-manager', (callback: (manager: MovementManager) => void) => {
       callback(this.movementManager);
     });
+
+    // Handle camera panning requests
+    EventBus.on('pan-camera-to', async (data: { x: number, y: number, duration?: number }) => {
+      await this.panCameraTo(data.x, data.y, data.duration || 1000);
+    });
   }
 
   private setupExecutionTextSystem() {
@@ -1844,213 +1864,6 @@ export class ProgrammingGame extends Scene {
     console.log(`Wheat sprite key changed to: ${spriteKey}`);
   }
 
-  // =====================================================================
-  // UPGRADE SYSTEM
-  // =====================================================================
-
-  private openUpgradeModal(): void {
-    if (this.isUpgradeModalOpen) return;
-    
-    this.isUpgradeModalOpen = true;
-    this.createUpgradeModal();
-  }
-
-  private closeUpgradeModal(): void {
-    if (!this.isUpgradeModalOpen) return;
-    
-    this.isUpgradeModalOpen = false;
-    if (this.upgradeModal) {
-      this.upgradeModal.destroy();
-      this.upgradeModal = null;
-    }
-  }
-
-  private createUpgradeModal(): void {
-    const camera = this.cameras.main;
-    const modalWidth = 500;
-    const modalHeight = 400;
-    
-    // Create modal container
-    this.upgradeModal = this.add.container(camera.centerX, camera.centerY);
-    this.upgradeModal.setScrollFactor(0);
-    this.upgradeModal.setDepth(2000);
-
-    // Background
-    const bg = this.add.graphics();
-    bg.fillStyle(0x000000, 0.95);
-    bg.lineStyle(2, 0xf5a623);
-    bg.fillRoundedRect(-modalWidth/2, -modalHeight/2, modalWidth, modalHeight, 8);
-    bg.strokeRoundedRect(-modalWidth/2, -modalHeight/2, modalWidth, modalHeight, 8);
-    this.upgradeModal.add(bg);
-
-    // Title
-    const title = this.add.text(0, -modalHeight/2 + 30, 'UPGRADES', {
-      fontSize: '24px',
-      color: '#f5a623',
-      fontFamily: 'Arial, sans-serif'
-    });
-    title.setOrigin(0.5);
-    this.upgradeModal.add(title);
-
-    // Current wheat display
-    const gameState = useGameStore.getState();
-    const wheatText = this.add.text(0, -modalHeight/2 + 70, `Available Wheat: ${gameState.globalResources.wheat || 0}`, {
-      fontSize: '16px',
-      color: '#cccccc',
-      fontFamily: 'Arial, sans-serif'
-    });
-    wheatText.setOrigin(0.5);
-    this.upgradeModal.add(wheatText);
-
-    // Upgrade buttons
-    this.createUpgradeButtons();
-
-    // Close button
-    const closeBtn = this.add.text(0, modalHeight/2 - 30, 'CLOSE', {
-      fontSize: '16px',
-      color: '#ffffff',
-      backgroundColor: '#666666',
-      padding: { x: 20, y: 10 }
-    });
-    closeBtn.setOrigin(0.5);
-    closeBtn.setInteractive({ useHandCursor: true });
-    closeBtn.on('pointerdown', () => this.closeUpgradeModal());
-    closeBtn.on('pointerover', () => closeBtn.setTint(0xaaaaaa));
-    closeBtn.on('pointerout', () => closeBtn.clearTint());
-    this.upgradeModal.add(closeBtn);
-  }
-
-  private createUpgradeButtons(): void {
-    const gameState = useGameStore.getState();
-    const activeEntity = gameState.entities.get(gameState.activeEntityId);
-    
-    if (!activeEntity) return;
-
-    const upgrades = [
-      {
-        name: 'Movement Speed +0.5',
-        description: 'Increase walking speed',
-        cost: 15,
-        current: activeEntity.stats.walkingSpeed,
-        apply: () => {
-          gameState.updateEntity(activeEntity.id, {
-            stats: { ...activeEntity.stats, walkingSpeed: activeEntity.stats.walkingSpeed + 0.5 }
-          });
-        }
-      },
-      {
-        name: 'Max Energy +20',
-        description: 'Increase maximum energy capacity',
-        cost: 10,
-        current: activeEntity.stats.maxEnergy,
-        apply: () => {
-          const newMaxEnergy = activeEntity.stats.maxEnergy + 20;
-          gameState.updateEntity(activeEntity.id, {
-            stats: { 
-              ...activeEntity.stats, 
-              maxEnergy: newMaxEnergy,
-              energy: Math.min(activeEntity.stats.energy + 20, newMaxEnergy) // Also restore 20 energy
-            }
-          });
-        }
-      },
-      {
-        name: 'Harvest Amount +2',
-        description: 'Get more wheat per harvest',
-        cost: 25,
-        current: activeEntity.stats.harvestAmount || 1,
-        apply: () => {
-          gameState.updateEntity(activeEntity.id, {
-            stats: { ...activeEntity.stats, harvestAmount: (activeEntity.stats.harvestAmount || 1) + 2 }
-          });
-        }
-      },
-      {
-        name: 'Planting Speed +25%',
-        description: 'Reduce planting time',
-        cost: 20,
-        current: `${Math.round((1 - (activeEntity.stats.plantingSpeedMultiplier || 1)) * 100)}% faster`,
-        apply: () => {
-          const currentMultiplier = activeEntity.stats.plantingSpeedMultiplier || 1;
-          gameState.updateEntity(activeEntity.id, {
-            stats: { ...activeEntity.stats, plantingSpeedMultiplier: Math.max(0.1, currentMultiplier - 0.25) }
-          });
-        }
-      }
-    ];
-
-    upgrades.forEach((upgrade, index) => {
-      const yOffset = -80 + (index * 80);
-      const canAfford = (gameState.globalResources.wheat || 0) >= upgrade.cost;
-      
-      // Upgrade container
-      const upgradeContainer = this.add.container(0, yOffset);
-      
-      // Background for upgrade item
-      const itemBg = this.add.graphics();
-      itemBg.fillStyle(0x333333, 0.8);
-      itemBg.lineStyle(1, canAfford ? 0x16c60c : 0x666666);
-      itemBg.fillRoundedRect(-200, -25, 400, 50, 4);
-      itemBg.strokeRoundedRect(-200, -25, 400, 50, 4);
-      upgradeContainer.add(itemBg);
-      
-      // Upgrade name
-      const nameText = this.add.text(-180, -15, upgrade.name, {
-        fontSize: '14px',
-        color: '#ffffff',
-        fontFamily: 'Arial, sans-serif'
-      });
-      upgradeContainer.add(nameText);
-      
-      // Current value
-      const currentText = this.add.text(-180, 5, `Current: ${upgrade.current}`, {
-        fontSize: '10px',
-        color: '#cccccc',
-        fontFamily: 'Arial, sans-serif'
-      });
-      upgradeContainer.add(currentText);
-      
-      // Cost
-      const costText = this.add.text(0, -5, `Cost: ${upgrade.cost} Wheat`, {
-        fontSize: '12px',
-        color: '#f5a623',
-        fontFamily: 'Arial, sans-serif'
-      });
-      costText.setOrigin(0.5);
-      upgradeContainer.add(costText);
-      
-      // Buy button
-      const buyBtn = this.add.text(150, 0, 'BUY', {
-        fontSize: '12px',
-        color: canAfford ? '#ffffff' : '#888888',
-        backgroundColor: canAfford ? '#16c60c' : '#444444',
-        padding: { x: 15, y: 8 }
-      });
-      buyBtn.setOrigin(0.5);
-      
-      if (canAfford) {
-        buyBtn.setInteractive({ useHandCursor: true });
-        buyBtn.on('pointerdown', () => {
-          // Consume wheat
-          gameState.updateResources({ wheat: (gameState.globalResources.wheat || 0) - upgrade.cost });
-          
-          // Apply upgrade
-          upgrade.apply();
-          
-          console.log(`[UPGRADES] Applied upgrade: ${upgrade.name}`);
-          
-          // Close and reopen modal to refresh
-          this.closeUpgradeModal();
-          this.openUpgradeModal();
-        });
-        buyBtn.on('pointerover', () => buyBtn.setTint(0xaaaaaa));
-        buyBtn.on('pointerout', () => buyBtn.clearTint());
-      }
-      
-      upgradeContainer.add(buyBtn);
-      this.upgradeModal!.add(upgradeContainer);
-    });
-  }
 
   // =====================================================================
   // SAVE/LOAD SYSTEM
