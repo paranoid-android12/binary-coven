@@ -1224,9 +1224,12 @@ export class ProgrammingGame extends Scene {
     if (grid.state.status === FarmlandState.PLANTING) {
       wheatFrame = 0; // Phase 1: Seed planted
     } else if (grid.state.status === FarmlandState.GROWING) {
-      // Get progress from centralized task system
+      // Get progress from centralized task system; fallback to saved state percent
       const gameState = useGameStore.getState();
-      const progressPercent = gameState.getTaskProgress(grid.id);
+      let progressPercent = gameState.getTaskProgress(grid.id);
+      if (!progressPercent || progressPercent === 0) {
+        progressPercent = grid.state.growthProgressPercent || 0;
+      }
       const progressValue = progressPercent / 100; // Convert to 0-1 range
       
       // Map progress to 6 phases (0-5): seed, growth stages 1-4, fully grown
@@ -1498,18 +1501,22 @@ export class ProgrammingGame extends Scene {
         if (Phaser.Input.Keyboard.JustDown(this.cameraKeys.up)) {
           const targetPos = { x: activeEntity.position.x, y: activeEntity.position.y - 1 };
           this.movementManager.moveEntity(activeEntity, targetPos);
+          EventBus.emit('tutorial-movement', { direction: 'up' });
         }
         if (Phaser.Input.Keyboard.JustDown(this.cameraKeys.down)) {
           const targetPos = { x: activeEntity.position.x, y: activeEntity.position.y + 1 };
           this.movementManager.moveEntity(activeEntity, targetPos);
+          EventBus.emit('tutorial-movement', { direction: 'down' });
         }
         if (Phaser.Input.Keyboard.JustDown(this.cameraKeys.left)) {
           const targetPos = { x: activeEntity.position.x - 1, y: activeEntity.position.y };
           this.movementManager.moveEntity(activeEntity, targetPos);
+          EventBus.emit('tutorial-movement', { direction: 'left' });
         }
         if (Phaser.Input.Keyboard.JustDown(this.cameraKeys.right)) {
           const targetPos = { x: activeEntity.position.x + 1, y: activeEntity.position.y };
           this.movementManager.moveEntity(activeEntity, targetPos);
+          EventBus.emit('tutorial-movement', { direction: 'right' });
         }
       }
     }
@@ -1968,6 +1975,20 @@ export class ProgrammingGame extends Scene {
             isBlocked: false,
             currentTask: undefined,
             progress: undefined
+          },
+          // Persist growth progress percent if growing
+          state: {
+            ...grid.state,
+            growthProgressPercent: ((): number => {
+              if (grid.type === 'farmland') {
+                // If there's an active grid task, read current progress
+                const percent = gameState.getTaskProgress(grid.id);
+                if (percent > 0) return Math.floor(percent);
+                // Otherwise keep existing saved value or 0
+                return grid.state.growthProgressPercent || 0;
+              }
+              return grid.state.growthProgressPercent || 0;
+            })()
           }
         })),
         activeEntityId: gameState.activeEntityId,
@@ -2082,6 +2103,73 @@ export class ProgrammingGame extends Scene {
       
       // Reinitialize grid functions that were lost during JSON serialization
       this.reinitializeGridFunctions();
+
+      // If any farmland was in GROWING state, restart growth tasks from saved progress
+      freshGameState.grids.forEach((grid) => {
+        if (grid.type === 'farmland' && grid.state.status === FarmlandState.GROWING) {
+          const savedPercent = Math.max(0, Math.min(100, grid.state.growthProgressPercent || 0));
+          
+          // Update the grid with the saved progress
+          freshGameState.updateGrid(grid.id, {
+            state: {
+              ...grid.state,
+              growthProgressPercent: savedPercent
+            }
+          } as any);
+          
+          console.log(`[LOAD] Resuming growth for grid ${grid.id} from ${savedPercent}%`);
+          
+          // Calculate remaining growth time based on saved progress
+          // Original growth time is 10 seconds (from PLANT_DATA.wheat.growthTime)
+          const totalGrowthTime = 10; // seconds
+          const elapsedTime = (savedPercent / 100) * totalGrowthTime;
+          const remainingTime = Math.max(0.1, totalGrowthTime - elapsedTime); // At least 0.1s remaining
+          
+          // Start growth task with remaining time and initial progress
+          const growthTaskSuccess = freshGameState.startTask({
+            type: 'grid',
+            targetId: grid.id,
+            taskName: 'growing',
+            duration: totalGrowthTime, // Use full duration
+            description: `${grid.state.plantType || 'Wheat'} growing...`,
+            initialProgress: savedPercent, // Set initial progress
+            onComplete: () => {
+              console.log(`[LOAD-GROWTH] Growth completed for grid ${grid.id}`);
+              
+              // Get fresh reference for growth completion
+              const completionStore = useGameStore.getState();
+              const completionGrid = completionStore.grids.get(grid.id);
+              
+              if (!completionGrid) {
+                console.error(`[LOAD-GROWTH] Grid not found after growth completion: ${grid.id}`);
+                return;
+              }
+              
+              console.log(`[LOAD-GROWTH] Updating grid ${grid.id} to READY state`);
+              
+              // Update to ready state (same as normal growth completion)
+              completionStore.updateGrid(grid.id, {
+                state: {
+                  ...completionGrid.state,
+                  status: FarmlandState.READY,
+                  isGrown: true,
+                  cropReady: true,
+                  cropAmount: 1, // Default harvest amount
+                  growthProgressPercent: 100
+                }
+              });
+              
+              console.log(`[LOAD-GROWTH] Grid ${grid.id} growth completed successfully`);
+            }
+          });
+          
+          if (!growthTaskSuccess) {
+            console.error(`[LOAD] Failed to restart growth task for grid ${grid.id}`);
+          } else {
+            console.log(`[LOAD] Growth task restarted successfully for grid ${grid.id} from ${savedPercent}% progress`);
+          }
+        }
+      });
       
       // Recreate sprites for the loaded entities and grids
       this.updateVisuals();

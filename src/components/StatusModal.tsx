@@ -4,6 +4,7 @@ import ProgrammingInterface from './ProgrammingInterface';
 import ProgressBar from './ProgressBar';
 import TaskManager from '../game/systems/TaskManager';
 import { useGameStore } from '../stores/gameStore';
+import { EventBus } from '../game/EventBus';
 
 interface StatusModalProps {
   isOpen: boolean;
@@ -247,7 +248,11 @@ export const StatusModal: React.FC<StatusModalProps> = ({
           </button>
           {isEntity && (
             <button
-              onClick={() => setActiveTab('program')}
+              onClick={() => {
+                setActiveTab('program');
+                // Emit tutorial event for terminal opening
+                EventBus.emit('tutorial-terminal-opened');
+              }}
               style={{
                 backgroundColor: activeTab === 'program' ? '#007acc' : 'transparent',
                 color: activeTab === 'program' ? 'white' : '#cccccc',

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Editor from '@monaco-editor/react';
 import { useGameStore } from '../stores/gameStore';
 import { Entity, CodeWindow } from '../types/game';
+import { EventBus } from '../game/EventBus';
 
 interface ProgrammingInterfaceProps {
   entity: Entity;
@@ -75,6 +76,8 @@ export const ProgrammingInterface: React.FC<ProgrammingInterfaceProps> = ({ enti
   const handleCodeChange = (value: string | undefined) => {
     if (selectedFunction && value !== undefined) {
       updateCodeWindow(selectedFunction.id, { code: value });
+      // Emit tutorial event for code content changes
+      EventBus.emit('tutorial-code-changed', { content: value });
     }
   };
 

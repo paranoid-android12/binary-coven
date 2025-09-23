@@ -73,6 +73,7 @@ export interface GameStore extends GameState {
     description: string;
     entityId?: string;
     onComplete?: () => void;
+    initialProgress?: number; // For resuming tasks from saved progress (0-100)
   }) => boolean;
   completeTask: (taskId: string) => void;
   cancelTask: (taskId: string) => void;
@@ -182,6 +183,7 @@ const createTaskSystem = (set: any, get: any) => ({
     description: string;
     entityId?: string;
     onComplete?: () => void;
+    initialProgress?: number; // For resuming tasks from saved progress (0-100)
   }) => {
     const state = get();
     
@@ -194,13 +196,23 @@ const createTaskSystem = (set: any, get: any) => ({
     }
     
     const taskId = uuidv4();
+    const currentTime = Date.now();
+    
+    // If we have initial progress, adjust the start time to reflect that progress
+    let adjustedStartTime = currentTime;
+    if (params.initialProgress && params.initialProgress > 0) {
+      const totalDurationMs = params.duration * 1000;
+      const elapsedMs = (params.initialProgress / 100) * totalDurationMs;
+      adjustedStartTime = currentTime - elapsedMs;
+    }
+    
     const task = {
       id: taskId,
       type: params.type,
       targetId: params.targetId,
       taskName: params.taskName,
       description: params.description,
-      startTime: Date.now(),
+      startTime: adjustedStartTime,
       duration: params.duration * 1000, // Convert to milliseconds
       onComplete: params.onComplete,
       entityId: params.entityId

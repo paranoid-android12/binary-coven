@@ -59,6 +59,14 @@ const useDraggable = (initialPosition: { x: number; y: number }) => {
 };
 
 // Dialogue system types
+interface DialogueRequirement {
+  type: 'movement' | 'open_terminal' | 'code_content' | 'play_button' | 'movement_command';
+  directions?: string[]; // For movement requirement
+  content?: string; // For code_content requirement
+  commands?: string[]; // For movement_command requirement
+  description: string;
+}
+
 interface DialogueEntry {
   name: string;
   content: string;
@@ -68,6 +76,7 @@ interface DialogueEntry {
     y: number;
   };
   mainImage?: string;
+  requirement?: DialogueRequirement;
 }
 
 interface DialogueState {
@@ -75,6 +84,15 @@ interface DialogueState {
   dialogues: DialogueEntry[];
   currentIndex: number;
   isLoading: boolean;
+}
+
+interface TutorialState {
+  movementDirections: Set<string>; // Tracks which directions have been moved
+  terminalOpened: boolean;
+  codeContent: string;
+  playButtonClicked: boolean;
+  movementCommandDetected: boolean;
+  hasAcknowledgedCurrentRequirement: boolean; // Tracks if user has seen and acknowledged the current tutorial step
 }
 
 export const GameInterface: React.FC = () => {
@@ -104,6 +122,16 @@ export const GameInterface: React.FC = () => {
     dialogues: [],
     currentIndex: 0,
     isLoading: false
+  });
+
+  // Tutorial state tracking
+  const [tutorialState, setTutorialState] = useState<TutorialState>({
+    movementDirections: new Set<string>(),
+    terminalOpened: false,
+    codeContent: '',
+    playButtonClicked: false,
+    movementCommandDetected: false,
+    hasAcknowledgedCurrentRequirement: false
   });
   
   // Map editor state
@@ -156,6 +184,75 @@ export const GameInterface: React.FC = () => {
   } = useGameStore();
 
   const [isCodeRunning, setIsCodeRunning] = useState(false);
+
+  // Check if current dialogue requirement is met
+  const isRequirementMet = useCallback((requirement?: DialogueRequirement): boolean => {
+    if (!requirement) return true;
+
+    switch (requirement.type) {
+      case 'movement':
+        // Check if all required directions have been moved
+        if (requirement.directions) {
+          return requirement.directions.every(dir => tutorialState.movementDirections.has(dir));
+        }
+        return false;
+
+      case 'open_terminal':
+        return tutorialState.terminalOpened;
+
+      case 'code_content':
+        // Check if the exact code content is present
+        if (requirement.content) {
+          return tutorialState.codeContent.trim().includes(requirement.content.trim());
+        }
+        return false;
+
+      case 'play_button':
+        return tutorialState.playButtonClicked;
+
+      case 'movement_command':
+        // Check if any of the movement commands are detected
+        if (requirement.commands) {
+          return requirement.commands.some(cmd => 
+            tutorialState.codeContent.includes(cmd)
+          );
+        }
+        return tutorialState.movementCommandDetected;
+
+      default:
+        return true;
+    }
+  }, [tutorialState]);
+
+  // Check if we should hide dialogue overlay (during tutorial requirements)
+  const shouldHideDialogue = useCallback(() => {
+    if (!dialogueState.isActive) return false;
+    const currentDialogue = dialogueState.dialogues[dialogueState.currentIndex];
+    // Only hide if there's a requirement, it's not met, AND user has acknowledged the instruction
+    return currentDialogue?.requirement && !isRequirementMet(currentDialogue.requirement) && tutorialState.hasAcknowledgedCurrentRequirement;
+  }, [dialogueState, isRequirementMet, tutorialState.hasAcknowledgedCurrentRequirement]);
+
+  // Override modal state when dialogue is hidden for tutorial
+  const shouldBlockModalInteractions = useCallback(() => {
+    // If dialogue is active but hidden for tutorial requirements, don't block anything
+    if (dialogueState.isActive && shouldHideDialogue()) {
+      console.log('[TUTORIAL] Dialogue hidden - allowing all interactions');
+      return false; // Allow all interactions during tutorial requirements
+    }
+    
+    // If dialogue is visible and active, block interactions
+    if (dialogueState.isActive && !shouldHideDialogue()) {
+      console.log('[TUTORIAL] Dialogue visible - blocking interactions');
+      return true; // Block interactions during visible dialogue
+    }
+    
+    // For non-dialogue modals, check if any are open
+    const nonDialogueModalsOpen = Array.from(globalModalState.openModals).some(modal => modal !== 'dialogue');
+    if (nonDialogueModalsOpen) {
+      console.log('[TUTORIAL] Non-dialogue modal open - blocking interactions');
+    }
+    return nonDialogueModalsOpen;
+  }, [dialogueState, shouldHideDialogue, globalModalState.openModals]);
   
   // Draggable UI elements  
   const resourcesPanel = useDraggable({ x: window.innerWidth - 220, y: 20 });
@@ -193,12 +290,13 @@ export const GameInterface: React.FC = () => {
   // Handle entity/grid clicks from Phaser
   useEffect(() => {
     const handleEntityClick = (entity: Entity) => {
-      // Block if any modal is currently open
-      if (globalModalState.isAnyModalOpen) {
+      // Block if any modal is currently open (but allow during tutorial requirements)
+      if (shouldBlockModalInteractions()) {
         console.log('Entity click blocked - modal is open');
         return;
       }
       
+      console.log('[TUTORIAL] Entity click allowed - opening modal');
       setModalState({
         isOpen: true,
         entity,
@@ -209,12 +307,13 @@ export const GameInterface: React.FC = () => {
     };
 
     const handleGridClick = (grid: GridTile) => {
-      // Block if any modal is currently open
-      if (globalModalState.isAnyModalOpen) {
+      // Block if any modal is currently open (but allow during tutorial requirements)
+      if (shouldBlockModalInteractions()) {
         console.log('Grid click blocked - modal is open');
         return;
       }
       
+      console.log('[TUTORIAL] Grid click allowed - opening modal');
       setModalState({
         isOpen: true,
         entity: undefined,
@@ -277,9 +376,42 @@ export const GameInterface: React.FC = () => {
       }));
     };
 
-    // Handle dialogue requests from EventBus
-    const handleStartDialogue = (dialogueFile: string) => {
-      startDialogue(dialogueFile);
+      // Handle dialogue requests from EventBus
+      const handleStartDialogue = (dialogueFile: string) => {
+        startDialogue(dialogueFile);
+      };
+
+    // Tutorial tracking event handlers
+    const handleMovementTracking = (data: { direction: string }) => {
+      if (dialogueState.isActive) {
+        setTutorialState(prev => ({
+          ...prev,
+          movementDirections: new Set([...prev.movementDirections, data.direction])
+        }));
+        console.log('[TUTORIAL] Movement tracked:', data.direction);
+      }
+    };
+
+    const handleTerminalOpened = () => {
+      if (dialogueState.isActive) {
+        setTutorialState(prev => ({ ...prev, terminalOpened: true }));
+        console.log('[TUTORIAL] Terminal opened');
+      }
+    };
+
+    const handleCodeContentChanged = (data: { content: string }) => {
+      if (dialogueState.isActive) {
+        setTutorialState(prev => ({ ...prev, codeContent: data.content }));
+        console.log('[TUTORIAL] Code content updated');
+      }
+    };
+
+    const handlePlayButtonClicked = () => {
+      if (dialogueState.isActive) {
+        setTutorialState(prev => ({ ...prev, playButtonClicked: true }));
+        console.log('[TUTORIAL] Play button clicked');
+        // Don't reset immediately - let the dialogue advancement handle it
+      }
     };
 
     EventBus.on('entity-clicked', handleEntityClick);
@@ -293,6 +425,12 @@ export const GameInterface: React.FC = () => {
     EventBus.on('map-editor-tileset-updated', handleTilesetUpdated);
     EventBus.on('start-dialogue', handleStartDialogue);
     EventBus.on('request-upgrade-modal', handleUpgradeModalRequest);
+    
+    // Tutorial tracking events
+    EventBus.on('tutorial-movement', handleMovementTracking);
+    EventBus.on('tutorial-terminal-opened', handleTerminalOpened);
+    EventBus.on('tutorial-code-changed', handleCodeContentChanged);
+    EventBus.on('tutorial-play-clicked', handlePlayButtonClicked);
 
     return () => {
       EventBus.removeListener('entity-clicked');
@@ -306,8 +444,14 @@ export const GameInterface: React.FC = () => {
       EventBus.removeListener('map-editor-tileset-updated');
       EventBus.removeListener('start-dialogue');
       EventBus.removeListener('request-upgrade-modal');
+      
+      // Tutorial tracking events cleanup
+      EventBus.removeListener('tutorial-movement');
+      EventBus.removeListener('tutorial-terminal-opened');
+      EventBus.removeListener('tutorial-code-changed');
+      EventBus.removeListener('tutorial-play-clicked');
     };
-  }, [globalModalState.isAnyModalOpen, openModal]);
+  }, [globalModalState.isAnyModalOpen, openModal, dialogueState, shouldBlockModalInteractions]);
 
   // Initialize game state on first load
   useEffect(() => {
@@ -375,6 +519,9 @@ export const GameInterface: React.FC = () => {
       return;
     }
     lastRunCodeCall.current = now;
+
+    // Emit tutorial event for play button click
+    EventBus.emit('tutorial-play-clicked');
 
     const scene = phaserRef.current?.scene as ProgrammingGame;
     
@@ -448,9 +595,24 @@ export const GameInterface: React.FC = () => {
     }
   }, [globalModalState.isAnyModalOpen, openModal]);
 
+  // Check if current dialogue requirement is met
   const advanceDialogue = useCallback(() => {
     setDialogueState(prev => {
-      if (!prev.isActive || prev.currentIndex >= prev.dialogues.length - 1) {
+      if (!prev.isActive) return prev;
+      
+      // Check if current dialogue has a requirement that must be met
+      const currentDialogue = prev.dialogues[prev.currentIndex];
+      if (currentDialogue?.requirement && !isRequirementMet(currentDialogue.requirement)) {
+        console.log('[TUTORIAL] Requirement not met, hiding dialogue for user to complete task');
+        // Set acknowledgment flag so dialogue will hide and user can complete the task
+        setTutorialState(tutState => ({
+          ...tutState,
+          hasAcknowledgedCurrentRequirement: true
+        }));
+        return prev; // Don't advance but let user complete the task
+      }
+      
+      if (prev.currentIndex >= prev.dialogues.length - 1) {
         // End dialogue
         closeModal('dialogue');
         // Re-lock camera to qubit after dialogue ends
@@ -459,6 +621,17 @@ export const GameInterface: React.FC = () => {
           scene.lockCameraToQubit();
         }
         console.log('[DIALOGUE] Dialogue sequence completed');
+        
+        // Reset tutorial state when dialogue ends
+        setTutorialState({
+          movementDirections: new Set<string>(),
+          terminalOpened: false,
+          codeContent: '',
+          playButtonClicked: false,
+          movementCommandDetected: false,
+          hasAcknowledgedCurrentRequirement: false
+        });
+        
         return {
           isActive: false,
           dialogues: [],
@@ -481,12 +654,31 @@ export const GameInterface: React.FC = () => {
       }
       
       console.log(`[DIALOGUE] Advanced to dialogue ${nextIndex + 1}/${prev.dialogues.length}`);
+      
+      // Reset acknowledgment flag and play button state for the new dialogue
+      setTutorialState(tutState => ({
+        ...tutState,
+        hasAcknowledgedCurrentRequirement: false,
+        playButtonClicked: false
+      }));
+      
       return {
         ...prev,
         currentIndex: nextIndex
       };
     });
-  }, [closeModal]);
+  }, [closeModal, isRequirementMet]);
+
+  // Auto-advance dialogue when requirements are met
+  useEffect(() => {
+    if (dialogueState.isActive) {
+      const currentDialogue = dialogueState.dialogues[dialogueState.currentIndex];
+      if (currentDialogue?.requirement && isRequirementMet(currentDialogue.requirement)) {
+        // Immediately advance when requirement is met
+        advanceDialogue();
+      }
+    }
+  }, [dialogueState, isRequirementMet, advanceDialogue]);
 
   const closeDialogue = useCallback(() => {
     setDialogueState({
@@ -531,14 +723,14 @@ export const GameInterface: React.FC = () => {
   // Handle dialogue interaction events (keyboard and mouse)
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (dialogueState.isActive && !dialogueState.isLoading) {
+      if (dialogueState.isActive && !dialogueState.isLoading && !shouldHideDialogue()) {
         event.preventDefault();
         advanceDialogue();
       }
     };
 
     const handleMouseClick = (event: MouseEvent) => {
-      if (dialogueState.isActive && !dialogueState.isLoading) {
+      if (dialogueState.isActive && !dialogueState.isLoading && !shouldHideDialogue()) {
         // Check if click is inside dialogue box (we'll let it propagate to the dialogue component)
         const target = event.target as HTMLElement;
         if (target.closest('.dialogue-container')) {
@@ -548,7 +740,7 @@ export const GameInterface: React.FC = () => {
       }
     };
 
-    if (dialogueState.isActive) {
+    if (dialogueState.isActive && !shouldHideDialogue()) {
       document.addEventListener('keydown', handleKeyPress);
       document.addEventListener('click', handleMouseClick);
     }
@@ -557,7 +749,7 @@ export const GameInterface: React.FC = () => {
       document.removeEventListener('keydown', handleKeyPress);
       document.removeEventListener('click', handleMouseClick);
     };
-  }, [dialogueState.isActive, dialogueState.isLoading, advanceDialogue]);
+  }, [dialogueState.isActive, dialogueState.isLoading, advanceDialogue, shouldHideDialogue]);
 
   // Expose startDialogue function globally for easy access
   useEffect(() => {
@@ -605,7 +797,7 @@ export const GameInterface: React.FC = () => {
       )}
 
       {/* Modal Blocking Overlay - Covers game area when any modal is open */}
-      {showProgrammingInterface && globalModalState.isAnyModalOpen && (
+      {showProgrammingInterface && shouldBlockModalInteractions() && (
         <div style={{
           position: 'fixed',
           top: 0,
@@ -680,6 +872,69 @@ export const GameInterface: React.FC = () => {
           />
 
           {/* Top Right - Resources & Controls */}
+          
+          {/* Tutorial Task Indicator - Top Right */}
+          {dialogueState.isActive && shouldHideDialogue() && (() => {
+            const currentDialogue = dialogueState.dialogues[dialogueState.currentIndex];
+            if (currentDialogue?.requirement) {
+              return (
+                <div style={{
+                  position: 'absolute',
+                  top: '20px',
+                  right: '20px',
+                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                  border: '2px solid #FFD700',
+                  borderRadius: '8px',
+                  padding: '12px 16px',
+                  color: '#FFD700',
+                  fontSize: '16px',
+                  fontFamily: 'BoldPixels',
+                  maxWidth: '300px',
+                  zIndex: 2000,
+                  pointerEvents: 'none'
+                }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '8px',
+                    marginBottom: '4px'
+                  }}>
+                    <span style={{ fontSize: '18px' }}>📝</span>
+                    <span style={{ fontWeight: 'bold' }}>Current Task:</span>
+                  </div>
+                  <div style={{ fontSize: '14px', lineHeight: '1.3' }}>
+                    {currentDialogue.requirement.description}
+                  </div>
+                  {/* Progress indicator for movement tutorial */}
+                  {currentDialogue.requirement.type === 'movement' && currentDialogue.requirement.directions && (
+                    <div style={{ 
+                      marginTop: '8px', 
+                      fontSize: '12px',
+                      display: 'flex',
+                      gap: '8px',
+                      flexWrap: 'wrap'
+                    }}>
+                      {currentDialogue.requirement.directions.map(dir => (
+                        <span 
+                          key={dir}
+                          style={{
+                            padding: '2px 6px',
+                            backgroundColor: tutorialState.movementDirections.has(dir) ? 'rgba(0, 200, 0, 0.3)' : 'rgba(100, 100, 100, 0.3)',
+                            border: `1px solid ${tutorialState.movementDirections.has(dir) ? '#00CC00' : '#666666'}`,
+                            borderRadius: '4px',
+                            fontSize: '10px'
+                          }}
+                        >
+                          {dir.toUpperCase()} {tutorialState.movementDirections.has(dir) ? '✓' : ''}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+            return null;
+          })()}
 
           {/* Bottom Left - Error Messages */}
           <div style={{
@@ -717,8 +972,8 @@ export const GameInterface: React.FC = () => {
         </div>
       )}
 
-      {/* Dialogue System Overlay - Always on top when active */}
-      {dialogueState.isActive && (
+      {/* Dialogue System Overlay - Always on top when active and not hidden for tutorial */}
+      {dialogueState.isActive && !shouldHideDialogue() && (
         <div style={{
           position: 'fixed',
           top: 0,
@@ -825,6 +1080,37 @@ export const GameInterface: React.FC = () => {
                   }}>
                     {dialogueState.dialogues[dialogueState.currentIndex].content}
                   </div>
+                  
+                  {/* Tutorial Requirement Indicator */}
+                  {(() => {
+                    const currentDialogue = dialogueState.dialogues[dialogueState.currentIndex];
+                    if (currentDialogue?.requirement) {
+                      const isComplete = isRequirementMet(currentDialogue.requirement);
+                      return (
+                        <div style={{
+                          marginTop: '8px',
+                          padding: '6px 10px',
+                          backgroundColor: isComplete ? 'rgba(0, 150, 0, 0.2)' : 'rgba(150, 150, 0, 0.2)',
+                          border: `2px solid ${isComplete ? '#00AA00' : '#AAAA00'}`,
+                          borderRadius: '6px',
+                          fontSize: '16px',
+                          fontFamily: 'BoldPixels',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}>
+                          <span style={{ fontSize: '18px' }}>
+                            {isComplete ? '✓' : '⏳'}
+                          </span>
+                          <span>
+                            {currentDialogue.requirement.description}
+                            {!isComplete && ' (In Progress...)'}
+                          </span>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
               )}
               
@@ -847,11 +1133,19 @@ export const GameInterface: React.FC = () => {
                 transform: 'translateX(-50%)',
                 fontSize: '14px',
                 color: '#1c0a18',
-                animation: 'pulse 1.5s ease-in-out infinite'
+                animation: dialogueState.dialogues[dialogueState.currentIndex]?.requirement && 
+                          !isRequirementMet(dialogueState.dialogues[dialogueState.currentIndex].requirement) 
+                          ? 'none' : 'pulse 1.5s ease-in-out infinite'
               }}>
-                {dialogueState.currentIndex < dialogueState.dialogues.length - 1 
-                  ? 'Click or press any key to continue...' 
-                  : 'Click or press any key to close...'}
+                {(() => {
+                  const currentDialogue = dialogueState.dialogues[dialogueState.currentIndex];
+                  if (currentDialogue?.requirement && !isRequirementMet(currentDialogue.requirement)) {
+                    return `Complete task: ${currentDialogue.requirement.description}`;
+                  }
+                  return dialogueState.currentIndex < dialogueState.dialogues.length - 1 
+                    ? 'Click or press any key to continue...' 
+                    : 'Click or press any key to close...';
+                })()}
               </div>
             </div>
           </div>

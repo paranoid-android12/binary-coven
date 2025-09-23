@@ -185,7 +185,8 @@ export class GridSystem {
                   plantType: seedType,
                   isGrown: false,
                   cropReady: false,
-                  cropAmount: 0
+                  cropAmount: 0,
+                  growthProgressPercent: 0
                 }
               });
               
@@ -228,7 +229,8 @@ export class GridSystem {
                       status: FarmlandState.READY,
                       isGrown: true,
                       cropReady: true,
-                      cropAmount: plantData.harvestAmount
+                      cropAmount: plantData.harvestAmount,
+                      growthProgressPercent: 100
                     }
                   });
                   
@@ -313,7 +315,8 @@ export class GridSystem {
                   isGrown: false,
                   cropReady: false,
                   plantType: null,
-                  cropAmount: 0
+                  cropAmount: 0,
+                  growthProgressPercent: 0
                 }
               });
               
@@ -525,7 +528,8 @@ export class GridSystem {
           isGrown: false,
           cropReady: false,
           plantType: null,
-          cropAmount: 0
+          cropAmount: 0,
+          growthProgressPercent: 0
         };
         break;
 
@@ -570,7 +574,7 @@ export class GridSystem {
           cropReady: grid.state.cropReady || false,
           plantType: grid.state.plantType || null,
           cropAmount: grid.state.cropAmount || 0,
-          progress: grid.taskState.progress ? store.getTaskProgress(grid.id) : 0
+          progress: grid.taskState.progress ? store.getTaskProgress(grid.id) : (grid.state.growthProgressPercent || 0)
         };
       case 'food':
         return {

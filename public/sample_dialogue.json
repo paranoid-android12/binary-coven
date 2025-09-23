@@ -1,7 +1,7 @@
 [
   {
     "name": "Lain",
-    "content": "Qubit! Wake up already. You can’t just sleep all day—we need to get the next batch of seeds into the soil.",
+    "content": "Qubit! Wake up already. You can't just sleep all day—we need to get the next batch of seeds into the soil.",
     "sprite": "manu-angry.png"
   },
   {
@@ -11,61 +11,89 @@
   },
   {
     "name": "Lain",
-    "content": "Five more minutes won’t grow wheat! Now get moving. Use the arrow keys—up, down, left, right—to walk around the farmland.",
-    "sprite": "manu-angry.png"
-  },
-  {
-    "name": "System",
-    "content": "Tip: You can also click on yourself to see your current status—like stamina, tools, and what seeds you’re carrying.",
-    "sprite": "star.png"
-  },
-  {
-    "name": "Qubit",
-    "content": "Alright, alright… walking, checking status, planting seeds. Got it. Happy now?",
-    "sprite": "qubit-defeated.png"
-  },
-  {
-    "name": "Lain",
-    "content": "Not until you’ve planted! Normally, you’d do it by hand—stand on farmland and type: plant(\"wheat\").",
-    "sprite": "manu-defeated.png"
-  },
-  {
-    "name": "System",
-    "content": "Example: If you’re standing on a farmland tile, type plant(\"wheat\") to plant wheat seeds there.",
-    "sprite": "star.png"
-  },
-  {
-    "name": "Qubit",
-    "content": "Sounds like tedious work if you ask me. Plant, plant, plant… over and over.",
-    "sprite": "qubit-speaking.png"
-  },
-  {
-    "name": "Lain",
-    "content": "That’s why we automate, you lazy lump! You can move with commands like move_left(), move_right(), move_up(), move_down(). Combine them with plant() or harvest() to make scripts that do the work for you.",
-    "sprite": "manu-defeated.png"
-  },
-  {
-    "name": "System",
-    "content": "Automation Example: move_right(); plant(\"wheat\"); move_right(); plant(\"wheat\");",
-    "sprite": "star.png",
-    "camera": {
-      "x": 12,
-      "y": 8
+    "content": "Five more minutes won't grow wheat! Now get moving. Use the arrow keys ↑, ↓, ←, and → to walk around the farmland. Try walking in all four directions!",
+    "sprite": "manu-angry.png",
+    "requirement": {
+      "type": "movement",
+      "directions": ["up", "down", "left", "right"],
+      "description": "Walk in all four directions using arrow keys"
     }
   },
   {
     "name": "Qubit",
-    "content": "Hmm… so if I get smart about it, I don’t have to break my back farming? Now we’re talking!",
+    "content": "Alright, walking around... Got it. This is actually easier than I thought!",
+    "sprite": "qubit-speaking.png"
+  },
+  {
+    "name": "Lain",
+    "content": "Good! Now let's get you set up with the coding terminal. Click on the 'Code Editor' button to open the programming interface.",
+    "sprite": "manu-speaking.png",
+    "requirement": {
+      "type": "open_terminal",
+      "description": "Open the coding terminal"
+    }
+  },
+  {
+    "name": "Lain",
+    "content": "Perfect! This is where the magic happens. You can write code to automate your farming tasks. The terminal has different sections: your main code window, function definitions, and execution controls.",
+    "sprite": "manu-pleased.png"
+  },
+  {
+    "name": "Lain",
+    "content": "Let's start with something simple. In the main code window, type exactly this: plant(\"wheat\") - this is how you plant wheat seeds when standing on farmland.",
+    "sprite": "manu-speaking.png",
+    "requirement": {
+      "type": "code_content",
+      "content": "plant(\"wheat\")",
+      "description": "Type plant(\"wheat\") in the code editor"
+    }
+  },
+  {
+    "name": "Qubit",
+    "content": "Okay, typed it in. But how do I actually make it do something?",
+    "sprite": "qubit-speaking.png"
+  },
+  {
+    "name": "Lain",
+    "content": "Great question! See that play button (▶) in the interface? Click it to execute your code and watch Qubit perform the action!",
+    "sprite": "manu-speaking.png",
+    "requirement": {
+      "type": "play_button",
+      "description": "Click the play button to execute code"
+    }
+  },
+  {
+    "name": "Lain",
+    "content": "Excellent! Now you understand the basics. But typing individual commands is still tedious. Let's learn about movement commands. Clear your code and try typing one of these: move_left(), move_right(), move_up(), or move_down()",
+    "sprite": "manu-pleased.png",
+    "requirement": {
+      "type": "movement_command",
+      "commands": ["move_left()", "move_right()", "move_up()", "move_down()"],
+      "description": "Type any movement command in the code editor"
+    }
+  },
+  {
+    "name": "Qubit",
+    "content": "Oh wow, I can control myself with code! This is actually pretty cool.",
     "sprite": "qubit-pleased.png"
   },
   {
     "name": "Lain",
-    "content": "Exactly. Work smarter, not lazier. Now get to it—we’ve got a whole field waiting for you.",
+    "content": "Now you're getting it! Click the play button again to execute your movement command and see Qubit move automatically!",
+    "sprite": "manu-pleased.png",
+    "requirement": {
+      "type": "play_button",
+      "description": "Click the play button to execute movement command"
+    }
+  },
+  {
+    "name": "Lain",
+    "content": "Perfect! You've mastered the basics: manual movement with arrow keys, opening the code terminal, writing simple commands, and executing them. Now you can combine these to automate your entire farming operation!",
     "sprite": "manu-pleased.png"
   },
   {
-    "name": "System",
-    "content": "End of Tutorial: You can now experiment with movement, planting, harvesting, and writing simple scripts to automate farming. The rest is up to you.",
-    "sprite": "star.png"
+    "name": "Qubit",
+    "content": "This is amazing! I can already imagine writing scripts to plant entire fields while I take a nap. Thanks for teaching me, Lain!",
+    "sprite": "qubit-pleased.png"
   }
 ]
