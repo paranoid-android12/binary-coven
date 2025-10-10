@@ -26,8 +26,12 @@ export const StatusModal: React.FC<StatusModalProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
   const dragOffset = useRef({ x: 0, y: 0 });
+  const isResizing = useRef(false);
+  const resizeStartPos = useRef({ x: 0, y: 0 });
+  const resizeStartSize = useRef({ width: 600, height: 500 });
   const [activeTab, setActiveTab] = useState<'profile' | 'program'>('profile');
   const [progress, setProgress] = useState(0);
+  const [size, setSize] = useState({ width: 600, height: 500 });
   const taskManager = TaskManager.getInstance();
   
   // Reset tab to 'profile' when modal opens or entity/grid changes
@@ -36,6 +40,21 @@ export const StatusModal: React.FC<StatusModalProps> = ({
       setActiveTab('profile');
     }
   }, [isOpen, entity?.id, grid?.id]);
+
+  // Listen for open programming tab event
+  useEffect(() => {
+    const handleOpenProgrammingTab = () => {
+      if (isOpen && entity) {
+        setActiveTab('program');
+      }
+    };
+
+    EventBus.on('open-programming-tab', handleOpenProgrammingTab);
+    
+    return () => {
+      EventBus.removeListener('open-programming-tab');
+    };
+  }, [isOpen, entity]);
   
   // Get fresh data from game store to ensure real-time updates
   const { entities, grids } = useGameStore();
@@ -83,14 +102,30 @@ export const StatusModal: React.FC<StatusModalProps> = ({
       const newY = e.clientY - dragOffset.current.y;
       
       onPositionChange({ 
-        x: Math.max(0, Math.min(newX, window.innerWidth - 600)), 
-        y: Math.max(0, Math.min(newY, window.innerHeight - 400)) 
+        x: Math.max(0, Math.min(newX, window.innerWidth - size.width)), 
+        y: Math.max(0, Math.min(newY, window.innerHeight - size.height)) 
       });
+    } else if (isResizing.current) {
+      const deltaX = e.clientX - resizeStartPos.current.x;
+      const deltaY = e.clientY - resizeStartPos.current.y;
+      
+      const newWidth = Math.max(400, Math.min(resizeStartSize.current.width + deltaX, window.innerWidth - position.x));
+      const newHeight = Math.max(300, Math.min(resizeStartSize.current.height + deltaY, window.innerHeight - position.y));
+      
+      setSize({ width: newWidth, height: newHeight });
     }
   };
 
   const handleMouseUp = () => {
     isDragging.current = false;
+    isResizing.current = false;
+  };
+
+  const handleResizeStart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    isResizing.current = true;
+    resizeStartPos.current = { x: e.clientX, y: e.clientY };
+    resizeStartSize.current = { width: size.width, height: size.height };
   };
 
   useEffect(() => {
@@ -134,8 +169,8 @@ export const StatusModal: React.FC<StatusModalProps> = ({
           position: 'absolute',
           left: position.x,
           top: position.y,
-          width: '600px',
-          height: '500px',
+          width: `${size.width}px`,
+          height: `${size.height}px`,
           backgroundColor: '#2d2d30',
           border: '1px solid #3c3c3c',
           borderRadius: '8px',
@@ -277,6 +312,32 @@ export const StatusModal: React.FC<StatusModalProps> = ({
           {activeTab === 'program' && isEntity && (
             <ProgramTab entity={currentEntity!} />
           )}
+        </div>
+
+        {/* Resize Handle */}
+        <div
+          onMouseDown={handleResizeStart}
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            right: 0,
+            width: '20px',
+            height: '20px',
+            cursor: 'nwse-resize',
+            backgroundColor: 'transparent',
+            zIndex: 10
+          }}
+        >
+          <div style={{
+            position: 'absolute',
+            bottom: '4px',
+            right: '4px',
+            width: '12px',
+            height: '12px',
+            borderRight: '2px solid #007acc',
+            borderBottom: '2px solid #007acc',
+            pointerEvents: 'none'
+          }} />
         </div>
       </div>
     </div>

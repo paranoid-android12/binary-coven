@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
 import { Entity, GridTile, CodeWindow, Position, ExecutionContext, TaskState, ProgressInfo, FarmlandState } from '../types/game';
+import { EventBus } from '../game/EventBus';
 
 // =====================================================================
 // CENTRALIZED STATE INTERFACES
@@ -435,6 +436,9 @@ export const useGameStore = create<GameStore>()(
         
         if (grid) {
           console.log(`[STORE] Removed grid: ${grid.name} (${grid.type})`);
+          
+          // Emit cleanup event for sprite management (Phaser best practice)
+          EventBus.emit('grid-removed', gridId);
         }
         
         return { grids: newGrids };
@@ -515,6 +519,9 @@ export const useGameStore = create<GameStore>()(
         
         if (entity) {
           console.log(`[STORE] Removed entity: ${entity.name} (${entity.type})`);
+          
+          // Emit cleanup event for sprite management (Phaser best practice)
+          EventBus.emit('entity-removed', entityId);
         }
         
         return { 

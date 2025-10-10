@@ -10,6 +10,7 @@ import { MapEditorUI } from './MapEditorUI';
 import { SpriteEnergyDisplay } from './SpriteEnergyDisplay';
 import ImageSpriteEnergyDisplay from './ImageSpriteEnergyDisplay';
 import { SpriteButton } from './SpriteButton';
+import { GlossaryModal } from './GlossaryModal';
 
 // Custom hook for draggable functionality
 const useDraggable = (initialPosition: { x: number; y: number }) => {
@@ -169,6 +170,11 @@ export const GameInterface: React.FC = () => {
     isOpen: false
   });
 
+  // Glossary modal state
+  const [glossaryModalState, setGlossaryModalState] = useState({
+    isOpen: false
+  });
+
   // Global modal state management - tracks if ANY modal is open
   const [globalModalState, setGlobalModalState] = useState({
     isAnyModalOpen: false,
@@ -267,6 +273,8 @@ export const GameInterface: React.FC = () => {
   // Save/Load button positions (to the right of energy bar)
   const saveButtonPosition = { x: 200, y: 20 };
   const loadButtonPosition = { x: 270, y: 20 };
+  const glossaryButtonPosition = { x: 340, y: 20 };
+  const quickProgramButtonPosition = { x: 410, y: 20 };
 
   // Modal management functions
   const openModal = useCallback((modalId: string) => {
@@ -898,6 +906,48 @@ export const GameInterface: React.FC = () => {
             }}
           />
 
+          {/* Glossary Button */}
+          <SpriteButton
+            position={glossaryButtonPosition}
+            backgroundSprite="button.png"
+            upFrame={{ x: 640, y: 256, w: 16, h: 16 }}
+            downFrame={{ x: 640, y: 272, w: 16, h: 16 }}
+            scale={4}
+            onClick={() => {
+              if (!globalModalState.isAnyModalOpen) {
+                setGlossaryModalState({ isOpen: true });
+                openModal('glossary');
+              }
+            }}
+          />
+
+          {/* Quick Programming Button */}
+          <SpriteButton
+            position={quickProgramButtonPosition}
+            backgroundSprite="button.png"
+            upFrame={{ x: 656, y: 256, w: 16, h: 16 }}
+            downFrame={{ x: 656, y: 272, w: 16, h: 16 }}
+            scale={4}
+            onClick={() => {
+              if (!globalModalState.isAnyModalOpen) {
+                const qubitEntity = entities.get('qubit');
+                if (qubitEntity) {
+                  setModalState({
+                    isOpen: true,
+                    entity: qubitEntity,
+                    grid: undefined,
+                    position: { x: 100, y: 100 }
+                  });
+                  openModal('status');
+                  // Set a flag to open programming tab
+                  setTimeout(() => {
+                    EventBus.emit('open-programming-tab');
+                  }, 100);
+                }
+              }
+            }}
+          />
+
           
           {/* Tutorial Task Indicator - Top Right */}
           {dialogueState.isActive && shouldHideDialogue() && (() => {
@@ -1469,6 +1519,16 @@ export const GameInterface: React.FC = () => {
         isActive={mapEditorState.isActive}
       /> */}
 
+      {/* Glossary Modal */}
+      {glossaryModalState.isOpen && (
+        <GlossaryModal
+          isOpen={glossaryModalState.isOpen}
+          onClose={() => {
+            setGlossaryModalState({ isOpen: false });
+            closeModal('glossary');
+          }}
+        />
+      )}
 
       {/* Loading indicator for dialogue */}
       {dialogueState.isLoading && (

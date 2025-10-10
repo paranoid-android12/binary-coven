@@ -262,55 +262,8 @@ export class ProgrammingGame extends Scene {
   }
 
   preload() {
-    // Configure pixel-perfect rendering for crisp sprites
-    this.load.on('filecomplete', (key: string) => {
-      if (key === 'qubit_walk' || key === 'qubit_idle' || key === 'wheat_growth') {
-        const texture = this.textures.get(key);
-        // Set texture filtering to nearest neighbor for pixel-perfect scaling
-        texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
-      }
-    });
-    
-    // Load the walking spritesheet for qubit
-    this.load.spritesheet('qubit_walk', 'Walk.png', {
-      frameWidth: 32,  // Updated to match user's adjustment
-      frameHeight: 32  // Updated to match user's adjustment
-    });
-
-    // Load the idle spritesheet for qubit
-    this.load.spritesheet('qubit_idle', 'Idle.png', {
-      frameWidth: 32,  // Same dimensions as walk sprite
-      frameHeight: 32
-    });
-
-    this.load.spritesheet('qubit_planting', 'Hoe.png', {
-      frameWidth: 32,
-      frameHeight: 32
-    });
-
-    // Load the Ground_Tileset for map editor (16x16 tiles in a spritesheet)
-    this.load.spritesheet('Ground_Tileset', 'Ground_Tileset.png', {
-      frameWidth: 16,
-      frameHeight: 16
-    });
-
-    // Load the Fence_Wood tileset for map editor (16x16 tiles in a spritesheet)
-    this.load.spritesheet('Fence_Wood', 'Fence Wood.png', {
-      frameWidth: 16,
-      frameHeight: 16
-    });
-
-    this.load.spritesheet('Well', 'Well.png', {
-      frameWidth: 16,
-      frameHeight: 16
-    });
-
-    // Load wheat growth sprites (6 phases in the last row, 16x16 each)
-    // The wheat sprites are at the very last row with 6 phases: seed to fully grown
-    this.load.spritesheet('wheat_growth', 'summer_crops.png', {
-      frameWidth: 16,
-      frameHeight: 16
-    });
+    // Note: Spritesheets are now loaded in Preloader scene
+    // Animations are created globally in Preloader scene (Phaser best practice)
     
     // Create simple colored rectangles as sprites for prototyping (other entities)
     this.createPlaceholderSprites();
@@ -325,8 +278,8 @@ export class ProgrammingGame extends Scene {
     // Create placeholder sprites first (fallback sprites)
     this.createPlaceholderSprites();
     
-    // Create animations after placeholder sprites
-    this.createAnimations();
+    // Note: Animations are now created globally in Preloader scene (Phaser best practice)
+    // No need to create them here - they're available across all scenes
     
     // Create visual grid
     this.createVisualGrid();
@@ -799,6 +752,19 @@ export class ProgrammingGame extends Scene {
       loop: true
     });
 
+    // =====================================================================
+    // SPRITE CLEANUP LISTENERS
+    // =====================================================================
+    // Listen for entity removal events and clean up their sprites
+    EventBus.on('entity-removed', (entityId: string) => {
+      this.cleanupEntitySprite(entityId);
+    });
+
+    // Listen for grid removal events and clean up their sprites
+    EventBus.on('grid-removed', (gridId: string) => {
+      this.cleanupGridSprite(gridId);
+    });
+
     // Handle map editor events
     EventBus.on('tile-selected', (tile: any) => {
       if (this.mapEditor) {
@@ -1252,6 +1218,119 @@ export class ProgrammingGame extends Scene {
     }
   }
 
+  // =====================================================================
+  // SPRITE CLEANUP METHODS (PHASER BEST PRACTICE)
+  // =====================================================================
+  
+  /**
+   * Clean up all visual elements associated with an entity
+   * Prevents memory leaks by properly destroying Phaser game objects
+   */
+  private cleanupEntitySprite(entityId: string): void {
+    console.log(`[CLEANUP] Cleaning up sprite for entity: ${entityId}`);
+    
+    // Clean up main sprite
+    const sprite = this.entitySprites.get(entityId);
+    if (sprite) {
+      sprite.destroy();
+      this.entitySprites.delete(entityId);
+    }
+    
+    // Clean up progress bar
+    const progressBar = this.progressBars.get(entityId);
+    if (progressBar) {
+      progressBar.destroy();
+      this.progressBars.delete(entityId);
+    }
+    
+    // Clean up progress text
+    const progressText = this.progressTexts.get(entityId);
+    if (progressText) {
+      progressText.destroy();
+      this.progressTexts.delete(entityId);
+    }
+    
+    console.log(`[CLEANUP] Entity sprite cleanup complete: ${entityId}`);
+  }
+  
+  /**
+   * Clean up all visual elements associated with a grid tile
+   * Prevents memory leaks by properly destroying Phaser game objects
+   */
+  private cleanupGridSprite(gridId: string): void {
+    console.log(`[CLEANUP] Cleaning up sprite for grid: ${gridId}`);
+    
+    // Clean up main grid sprite
+    const sprite = this.gridSprites.get(gridId);
+    if (sprite) {
+      sprite.destroy();
+      this.gridSprites.delete(gridId);
+    }
+    
+    // Clean up wheat sprite (if this is a farmland)
+    const wheatSpriteId = `wheat_${gridId}`;
+    const wheatSprite = this.wheatSprites.get(wheatSpriteId);
+    if (wheatSprite) {
+      wheatSprite.destroy();
+      this.wheatSprites.delete(wheatSpriteId);
+    }
+    
+    // Clean up progress bar
+    const progressBar = this.progressBars.get(gridId);
+    if (progressBar) {
+      progressBar.destroy();
+      this.progressBars.delete(gridId);
+    }
+    
+    // Clean up progress text
+    const progressText = this.progressTexts.get(gridId);
+    if (progressText) {
+      progressText.destroy();
+      this.progressTexts.delete(gridId);
+    }
+    
+    console.log(`[CLEANUP] Grid sprite cleanup complete: ${gridId}`);
+  }
+  
+  /**
+   * Clean up all sprites (useful when scene is destroyed)
+   */
+  private cleanupAllSprites(): void {
+    console.log('[CLEANUP] Cleaning up all sprites');
+    
+    // Clean up all entity sprites
+    this.entitySprites.forEach((sprite, id) => {
+      sprite.destroy();
+    });
+    this.entitySprites.clear();
+    
+    // Clean up all grid sprites
+    this.gridSprites.forEach((sprite, id) => {
+      sprite.destroy();
+    });
+    this.gridSprites.clear();
+    
+    // Clean up all wheat sprites
+    this.wheatSprites.forEach((sprite, id) => {
+      sprite.destroy();
+    });
+    this.wheatSprites.clear();
+    
+    // Clean up all progress bars
+    this.progressBars.forEach((bar, id) => {
+      bar.destroy();
+    });
+    this.progressBars.clear();
+    
+    // Clean up all progress texts
+    this.progressTexts.forEach((text, id) => {
+      text.destroy();
+    });
+    this.progressTexts.clear();
+    
+    console.log('[CLEANUP] All sprites cleaned up');
+  }
+
   // Public methods for external control
   startCodeExecution() {
     const gameState = useGameStore.getState();
@@ -1442,113 +1521,8 @@ export class ProgrammingGame extends Scene {
     }
   }
 
-  private createAnimations() {
-    // Check if the spritesheets loaded successfully
-    if (!this.textures.exists('qubit_walk')) {
-      console.warn('qubit_walk texture not found. Walk animations will not be created.');
-      return;
-    }
-    
-    if (!this.textures.exists('qubit_idle')) {
-      console.warn('qubit_idle texture not found. Idle animations will not be created.');
-      return;
-    }
-
-    if (!this.textures.exists('qubit_planting')) {
-      console.warn('qubit_planting texture not found. Planting animations will not be created.');
-      return;
-    }
-    
-    // Log frame information for debugging
-    const walkTexture = this.textures.get('qubit_walk');
-    const idleTexture = this.textures.get('qubit_idle');
-    console.log('Qubit walk texture frames:', walkTexture.getFrameNames());
-    console.log('Qubit idle texture frames:', idleTexture.getFrameNames());
-    
-    // === IDLE ANIMATIONS ===
-    // Idle down (first row of idle sheet)
-    this.anims.create({
-      key: 'qubit_idle_down',
-      frames: this.anims.generateFrameNumbers('qubit_idle', { start: 0, end: 3 }),
-      frameRate: 4,
-      repeat: -1
-    });
-    
-    // Idle up (second row of idle sheet)
-    this.anims.create({
-      key: 'qubit_idle_up',
-      frames: this.anims.generateFrameNumbers('qubit_idle', { start: 4, end: 7 }),
-      frameRate: 4,
-      repeat: -1
-    });
-    
-    // Idle right (third row of idle sheet)
-    this.anims.create({
-      key: 'qubit_idle_right',
-      frames: this.anims.generateFrameNumbers('qubit_idle', { start: 8, end: 11 }),
-      frameRate: 4,
-      repeat: -1
-    });
-    
-    // Idle left (third row of idle sheet, flipped)
-    this.anims.create({
-      key: 'qubit_idle_left',
-      frames: this.anims.generateFrameNumbers('qubit_idle', { start: 8, end: 11 }),
-      frameRate: 4,
-      repeat: -1
-    });
-    
-    // Planting animation
-    this.anims.create({
-      key: 'qubit_planting',
-      frames: this.anims.generateFrameNumbers('qubit_planting', { start: 0, end: 3 }),
-      frameRate: 4,
-      repeat: -1
-    });
-    
-    // === WALKING ANIMATIONS ===
-    // Walking down (first row of walk sheet)
-    this.anims.create({
-      key: 'qubit_walk_down',
-      frames: this.anims.generateFrameNumbers('qubit_walk', { start: 0, end: 5 }),
-      frameRate: 8,
-      repeat: -1
-    });
-    
-    // Walking up (second row of walk sheet)
-    this.anims.create({
-      key: 'qubit_walk_up',
-      frames: this.anims.generateFrameNumbers('qubit_walk', { start: 6, end: 11 }),
-      frameRate: 8,
-      repeat: -1
-    });
-    
-    // Walking right (third row of walk sheet)
-    this.anims.create({
-      key: 'qubit_walk_right',
-      frames: this.anims.generateFrameNumbers('qubit_walk', { start: 12, end: 17 }),
-      frameRate: 8,
-      repeat: -1
-    });
-    
-    // Walking left (third row of walk sheet, flipped)
-    this.anims.create({
-      key: 'qubit_walk_left',
-      frames: this.anims.generateFrameNumbers('qubit_walk', { start: 12, end: 17 }),
-      frameRate: 8,
-      repeat: -1
-    });
-    
-    // Default idle animation (down facing)
-    this.anims.create({
-      key: 'qubit_idle',
-      frames: this.anims.generateFrameNumbers('qubit_idle', { start: 0, end: 3 }),
-      frameRate: 4,
-      repeat: -1
-    });
-    
-    console.log('Qubit animations created successfully');
-  }
+  // Note: createAnimations() method removed - animations are now created globally in Preloader scene
+  // This follows Phaser best practices: create animations once in Preloader, use them everywhere
 
   private setupMovementEventHandlers() {
     // Handle smooth movement requests from built-in functions
@@ -2134,5 +2108,38 @@ export class ProgrammingGame extends Scene {
       ease: 'Power2',
       onComplete: () => notification.destroy()
     });
+  }
+
+  /**
+   * Scene shutdown lifecycle method
+   * Called when the scene is shut down - clean up all resources
+   * This is a Phaser best practice to prevent memory leaks
+   */
+  shutdown() {
+    console.log('[SCENE] ProgrammingGame shutting down - cleaning up resources');
+    
+    // Clean up all sprites and visual elements
+    this.cleanupAllSprites();
+    
+    // Remove all EventBus listeners for this scene
+    EventBus.removeAllListeners('entity-removed');
+    EventBus.removeAllListeners('grid-removed');
+    EventBus.removeAllListeners('entity-movement-started');
+    EventBus.removeAllListeners('entity-movement-completed');
+    EventBus.removeAllListeners('request-smooth-movement');
+    EventBus.removeAllListeners('request-movement-manager');
+    EventBus.removeAllListeners('pan-camera-to');
+    EventBus.removeAllListeners('tile-selected');
+    EventBus.removeAllListeners('save-map');
+    EventBus.removeAllListeners('load-map');
+    EventBus.removeAllListeners('toggle-map-editor');
+    EventBus.removeAllListeners('save-game-state');
+    EventBus.removeAllListeners('load-game-state');
+    EventBus.removeAllListeners('map-editor-debug-request');
+    EventBus.removeAllListeners('farmland-grid-added');
+    EventBus.removeAllListeners('farmland-grid-removed');
+    EventBus.removeAllListeners('map-editor-loaded');
+    
+    console.log('[SCENE] ProgrammingGame shutdown complete');
   }
 } 
