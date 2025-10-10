@@ -263,6 +263,10 @@ export const GameInterface: React.FC = () => {
   // Button positions (top-right corner)
   const playButtonPosition = { x: window.innerWidth - 180, y: 20 };
   const upgradeButtonPosition = { x: window.innerWidth - 115, y: 20 };
+  
+  // Save/Load button positions (to the right of energy bar)
+  const saveButtonPosition = { x: 200, y: 20 };
+  const loadButtonPosition = { x: 270, y: 20 };
 
   // Modal management functions
   const openModal = useCallback((modalId: string) => {
@@ -465,7 +469,7 @@ export const GameInterface: React.FC = () => {
       const mainWindowId = store.addCodeWindow({
         id: 'main',
         name: 'main',
-        code: '# Main function - execution starts here\ndef main():\n    # Your code here\n    plant("wheat")\n    pass',
+        code: '# Main function - execution starts here\ndef main():\n    # Your code here\n    pass',
         isMain: true,
         isActive: true,
         position: { x: 50, y: 50 },
@@ -871,7 +875,29 @@ export const GameInterface: React.FC = () => {
             }}
           />
 
-          {/* Top Right - Resources & Controls */}
+          {/* Save and Load Buttons - To the right of energy bar */}
+          <SpriteButton
+            position={saveButtonPosition}
+            backgroundSprite="button.png"
+            upFrame={{ x: 608, y: 256, w: 16, h: 16 }}
+            downFrame={{ x: 608, y: 272, w: 16, h: 16 }}
+            scale={4}
+            onClick={() => {
+              EventBus.emit('save-game-state');
+            }}
+          />
+          
+          <SpriteButton
+            position={loadButtonPosition}
+            backgroundSprite="button.png"
+            upFrame={{ x: 624, y: 256, w: 16, h: 16 }}
+            downFrame={{ x: 624, y: 272, w: 16, h: 16 }}
+            scale={4}
+            onClick={() => {
+              EventBus.emit('load-game-state');
+            }}
+          />
+
           
           {/* Tutorial Task Indicator - Top Right */}
           {dialogueState.isActive && shouldHideDialogue() && (() => {
@@ -880,7 +906,7 @@ export const GameInterface: React.FC = () => {
               return (
                 <div style={{
                   position: 'absolute',
-                  top: '20px',
+                  bottom: '20px',
                   right: '20px',
                   backgroundColor: 'rgba(0, 0, 0, 0.8)',
                   border: '2px solid #FFD700',
@@ -1182,7 +1208,6 @@ export const GameInterface: React.FC = () => {
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundImage: 'url(/title.png)',
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',

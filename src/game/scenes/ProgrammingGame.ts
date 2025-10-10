@@ -191,8 +191,6 @@ export class ProgrammingGame extends Scene {
   private movementManager: MovementManager;
   private mapEditor: MapEditor;
   private mapEditorUI: React.ComponentType<any> | null = null;
-  private save_game: Phaser.GameObjects.Sprite;
-  private load_game: Phaser.GameObjects.Sprite;
   private well: Phaser.GameObjects.Sprite;
   
   
@@ -279,52 +277,6 @@ export class ProgrammingGame extends Scene {
       frameHeight: 32  // Updated to match user's adjustment
     });
 
-
-
-    this.load.atlas("save_game", "button.png", {
-      "frames": {
-        "save_game_up": {
-          "frame": {
-            "x": 608,
-            "y": 256,
-            "w": 16,
-            "h": 16
-          }
-        },
-        "save_game_down": {
-          "frame": {
-            "x": 608,
-            "y": 272,
-            "w": 16,
-            "h": 16
-          }
-        }
-      }
-    });
-
-    this.load.atlas("load_game", "button.png", {
-      "frames": {
-        "load_game_up": {
-          "frame": {
-            "x": 624,
-            "y": 256,
-            "w": 16,
-            "h": 16
-          }
-        },
-        "load_game_down": {
-          "frame": {
-            "x": 624,
-            "y": 272,
-            "w": 16,
-            "h": 16
-          }
-        }
-      }
-    });
-
-
-    
     // Load the idle spritesheet for qubit
     this.load.spritesheet('qubit_idle', 'Idle.png', {
       frameWidth: 32,  // Same dimensions as walk sprite
@@ -369,47 +321,6 @@ export class ProgrammingGame extends Scene {
     this.cameras.main.setRoundPixels(true);
 
     const camera = this.cameras.main;
-
-     // Create save button
-     this.save_game = this.add.sprite(250, 250, "save_game", "save_game_up")
-      .setScale(5)
-      .setScrollFactor(0)
-      .setInteractive()
-      .setDepth(1000);
-
-     this.save_game.setPosition(
-       camera.width - this.save_game.displayWidth + 640,
-       -180
-     );
-
-     this.save_game.on('pointerdown', () => {
-      this.save_game.setFrame("save_game_down");
-     });
-
-     this.save_game.on('pointerup', () => {
-      this.save_game.setFrame("save_game_up");
-      this.saveGameState();
-     });
-       
-     // Create load button
-     this.load_game = this.add.sprite(250, 250, "load_game", "load_game_up")
-       .setScale(5)
-       .setScrollFactor(0) // Fix to camera
-       .setInteractive()
-       .setDepth(1000);
-
-     this.load_game.setPosition(
-       camera.width - this.load_game.displayWidth + 730,  // 20px from right edge
-       -180  // 20px from top
-     );
-
-     this.load_game.on('pointerdown', () => {
-      this.load_game.setFrame("load_game_down");
-     });
-     this.load_game.on('pointerup', () => {
-      this.load_game.setFrame("load_game_up");
-      this.loadGameState();
-     });
     
     // Create placeholder sprites first (fallback sprites)
     this.createPlaceholderSprites();
@@ -470,8 +381,8 @@ export class ProgrammingGame extends Scene {
     graphics.generateTexture('farmland', this.GRID_SIZE - 4, this.GRID_SIZE - 4);
     graphics.clear();
     
-    // Food Station - Orange square
-    graphics.fillStyle(0xFF6600);
+    // Food Station - Invisible
+    graphics.fillStyle(0xFF6600, 0); // Set alpha to 0 for invisibility
     graphics.fillRect(0, 0, this.GRID_SIZE - 4, this.GRID_SIZE - 4);
     graphics.generateTexture('food', this.GRID_SIZE - 4, this.GRID_SIZE - 4);
     graphics.clear();
@@ -915,6 +826,15 @@ export class ProgrammingGame extends Scene {
           this.mapEditor.activate();
         }
       }
+    });
+
+    // Handle save/load game state events
+    EventBus.on('save-game-state', () => {
+      this.saveGameState();
+    });
+
+    EventBus.on('load-game-state', () => {
+      this.loadGameState();
     });
 
     // Handle debug requests from map editor UI

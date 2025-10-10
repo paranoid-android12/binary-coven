@@ -115,7 +115,7 @@ export interface GameStore extends GameState {
 // INITIAL STATE FACTORY
 // =====================================================================
 const createInitialState = (): GameState => ({
-  isTutorialDone: false,
+  isTutorialDone: true,
   gridSize: { width: 52, height: 32 },
   grids: new Map(),
   entities: new Map(),
