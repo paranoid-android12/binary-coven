@@ -94,7 +94,6 @@ export const GlossaryModal: React.FC<GlossaryModalProps> = ({ isOpen, onClose })
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span style={{ fontSize: '24px' }}>📖</span>
             <h2 style={{
               margin: 0,
               fontSize: '24px',

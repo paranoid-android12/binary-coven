@@ -373,30 +373,15 @@ export const ProgrammingInterface: React.FC<ProgrammingInterfaceProps> = ({ enti
               justifyContent: 'space-between',
               alignItems: 'center'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontWeight: 'bold' }}>{selectedFunction.name}</span>
-                {selectedFunction.isMain && (
-                  <span style={{
-                    backgroundColor: '#f5a623',
-                    color: 'white',
-                    padding: '2px 6px',
-                    borderRadius: '3px',
-                    fontSize: '12px',
-                    fontWeight: 'bold'
-                  }}>
-                    MAIN FUNCTION
-                  </span>
-                )}
-              </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 {/* Preset Templates Button */}
                 <div className="preset-menu-container" style={{ position: 'relative' }}>
                   <button
                     onClick={() => setShowPresetMenu(!showPresetMenu)}
                     style={{
-                      backgroundColor: '#16c60c',
+                      backgroundColor: '#1e1e1e',
                       color: 'white',
-                      border: 'none',
+                      border: '#7e7e7e',
                       borderRadius: '4px',
                       padding: '6px 12px',
                       cursor: 'pointer',
@@ -408,7 +393,7 @@ export const ProgrammingInterface: React.FC<ProgrammingInterfaceProps> = ({ enti
                     }}
                     title="Load preset code templates"
                   >
-                    📋 Templates
+                    Templates
                   </button>
                   
                   {/* Preset Dropdown Menu */}

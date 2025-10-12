@@ -271,10 +271,10 @@ export const GameInterface: React.FC = () => {
   const upgradeButtonPosition = { x: window.innerWidth - 115, y: 20 };
   
   // Save/Load button positions (to the right of energy bar)
-  const saveButtonPosition = { x: 200, y: 20 };
-  const loadButtonPosition = { x: 270, y: 20 };
-  const glossaryButtonPosition = { x: 340, y: 20 };
-  const quickProgramButtonPosition = { x: 410, y: 20 };
+  const saveButtonPosition = { x: 30, y: 80 };
+  const loadButtonPosition = { x: 80, y: 80 };
+  const glossaryButtonPosition = { x: 220, y: 40 };
+  const quickProgramButtonPosition = { x: 270, y: 40 };
 
   // Modal management functions
   const openModal = useCallback((modalId: string) => {
@@ -887,9 +887,9 @@ export const GameInterface: React.FC = () => {
           <SpriteButton
             position={saveButtonPosition}
             backgroundSprite="button.png"
-            upFrame={{ x: 608, y: 256, w: 16, h: 16 }}
-            downFrame={{ x: 608, y: 272, w: 16, h: 16 }}
-            scale={4}
+            upFrame={{ x: 832, y: 208, w: 16, h: 16 }}
+            downFrame={{ x: 832, y: 224, w: 16, h: 16 }}
+            scale={3}
             onClick={() => {
               EventBus.emit('save-game-state');
             }}
@@ -900,7 +900,7 @@ export const GameInterface: React.FC = () => {
             backgroundSprite="button.png"
             upFrame={{ x: 624, y: 256, w: 16, h: 16 }}
             downFrame={{ x: 624, y: 272, w: 16, h: 16 }}
-            scale={4}
+            scale={3}
             onClick={() => {
               EventBus.emit('load-game-state');
             }}
@@ -910,9 +910,9 @@ export const GameInterface: React.FC = () => {
           <SpriteButton
             position={glossaryButtonPosition}
             backgroundSprite="button.png"
-            upFrame={{ x: 640, y: 256, w: 16, h: 16 }}
-            downFrame={{ x: 640, y: 272, w: 16, h: 16 }}
-            scale={4}
+            upFrame={{ x: 320, y: 496, w: 16, h: 16 }}
+            downFrame={{ x: 320, y: 512, w: 16, h: 16 }}
+            scale={3}
             onClick={() => {
               if (!globalModalState.isAnyModalOpen) {
                 setGlossaryModalState({ isOpen: true });
@@ -925,9 +925,9 @@ export const GameInterface: React.FC = () => {
           <SpriteButton
             position={quickProgramButtonPosition}
             backgroundSprite="button.png"
-            upFrame={{ x: 656, y: 256, w: 16, h: 16 }}
-            downFrame={{ x: 656, y: 272, w: 16, h: 16 }}
-            scale={4}
+            upFrame={{ x: 432, y: 496, w: 16, h: 16 }}
+            downFrame={{ x: 432, y: 512, w: 16, h: 16 }}
+            scale={3}
             onClick={() => {
               if (!globalModalState.isAnyModalOpen) {
                 const qubitEntity = entities.get('qubit');
