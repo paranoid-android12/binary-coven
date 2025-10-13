@@ -32,7 +32,7 @@ export class Preloader extends Scene
         // Set texture filtering for pixel-perfect rendering BEFORE loading
         this.load.on('filecomplete', (key: string) => {
             console.log(`[PRELOADER] File loaded: ${key}`);
-            if (['qubit_walk', 'qubit_idle', 'qubit_planting', 'manu_idle', 'wheat_growth', 'Ground_Tileset', 'Fence_Wood', 'Well'].includes(key)) {
+            if (['qubit_walk', 'qubit_idle', 'qubit_planting', 'manu_idle', 'wheat_growth', 'extras', 'Ground_Tileset', 'Fence_Wood', 'Well'].includes(key)) {
                 const texture = this.textures.get(key);
                 texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
                 console.log(`[PRELOADER] Applied NEAREST filter to: ${key}`);
@@ -96,6 +96,12 @@ export class Preloader extends Scene
 
         // Load wheat growth sprites (6 phases in the last row, 16x16 each)
         this.load.spritesheet('wheat_growth', 'summer_crops.png', {
+            frameWidth: 16,
+            frameHeight: 16
+        });
+
+        // Load Extras spritesheet for hover animations (16x16 frames)
+        this.load.spritesheet('extras', 'Extras.png', {
             frameWidth: 16,
             frameHeight: 16
         });
@@ -284,6 +290,21 @@ export class Preloader extends Scene
             frameRate: 4,
             repeat: -1
         });
+
+        // Hover animation (simple loop like Manu)
+        // Uses frames 0-3 from Extras.png for a perpetual corner animation
+        if (this.textures.exists('extras')) {
+            this.anims.create({
+                key: 'hover_animation',
+                frames: [
+                    { key: 'extras', frame: 11 },
+                    { key: 'extras', frame: 14 }
+                ],
+                frameRate: 2,
+                repeat: -1
+            });
+            console.log('[PRELOADER] Hover animation created successfully');
+        }
         
         console.log('[PRELOADER] Qubit animations created successfully');
         console.log('[PRELOADER] Manu animations created successfully');

@@ -208,26 +208,38 @@ export class NPCManager {
     // Add hover effects
     npc.sprite.on('pointerover', () => {
       npc.sprite?.setTint(0xcccccc); // Slight tint on hover
+      
+      // Start hover animation when mouse enters
+      const hoverAnimation = this.hoverAnimations.get(npc.id);
+      if (hoverAnimation && !hoverAnimation.isAnimationActive()) {
+        hoverAnimation.start();
+      }
     });
 
     npc.sprite.on('pointerout', () => {
       npc.sprite?.clearTint();
+      
+      // Stop hover animation when mouse leaves
+      const hoverAnimation = this.hoverAnimations.get(npc.id);
+      if (hoverAnimation && hoverAnimation.isAnimationActive()) {
+        hoverAnimation.stop();
+      }
     });
   }
 
   /**
    * Create hover animation for NPC
+   * Note: Animation is created but not started - it will start on mouse hover
    */
   private createHoverAnimation(npc: NPC): void {
     const hoverAnimation = new GridHoverAnimation(this.scene, {
       position: npc.position,
       gridSize: this.gridSize,
       scale: npc.config.scale || 1.5,
-      tintColor: 0xffffff,
-      animationSpeed: 1000
+      tintColor: 0xffffff
     });
 
-    hoverAnimation.start();
+    // Don't start the animation yet - it will be started on hover
     this.hoverAnimations.set(npc.id, hoverAnimation);
   }
 
@@ -251,6 +263,9 @@ export class NPCManager {
    * Create placeholder sprite for missing textures
    */
   private createPlaceholderSprite(spriteKey: string): void {
+    console.log(`[NPC-MANAGER] Checking texture '${spriteKey}' exists:`, this.scene.textures.exists(spriteKey));
+    console.log(`[NPC-MANAGER] Available textures:`, Object.keys(this.scene.textures.list));
+    
     if (this.scene.textures.exists(spriteKey)) {
       return;
     }

@@ -5,8 +5,8 @@ import { Position } from '../../types/game';
  * GridHoverAnimation
  * 
  * A reusable system for displaying hover animations on grid positions.
- * Creates a 3x3 grid (48x48 pixels) corner-only box sprite animation
- * that hovers in and out with two frames.
+ * Creates 4 corner sprites (upper-left, upper-right, lower-left, lower-right)
+ * with a simple looped animation, just like Manu's idle animation.
  * 
  * This can be used for NPCs, special grids, or any interactive element
  * that needs visual feedback.
@@ -17,14 +17,12 @@ export interface GridHoverAnimationConfig {
   gridSize: number; // Size of each grid cell in pixels
   scale?: number; // Optional scale for the sprite (default: 1.5)
   tintColor?: number; // Optional tint color (default: 0xffffff - white)
-  animationSpeed?: number; // Duration of hover animation in ms (default: 1000)
 }
 
 export class GridHoverAnimation {
   private scene: Scene;
   private config: GridHoverAnimationConfig;
   private cornerSprites: Phaser.GameObjects.Sprite[] = [];
-  private animationTween?: Phaser.Tweens.Tween;
   private isActive: boolean = false;
 
   constructor(scene: Scene, config: GridHoverAnimationConfig) {
@@ -32,7 +30,6 @@ export class GridHoverAnimation {
     this.config = {
       scale: 1.5,
       tintColor: 0xffffff,
-      animationSpeed: 1000,
       ...config
     };
   }
@@ -47,7 +44,6 @@ export class GridHoverAnimation {
     }
 
     this.createCornerSprites();
-    this.startAnimation();
     this.isActive = true;
   }
 
@@ -56,12 +52,6 @@ export class GridHoverAnimation {
    */
   stop(): void {
     if (!this.isActive) return;
-
-    // Stop animation tween
-    if (this.animationTween) {
-      this.animationTween.stop();
-      this.animationTween = undefined;
-    }
 
     // Destroy all corner sprites
     this.cornerSprites.forEach(sprite => {
@@ -88,7 +78,8 @@ export class GridHoverAnimation {
 
   /**
    * Create the corner sprites for the hover animation
-   * Creates 4 corner sprites arranged in a 3x3 grid pattern
+   * Creates 4 corner sprites at upper-left, upper-right, lower-left, lower-right
+   * Each sprite plays the 'hover_animation' loop
    */
   private createCornerSprites(): void {
     const { position, gridSize, scale, tintColor } = this.config;
@@ -97,104 +88,44 @@ export class GridHoverAnimation {
     const centerX = position.x * gridSize + gridSize / 2;
     const centerY = position.y * gridSize + gridSize / 2;
 
-    // Create corner frame sprite if it doesn't exist
-    this.createCornerFrameTexture();
+    // Check if hover animation is available
+    if (!this.scene.anims.exists('hover_animation')) {
+      console.warn('[GridHoverAnimation] hover_animation not found in Preloader');
+      return;
+    }
 
-    // Corner positions relative to center (for 3x3 grid)
-    // Each corner is at the outer edge of the 3x3 grid
+    // Corner positions: upper-left, upper-right, lower-left, lower-right
     const cornerOffsets = [
-      { x: -gridSize, y: -gridSize, rotation: 0 },           // Top-left
-      { x: gridSize, y: -gridSize, rotation: Math.PI / 2 },  // Top-right
-      { x: gridSize, y: gridSize, rotation: Math.PI },       // Bottom-right
-      { x: -gridSize, y: gridSize, rotation: -Math.PI / 2 }  // Bottom-left
+      { x: -gridSize + 20, y: -gridSize + 20, rotation: 0 },       // Upper-left: 90°
+      { x: gridSize - 20, y: -gridSize + 20, rotation: Math.PI / 2 },            // Upper-right: 180°
+      { x: -gridSize + 20, y: gridSize - 20, rotation: ( 3 * Math.PI) / 2 }, // Lower-left: 270°
+      { x: gridSize - 20, y: gridSize - 20, rotation: Math.PI }                    // Lower-right: 0° (or 360°)
     ];
-
+    
+    //Rotated 90 increasingly starting index
     cornerOffsets.forEach(offset => {
       const sprite = this.scene.add.sprite(
         centerX + offset.x,
         centerY + offset.y,
-        'corner_frame_0'
+        'extras'
       );
 
       sprite.setDepth(2000); // High depth to be above most elements
       sprite.setOrigin(0.5, 0.5);
-      sprite.setRotation(offset.rotation);
       sprite.setTint(tintColor!);
+      sprite.setRotation(offset.rotation);
 
-      // Set scale based on config (corner sprites are small, so we scale them appropriately)
-      const cornerScale = (scale || 1.5) * 0.8;
+      // Set scale based on config
+      const cornerScale = (6) * 0.8;
       sprite.setScale(cornerScale);
+
+      // Play the hover animation (looped, just like Manu)
+      sprite.play('hover_animation');
 
       this.cornerSprites.push(sprite);
     });
-  }
 
-  /**
-   * Create the corner frame texture programmatically
-   * Creates two frames for animation
-   */
-  private createCornerFrameTexture(): void {
-    // Check if textures already exist
-    if (this.scene.textures.exists('corner_frame_0')) {
-      return;
-    }
-
-    const graphics = this.scene.add.graphics();
-    
-    // Frame 0: Corner bracket (normal state)
-    graphics.lineStyle(2, 0xffffff, 1);
-    // Draw L-shaped corner bracket
-    graphics.beginPath();
-    graphics.moveTo(0, 8);
-    graphics.lineTo(0, 0);
-    graphics.lineTo(8, 0);
-    graphics.strokePath();
-    graphics.generateTexture('corner_frame_0', 16, 16);
-    graphics.clear();
-
-    // Frame 1: Corner bracket (expanded state - slightly larger)
-    graphics.lineStyle(2, 0xffffff, 1);
-    graphics.beginPath();
-    graphics.moveTo(0, 10);
-    graphics.lineTo(0, 0);
-    graphics.lineTo(10, 0);
-    graphics.strokePath();
-    graphics.generateTexture('corner_frame_1', 16, 16);
-    graphics.clear();
-
-    graphics.destroy();
-  }
-
-  /**
-   * Start the hover in/out animation
-   */
-  private startAnimation(): void {
-    // Create a repeating animation that switches between frames
-    let currentFrame = 0;
-    
-    // Use a timeline for smooth frame switching
-    this.animationTween = this.scene.tweens.addCounter({
-      from: 0,
-      to: 1,
-      duration: this.config.animationSpeed!,
-      yoyo: true,
-      repeat: -1,
-      onUpdate: (tween) => {
-        const progress = tween.getValue();
-        
-        // Switch frame based on progress
-        const frameIndex = progress > 0.5 ? 1 : 0;
-        
-        if (frameIndex !== currentFrame) {
-          currentFrame = frameIndex;
-          this.cornerSprites.forEach(sprite => {
-            if (sprite && sprite.active) {
-              sprite.setTexture(`corner_frame_${currentFrame}`);
-            }
-          });
-        }
-      }
-    });
+    console.log(`[GridHoverAnimation] Created ${this.cornerSprites.length} corner sprites with hover animation`);
   }
 
   /**
@@ -206,10 +137,10 @@ export class GridHoverAnimation {
     const centerY = position.y * gridSize + gridSize / 2;
 
     const cornerOffsets = [
-      { x: -gridSize, y: -gridSize },
-      { x: gridSize, y: -gridSize },
-      { x: gridSize, y: gridSize },
-      { x: -gridSize, y: gridSize }
+      { x: -gridSize, y: -gridSize }, // Upper-left
+      { x: gridSize, y: -gridSize },  // Upper-right
+      { x: -gridSize, y: gridSize },  // Lower-left
+      { x: gridSize, y: gridSize }    // Lower-right
     ];
 
     this.cornerSprites.forEach((sprite, index) => {
