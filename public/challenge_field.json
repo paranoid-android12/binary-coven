@@ -1,0 +1,33 @@
+[
+    {
+      "name": "Lain",
+      "content": "Qubit, Grandpa left you a new task before he went to town.",
+      "sprite": "manu-speaking.png"
+    },
+    {
+      "name": "Qubit",
+      "content": "Please don’t tell me it’s more plowing...",
+      "sprite": "qubit-defeated.png"
+    },
+    {
+      "name": "Lain",
+      "content": "Not quite. The fields in front of me still need to be planted, but Grandpa said you have to do it *without walking* this time.",
+      "sprite": "manu-pleased.png"
+    },
+    {
+      "name": "Qubit",
+      "content": "Without walking? How am I supposed to reach them then?",
+      "sprite": "qubit-speaking.png"
+    },
+    {
+      "name": "Lain",
+      "content": "By using your code, of course! Grandpa wants you to rely completely on your programming skills to handle those fields.",
+      "sprite": "manu-speaking.png"
+    },
+    {
+      "name": "Qubit",
+      "content": "Heh, figures. Guess it’s time to let my code do the farming for me.",
+      "sprite": "qubit-pleased.png"
+    }
+  ]
+  

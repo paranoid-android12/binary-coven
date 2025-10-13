@@ -2154,7 +2154,7 @@ export class ProgrammingGame extends Scene {
       name: 'Helper NPC',
       position: { x: 21, y: 17 },
       spriteKey: 'manu_idle',
-      dialogueFile: 'sample_dialogue.json',
+      dialogueFile: 'challenge_field.json',
       scale: 1.5,
       showHoverAnimation: true
     });

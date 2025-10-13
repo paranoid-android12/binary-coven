@@ -19338,18 +19338,6 @@ export const MAP_EDITOR_DATA = {
       "layer": 3
     },
     {
-      "id": "ground_18_18_3",
-      "position": {
-        "x": 18,
-        "y": 18
-      },
-      "tilesetX": 128,
-      "tilesetY": 0,
-      "frame": 8,
-      "tilesetKey": "Fence_Wood",
-      "layer": 3
-    },
-    {
       "id": "ground_19_18_3",
       "position": {
         "x": 19,
@@ -19518,18 +19506,6 @@ export const MAP_EDITOR_DATA = {
       "layer": 3
     },
     {
-      "id": "ground_18_23_3",
-      "position": {
-        "x": 18,
-        "y": 23
-      },
-      "tilesetX": 160,
-      "tilesetY": 48,
-      "frame": 46,
-      "tilesetKey": "Fence_Wood",
-      "layer": 3
-    },
-    {
       "id": "ground_16_23_3",
       "position": {
         "x": 16,
@@ -19660,6 +19636,366 @@ export const MAP_EDITOR_DATA = {
       "frame": 19,
       "tilesetKey": "Fence_Wood",
       "layer": 3
+    },
+    {
+      "id": "ground_19_19_2",
+      "position": {
+        "x": 19,
+        "y": 19
+      },
+      "tilesetX": 80,
+      "tilesetY": 288,
+      "frame": 455,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_20_19_2",
+      "position": {
+        "x": 20,
+        "y": 19
+      },
+      "tilesetX": 96,
+      "tilesetY": 288,
+      "frame": 456,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_21_19_2",
+      "position": {
+        "x": 21,
+        "y": 19
+      },
+      "tilesetX": 96,
+      "tilesetY": 288,
+      "frame": 456,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_22_19_2",
+      "position": {
+        "x": 22,
+        "y": 19
+      },
+      "tilesetX": 112,
+      "tilesetY": 288,
+      "frame": 457,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_22_20_2",
+      "position": {
+        "x": 22,
+        "y": 20
+      },
+      "tilesetX": 112,
+      "tilesetY": 304,
+      "frame": 482,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_22_21_2",
+      "position": {
+        "x": 22,
+        "y": 21
+      },
+      "tilesetX": 112,
+      "tilesetY": 304,
+      "frame": 482,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_21_22_2",
+      "position": {
+        "x": 21,
+        "y": 22
+      },
+      "tilesetX": 96,
+      "tilesetY": 320,
+      "frame": 506,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_20_22_2",
+      "position": {
+        "x": 20,
+        "y": 22
+      },
+      "tilesetX": 96,
+      "tilesetY": 320,
+      "frame": 506,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_19_21_2",
+      "position": {
+        "x": 19,
+        "y": 21
+      },
+      "tilesetX": 80,
+      "tilesetY": 304,
+      "frame": 480,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_19_20_2",
+      "position": {
+        "x": 19,
+        "y": 20
+      },
+      "tilesetX": 80,
+      "tilesetY": 304,
+      "frame": 480,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_19_22_2",
+      "position": {
+        "x": 19,
+        "y": 22
+      },
+      "tilesetX": 80,
+      "tilesetY": 320,
+      "frame": 505,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_22_22_2",
+      "position": {
+        "x": 22,
+        "y": 22
+      },
+      "tilesetX": 112,
+      "tilesetY": 320,
+      "frame": 507,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_21_20_2",
+      "position": {
+        "x": 21,
+        "y": 20
+      },
+      "tilesetX": 96,
+      "tilesetY": 304,
+      "frame": 481,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_20_20_2",
+      "position": {
+        "x": 20,
+        "y": 20
+      },
+      "tilesetX": 96,
+      "tilesetY": 304,
+      "frame": 481,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_20_21_2",
+      "position": {
+        "x": 20,
+        "y": 21
+      },
+      "tilesetX": 96,
+      "tilesetY": 304,
+      "frame": 481,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_21_21_2",
+      "position": {
+        "x": 21,
+        "y": 21
+      },
+      "tilesetX": 96,
+      "tilesetY": 304,
+      "frame": 481,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_22_20_3",
+      "position": {
+        "x": 22,
+        "y": 20
+      },
+      "tilesetX": 96,
+      "tilesetY": 336,
+      "frame": 531,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 3
+    },
+    {
+      "id": "ground_20_22_3",
+      "position": {
+        "x": 20,
+        "y": 22
+      },
+      "tilesetX": 48,
+      "tilesetY": 336,
+      "frame": 528,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 3
+    },
+    {
+      "id": "ground_18_18_2",
+      "position": {
+        "x": 18,
+        "y": 18
+      },
+      "tilesetX": 112,
+      "tilesetY": 0,
+      "frame": 7,
+      "tilesetKey": "Fence_Wood",
+      "layer": 2
+    },
+    {
+      "id": "ground_18_18_3",
+      "position": {
+        "x": 18,
+        "y": 18
+      },
+      "tilesetX": 112,
+      "tilesetY": 0,
+      "frame": 7,
+      "tilesetKey": "Fence_Wood",
+      "layer": 3
+    },
+    {
+      "id": "ground_18_19_2",
+      "position": {
+        "x": 18,
+        "y": 19
+      },
+      "tilesetX": 112,
+      "tilesetY": 16,
+      "frame": 19,
+      "tilesetKey": "Fence_Wood",
+      "layer": 2
+    },
+    {
+      "id": "ground_18_20_2",
+      "position": {
+        "x": 18,
+        "y": 20
+      },
+      "tilesetX": 112,
+      "tilesetY": 16,
+      "frame": 19,
+      "tilesetKey": "Fence_Wood",
+      "layer": 2
+    },
+    {
+      "id": "ground_18_23_2",
+      "position": {
+        "x": 18,
+        "y": 23
+      },
+      "tilesetX": 112,
+      "tilesetY": 32,
+      "frame": 31,
+      "tilesetKey": "Fence_Wood",
+      "layer": 2
+    },
+    {
+      "id": "ground_18_23_3",
+      "position": {
+        "x": 18,
+        "y": 23
+      },
+      "tilesetX": 112,
+      "tilesetY": 32,
+      "frame": 31,
+      "tilesetKey": "Fence_Wood",
+      "layer": 3
+    },
+    {
+      "id": "ground_18_22_4",
+      "position": {
+        "x": 18,
+        "y": 22
+      },
+      "tilesetX": 96,
+      "tilesetY": 16,
+      "frame": 18,
+      "tilesetKey": "Fence_Wood",
+      "layer": 4
+    },
+    {
+      "id": "ground_18_22_3",
+      "position": {
+        "x": 18,
+        "y": 22
+      },
+      "tilesetX": 96,
+      "tilesetY": 16,
+      "frame": 18,
+      "tilesetKey": "Fence_Wood",
+      "layer": 3
+    },
+    {
+      "id": "ground_18_22_2",
+      "position": {
+        "x": 18,
+        "y": 22
+      },
+      "tilesetX": 96,
+      "tilesetY": 32,
+      "frame": 30,
+      "tilesetKey": "Fence_Wood",
+      "layer": 2
+    },
+    {
+      "id": "ground_18_21_3",
+      "position": {
+        "x": 18,
+        "y": 21
+      },
+      "tilesetX": 96,
+      "tilesetY": 16,
+      "frame": 18,
+      "tilesetKey": "Fence_Wood",
+      "layer": 3
+    },
+    {
+      "id": "ground_18_21_2",
+      "position": {
+        "x": 18,
+        "y": 21
+      },
+      "tilesetX": 96,
+      "tilesetY": 64,
+      "frame": 54,
+      "tilesetKey": "Fence_Wood",
+      "layer": 2
+    },
+    {
+      "id": "ground_21_17_2",
+      "position": {
+        "x": 21,
+        "y": 17
+      },
+      "tilesetX": 96,
+      "tilesetY": 16,
+      "frame": 18,
+      "tilesetKey": "Fence_Wood",
+      "layer": 2
     }
   ],
   "farmlandGrids": [],
@@ -20542,5 +20878,5 @@ export const MAP_EDITOR_DATA = {
     }
   ],
   "gameGrids": [],
-  "timestamp": "2025-10-01T11:05:48.356Z"
+  "timestamp": "2025-10-13T07:50:54.573Z"
 }
