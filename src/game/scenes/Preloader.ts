@@ -31,9 +31,11 @@ export class Preloader extends Scene
     {
         // Set texture filtering for pixel-perfect rendering BEFORE loading
         this.load.on('filecomplete', (key: string) => {
-            if (['qubit_walk', 'qubit_idle', 'qubit_planting', 'wheat_growth', 'Ground_Tileset', 'Fence_Wood', 'Well'].includes(key)) {
+            console.log(`[PRELOADER] File loaded: ${key}`);
+            if (['qubit_walk', 'qubit_idle', 'qubit_planting', 'manu_idle', 'wheat_growth', 'Ground_Tileset', 'Fence_Wood', 'Well'].includes(key)) {
                 const texture = this.textures.get(key);
                 texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+                console.log(`[PRELOADER] Applied NEAREST filter to: ${key}`);
             }
         });
 
@@ -48,6 +50,13 @@ export class Preloader extends Scene
         // These files are in public/ not public/assets/, so we need to reset path
         // Using setPath() with base URL to ensure correct loading
         this.load.setPath('/');
+
+        this.load.spritesheet('manu_idle', 'Manu_Idle.png', {
+            frameWidth: 32,
+            frameHeight: 32
+        });
+        
+        console.log('[PRELOADER] Queued manu_idle spritesheet for loading');
         
         // Load the walking spritesheet for qubit
         this.load.spritesheet('qubit_walk', 'Walk.png', {
@@ -90,8 +99,27 @@ export class Preloader extends Scene
             frameWidth: 16,
             frameHeight: 16
         });
+
+        // =====================================================================
+        // LOAD NPC DIALOGUE PORTRAITS
+        // =====================================================================
+        // Load NPC portrait sprites from assets folder (used in dialogue system)
+        this.load.setPath('/assets');
+
+        // Load Manu dialogue portraits (for dialogue system only, not world sprites)
+        this.load.image('manu_portrait', 'manu.png');
+        this.load.image('manu_speaking', 'manu-speaking.png');
+        this.load.image('manu_pleased', 'manu-pleased.png');
+        this.load.image('manu_angry', 'manu-angry.png');
+        this.load.image('manu_defeated', 'manu-defeated.png');
         
-        console.log('[PRELOADER] Spritesheets queued for loading from root (/)');
+        // Load Qubit NPC sprites (can be used as NPC too)
+        this.load.image('qubit_npc', 'qubit-speaking.png');
+        this.load.image('qubit_pleased', 'qubit-pleased.png');
+        this.load.image('qubit_angry', 'qubit-angry.png');
+        this.load.image('qubit_defeated', 'qubit-defeated.png');
+        
+        console.log('[PRELOADER] Spritesheets and NPC sprites queued for loading');
     }
 
     create ()
@@ -109,6 +137,7 @@ export class Preloader extends Scene
         console.log('[PRELOADER] Textures loaded:', Object.keys(this.textures.list));
         console.log('[PRELOADER] qubit_walk exists?', this.textures.exists('qubit_walk'));
         console.log('[PRELOADER] qubit_idle exists?', this.textures.exists('qubit_idle'));
+        console.log('[PRELOADER] manu_idle exists?', this.textures.exists('manu_idle'));
         console.log('[PRELOADER] Ground_Tileset exists?', this.textures.exists('Ground_Tileset'));
         
         this.createQubitAnimations();
@@ -116,6 +145,7 @@ export class Preloader extends Scene
         console.log('[PRELOADER] All animations created globally');
         console.log('[PRELOADER] qubit_idle animation exists?', this.anims.exists('qubit_idle'));
         console.log('[PRELOADER] qubit_walk_down animation exists?', this.anims.exists('qubit_walk_down'));
+        console.log('[PRELOADER] manu_idle animation exists?', this.anims.exists('manu_idle'));
 
         //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
         this.scene.start('MainMenu');
@@ -142,13 +172,19 @@ export class Preloader extends Scene
             console.warn('[PRELOADER] qubit_planting texture not found. Planting animations will not be created.');
             return;
         }
+
+        if (!this.textures.exists('manu_idle')) {
+            console.warn('[PRELOADER] manu_idle texture not found. Manu animations will not be created.');
+            return;
+        }
         
         // Log frame information for debugging
         const walkTexture = this.textures.get('qubit_walk');
         const idleTexture = this.textures.get('qubit_idle');
+        const manuTexture = this.textures.get('manu_idle');
         console.log('[PRELOADER] Qubit walk texture frames:', walkTexture.getFrameNames());
         console.log('[PRELOADER] Qubit idle texture frames:', idleTexture.getFrameNames());
-        
+        console.log('[PRELOADER] manu_idle texture frames:', manuTexture.getFrameNames());
         // =====================================================================
         // IDLE ANIMATIONS
         // =====================================================================
@@ -240,7 +276,17 @@ export class Preloader extends Scene
             frameRate: 4,
             repeat: -1
         });
+
+        // Manu idle animation
+        this.anims.create({
+            key: 'manu_idle',
+            frames: this.anims.generateFrameNumbers('manu_idle', { start: 0, end: 3 }),
+            frameRate: 4,
+            repeat: -1
+        });
         
         console.log('[PRELOADER] Qubit animations created successfully');
+        console.log('[PRELOADER] Manu animations created successfully');
     }
 }
+

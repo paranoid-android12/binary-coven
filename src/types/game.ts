@@ -236,4 +236,24 @@ export enum FoodState {
 export enum SiloState {
   IDLE = 'idle',
   STORING = 'storing'
+}
+
+// NPC System Types
+export interface NPCConfig {
+  id: string;
+  name: string;
+  position: Position;
+  spriteKey: string; // Base sprite key for idle animation (e.g., 'npc_manu')
+  dialogueFile?: string; // Optional dialogue file to trigger on click
+  scale?: number; // Optional scale factor (default 1.5 like Qubit)
+  showHoverAnimation?: boolean; // Whether to show the hover animation (default true)
+}
+
+export interface NPC {
+  id: string;
+  name: string;
+  position: Position;
+  sprite?: Phaser.GameObjects.Sprite;
+  hoverAnimation?: any; // Reference to hover animation instance
+  config: NPCConfig;
 } 

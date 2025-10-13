@@ -3,10 +3,12 @@ import { useGameStore } from '../../stores/gameStore';
 import GridSystem, { initializeDefaultGridTypes } from '../systems/GridSystem';
 import { CodeExecutor } from '../systems/CodeExecutor';
 import { BuiltInFunctionRegistry } from '../systems/BuiltInFunctions';
-import { Entity, GridTile, Position, FarmlandState, CodeWindow } from '../../types/game';
+import { Entity, GridTile, Position, FarmlandState, CodeWindow, NPCConfig } from '../../types/game';
 import { EventBus } from '../EventBus';
 import TaskManager from '../systems/TaskManager';
 import { MapEditor } from '../systems/MapEditor';
+import { NPCManager } from '../systems/NPCManager';
+import { GridHoverAnimation } from '../systems/GridHoverAnimation';
 
 // Movement Manager for smooth entity transitions
 export class MovementManager {
@@ -190,6 +192,7 @@ export class ProgrammingGame extends Scene {
   private taskManager: TaskManager;
   private movementManager: MovementManager;
   private mapEditor: MapEditor;
+  private npcManager: NPCManager;
   private mapEditorUI: React.ComponentType<any> | null = null;
   private well: Phaser.GameObjects.Sprite;
   
@@ -243,6 +246,7 @@ export class ProgrammingGame extends Scene {
     this.taskManager = TaskManager.getInstance();
     this.movementManager = new MovementManager(this, this.GRID_SIZE);
     this.mapEditor = new MapEditor(this);
+    this.npcManager = new NPCManager(this, this.GRID_SIZE);
     
     // Initialize farming grid types
     initializeDefaultGridTypes();
@@ -307,6 +311,9 @@ export class ProgrammingGame extends Scene {
     
     // Force initial visual update to render any existing entities
     this.updateVisuals();
+    
+    // Create sample NPCs
+    this.createSampleNPCs();
     
     console.log('Programming Game Scene Created');
     
@@ -2110,6 +2117,49 @@ export class ProgrammingGame extends Scene {
     });
   }
 
+  // =====================================================================
+  // NPC SYSTEM
+  // =====================================================================
+  
+  /**
+   * Create an NPC in the game
+   * @param config NPC configuration object
+   */
+  public createNPC(config: NPCConfig): void {
+    this.npcManager.createNPC(config);
+  }
+  
+  /**
+   * Remove an NPC from the game
+   * @param npcId ID of the NPC to remove
+   */
+  public removeNPC(npcId: string): void {
+    this.npcManager.removeNPC(npcId);
+  }
+  
+  /**
+   * Get the NPC manager instance (for advanced usage)
+   */
+  public getNPCManager(): NPCManager {
+    return this.npcManager;
+  }
+  
+  /**
+   * Create sample NPCs for demonstration
+   */
+  private createSampleNPCs(): void {    
+    // Example NPC 2: Another NPC at position (10, 10)
+    this.createNPC({
+      id: 'npc_helper',
+      name: 'Helper NPC',
+      position: { x: 21, y: 17 },
+      spriteKey: 'manu_idle',
+      dialogueFile: 'sample_dialogue.json',
+      scale: 1.5,
+      showHoverAnimation: true
+    });
+  }
+
   /**
    * Scene shutdown lifecycle method
    * Called when the scene is shut down - clean up all resources
@@ -2117,6 +2167,11 @@ export class ProgrammingGame extends Scene {
    */
   shutdown() {
     console.log('[SCENE] ProgrammingGame shutting down - cleaning up resources');
+    
+    // Clean up NPC manager
+    if (this.npcManager) {
+      this.npcManager.destroy();
+    }
     
     // Clean up all sprites and visual elements
     this.cleanupAllSprites();
