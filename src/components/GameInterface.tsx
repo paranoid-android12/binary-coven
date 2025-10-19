@@ -175,6 +175,10 @@ export const GameInterface: React.FC = () => {
     isOpen: false
   });
 
+  // Drone state
+  const [activeDroneId, setActiveDroneId] = useState<string | undefined>(undefined);
+  const [droneExecutionStates, setDroneExecutionStates] = useState<Map<string, boolean>>(new Map());
+
   // Global modal state management - tracks if ANY modal is open
   const [globalModalState, setGlobalModalState] = useState({
     isAnyModalOpen: false,
@@ -269,6 +273,9 @@ export const GameInterface: React.FC = () => {
   // Button positions (top-right corner)
   const playButtonPosition = { x: window.innerWidth - 180, y: 20 };
   const upgradeButtonPosition = { x: window.innerWidth - 115, y: 20 };
+  
+  // Drone button position (below main play button)
+  const dronePlayButtonPosition = { x: window.innerWidth - 180, y: 90 };
   
   // Save/Load button positions (to the right of energy bar)
   const saveButtonPosition = { x: 30, y: 80 };
@@ -426,8 +433,70 @@ export const GameInterface: React.FC = () => {
       }
     };
 
+    // Handle drone click events
+    const handleDroneClick = (drone: Entity) => {
+      // Block if any modal is currently open
+      if (shouldBlockModalInteractions()) {
+        console.log('Drone click blocked - modal is open');
+        return;
+      }
+      
+      console.log('[DRONE] Drone clicked:', drone.name);
+      // Open the entity modal for the drone (which will show programming interface)
+      setModalState({
+        isOpen: true,
+        entity: drone,
+        grid: undefined,
+        position: { x: 100, y: 100 }
+      });
+      setActiveDroneId(drone.id);
+      openModal('status');
+    };
+
+    // Handle drone execution events
+    const handleDroneExecutionStarted = (data: { droneId: string }) => {
+      console.log('[DRONE] Execution started:', data.droneId);
+      setDroneExecutionStates(prev => {
+        const next = new Map(prev);
+        next.set(data.droneId, true);
+        return next;
+      });
+    };
+
+    const handleDroneExecutionCompleted = (data: { droneId: string; result: any }) => {
+      console.log('[DRONE] Execution completed:', data.droneId, data.result);
+      setDroneExecutionStates(prev => {
+        const next = new Map(prev);
+        next.set(data.droneId, false);
+        return next;
+      });
+    };
+
+    const handleDroneExecutionFailed = (data: { droneId: string; error: string }) => {
+      console.log('[DRONE] Execution failed:', data.droneId, data.error);
+      setDroneExecutionStates(prev => {
+        const next = new Map(prev);
+        next.set(data.droneId, false);
+        return next;
+      });
+    };
+
+    const handleDroneExecutionStopped = (data: { droneId: string }) => {
+      console.log('[DRONE] Execution stopped:', data.droneId);
+      setDroneExecutionStates(prev => {
+        const next = new Map(prev);
+        next.set(data.droneId, false);
+        return next;
+      });
+    };
+
     EventBus.on('entity-clicked', handleEntityClick);
     EventBus.on('grid-clicked', handleGridClick);
+    EventBus.on('drone-clicked', handleDroneClick);
+    EventBus.on('drone-execution-started', handleDroneExecutionStarted);
+    EventBus.on('drone-execution-completed', handleDroneExecutionCompleted);
+    EventBus.on('drone-execution-failed', handleDroneExecutionFailed);
+    EventBus.on('drone-execution-stopped', handleDroneExecutionStopped);
     EventBus.on('code-execution-started', handleExecutionStarted);
     EventBus.on('code-execution-completed', handleExecutionCompleted);
     EventBus.on('code-execution-failed', handleExecutionFailed);
@@ -456,6 +525,13 @@ export const GameInterface: React.FC = () => {
       EventBus.removeListener('map-editor-tileset-updated');
       EventBus.removeListener('start-dialogue');
       EventBus.removeListener('request-upgrade-modal');
+      
+      // Drone event cleanup
+      EventBus.removeListener('drone-clicked');
+      EventBus.removeListener('drone-execution-started');
+      EventBus.removeListener('drone-execution-completed');
+      EventBus.removeListener('drone-execution-failed');
+      EventBus.removeListener('drone-execution-stopped');
       
       // Tutorial tracking events cleanup
       EventBus.removeListener('tutorial-movement');
@@ -549,6 +625,29 @@ export const GameInterface: React.FC = () => {
       // Start execution via the scene
       if (scene && scene.startCodeExecution) {
         scene.startCodeExecution();
+      }
+    }
+  };
+
+  const handleRunDroneCode = (droneId: string) => {
+    const scene = phaserRef.current?.scene as any;
+    
+    if (!scene) {
+      console.warn('No scene available for drone execution');
+      return;
+    }
+
+    const isDroneRunning = droneExecutionStates.get(droneId) || false;
+    
+    if (isDroneRunning) {
+      console.log('Stopping drone execution', droneId);
+      if (scene.stopDroneExecution) {
+        scene.stopDroneExecution(droneId);
+      }
+    } else {
+      console.log('Starting drone execution', droneId);
+      if (scene.startDroneExecution) {
+        scene.startDroneExecution(droneId);
       }
     }
   };
@@ -948,6 +1047,105 @@ export const GameInterface: React.FC = () => {
             }}
           />
 
+          {/* Drone Control Panel - Below main play button */}
+          {(() => {
+            // Get all drones
+            const allDrones = Array.from(entities.values()).filter(e => e.isDrone);
+            
+            // Show the first drone (or selected drone)
+            const displayDrone = activeDroneId 
+              ? entities.get(activeDroneId) 
+              : allDrones[0];
+            
+            if (displayDrone && displayDrone.isDrone) {
+              const isDroneRunning = droneExecutionStates.get(displayDrone.id) || false;
+              
+              return (
+                <div style={{
+                  position: 'absolute',
+                  top: '90px',
+                  right: '20px',
+                  pointerEvents: 'auto',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-end',
+                  gap: '4px'
+                }}>
+                  {/* Drone Status Display */}
+                  <div style={{
+                    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                    border: '2px solid #4A90E2',
+                    borderRadius: '8px',
+                    padding: '8px 12px',
+                    minWidth: '200px',
+                    fontFamily: 'BoldPixels',
+                    fontSize: '14px',
+                    color: 'white'
+                  }}>
+                    {/* Drone Name */}
+                    <div style={{
+                      fontSize: '16px',
+                      fontWeight: 'bold',
+                      color: '#4A90E2',
+                      marginBottom: '6px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}>
+                      <span>🤖</span>
+                      <span>{displayDrone.name}</span>
+                    </div>
+                    
+                    {/* Drone Position */}
+                    <div style={{
+                      fontSize: '12px',
+                      color: '#cccccc',
+                      marginBottom: '4px'
+                    }}>
+                      Position: ({displayDrone.position.x}, {displayDrone.position.y})
+                    </div>
+                    
+                    {/* Drone Energy */}
+                    <div style={{
+                      fontSize: '12px',
+                      color: '#cccccc',
+                      marginBottom: '4px'
+                    }}>
+                      Energy: {displayDrone.stats.energy}/{displayDrone.stats.maxEnergy}
+                    </div>
+                    
+                    {/* Execution Status */}
+                    {isDroneRunning && (
+                      <div style={{
+                        fontSize: '11px',
+                        color: '#FFD700',
+                        marginTop: '6px',
+                        padding: '3px 6px',
+                        backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                        borderRadius: '4px',
+                        border: '1px solid #FFD700'
+                      }}>
+                        ⚡ Executing...
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Drone Play Button */}
+                  <div style={{ position: 'relative' }}>
+                    <SpriteButton
+                      position={{ x: 0, y: 0 }}
+                      backgroundSprite="button.png"
+                      upFrame={{ x: 176, y: 16, w: 16, h: 16 }}
+                      downFrame={{ x: 176, y: 32, w: 16, h: 16 }}
+                      scale={3.5}
+                      onClick={() => handleRunDroneCode(displayDrone.id)}
+                    />
+                  </div>
+                </div>
+              );
+            }
+            return null;
+          })()}
           
           {/* Tutorial Task Indicator - Top Right */}
           {dialogueState.isActive && shouldHideDialogue() && (() => {

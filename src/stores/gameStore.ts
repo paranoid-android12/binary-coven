@@ -14,8 +14,8 @@ export interface GameState {
   grids: Map<string, GridTile>;
   entities: Map<string, Entity>;
   activeEntityId: string;
-  codeWindows: Map<string, CodeWindow>;
-  mainWindowId: string;
+  codeWindows: Map<string, CodeWindow>; // Player's code windows
+  mainWindowId: string; // Player's main window
   globalResources: {
     wheat: number;
     energy: number;
@@ -24,6 +24,10 @@ export interface GameState {
   selectedCodeWindow?: string;
   isPaused: boolean;
   gameSpeed: number;
+  
+  // Drone system
+  activeDroneId?: string; // Currently selected drone for programming
+  droneExecutors: Map<string, any>; // CodeExecutor instances for each drone
   
   // =====================================================================
   // CENTRALIZED TASK SYSTEM
@@ -62,6 +66,15 @@ export interface GameStore extends GameState {
   updateEntity: (entityId: string, updates: Partial<Entity>) => void;
   setActiveEntity: (entityId: string) => void;
   forceUnblockEntity: (entityId: string) => void;
+  
+  // =====================================================================
+  // DRONE MANAGEMENT
+  // =====================================================================
+  setActiveDrone: (droneId?: string) => void;
+  getDroneCodeWindows: (droneId: string) => Map<string, CodeWindow> | undefined;
+  updateDroneCodeWindow: (droneId: string, windowId: string, updates: Partial<CodeWindow>) => void;
+  addDroneCodeWindow: (droneId: string, codeWindow: Omit<CodeWindow, 'id'> & { id?: string }) => string;
+  removeDroneCodeWindow: (droneId: string, windowId: string) => void;
   
   // =====================================================================
   // CENTRALIZED TASK MANAGEMENT
@@ -132,7 +145,9 @@ const createInitialState = (): GameState => ({
   isPaused: false,
   gameSpeed: 1.0,
   activeTasks: new Map(),
-  taskTimer: undefined
+  taskTimer: undefined,
+  activeDroneId: undefined,
+  droneExecutors: new Map()
 });
 
 // =====================================================================
@@ -682,6 +697,95 @@ export const useGameStore = create<GameStore>()(
       set((state: GameState) => ({
         globalResources: { ...state.globalResources, ...resources }
       }));
+    },
+
+    // =====================================================================
+    // DRONE MANAGEMENT
+    // =====================================================================
+    setActiveDrone: (droneId?: string) => {
+      set({ activeDroneId: droneId });
+      if (droneId) {
+        console.log(`[STORE] Set active drone: ${droneId}`);
+      } else {
+        console.log('[STORE] Cleared active drone');
+      }
+    },
+
+    getDroneCodeWindows: (droneId: string) => {
+      const state = get();
+      const drone = state.entities.get(droneId);
+      return drone?.codeWindows;
+    },
+
+    updateDroneCodeWindow: (droneId: string, windowId: string, updates: Partial<CodeWindow>) => {
+      const state = get();
+      const drone = state.entities.get(droneId);
+      
+      if (!drone || !drone.codeWindows) {
+        console.warn(`[STORE] updateDroneCodeWindow: Drone ${droneId} not found or has no code windows`);
+        return;
+      }
+
+      const window = drone.codeWindows.get(windowId);
+      if (!window) {
+        console.warn(`[STORE] updateDroneCodeWindow: Window ${windowId} not found in drone ${droneId}`);
+        return;
+      }
+
+      const updatedWindow = { ...window, ...updates };
+      const newCodeWindows = new Map(drone.codeWindows);
+      newCodeWindows.set(windowId, updatedWindow);
+
+      state.updateEntity(droneId, { codeWindows: newCodeWindows });
+      console.log(`[STORE] Updated drone code window: ${updatedWindow.name} for drone ${droneId}`);
+    },
+
+    addDroneCodeWindow: (droneId: string, codeWindow: Omit<CodeWindow, 'id'> & { id?: string }) => {
+      const state = get();
+      const drone = state.entities.get(droneId);
+      
+      if (!drone || !drone.codeWindows) {
+        console.warn(`[STORE] addDroneCodeWindow: Drone ${droneId} not found or has no code windows`);
+        return '';
+      }
+
+      const id = codeWindow.id || uuidv4();
+      const { id: _, ...cleanWindowData } = codeWindow;
+      const window: CodeWindow = { ...cleanWindowData, id };
+
+      const newCodeWindows = new Map(drone.codeWindows);
+      newCodeWindows.set(id, window);
+
+      state.updateEntity(droneId, { codeWindows: newCodeWindows });
+      console.log(`[STORE] Added drone code window: ${window.name} for drone ${droneId}`);
+      return id;
+    },
+
+    removeDroneCodeWindow: (droneId: string, windowId: string) => {
+      const state = get();
+      const drone = state.entities.get(droneId);
+      
+      if (!drone || !drone.codeWindows) {
+        console.warn(`[STORE] removeDroneCodeWindow: Drone ${droneId} not found or has no code windows`);
+        return;
+      }
+
+      const window = drone.codeWindows.get(windowId);
+      if (!window) {
+        console.warn(`[STORE] removeDroneCodeWindow: Window ${windowId} not found in drone ${droneId}`);
+        return;
+      }
+
+      if (window.isMain) {
+        console.warn(`[STORE] Cannot remove main window for drone ${droneId}`);
+        return;
+      }
+
+      const newCodeWindows = new Map(drone.codeWindows);
+      newCodeWindows.delete(windowId);
+
+      state.updateEntity(droneId, { codeWindows: newCodeWindows });
+      console.log(`[STORE] Removed drone code window: ${window.name} from drone ${droneId}`);
     },
 
     // =====================================================================

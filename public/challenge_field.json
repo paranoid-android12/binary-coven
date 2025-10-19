@@ -1,33 +1,42 @@
 [
-    {
-      "name": "Lain",
-      "content": "Qubit, Grandpa left you a new task before he went to town.",
-      "sprite": "manu-speaking.png"
-    },
-    {
-      "name": "Qubit",
-      "content": "Please don’t tell me it’s more plowing...",
-      "sprite": "qubit-defeated.png"
-    },
-    {
-      "name": "Lain",
-      "content": "Not quite. The fields in front of me still need to be planted, but Grandpa said you have to do it *without walking* this time.",
-      "sprite": "manu-pleased.png"
-    },
-    {
-      "name": "Qubit",
-      "content": "Without walking? How am I supposed to reach them then?",
-      "sprite": "qubit-speaking.png"
-    },
-    {
-      "name": "Lain",
-      "content": "By using your code, of course! Grandpa wants you to rely completely on your programming skills to handle those fields.",
-      "sprite": "manu-speaking.png"
-    },
-    {
-      "name": "Qubit",
-      "content": "Heh, figures. Guess it’s time to let my code do the farming for me.",
-      "sprite": "qubit-pleased.png"
+  {
+    "name": "Lain",
+    "content": "Qubit, Grandpa left you another one of his chores before he went into town.",
+    "sprite": "manu-speaking.png"
+  },
+  {
+    "name": "Qubit",
+    "content": "Oh no… please don’t tell me it’s more plowing again.",
+    "sprite": "qubit-defeated.png"
+  },
+  {
+    "name": "Lain",
+    "content": "Not this time. The field in front of me still needs to be planted—but Grandpa said you have to do it *without moving at all*.",
+    "sprite": "manu-pleased.png"
+  },
+  {
+    "name": "Qubit",
+    "content": "Without walking? How am I supposed to reach all the tiles then?",
+    "sprite": "qubit-speaking.png"
+  },
+  {
+    "name": "Lain",
+    "content": "That’s the challenge! He wants you to rely on your programming skills this time. Grandpa said you’d understand what he meant once you tried it yourself.",
+    "sprite": "manu-speaking.png"
+  },
+  {
+    "name": "Lain",
+    "content": "So here’s the task: fill the entire field with plants *purely through code*. No walking, no shortcuts—just logic and automation.",
+    "sprite": "manu-speaking.png",
+    "requirement": {
+      "type": "code_content",
+      "content": "loop_or_grid_logic",
+      "description": "Write code that plants across the whole field using loops or movement commands"
     }
-  ]
-  
+  },
+  {
+    "name": "Qubit",
+    "content": "Heh, figures. Sounds like something Grandpa would come up with. Alright, time to let my code do the farming!",
+    "sprite": "qubit-pleased.png"
+  }
+]

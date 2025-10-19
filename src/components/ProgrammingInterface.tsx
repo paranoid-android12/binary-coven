@@ -111,13 +111,31 @@ def main():
 };
 
 export const ProgrammingInterface: React.FC<ProgrammingInterfaceProps> = ({ entity }) => {
-  const { codeWindows, addCodeWindow, updateCodeWindow, removeCodeWindow, setMainWindow } = useGameStore();
+  const { 
+    codeWindows, 
+    addCodeWindow, 
+    updateCodeWindow, 
+    removeCodeWindow, 
+    setMainWindow,
+    getDroneCodeWindows,
+    updateDroneCodeWindow,
+    addDroneCodeWindow,
+    removeDroneCodeWindow
+  } = useGameStore();
   const [selectedFunctionId, setSelectedFunctionId] = useState<string>('');
   const [showPresetMenu, setShowPresetMenu] = useState(false);
 
+  // Check if entity is a drone
+  const isDrone = entity.isDrone === true;
+
+  // Get appropriate code windows (drone's own or player's)
+  const entityCodeWindows = isDrone && entity.codeWindows 
+    ? entity.codeWindows 
+    : codeWindows;
+
   // Get all code windows as an array
-  const functions = Array.from(codeWindows.values());
-  const selectedFunction = selectedFunctionId ? codeWindows.get(selectedFunctionId) : functions.find(f => f.isMain);
+  const functions = Array.from(entityCodeWindows.values());
+  const selectedFunction = selectedFunctionId ? entityCodeWindows.get(selectedFunctionId) : functions.find(f => f.isMain);
 
   // Auto-select main function if nothing is selected
   React.useEffect(() => {
@@ -160,28 +178,41 @@ export const ProgrammingInterface: React.FC<ProgrammingInterfaceProps> = ({ enti
         return;
       }
 
-      const newFunctionId = addCodeWindow({
-        name,
-        code: `# ${name} function\ndef ${name}():\n    # Your code here\n    pass`,
-        isMain: false,
-        isActive: true,
-        position: { x: 50, y: 50 },
-        size: { width: 400, height: 300 }
-      });
+      const newFunctionId = isDrone
+        ? addDroneCodeWindow(entity.id, {
+            name,
+            code: `# ${name} function\ndef ${name}():\n    # Your code here\n    pass`,
+            isMain: false,
+            isActive: true,
+            position: { x: 50, y: 50 },
+            size: { width: 400, height: 300 }
+          })
+        : addCodeWindow({
+            name,
+            code: `# ${name} function\ndef ${name}():\n    # Your code here\n    pass`,
+            isMain: false,
+            isActive: true,
+            position: { x: 50, y: 50 },
+            size: { width: 400, height: 300 }
+          });
       
       setSelectedFunctionId(newFunctionId);
     }
   };
 
   const handleDeleteFunction = (functionId: string) => {
-    const func = codeWindows.get(functionId);
+    const func = entityCodeWindows.get(functionId);
     if (func?.isMain) {
       alert('Cannot delete the main function!');
       return;
     }
 
     if (confirm(`Are you sure you want to delete the function "${func?.name}"?`)) {
-      removeCodeWindow(functionId);
+      if (isDrone) {
+        removeDroneCodeWindow(entity.id, functionId);
+      } else {
+        removeCodeWindow(functionId);
+      }
       
       // Select main function if we deleted the selected one
       if (selectedFunctionId === functionId) {
@@ -192,12 +223,19 @@ export const ProgrammingInterface: React.FC<ProgrammingInterfaceProps> = ({ enti
   };
 
   const handleSetAsMain = (functionId: string) => {
-    setMainWindow(functionId);
+    // Main window switching only for player, not drones
+    if (!isDrone) {
+      setMainWindow(functionId);
+    }
   };
 
   const handleCodeChange = (value: string | undefined) => {
     if (selectedFunction && value !== undefined) {
-      updateCodeWindow(selectedFunction.id, { code: value });
+      if (isDrone) {
+        updateDroneCodeWindow(entity.id, selectedFunction.id, { code: value });
+      } else {
+        updateCodeWindow(selectedFunction.id, { code: value });
+      }
       // Emit tutorial event for code content changes
       EventBus.emit('tutorial-code-changed', { content: value });
     }
@@ -213,7 +251,11 @@ export const ProgrammingInterface: React.FC<ProgrammingInterfaceProps> = ({ enti
           return;
         }
       }
-      updateCodeWindow(selectedFunction.id, { code: preset.code });
+      if (isDrone) {
+        updateDroneCodeWindow(entity.id, selectedFunction.id, { code: preset.code });
+      } else {
+        updateCodeWindow(selectedFunction.id, { code: preset.code });
+      }
       setShowPresetMenu(false);
     }
   };

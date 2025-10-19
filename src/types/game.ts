@@ -53,6 +53,13 @@ export interface Entity {
     duration?: number;
     tween?: Phaser.Tweens.Tween;
   };
+  // Drone-specific properties
+  isDrone?: boolean; // Indicates if this entity is a programmable drone
+  codeWindows?: Map<string, CodeWindow>; // Drone's own code windows
+  mainWindowId?: string; // Drone's main execution window
+  isExecuting?: boolean; // Whether the drone is currently executing code
+  spriteKey?: string; // Sprite key for rendering (e.g., 'drone_idle')
+  scale?: number; // Visual scale factor
 }
 
 // Inventory System
@@ -256,4 +263,24 @@ export interface NPC {
   sprite?: Phaser.GameObjects.Sprite;
   hoverAnimation?: any; // Reference to hover animation instance
   config: NPCConfig;
+}
+
+// Drone System Types
+export interface DroneConfig {
+  id: string;
+  name: string;
+  position: Position;
+  spriteKey: string; // Sprite for the drone (e.g., 'drone_idle')
+  scale?: number; // Optional scale factor (default 1.5)
+  showHoverAnimation?: boolean; // Whether to show hover animation (default true)
+  stats?: Partial<EntityStats>; // Optional custom stats
+}
+
+export interface Drone extends Entity {
+  isDrone: true;
+  codeWindows: Map<string, CodeWindow>;
+  mainWindowId: string;
+  isExecuting: boolean;
+  spriteKey: string;
+  scale: number;
 } 

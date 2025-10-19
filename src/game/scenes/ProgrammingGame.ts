@@ -9,6 +9,7 @@ import TaskManager from '../systems/TaskManager';
 import { MapEditor } from '../systems/MapEditor';
 import { NPCManager } from '../systems/NPCManager';
 import { GridHoverAnimation } from '../systems/GridHoverAnimation';
+import { DroneManager } from '../systems/DroneManager';
 
 // Movement Manager for smooth entity transitions
 export class MovementManager {
@@ -193,6 +194,8 @@ export class ProgrammingGame extends Scene {
   private movementManager: MovementManager;
   private mapEditor: MapEditor;
   private npcManager: NPCManager;
+  private droneManager: DroneManager;
+  private droneExecutors: Map<string, CodeExecutor> = new Map(); // Code executors for each drone
   private mapEditorUI: React.ComponentType<any> | null = null;
   private well: Phaser.GameObjects.Sprite;
   
@@ -247,6 +250,7 @@ export class ProgrammingGame extends Scene {
     this.movementManager = new MovementManager(this, this.GRID_SIZE);
     this.mapEditor = new MapEditor(this);
     this.npcManager = new NPCManager(this, this.GRID_SIZE);
+    this.droneManager = new DroneManager(this, this.GRID_SIZE);
     
     // Initialize farming grid types
     initializeDefaultGridTypes();
@@ -523,6 +527,23 @@ export class ProgrammingGame extends Scene {
     this.createFoodStation(9, 9);
     this.createFoodStation(8, 9);
     this.createFoodStation(7, 8);
+    
+    // Create a test drone
+    this.createDrone({
+      id: 'drone_alpha',
+      name: 'Alpha Drone',
+      position: { x: 15, y: 12 },
+      spriteKey: 'drone',
+      scale: 1.5,
+      showHoverAnimation: true,
+      stats: {
+        walkingSpeed: 3.0,
+        energy: 100,
+        maxEnergy: 100,
+        harvestAmount: 1,
+        plantingSpeedMultiplier: 1.0
+      }
+    });
     
     // const siloData = this.gridSystem.initializeGrid('silo', '');
     // const siloId = store.addGrid({
@@ -1435,6 +1456,142 @@ export class ProgrammingGame extends Scene {
     EventBus.emit('code-execution-stopped');
   }
 
+  // Drone execution methods
+  startDroneExecution(droneId: string) {
+    const gameState = useGameStore.getState();
+    const drone = gameState.entities.get(droneId);
+    
+    if (!drone || !drone.isDrone) {
+      console.warn(`No drone found with id: ${droneId}`);
+      EventBus.emit('drone-execution-failed', { droneId, error: 'Drone not found' });
+      return;
+    }
+
+    // Check if drone is already executing
+    if (drone.isExecuting) {
+      console.warn(`Drone ${droneId} is already executing`);
+      return;
+    }
+
+    // Force unblock the drone before starting execution
+    console.log(`[DRONE-EXECUTION] Drone ${drone.id} blocked state before unblock: ${drone.taskState.isBlocked}`);
+    gameState.forceUnblockEntity(drone.id);
+    
+    // Get fresh drone data after potential unblocking
+    const freshDrone = gameState.entities.get(droneId);
+    if (!freshDrone) {
+      console.warn('Drone not found after unblocking');
+      EventBus.emit('drone-execution-failed', { droneId, error: 'Drone not found after unblocking' });
+      return;
+    }
+
+    console.log(`[DRONE-EXECUTION] Drone ${freshDrone.id} blocked state after unblock: ${freshDrone.taskState.isBlocked}`);
+    
+    // Create execution context for drone
+    const executionContext = {
+      entity: freshDrone,
+      availableFunctions: BuiltInFunctionRegistry.createFunctionMap(),
+      globalVariables: {},
+      isRunning: true,
+      currentGrid: gameState.getGridAt(freshDrone.position)
+    };
+    
+    // Create code executor for this drone
+    const droneExecutor = new CodeExecutor(executionContext, this.gridSystem);
+    
+    // Set drone's code windows
+    if (freshDrone.codeWindows) {
+      droneExecutor.setUserFunctions(freshDrone.codeWindows);
+    } else {
+      console.warn(`Drone ${droneId} has no code windows`);
+      EventBus.emit('drone-execution-failed', { droneId, error: 'No code windows' });
+      return;
+    }
+    
+    // Store executor
+    this.droneExecutors.set(droneId, droneExecutor);
+    
+    // Update drone state
+    gameState.updateEntity(droneId, { isExecuting: true });
+    
+    // Emit execution started event
+    EventBus.emit('drone-execution-started', { droneId });
+    
+    console.log(`[DRONE-EXECUTION] Starting drone ${drone.name} execution`);
+    
+    // Start execution
+    try {
+      const executePromise = droneExecutor.executeMain();
+      
+      executePromise.then(result => {
+        console.log(`[DRONE-EXECUTION] Drone ${drone.name} execution completed:`, result);
+        
+        // Update drone state
+        gameState.updateEntity(droneId, { isExecuting: false });
+        
+        // Clean up executor
+        this.droneExecutors.delete(droneId);
+        
+        if (result.success) {
+          EventBus.emit('drone-execution-completed', { droneId, result });
+        } else {
+          EventBus.emit('drone-execution-failed', { droneId, error: result.message || 'Unknown error' });
+          this.showExecutionError(`Drone ${drone.name}: ${result.message || 'Unknown error'}`);
+        }
+      }).catch(error => {
+        console.error(`[DRONE-EXECUTION] Drone ${drone.name} execution error:`, error);
+        
+        // Update drone state
+        gameState.updateEntity(droneId, { isExecuting: false });
+        
+        // Clean up executor
+        this.droneExecutors.delete(droneId);
+        
+        const errorMessage = error.message || 'Unknown error';
+        EventBus.emit('drone-execution-failed', { droneId, error: errorMessage });
+        this.showExecutionError(`Drone ${drone.name}: ${errorMessage}`);
+      });
+    } catch (syncError) {
+      console.error(`[DRONE-EXECUTION] Synchronous error starting drone ${drone.name}:`, syncError);
+      gameState.updateEntity(droneId, { isExecuting: false });
+      this.droneExecutors.delete(droneId);
+      EventBus.emit('drone-execution-failed', { droneId, error: 'Failed to start execution' });
+    }
+  }
+
+  stopDroneExecution(droneId: string) {
+    const droneExecutor = this.droneExecutors.get(droneId);
+    
+    if (droneExecutor) {
+      droneExecutor.stop();
+      this.droneExecutors.delete(droneId);
+    }
+    
+    // Cancel drone tasks and stop movement
+    const gameState = useGameStore.getState();
+    const drone = gameState.entities.get(droneId);
+    
+    if (drone) {
+      gameState.forceUnblockEntity(droneId);
+      gameState.updateEntity(droneId, { isExecuting: false });
+      
+      // Stop drone movement
+      if (drone.movementState?.isMoving) {
+        this.movementManager.stopMovement(drone);
+      }
+    }
+    
+    // Emit execution stopped event
+    EventBus.emit('drone-execution-stopped', { droneId });
+    console.log(`[DRONE-EXECUTION] Stopped drone ${droneId} execution`);
+  }
+
+  stopAllDroneExecution() {
+    const droneIds = Array.from(this.droneExecutors.keys());
+    droneIds.forEach(id => this.stopDroneExecution(id));
+    console.log('[DRONE-EXECUTION] Stopped all drone executions');
+  }
+
   private showExecutionError(message: string) {
     // Emit error event for the UI to handle
     EventBus.emit('show-execution-error', message);
@@ -2142,6 +2299,33 @@ export class ProgrammingGame extends Scene {
    */
   public getNPCManager(): NPCManager {
     return this.npcManager;
+  }
+  
+  // =====================================================================
+  // DRONE SYSTEM
+  // =====================================================================
+  
+  /**
+   * Create a programmable drone in the game
+   * @param config Drone configuration object
+   */
+  public createDrone(config: any): void {
+    this.droneManager.createDrone(config);
+  }
+  
+  /**
+   * Remove a drone from the game
+   * @param droneId ID of the drone to remove
+   */
+  public removeDrone(droneId: string): void {
+    this.droneManager.removeDrone(droneId);
+  }
+  
+  /**
+   * Get the Drone manager instance (for advanced usage)
+   */
+  public getDroneManager(): DroneManager {
+    return this.droneManager;
   }
   
   /**

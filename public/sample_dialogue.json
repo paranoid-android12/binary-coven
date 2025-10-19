@@ -1,18 +1,18 @@
 [
   {
     "name": "Lain",
-    "content": "Qubit! Wake up already. You can't just sleep all day—we need to get the next batch of seeds into the soil.",
+    "content": "Qubit! Wake up already. Grandpa left you three chores to finish before sunset!",
     "sprite": "manu-angry.png"
   },
   {
     "name": "Qubit",
-    "content": "Ughhh… just five more minutes. The farm will still be here, you know.",
+    "content": "Chores? Ughhh… can’t they wait? I was having such a good dream...",
     "sprite": "qubit-defeated.png"
   },
   {
     "name": "Lain",
-    "content": "Five more minutes won't grow wheat! Now get moving. Use the arrow keys ↑, ↓, ←, and → to walk around the farmland. Try walking in all four directions!",
-    "sprite": "manu-angry.png",
+    "content": "Nope! He said they’re important. And he told a few people around town some clues to help you out. But first—you need to get moving. Use the arrow keys ↑, ↓, ←, and → to walk around the farmland. Try walking in all four directions!",
+    "sprite": "manu-speaking.png",
     "requirement": {
       "type": "movement",
       "directions": ["up", "down", "left", "right"],
@@ -21,13 +21,13 @@
   },
   {
     "name": "Qubit",
-    "content": "Alright, walking around... Got it. This is actually easier than I thought!",
+    "content": "Alright, alright… walking around… Got it. Maybe this won’t be so bad.",
     "sprite": "qubit-speaking.png"
   },
   {
     "name": "Lain",
-    "content": "Good! Now let's get you set up with the coding terminal. Click on the 'Code Editor' button to open the programming interface.",
-    "sprite": "manu-speaking.png",
+    "content": "Good! Now, before you start on the chores, Grandpa said you’d need to use his coding terminal to help automate your tasks. Click on the 'Code Editor' button to open it.",
+    "sprite": "manu-pleased.png",
     "requirement": {
       "type": "open_terminal",
       "description": "Open the coding terminal"
@@ -35,12 +35,12 @@
   },
   {
     "name": "Lain",
-    "content": "Perfect! This is where the magic happens. You can write code to automate your farming tasks. The terminal has different sections: your main code window, function definitions, and execution controls.",
+    "content": "Perfect! This terminal is your tool for getting chores done faster. You can write commands to handle farming tasks automatically.",
     "sprite": "manu-pleased.png"
   },
   {
     "name": "Lain",
-    "content": "Let's start with something simple. In the main code window, type exactly this: plant(\"wheat\") - this is how you plant wheat seeds when standing on farmland.",
+    "content": "Let’s start simple. In the main code window, type exactly this: plant(\"wheat\"). That’s how you plant wheat seeds when you’re standing on farmland.",
     "sprite": "manu-speaking.png",
     "requirement": {
       "type": "code_content",
@@ -50,12 +50,12 @@
   },
   {
     "name": "Qubit",
-    "content": "Okay, typed it in. But how do I actually make it do something?",
+    "content": "Okay, I typed it in. Now what—do I just hope it grows?",
     "sprite": "qubit-speaking.png"
   },
   {
     "name": "Lain",
-    "content": "Great question! See that play button (▶) in the interface? Click it to execute your code and watch Qubit perform the action!",
+    "content": "Not quite! Click the play button (▶) to execute your code and watch yourself plant those seeds!",
     "sprite": "manu-speaking.png",
     "requirement": {
       "type": "play_button",
@@ -64,7 +64,7 @@
   },
   {
     "name": "Lain",
-    "content": "Excellent! Now you understand the basics. But typing individual commands is still tedious. Let's learn about movement commands. Clear your code and try typing one of these: move_left(), move_right(), move_up(), or move_down()",
+    "content": "Nice work! Grandpa’s first chore involves planting crops, so this’ll come in handy. But you’ll need to move around, too. Try typing one of these next: move_left(), move_right(), move_up(), or move_down()",
     "sprite": "manu-pleased.png",
     "requirement": {
       "type": "movement_command",
@@ -74,13 +74,13 @@
   },
   {
     "name": "Qubit",
-    "content": "Oh wow, I can control myself with code! This is actually pretty cool.",
+    "content": "Oh wow, I can make myself move with code! Grandpa really left some cool tools behind.",
     "sprite": "qubit-pleased.png"
   },
   {
     "name": "Lain",
-    "content": "Now you're getting it! Click the play button again to execute your movement command and see Qubit move automatically!",
-    "sprite": "manu-pleased.png",
+    "content": "Exactly! Click the play button again to execute your movement command and see yourself move automatically.",
+    "sprite": "manu-speaking.png",
     "requirement": {
       "type": "play_button",
       "description": "Click the play button to execute movement command"
@@ -88,12 +88,12 @@
   },
   {
     "name": "Lain",
-    "content": "Perfect! You've mastered the basics: manual movement with arrow keys, opening the code terminal, writing simple commands, and executing them. Now you can combine these to automate your entire farming operation!",
+    "content": "Great job! You’ve got the hang of it—moving around, planting crops, and coding actions. Now you can use these skills to finish Grandpa’s three chores. Talk to the townsfolk to find out what each one is!",
     "sprite": "manu-pleased.png"
   },
   {
     "name": "Qubit",
-    "content": "This is amazing! I can already imagine writing scripts to plant entire fields while I take a nap. Thanks for teaching me, Lain!",
+    "content": "Got it! Move around, code smart, and get those chores done. Guess I better start asking around town!",
     "sprite": "qubit-pleased.png"
   }
 ]
