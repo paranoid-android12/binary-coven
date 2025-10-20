@@ -31,11 +31,16 @@ export class Preloader extends Scene
     {
         // Set texture filtering for pixel-perfect rendering BEFORE loading
         this.load.on('filecomplete', (key: string) => {
-            console.log(`[PRELOADER] File loaded: ${key}`);
-            if (['qubit_walk', 'qubit_idle', 'qubit_planting', 'manu_idle', 'wheat_growth', 'extras', 'Ground_Tileset', 'Fence_Wood', 'Well'].includes(key)) {
+            if (['qubit_walk', 'qubit_idle', 'qubit_planting', 'manu_idle', 'drone_idle', 'wheat_growth', 'extras', 'Ground_Tileset', 'Fence_Wood', 'Well'].includes(key)) {
                 const texture = this.textures.get(key);
                 texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
-                console.log(`[PRELOADER] Applied NEAREST filter to: ${key}`);
+                if (key === 'drone_idle') {
+                    console.log(`[DRONE-INIT] ✓ Texture loaded: ${key}`, {
+                        exists: this.textures.exists(key),
+                        frames: texture.getFrameNames(),
+                        frameCount: texture.getFrameNames().length
+                    });
+                }
             }
         });
 
@@ -55,8 +60,8 @@ export class Preloader extends Scene
             frameWidth: 32,
             frameHeight: 32
         });
-        
-        console.log('[PRELOADER] Queued manu_idle spritesheet for loading');
+
+
         
         // Load the walking spritesheet for qubit
         this.load.spritesheet('qubit_walk', 'Walk.png', {
@@ -72,6 +77,11 @@ export class Preloader extends Scene
 
         // Load the planting spritesheet for qubit
         this.load.spritesheet('qubit_planting', 'Hoe.png', {
+            frameWidth: 32,
+            frameHeight: 32
+        });
+
+        this.load.spritesheet('drone_idle', 'drone_idle.png', {
             frameWidth: 32,
             frameHeight: 32
         });
@@ -124,34 +134,11 @@ export class Preloader extends Scene
         this.load.image('qubit_pleased', 'qubit-pleased.png');
         this.load.image('qubit_angry', 'qubit-angry.png');
         this.load.image('qubit_defeated', 'qubit-defeated.png');
-        
-        console.log('[PRELOADER] Spritesheets and NPC sprites queued for loading');
     }
 
     create ()
     {
-        //  When all the assets have loaded, it's often worth creating global objects here that the rest of the game can use.
-        //  For example, you can define global animations here, so we can use them in other scenes.
-
-        // =====================================================================
-        // CREATE GLOBAL ANIMATIONS (ONE-TIME SETUP)
-        // =====================================================================
-        // Animations are created once here and are available across all scenes
-        // This is the recommended Phaser best practice
-        
-        console.log('[PRELOADER] Starting animation creation...');
-        console.log('[PRELOADER] Textures loaded:', Object.keys(this.textures.list));
-        console.log('[PRELOADER] qubit_walk exists?', this.textures.exists('qubit_walk'));
-        console.log('[PRELOADER] qubit_idle exists?', this.textures.exists('qubit_idle'));
-        console.log('[PRELOADER] manu_idle exists?', this.textures.exists('manu_idle'));
-        console.log('[PRELOADER] Ground_Tileset exists?', this.textures.exists('Ground_Tileset'));
-        
         this.createQubitAnimations();
-        
-        console.log('[PRELOADER] All animations created globally');
-        console.log('[PRELOADER] qubit_idle animation exists?', this.anims.exists('qubit_idle'));
-        console.log('[PRELOADER] qubit_walk_down animation exists?', this.anims.exists('qubit_walk_down'));
-        console.log('[PRELOADER] manu_idle animation exists?', this.anims.exists('manu_idle'));
 
         //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
         this.scene.start('MainMenu');
@@ -183,14 +170,11 @@ export class Preloader extends Scene
             console.warn('[PRELOADER] manu_idle texture not found. Manu animations will not be created.');
             return;
         }
-        
-        // Log frame information for debugging
-        const walkTexture = this.textures.get('qubit_walk');
-        const idleTexture = this.textures.get('qubit_idle');
-        const manuTexture = this.textures.get('manu_idle');
-        console.log('[PRELOADER] Qubit walk texture frames:', walkTexture.getFrameNames());
-        console.log('[PRELOADER] Qubit idle texture frames:', idleTexture.getFrameNames());
-        console.log('[PRELOADER] manu_idle texture frames:', manuTexture.getFrameNames());
+
+        if (!this.textures.exists('drone_idle')) {
+            console.warn('[PRELOADER] ✗ drone_idle texture not found. Drone animations will not be created.');
+            return;
+        }
         // =====================================================================
         // IDLE ANIMATIONS
         // =====================================================================
@@ -233,6 +217,28 @@ export class Preloader extends Scene
             frames: this.anims.generateFrameNumbers('qubit_idle', { start: 0, end: 3 }),
             frameRate: 4,
             repeat: -1
+        });
+
+        // =====================================================================
+        // DRONE ANIMATIONS
+        // =====================================================================
+        
+        // Drone idle animation
+        const droneTexture = this.textures.get('drone_idle');
+        const droneFrameCount = droneTexture.getFrameNames().length;
+        console.log(`[DRONE-INIT] ✓ Creating animation with ${droneFrameCount} frames:`, droneTexture.getFrameNames());
+        
+        this.anims.create({
+            key: 'drone_idle',
+            frames: this.anims.generateFrameNumbers('drone_idle', { start: 0, end: 3 }),
+            frameRate: 4,
+            repeat: -1
+        });
+        
+        console.log('[DRONE-INIT] ✓ Animation created:', {
+            key: 'drone_idle',
+            exists: this.anims.exists('drone_idle'),
+            frameCount: droneFrameCount
         });
         
         // =====================================================================
@@ -303,11 +309,7 @@ export class Preloader extends Scene
                 frameRate: 2,
                 repeat: -1
             });
-            console.log('[PRELOADER] Hover animation created successfully');
         }
-        
-        console.log('[PRELOADER] Qubit animations created successfully');
-        console.log('[PRELOADER] Manu animations created successfully');
     }
 }
 

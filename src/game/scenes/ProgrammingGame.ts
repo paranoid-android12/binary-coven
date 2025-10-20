@@ -332,6 +332,8 @@ export class ProgrammingGame extends Scene {
   private createPlaceholderSprites() {
     // Create colored rectangles for different game objects
     const graphics = this.add.graphics();
+
+
     
     // Qubit (player entity) - Blue square (fallback for non-animated usage)
     graphics.fillStyle(0x4a90e2);
@@ -529,12 +531,20 @@ export class ProgrammingGame extends Scene {
     this.createFoodStation(7, 8);
     
     // Create a test drone
+    console.log('[DRONE-INIT] ═══════════════════════════════════════');
+    console.log('[DRONE-INIT] Starting drone creation...');
+    console.log('[DRONE-INIT] Checking prerequisites:', {
+      textureExists: this.textures.exists('drone_idle'),
+      animExists: this.anims.exists('drone_idle'),
+      droneManagerReady: !!this.droneManager
+    });
+    
     this.createDrone({
       id: 'drone_alpha',
       name: 'Alpha Drone',
       position: { x: 15, y: 12 },
-      spriteKey: 'drone',
-      scale: 1.5,
+      spriteKey: 'drone_idle',
+      scale: 1,
       showHoverAnimation: true,
       stats: {
         walkingSpeed: 3.0,
@@ -544,6 +554,8 @@ export class ProgrammingGame extends Scene {
         plantingSpeedMultiplier: 1.0
       }
     });
+    
+    console.log('[DRONE-INIT] ═══════════════════════════════════════');
     
     // const siloData = this.gridSystem.initializeGrid('silo', '');
     // const siloId = store.addGrid({
@@ -902,6 +914,11 @@ export class ProgrammingGame extends Scene {
   }
 
   private updateEntitySprite(entity: Entity) {
+    // Skip drones - DroneManager handles their sprites
+    if (entity.isDrone) {
+      return;
+    }
+    
     let sprite = this.entitySprites.get(entity.id);
     
     if (!sprite) {

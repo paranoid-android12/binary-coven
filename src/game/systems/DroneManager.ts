@@ -95,30 +95,37 @@ def main():
       scale: config.scale || 1.5
     };
 
-    // Add drone to game store
-    const entityId = store.addEntity(droneEntity);
-    
-    // Get the entity back from store (it may have been modified)
-    const storedEntity = store.entities.get(entityId);
-    if (!storedEntity) {
-      console.error(`Failed to create drone ${config.id}`);
-      return droneEntity;
-    }
-
-    // Create sprite for drone
-    this.createDroneSprite(storedEntity);
+    // Create sprite for drone BEFORE adding to store
+    this.createDroneSprite(droneEntity);
 
     // Create hover animation if enabled
     if (config.showHoverAnimation !== false) {
-      this.createHoverAnimation(storedEntity);
+      this.createHoverAnimation(droneEntity);
     }
 
+    // Add drone to game store with sprite already attached
+    const entityId = store.addEntity(droneEntity);
+
     // Store drone reference locally
-    this.drones.set(config.id, storedEntity);
+    this.drones.set(config.id, droneEntity);
 
-    console.log(`[DRONE-MANAGER] Created drone: ${config.name} at (${config.position.x}, ${config.position.y})`);
+    console.log(`[DRONE-INIT] ════════════════════════════════════`);
+    console.log(`[DRONE-INIT] ✓ Drone FINAL STATE: ${config.name}`, {
+      id: config.id,
+      spriteKey: config.spriteKey,
+      hasSprite: !!droneEntity.sprite,
+      spriteVisible: droneEntity.sprite?.visible,
+      spriteTexture: droneEntity.sprite?.texture?.key,
+      spriteFrame: droneEntity.sprite?.frame?.name,
+      spritePosition: { x: droneEntity.sprite?.x, y: droneEntity.sprite?.y },
+      spriteDepth: droneEntity.sprite?.depth,
+      spriteAlpha: droneEntity.sprite?.alpha,
+      isPlaying: droneEntity.sprite?.anims?.isPlaying,
+      currentAnim: droneEntity.sprite?.anims?.currentAnim?.key
+    });
+    console.log(`[DRONE-INIT] ════════════════════════════════════`);
 
-    return storedEntity;
+    return droneEntity;
   }
 
   /**
@@ -150,8 +157,6 @@ def main():
 
     // Remove from local map
     this.drones.delete(droneId);
-
-    console.log(`[DRONE-MANAGER] Removed drone: ${drone.name}`);
   }
 
   /**
@@ -217,11 +222,25 @@ def main():
 
     // Check if sprite texture exists
     const spriteKey = drone.spriteKey || 'drone';
-    console.log(`[DRONE-MANAGER] Checking texture '${spriteKey}' exists:`, this.scene.textures.exists(spriteKey));
+    const textureExists = this.scene.textures.exists(spriteKey);
     
-    if (this.scene.textures.exists(spriteKey)) {
+    console.log(`[DRONE-INIT] ════════════════════════════════════`);
+    console.log(`[DRONE-INIT] Creating sprite for ${drone.name}:`, {
+      spriteKey,
+      textureExists,
+      position: { grid: drone.position, pixel: { x: pixelX, y: pixelY } },
+      scale,
+      displaySize: this.gridSize * scale,
+      allTextures: Object.keys(this.scene.textures.list)
+    });
+    
+    if (!textureExists) {
+      console.error(`[DRONE-INIT] ✗✗✗ TEXTURE NOT FOUND: '${spriteKey}'`);
+      console.error(`[DRONE-INIT] Available textures:`, Object.keys(this.scene.textures.list));
+    }
+    
+    if (textureExists) {
       // Create sprite
-      console.log(`[DRONE-MANAGER] Creating sprite with texture '${spriteKey}'`);
       drone.sprite = this.scene.add.sprite(pixelX, pixelY, spriteKey);
       
       // Set scale
@@ -233,20 +252,37 @@ def main():
       // Set depth (same as other entities)
       drone.sprite.setDepth(1000);
 
+      console.log(`[DRONE-INIT] ✓ Sprite created:`, {
+        frame: drone.sprite.frame.name,
+        visible: drone.sprite.visible,
+        alpha: drone.sprite.alpha,
+        actualSize: { width: drone.sprite.width, height: drone.sprite.height }
+      });
+
       // Play idle animation if it exists
-      if (this.scene.anims.exists(spriteKey)) {
+      const animExists = this.scene.anims.exists(spriteKey);
+      const idleAnimKey = `${spriteKey}_idle`;
+      const idleAnimExists = this.scene.anims.exists(idleAnimKey);
+      
+      if (animExists) {
         drone.sprite.play(spriteKey);
-        console.log(`[DRONE-MANAGER] Playing animation: ${spriteKey}`);
+        console.log(`[DRONE-INIT] ✓ Playing animation: ${spriteKey}`, {
+          isPlaying: drone.sprite.anims.isPlaying,
+          currentAnim: drone.sprite.anims.currentAnim?.key,
+          currentFrame: drone.sprite.anims.currentFrame?.index
+        });
+      } else if (idleAnimExists) {
+        drone.sprite.play(idleAnimKey);
+        console.log(`[DRONE-INIT] ✓ Playing animation: ${idleAnimKey}`, {
+          isPlaying: drone.sprite.anims.isPlaying,
+          currentAnim: drone.sprite.anims.currentAnim?.key
+        });
       } else {
-        const idleAnimKey = `${spriteKey}_idle`;
-        if (this.scene.anims.exists(idleAnimKey)) {
-          drone.sprite.play(idleAnimKey);
-          console.log(`[DRONE-MANAGER] Playing animation: ${idleAnimKey}`);
-        }
+        console.warn(`[DRONE-INIT] ✗ No animation found for '${spriteKey}' or '${idleAnimKey}'`);
       }
     } else {
       // Fallback: create placeholder sprite
-      console.warn(`[DRONE-MANAGER] Sprite texture '${spriteKey}' not found. Creating placeholder.`);
+      console.warn(`[DRONE-INIT] ✗ Texture '${spriteKey}' not found. Creating placeholder.`);
       this.createPlaceholderSprite(spriteKey);
       
       drone.sprite = this.scene.add.sprite(pixelX, pixelY, spriteKey);
@@ -282,10 +318,6 @@ def main():
         hoverAnimation.stop();
       }
     });
-
-    // Update entity in store with sprite reference
-    const store = useGameStore.getState();
-    store.updateEntity(drone.id, { sprite: drone.sprite });
   }
 
   /**
@@ -306,8 +338,6 @@ def main():
    * Handle drone click interaction - opens programming interface
    */
   private handleDroneClick(drone: Entity): void {
-    console.log(`[DRONE-MANAGER] Drone clicked: ${drone.name}`);
-
     // Emit event to open drone programming interface
     EventBus.emit('drone-clicked', drone);
   }
@@ -373,8 +403,6 @@ def main():
 
     // Update the entity in store
     store.updateEntity(droneId, { codeWindows: new Map(drone.codeWindows) });
-
-    console.log(`[DRONE-MANAGER] Updated code for drone ${drone.name}`);
   }
 
   /**
@@ -395,8 +423,6 @@ def main():
 
     this.drones.clear();
     this.hoverAnimations.clear();
-
-    console.log('[DRONE-MANAGER] Destroyed all drones');
   }
 }
 
