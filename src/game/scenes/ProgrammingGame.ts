@@ -1675,6 +1675,21 @@ export class ProgrammingGame extends Scene {
     
     // Arrow key qubit movement (only when camera is locked and not in unlocked mode)
     if (this.isLockedToQubit && !isTypingInInput()) {
+      // Check if player is on a Challenge Grid - if so, block manual movement
+      const isOnChallengeGrid = gameState.isPlayerOnChallengeGrid();
+      
+      if (isOnChallengeGrid) {
+        // Block manual movement but show a brief message (optional)
+        if (Phaser.Input.Keyboard.JustDown(this.cameraKeys.up) ||
+            Phaser.Input.Keyboard.JustDown(this.cameraKeys.down) ||
+            Phaser.Input.Keyboard.JustDown(this.cameraKeys.left) ||
+            Phaser.Input.Keyboard.JustDown(this.cameraKeys.right)) {
+          console.log('[CHALLENGE] Manual movement blocked - use code to move on Challenge Grid');
+          EventBus.emit('challenge-movement-blocked');
+        }
+        return; // Exit early to prevent any manual movement
+      }
+      
       // Only allow movement if entity is not currently moving and not blocked by tasks
       if (!activeEntity.movementState?.isMoving && !activeEntity.taskState.isBlocked) {
         // Handle movement with smooth transitions

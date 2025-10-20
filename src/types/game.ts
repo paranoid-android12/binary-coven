@@ -107,6 +107,7 @@ export interface GridTile {
   isActive: boolean;
   energyRequired?: number;
   taskState: TaskState;
+  isChallengeGrid?: boolean; // Indicates if this grid is part of a challenge (no manual movement allowed)
 }
 
 // Code Execution System

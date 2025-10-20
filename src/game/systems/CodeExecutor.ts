@@ -123,7 +123,10 @@ export class CodeExecutor {
       const result = await builtInFunction.execute(this.context, ...args);
       
       // Handle energy consumption if the function has an energy cost
-      if (result.success && result.energyCost && result.energyCost > 0) {
+      // BUT skip energy consumption if player is on a Challenge Grid
+      const isOnChallengeGrid = store.isPlayerOnChallengeGrid();
+      
+      if (result.success && result.energyCost && result.energyCost > 0 && !isOnChallengeGrid) {
         const currentEntity = store.entities.get(this.context.entity.id);
         if (currentEntity && currentEntity.stats.energy >= result.energyCost) {
           // Consume energy
@@ -142,6 +145,9 @@ export class CodeExecutor {
             message: `Not enough energy. Required: ${result.energyCost}, Available: ${currentEntity?.stats.energy || 0}`
           };
         }
+      } else if (result.success && result.energyCost && result.energyCost > 0 && isOnChallengeGrid) {
+        // Log that energy was not consumed due to Challenge Grid
+        console.log('[CHALLENGE] Energy consumption skipped - on Challenge Grid');
       }
       
       // Handle duration (for animations/timing)

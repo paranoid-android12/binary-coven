@@ -29,6 +29,10 @@ export interface GameState {
   activeDroneId?: string; // Currently selected drone for programming
   droneExecutors: Map<string, any>; // CodeExecutor instances for each drone
   
+  // Challenge Grid system
+  challengeGridPositions: Set<string>; // Set of position strings "x,y" for challenge grids
+  isChallengeMode: boolean; // Whether challenge mode is currently active
+  
   // =====================================================================
   // CENTRALIZED TASK SYSTEM
   // =====================================================================
@@ -57,6 +61,14 @@ export interface GameStore extends GameState {
   updateGrid: (gridId: string, updates: Partial<GridTile>) => void;
   getGridAt: (position: Position) => GridTile | undefined;
   getGridsByType: (type: string) => GridTile[];
+  
+  // Challenge Grid management
+  activateChallengeGrid: (position: Position) => void;
+  deactivateChallengeGrid: (position: Position) => void;
+  activateChallengeGrids: (positions: Position[]) => void;
+  deactivateAllChallengeGrids: () => void;
+  isChallengeGridAt: (position: Position) => boolean;
+  isPlayerOnChallengeGrid: () => boolean;
   
   // =====================================================================
   // ENTITY MANAGEMENT
@@ -147,7 +159,9 @@ const createInitialState = (): GameState => ({
   activeTasks: new Map(),
   taskTimer: undefined,
   activeDroneId: undefined,
-  droneExecutors: new Map()
+  droneExecutors: new Map(),
+  challengeGridPositions: new Set(),
+  isChallengeMode: false
 });
 
 // =====================================================================
@@ -508,6 +522,95 @@ export const useGameStore = create<GameStore>()(
     getGridsByType: (type: string) => {
       const state = get();
       return Array.from(state.grids.values()).filter(grid => grid.type === type);
+    },
+
+    // =====================================================================
+    // CHALLENGE GRID MANAGEMENT
+    // =====================================================================
+    activateChallengeGrid: (position: Position) => {
+      const posKey = `${position.x},${position.y}`;
+      set((state: GameState) => {
+        const newChallengeGrids = new Set(state.challengeGridPositions);
+        newChallengeGrids.add(posKey);
+        
+        // Update the grid tile itself
+        const grid = state.getGridAt(position);
+        if (grid) {
+          state.updateGrid(grid.id, { isChallengeGrid: true });
+        }
+        
+        console.log(`[CHALLENGE] Activated challenge grid at (${position.x}, ${position.y})`);
+        return { 
+          challengeGridPositions: newChallengeGrids,
+          isChallengeMode: true
+        };
+      });
+      
+      // Emit event for visual updates
+      EventBus.emit('challenge-grid-activated', { position });
+    },
+
+    deactivateChallengeGrid: (position: Position) => {
+      const posKey = `${position.x},${position.y}`;
+      set((state: GameState) => {
+        const newChallengeGrids = new Set(state.challengeGridPositions);
+        newChallengeGrids.delete(posKey);
+        
+        // Update the grid tile itself
+        const grid = state.getGridAt(position);
+        if (grid) {
+          state.updateGrid(grid.id, { isChallengeGrid: false });
+        }
+        
+        console.log(`[CHALLENGE] Deactivated challenge grid at (${position.x}, ${position.y})`);
+        return { 
+          challengeGridPositions: newChallengeGrids,
+          isChallengeMode: newChallengeGrids.size > 0
+        };
+      });
+      
+      // Emit event for visual updates
+      EventBus.emit('challenge-grid-deactivated', { position });
+    },
+
+    activateChallengeGrids: (positions: Position[]) => {
+      positions.forEach(position => {
+        get().activateChallengeGrid(position);
+      });
+      console.log(`[CHALLENGE] Activated ${positions.length} challenge grids`);
+    },
+
+    deactivateAllChallengeGrids: () => {
+      const state = get();
+      const positions = Array.from(state.challengeGridPositions).map(posKey => {
+        const [x, y] = posKey.split(',').map(Number);
+        return { x, y };
+      });
+      
+      positions.forEach(position => {
+        state.deactivateChallengeGrid(position);
+      });
+      
+      set({ 
+        challengeGridPositions: new Set(),
+        isChallengeMode: false
+      });
+      
+      console.log('[CHALLENGE] Deactivated all challenge grids');
+      EventBus.emit('challenge-mode-ended');
+    },
+
+    isChallengeGridAt: (position: Position) => {
+      const state = get();
+      const posKey = `${position.x},${position.y}`;
+      return state.challengeGridPositions.has(posKey);
+    },
+
+    isPlayerOnChallengeGrid: () => {
+      const state = get();
+      const activeEntity = state.entities.get(state.activeEntityId);
+      if (!activeEntity) return false;
+      return state.isChallengeGridAt(activeEntity.position);
     },
 
     // =====================================================================

@@ -78,6 +78,10 @@ interface DialogueEntry {
   };
   mainImage?: string;
   requirement?: DialogueRequirement;
+  challengeGrids?: {
+    positions: Array<{ x: number; y: number }>;
+    activate: boolean; // true to activate, false to deactivate
+  };
 }
 
 interface DialogueState {
@@ -178,6 +182,10 @@ export const GameInterface: React.FC = () => {
   // Drone state
   const [activeDroneId, setActiveDroneId] = useState<string | undefined>(undefined);
   const [droneExecutionStates, setDroneExecutionStates] = useState<Map<string, boolean>>(new Map());
+
+  // Challenge Grid state
+  const [isOnChallengeGrid, setIsOnChallengeGrid] = useState(false);
+  const [showChallengeBlockedMessage, setShowChallengeBlockedMessage] = useState(false);
 
   // Global modal state management - tracks if ANY modal is open
   const [globalModalState, setGlobalModalState] = useState({
@@ -490,6 +498,16 @@ export const GameInterface: React.FC = () => {
       });
     };
 
+    // Handle Challenge Grid events
+    const handleChallengeMovementBlocked = () => {
+      console.log('[CHALLENGE] Movement blocked - showing message');
+      setShowChallengeBlockedMessage(true);
+      // Auto-hide after 2 seconds
+      setTimeout(() => {
+        setShowChallengeBlockedMessage(false);
+      }, 2000);
+    };
+
     EventBus.on('entity-clicked', handleEntityClick);
     EventBus.on('grid-clicked', handleGridClick);
     EventBus.on('drone-clicked', handleDroneClick);
@@ -512,6 +530,7 @@ export const GameInterface: React.FC = () => {
     EventBus.on('tutorial-terminal-opened', handleTerminalOpened);
     EventBus.on('tutorial-code-changed', handleCodeContentChanged);
     EventBus.on('tutorial-play-clicked', handlePlayButtonClicked);
+    EventBus.on('challenge-movement-blocked', handleChallengeMovementBlocked);
 
     return () => {
       EventBus.removeListener('entity-clicked');
@@ -538,6 +557,7 @@ export const GameInterface: React.FC = () => {
       EventBus.removeListener('tutorial-terminal-opened');
       EventBus.removeListener('tutorial-code-changed');
       EventBus.removeListener('tutorial-play-clicked');
+      EventBus.removeListener('challenge-movement-blocked');
     };
   }, [globalModalState.isAnyModalOpen, openModal, dialogueState, shouldBlockModalInteractions]);
 
@@ -698,6 +718,20 @@ export const GameInterface: React.FC = () => {
         }
       }
       
+      // Handle Challenge Grid activation for first dialogue if specified
+      if (dialogues[0]?.challengeGrids) {
+        const store = useGameStore.getState();
+        const { positions, activate } = dialogues[0].challengeGrids;
+        
+        if (activate) {
+          store.activateChallengeGrids(positions);
+          console.log(`[CHALLENGE] Activated ${positions.length} challenge grids from dialogue`);
+        } else {
+          store.deactivateAllChallengeGrids();
+          console.log('[CHALLENGE] Deactivated all challenge grids from dialogue');
+        }
+      }
+      
       openModal('dialogue');
       console.log(`[DIALOGUE] Started dialogue: ${dialogueFile} with ${dialogues.length} entries`);
     } catch (error) {
@@ -733,6 +767,13 @@ export const GameInterface: React.FC = () => {
         }
         console.log('[DIALOGUE] Dialogue sequence completed');
         
+        // Deactivate all Challenge Grids when dialogue ends
+        const store = useGameStore.getState();
+        if (store.challengeGridPositions.size > 0) {
+          store.deactivateAllChallengeGrids();
+          console.log('[CHALLENGE] Deactivated all challenge grids at dialogue end');
+        }
+        
         // Reset tutorial state when dialogue ends
         setTutorialState({
           movementDirections: new Set<string>(),
@@ -761,6 +802,20 @@ export const GameInterface: React.FC = () => {
         if (scene && scene.panCameraTo) {
           console.log(`[DIALOGUE] Panning camera to (${nextDialogue.camera.x}, ${nextDialogue.camera.y})`);
           scene.panCameraTo(nextDialogue.camera.x, nextDialogue.camera.y, 1000);
+        }
+      }
+      
+      // Handle Challenge Grid activation/deactivation if specified
+      if (nextDialogue?.challengeGrids) {
+        const store = useGameStore.getState();
+        const { positions, activate } = nextDialogue.challengeGrids;
+        
+        if (activate) {
+          store.activateChallengeGrids(positions);
+          console.log(`[CHALLENGE] Activated ${positions.length} challenge grids from dialogue advancement`);
+        } else {
+          store.deactivateAllChallengeGrids();
+          console.log('[CHALLENGE] Deactivated all challenge grids from dialogue advancement');
         }
       }
       
@@ -804,6 +859,14 @@ export const GameInterface: React.FC = () => {
     if (scene && scene.lockCameraToQubit) {
       scene.lockCameraToQubit();
     }
+    
+    // Deactivate all Challenge Grids when dialogue is manually closed
+    const store = useGameStore.getState();
+    if (store.challengeGridPositions.size > 0) {
+      store.deactivateAllChallengeGrids();
+      console.log('[CHALLENGE] Deactivated all challenge grids on manual dialogue close');
+    }
+    
     console.log('[DIALOGUE] Dialogue closed manually');
   }, [closeModal]);
 
@@ -875,6 +938,28 @@ export const GameInterface: React.FC = () => {
       delete (window as any).startDialogue;
     };
   }, [startDialogue]);
+
+  // Track Challenge Grid status
+  useEffect(() => {
+    const updateChallengeGridStatus = () => {
+      const store = useGameStore.getState();
+      const activeEntity = store.entities.get(store.activeEntityId);
+      if (activeEntity) {
+        const onChallengeGrid = store.isPlayerOnChallengeGrid();
+        setIsOnChallengeGrid(onChallengeGrid);
+      }
+    };
+
+    // Check immediately
+    updateChallengeGridStatus();
+
+    // Check on entity position changes
+    const intervalId = setInterval(updateChallengeGridStatus, 100);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [activeEntityId, entities]);
 
   return (
     <div style={{ 
@@ -1092,7 +1177,6 @@ export const GameInterface: React.FC = () => {
                       alignItems: 'center',
                       gap: '6px'
                     }}>
-                      <span>🤖</span>
                       <span>{displayDrone.name}</span>
                     </div>
                     
@@ -1131,13 +1215,13 @@ export const GameInterface: React.FC = () => {
                   </div>
                   
                   {/* Drone Play Button */}
-                  <div style={{ position: 'relative' }}>
+                  <div >
                     <SpriteButton
-                      position={{ x: 0, y: 0 }}
+                      position={{ x: 180, y: 10 }}
                       backgroundSprite="button.png"
                       upFrame={{ x: 176, y: 16, w: 16, h: 16 }}
                       downFrame={{ x: 176, y: 32, w: 16, h: 16 }}
-                      scale={3.5}
+                      scale={2.5}
                       onClick={() => handleRunDroneCode(displayDrone.id)}
                     />
                   </div>
@@ -1147,7 +1231,67 @@ export const GameInterface: React.FC = () => {
             return null;
           })()}
           
-          {/* Tutorial Task Indicator - Top Right */}
+          {/* Challenge Grid Indicator - Top Center */}
+          {isOnChallengeGrid && (
+            <div style={{
+              position: 'absolute',
+              top: '20px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              backgroundColor: 'rgba(255, 100, 100, 0.95)',
+              border: '3px solid #FF0000',
+              borderRadius: '12px',
+              padding: '12px 24px',
+              color: '#FFFFFF',
+              fontSize: '18px',
+              fontFamily: 'BoldPixels',
+              zIndex: 2500,
+              pointerEvents: 'none',
+              boxShadow: '0 4px 16px rgba(255, 0, 0, 0.5)',
+            }}>
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '10px',
+                justifyContent: 'center'
+              }}>
+                <span style={{ fontWeight: 'bold' }}>CHALLENGE GRID - Code Only Mode</span>
+              </div>
+              <div style={{ 
+                fontSize: '14px', 
+                textAlign: 'center', 
+                marginTop: '4px',
+                color: '#FFEEEE'
+              }}>
+                Arrow keys disabled • Use code to move • No energy cost
+              </div>
+            </div>
+          )}
+
+          {/* Challenge Movement Blocked Message */}
+          {showChallengeBlockedMessage && (
+            <div style={{
+              position: 'absolute',
+              top: '100px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              backgroundColor: 'rgba(255, 150, 0, 0.95)',
+              border: '2px solid #FF8800',
+              borderRadius: '8px',
+              padding: '10px 20px',
+              color: '#FFFFFF',
+              fontSize: '16px',
+              fontFamily: 'BoldPixels',
+              zIndex: 2500,
+              pointerEvents: 'none',
+              boxShadow: '0 4px 12px rgba(255, 136, 0, 0.5)',
+              animation: 'slideInDown 0.3s ease-out'
+            }}>
+              🚫 Manual movement blocked! Use code to move on Challenge Grid
+            </div>
+          )}
+
+          {/* Tutorial Task Indicator - Bottom Right */}
           {dialogueState.isActive && shouldHideDialogue() && (() => {
             const currentDialogue = dialogueState.dialogues[dialogueState.currentIndex];
             if (currentDialogue?.requirement) {
@@ -1173,7 +1317,6 @@ export const GameInterface: React.FC = () => {
                     gap: '8px',
                     marginBottom: '4px'
                   }}>
-                    <span style={{ fontSize: '18px' }}>📝</span>
                     <span style={{ fontWeight: 'bold' }}>Current Task:</span>
                   </div>
                   <div style={{ fontSize: '14px', lineHeight: '1.3' }}>
@@ -1694,7 +1837,7 @@ export const GameInterface: React.FC = () => {
         </div>
       )}
 
-      <MapEditorUI
+      {/* <MapEditorUI
         tilesets={mapEditorState.tilesets}
         activeTileset={mapEditorState.activeTileset}
         selectedLayer={mapEditorState.selectedLayer}
@@ -1715,7 +1858,7 @@ export const GameInterface: React.FC = () => {
           EventBus.emit('toggle-map-editor');
         }}
         isActive={mapEditorState.isActive}
-      />
+      /> */}
 
       {/* Glossary Modal */}
       {glossaryModalState.isOpen && (

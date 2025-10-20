@@ -6,7 +6,7 @@
   },
   {
     "name": "Qubit",
-    "content": "Oh no… please don’t tell me it’s more plowing again.",
+    "content": "Oh no… please don't tell me it's more plowing again.",
     "sprite": "qubit-defeated.png"
   },
   {
@@ -21,13 +21,38 @@
   },
   {
     "name": "Lain",
-    "content": "That’s the challenge! He wants you to rely on your programming skills this time. Grandpa said you’d understand what he meant once you tried it yourself.",
+    "content": "That's the challenge! He wants you to rely on your programming skills this time. Grandpa said you'd understand what he meant once you tried it yourself.",
     "sprite": "manu-speaking.png"
   },
   {
     "name": "Lain",
-    "content": "So here’s the task: fill the entire field with plants *purely through code*. No walking, no shortcuts—just logic and automation.",
+    "content": "So here's the task: fill the entire field with plants *purely through code*. No walking, no shortcuts—just logic and automation. I've activated the Challenge Grid system for you!",
     "sprite": "manu-speaking.png",
+    "challengeGrids": {
+      "positions": [
+        {"x": 22, "y": 19}, 
+        {"x": 19, "y": 20}, 
+        {"x": 20, "y": 20},
+        {"x": 21, "y": 20},
+        {"x": 22, "y": 20},
+
+        {"x": 19, "y": 21},
+        {"x": 20, "y": 21},
+        {"x": 21, "y": 21},
+        {"x": 22, "y": 21},
+
+        {"x": 19, "y": 23},
+        {"x": 20, "y": 23},
+        {"x": 21, "y": 23},
+        {"x": 22, "y": 23},
+
+        {"x": 19, "y": 25},
+        {"x": 20, "y": 25},
+        {"x": 21, "y": 25},
+        {"x": 22, "y": 25}
+      ],
+      "activate": true
+    },
     "requirement": {
       "type": "code_content",
       "content": "loop_or_grid_logic",
