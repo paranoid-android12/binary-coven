@@ -11,6 +11,8 @@ import { SpriteEnergyDisplay } from './SpriteEnergyDisplay';
 import ImageSpriteEnergyDisplay from './ImageSpriteEnergyDisplay';
 import { SpriteButton } from './SpriteButton';
 import { GlossaryModal } from './GlossaryModal';
+import { LessonModal } from './LessonModal';
+import { ErrorDisplay } from './ErrorDisplay';
 
 // Custom hook for draggable functionality
 const useDraggable = (initialPosition: { x: number; y: number }) => {
@@ -61,10 +63,11 @@ const useDraggable = (initialPosition: { x: number; y: number }) => {
 
 // Dialogue system types
 interface DialogueRequirement {
-  type: 'movement' | 'open_terminal' | 'code_content' | 'play_button' | 'movement_command';
+  type: 'movement' | 'open_terminal' | 'code_content' | 'play_button' | 'movement_command' | 'challenge_completion';
   directions?: string[]; // For movement requirement
   content?: string; // For code_content requirement
   commands?: string[]; // For movement_command requirement
+  challengePositions?: Array<{ x: number; y: number }>; // For challenge_completion requirement
   description: string;
 }
 
@@ -179,6 +182,11 @@ export const GameInterface: React.FC = () => {
     isOpen: false
   });
 
+  // Lesson modal state
+  const [lessonModalState, setLessonModalState] = useState({
+    isOpen: false
+  });
+
   // Drone state
   const [activeDroneId, setActiveDroneId] = useState<string | undefined>(undefined);
   const [droneExecutionStates, setDroneExecutionStates] = useState<Map<string, boolean>>(new Map());
@@ -237,6 +245,22 @@ export const GameInterface: React.FC = () => {
         }
         return tutorialState.movementCommandDetected;
 
+      case 'challenge_completion':
+        // Check if all Challenge Grid positions have fully-grown wheat
+        if (requirement.challengePositions) {
+          const store = useGameStore.getState();
+          return requirement.challengePositions.every(pos => {
+            const grid = store.getGridAt(pos);
+            if (!grid) return false;
+            // Check if it's farmland with fully grown wheat
+            return grid.type === 'farmland' && 
+                   grid.state?.status === 'ready' && 
+                   grid.state?.isGrown === true &&
+                   grid.state?.plantType === 'wheat';
+          });
+        }
+        return false;
+
       default:
         return true;
     }
@@ -289,7 +313,8 @@ export const GameInterface: React.FC = () => {
   const saveButtonPosition = { x: 30, y: 80 };
   const loadButtonPosition = { x: 80, y: 80 };
   const glossaryButtonPosition = { x: 220, y: 40 };
-  const quickProgramButtonPosition = { x: 270, y: 40 };
+  const lessonButtonPosition = { x: 270, y: 40 };
+  const quickProgramButtonPosition = { x: 320, y: 40 };
 
   // Modal management functions
   const openModal = useCallback((modalId: string) => {
@@ -1105,6 +1130,21 @@ export const GameInterface: React.FC = () => {
             }}
           />
 
+          {/* Lesson Button */}
+          <SpriteButton
+            position={lessonButtonPosition}
+            backgroundSprite="button.png"
+            upFrame={{ x: 336, y: 496, w: 16, h: 16 }}
+            downFrame={{ x: 336, y: 512, w: 16, h: 16 }}
+            scale={3}
+            onClick={() => {
+              if (!globalModalState.isAnyModalOpen) {
+                setLessonModalState({ isOpen: true });
+                openModal('lesson');
+              }
+            }}
+          />
+
           {/* Quick Programming Button */}
           <SpriteButton
             position={quickProgramButtonPosition}
@@ -1347,6 +1387,36 @@ export const GameInterface: React.FC = () => {
                       ))}
                     </div>
                   )}
+                  
+                  {/* Progress indicator for challenge completion */}
+                  {currentDialogue.requirement.type === 'challenge_completion' && currentDialogue.requirement.challengePositions && (() => {
+                    const store = useGameStore.getState();
+                    const total = currentDialogue.requirement.challengePositions.length;
+                    const completed = currentDialogue.requirement.challengePositions.filter(pos => {
+                      const grid = store.getGridAt(pos);
+                      return grid?.type === 'farmland' && 
+                             grid.state?.status === 'ready' && 
+                             grid.state?.isGrown === true &&
+                             grid.state?.plantType === 'wheat';
+                    }).length;
+                    
+                    return (
+                      <div style={{ 
+                        marginTop: '8px', 
+                        fontSize: '12px'
+                      }}>
+                        <div style={{
+                          padding: '4px 8px',
+                          backgroundColor: completed === total ? 'rgba(0, 200, 0, 0.3)' : 'rgba(100, 100, 100, 0.3)',
+                          border: `1px solid ${completed === total ? '#00CC00' : '#666666'}`,
+                          borderRadius: '4px',
+                          fontSize: '11px'
+                        }}>
+                          Progress: {completed} / {total} wheat plants grown {completed === total ? '✓' : ''}
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               );
             }
@@ -1513,16 +1583,44 @@ export const GameInterface: React.FC = () => {
                           fontSize: '16px',
                           fontFamily: 'BoldPixels',
                           display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px'
+                          flexDirection: 'column',
+                          gap: '6px'
                         }}>
-                          <span style={{ fontSize: '18px' }}>
-                            {isComplete ? '✓' : '⏳'}
-                          </span>
-                          <span>
-                            {currentDialogue.requirement.description}
-                            {!isComplete && ' (In Progress...)'}
-                          </span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ fontSize: '18px' }}>
+                              {isComplete ? '✓' : '⏳'}
+                            </span>
+                            <span>
+                              {currentDialogue.requirement.description}
+                              {!isComplete && ' (In Progress...)'}
+                            </span>
+                          </div>
+                          
+                          {/* Challenge completion progress */}
+                          {currentDialogue.requirement.type === 'challenge_completion' && 
+                           currentDialogue.requirement.challengePositions && (() => {
+                            const store = useGameStore.getState();
+                            const total = currentDialogue.requirement.challengePositions.length;
+                            const completed = currentDialogue.requirement.challengePositions.filter(pos => {
+                              const grid = store.getGridAt(pos);
+                              return grid?.type === 'farmland' && 
+                                     grid.state?.status === 'ready' && 
+                                     grid.state?.isGrown === true &&
+                                     grid.state?.plantType === 'wheat';
+                            }).length;
+                            
+                            return (
+                              <div style={{
+                                padding: '4px 8px',
+                                backgroundColor: completed === total ? 'rgba(0, 200, 0, 0.3)' : 'rgba(0, 0, 0, 0.2)',
+                                border: `1px solid ${completed === total ? '#00CC00' : '#666666'}`,
+                                borderRadius: '4px',
+                                fontSize: '13px'
+                              }}>
+                                🌾 Progress: {completed} / {total} wheat plants grown
+                              </div>
+                            );
+                          })()}
                         </div>
                       );
                     }
@@ -1870,6 +1968,20 @@ export const GameInterface: React.FC = () => {
           }}
         />
       )}
+
+      {/* Lesson Modal */}
+      {lessonModalState.isOpen && (
+        <LessonModal
+          isOpen={lessonModalState.isOpen}
+          onClose={() => {
+            setLessonModalState({ isOpen: false });
+            closeModal('lesson');
+          }}
+        />
+      )}
+
+      {/* Educational Error Display */}
+      <ErrorDisplay />
 
       {/* Loading indicator for dialogue */}
       {dialogueState.isLoading && (

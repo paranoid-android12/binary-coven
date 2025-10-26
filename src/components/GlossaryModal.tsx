@@ -41,6 +41,9 @@ export const GlossaryModal: React.FC<GlossaryModalProps> = ({ isOpen, onClose })
       case 'interaction': return '#f5a623';
       case 'system': return '#bd10e0';
       case 'utility': return '#50e3c2';
+      case 'arrays': return '#ff6b6b';
+      case 'objects': return '#4ecdc4';
+      case 'control_flow': return '#ffeaa7';
       default: return '#007acc';
     }
   };

@@ -85,14 +85,46 @@ Challenge Grids can be activated/deactivated through the dialogue system by addi
       {"x": 12, "y": 8}
     ],
     "activate": true
+  },
+  "requirement": {
+    "type": "challenge_completion",
+    "challengePositions": [
+      {"x": 10, "y": 8},
+      {"x": 11, "y": 8},
+      {"x": 12, "y": 8}
+    ],
+    "description": "Plant and grow wheat on all Challenge Grid tiles"
   }
 }
 ```
 
 ### Properties:
 
+**Challenge Grids:**
 - `challengeGrids.positions` - Array of grid positions to activate/deactivate
 - `challengeGrids.activate` - `true` to activate, `false` to deactivate
+
+**Challenge Completion Requirement:**
+- `requirement.type` - Set to `"challenge_completion"` for success condition tracking
+- `requirement.challengePositions` - Array of positions that must have fully-grown wheat
+- `requirement.description` - Description shown to player
+
+### Success Conditions:
+
+The `challenge_completion` requirement type checks if all specified positions have:
+1. A farmland grid tile
+2. Status set to `'ready'`
+3. `isGrown` flag is `true`
+4. `plantType` is `'wheat'`
+
+This ensures players must successfully plant, wait for growth, and have fully mature wheat crops on all tiles.
+
+### Progress Tracking:
+
+The system automatically displays:
+- Real-time progress counter in dialogue box: "🌾 Progress: X / Y wheat plants grown"
+- Progress indicator in task overlay when dialogue is hidden
+- Visual feedback when requirement is met (green checkmark)
 
 ### Automatic Cleanup:
 
@@ -116,16 +148,20 @@ The provided `challenge_field.json` demonstrates a complete quest using Challeng
 {
   "challengeGrids": {
     "positions": [
-      {"x": 10, "y": 8}, {"x": 11, "y": 8}, // Row 1
-      {"x": 10, "y": 9}, {"x": 11, "y": 9}, // Row 2
+      {"x": 19, "y": 19}, {"x": 20, "y": 19}, // Row 1
+      {"x": 19, "y": 20}, {"x": 20, "y": 20}, // Row 2
       // ... more positions
     ],
     "activate": true
   },
   "requirement": {
-    "type": "code_content",
-    "content": "loop_or_grid_logic",
-    "description": "Write code that plants across the whole field"
+    "type": "challenge_completion",
+    "challengePositions": [
+      {"x": 19, "y": 19}, {"x": 20, "y": 19},
+      {"x": 19, "y": 20}, {"x": 20, "y": 20}
+      // Same positions as challengeGrids
+    ],
+    "description": "Plant and grow wheat on all Challenge Grid tiles"
   }
 }
 ```
@@ -146,7 +182,19 @@ for (let y = 5; y <= 7; y++) {
 }
 ```
 
-### Step 2: Create Dialogue File
+### Step 2: Create Farmland Grids (Game Code)
+
+In `ProgrammingGame.ts`, ensure farmland grids exist at those positions:
+
+```typescript
+// Add in create() method where other farmland is created
+this.createFarmLand(5, 5, 1);
+this.createFarmLand(6, 5, 2);
+this.createFarmLand(7, 5, 3);
+// ... etc for all positions
+```
+
+### Step 3: Create Dialogue File
 
 Create a JSON file in `/public/` directory:
 
@@ -164,16 +212,32 @@ Create a JSON file in `/public/` directory:
     "challengeGrids": {
       "positions": [
         {"x": 5, "y": 5},
-        {"x": 6, "y": 5}
-        // ... more positions
+        {"x": 6, "y": 5},
+        {"x": 7, "y": 5}
+        // ... all 9 positions
       ],
       "activate": true
+    },
+    "requirement": {
+      "type": "challenge_completion",
+      "challengePositions": [
+        {"x": 5, "y": 5},
+        {"x": 6, "y": 5},
+        {"x": 7, "y": 5}
+        // Same positions as challengeGrids
+      ],
+      "description": "Plant and grow wheat on all Challenge Grid tiles"
     }
+  },
+  {
+    "name": "Quest Giver",
+    "content": "Well done! You've mastered code-based farming!",
+    "sprite": "npc-pleased.png"
   }
 ]
 ```
 
-### Step 3: Trigger Dialogue
+### Step 4: Trigger Dialogue
 
 From game code:
 
@@ -186,6 +250,16 @@ Or expose globally:
 ```typescript
 window.startDialogue('your_quest_file.json');
 ```
+
+### Step 5: Test the Challenge
+
+1. Start the dialogue
+2. Challenge Grids activate automatically
+3. Player cannot move manually on grids
+4. Player must write code to plant wheat
+5. Wait for wheat to grow (or speed up for testing)
+6. When all tiles have grown wheat, dialogue advances
+7. Challenge Grids deactivate automatically
 
 ## Event System
 

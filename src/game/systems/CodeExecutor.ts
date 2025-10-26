@@ -4,6 +4,153 @@ import GridSystem from './GridSystem';
 import { useGameStore } from '../../stores/gameStore';
 import { EventBus } from '../EventBus';
 
+// Enhanced error message system for better learning
+interface EducationalError {
+  originalMessage: string;
+  userFriendlyMessage: string;
+  suggestion: string;
+  concept: string;
+  severity: 'error' | 'warning' | 'info';
+}
+
+class EducationalErrorHandler {
+  private static errorPatterns: Array<{
+    pattern: RegExp;
+    educational: EducationalError;
+  }> = [
+    // Syntax errors
+    {
+      pattern: /Invalid function call syntax/i,
+      educational: {
+        originalMessage: 'Invalid function call syntax',
+        userFriendlyMessage: 'Oops! Your function call has a syntax error.',
+        suggestion: 'Remember: function_name(parameter1, parameter2). Check for missing parentheses, commas, or quotes.',
+        concept: 'function_calls',
+        severity: 'error'
+      }
+    },
+    {
+      pattern: /Invalid if statement syntax/i,
+      educational: {
+        originalMessage: 'Invalid if statement syntax',
+        userFriendlyMessage: 'Your if statement needs a colon (:) at the end.',
+        suggestion: 'Try: if condition: (not just "if condition")',
+        concept: 'conditionals',
+        severity: 'error'
+      }
+    },
+    {
+      pattern: /Invalid for loop syntax/i,
+      educational: {
+        originalMessage: 'Invalid for loop syntax',
+        userFriendlyMessage: 'Your for loop needs the correct format.',
+        suggestion: 'Try: for variable in range(5): or for item in list:',
+        concept: 'loops',
+        severity: 'error'
+      }
+    },
+    {
+      pattern: /Invalid while loop syntax/i,
+      educational: {
+        originalMessage: 'Invalid while loop syntax',
+        userFriendlyMessage: 'Your while loop needs a colon (:) at the end.',
+        suggestion: 'Try: while condition: (not just "while condition")',
+        concept: 'loops',
+        severity: 'error'
+      }
+    },
+    // Logic errors
+    {
+      pattern: /Cannot move.*out of bounds/i,
+      educational: {
+        originalMessage: 'Movement out of bounds',
+        userFriendlyMessage: 'You tried to move outside the game world!',
+        suggestion: 'Check your coordinates with get_position() or use smaller movement steps.',
+        concept: 'coordinates',
+        severity: 'warning'
+      }
+    },
+    {
+      pattern: /Not enough energy/i,
+      educational: {
+        originalMessage: 'Not enough energy',
+        userFriendlyMessage: 'You\'re out of energy! Time to rest.',
+        suggestion: 'Move to a food station and use eat() to restore energy, or use get_energy() to check your current level.',
+        concept: 'resource_management',
+        severity: 'warning'
+      }
+    },
+    {
+      pattern: /Cannot move.*blocked/i,
+      educational: {
+        originalMessage: 'Movement blocked',
+        userFriendlyMessage: 'Something is blocking your path!',
+        suggestion: 'Check what\'s around you with scanner(x, y) or look for walls, other characters, or busy grid tiles.',
+        concept: 'collision_detection',
+        severity: 'warning'
+      }
+    },
+    // Function errors
+    {
+      pattern: /function.*not found/i,
+      educational: {
+        originalMessage: 'Function not found',
+        userFriendlyMessage: 'That function doesn\'t exist.',
+        suggestion: 'Check the Function Glossary (📚 button) to see all available functions, or verify the spelling.',
+        concept: 'functions',
+        severity: 'error'
+      }
+    },
+    // Variable errors
+    {
+      pattern: /variable.*not defined|undefined variable/i,
+      educational: {
+        originalMessage: 'Variable not defined',
+        userFriendlyMessage: 'You\'re using a variable that hasn\'t been created yet.',
+        suggestion: 'Create variables like: my_variable = 5, or check if you spelled the variable name correctly.',
+        concept: 'variables',
+        severity: 'error'
+      }
+    }
+  ];
+
+  static enhanceError(message: string): EducationalError | null {
+    for (const pattern of this.errorPatterns) {
+      if (pattern.pattern.test(message)) {
+        return {
+          ...pattern.educational,
+          originalMessage: message
+        };
+      }
+    }
+
+    // Default educational error for unknown errors
+    return {
+      originalMessage: message,
+      userFriendlyMessage: 'Something went wrong with your code.',
+      suggestion: 'Check your syntax and try again. If you\'re stuck, look at the code examples or ask for help!',
+      concept: 'debugging',
+      severity: 'error'
+    };
+  }
+
+  static getConceptExplanation(concept: string): string {
+    const explanations: Record<string, string> = {
+      'function_calls': 'Functions are like mini-programs that do specific tasks. You call them by writing the function name followed by parentheses: function_name()',
+      'conditionals': 'If statements let your code make decisions. They check if something is true, then do different actions based on the result.',
+      'loops': 'Loops repeat the same code multiple times. For loops are great when you know exactly how many times to repeat.',
+      'coordinates': 'The game world uses a grid system. X increases as you move right, Y increases as you move down. Start at (0,0)!',
+      'resource_management': 'Energy is like fuel for your character. You spend it when moving and interacting. Restore it by eating at food stations.',
+      'collision_detection': 'The game world has obstacles and boundaries. Always check if you can move before trying to move.',
+      'functions': 'All available functions are listed in the Function Glossary. Each function has a specific purpose and parameters.',
+      'variables': 'Variables store information you can use later. Think of them as labeled boxes where you can put values.',
+      'debugging': 'Debugging means finding and fixing problems in your code. Start by checking for typos and syntax errors.'
+    };
+
+    return explanations[concept] || 'This concept helps you write better code. Check the lesson or examples for more details.';
+  }
+}
+
 interface CodeExecutionState {
   isRunning: boolean;
   currentLine: number;
@@ -86,9 +233,39 @@ export class CodeExecutor {
 
     try {
       console.log('[DEBUG] executeMain: About to call executeFunction("main", [])');
+      const startTime = Date.now();
       const result = await this.executeFunction('main', []);
+      const executionTime = Date.now() - startTime;
       console.log('[DEBUG] executeMain: executeFunction returned:', result);
       this.executionState.isRunning = false;
+
+      // Check for lesson challenge completion
+      if (result.success) {
+        const store = useGameStore.getState();
+        const activeLesson = store.activeLesson;
+
+        if (activeLesson) {
+          console.log(`[LESSON] Code execution successful in lesson: ${activeLesson.title}`);
+
+          // Check if this execution completes any lesson challenges
+          const lessonManager = (await import('./LessonManager')).default.getInstance();
+
+          // For now, we'll emit a challenge completion event for the first challenge
+          // In a more sophisticated system, we'd analyze the code to determine which challenge was completed
+          if (activeLesson.challenges.length > 0) {
+            const currentChallenge = activeLesson.challenges[0]; // Simplified - first challenge
+            const score = this.calculateCodeQuality(result);
+
+            EventBus.emit('lesson-challenge-completed', {
+              challengeId: currentChallenge.id,
+              score,
+              executionTime,
+              lessonId: activeLesson.id
+            });
+          }
+        }
+      }
+
       return result;
     } catch (error) {
       this.executionState.isRunning = false;
@@ -376,10 +553,17 @@ export class CodeExecutor {
     try {
       const match = line.match(/(\w+)\((.*)\)/);
       if (!match) {
-        return {
-          success: false,
-          message: 'Invalid function call syntax'
-        };
+      const educationalError = EducationalErrorHandler.enhanceError('Invalid function call syntax');
+      return {
+        success: false,
+        message: educationalError?.userFriendlyMessage || 'Invalid function call syntax',
+        data: educationalError ? {
+          suggestion: educationalError.suggestion,
+          concept: educationalError.concept,
+          severity: educationalError.severity,
+          explanation: EducationalErrorHandler.getConceptExplanation(educationalError.concept)
+        } : undefined
+      };
       }
 
       const [, functionName, argsString] = match;
@@ -796,10 +980,17 @@ export class CodeExecutor {
     // Parse the condition
     const match = content.match(/^if\s+(.+):\s*$/);
     if (!match) {
-      return {
-        success: false,
-        message: 'Invalid if statement syntax. Expected: if condition:'
-      };
+        const educationalError = EducationalErrorHandler.enhanceError('Invalid if statement syntax. Expected: if condition:');
+        return {
+          success: false,
+          message: educationalError?.userFriendlyMessage || 'Invalid if statement syntax. Expected: if condition:',
+          data: educationalError ? {
+            suggestion: educationalError.suggestion,
+            concept: educationalError.concept,
+            severity: educationalError.severity,
+            explanation: EducationalErrorHandler.getConceptExplanation(educationalError.concept)
+          } : undefined
+        };
     }
 
     const condition = match[1];
@@ -889,9 +1080,16 @@ export class CodeExecutor {
     // Parse the for loop
     const match = content.match(/^for\s+(\w+)\s+in\s+(.+):\s*$/);
     if (!match) {
+      const educationalError = EducationalErrorHandler.enhanceError('Invalid for loop syntax. Expected: for variable in iterable:');
       return {
         success: false,
-        message: 'Invalid for loop syntax. Expected: for variable in iterable:'
+        message: educationalError?.userFriendlyMessage || 'Invalid for loop syntax. Expected: for variable in iterable:',
+        data: educationalError ? {
+          suggestion: educationalError.suggestion,
+          concept: educationalError.concept,
+          severity: educationalError.severity,
+          explanation: EducationalErrorHandler.getConceptExplanation(educationalError.concept)
+        } : undefined
       };
     }
 
@@ -1025,6 +1223,39 @@ export class CodeExecutor {
   // Stop execution
   stop(): void {
     this.executionState.isRunning = false;
+  }
+
+  // Calculate code quality score (0-100) based on efficiency and best practices
+  private calculateCodeQuality(result: ExecutionResult): number {
+    let score = 100;
+
+    // Base score adjustments
+    if (result.energyCost && result.energyCost > 20) {
+      score -= 10; // High energy cost reduces score
+    }
+
+    if (result.duration && result.duration > 5000) {
+      score -= 10; // Long execution time reduces score
+    }
+
+    // Check for proper error handling
+    const userFunctions = this.userFunctions;
+    const hasErrorHandling = Array.from(userFunctions.values()).some(func =>
+      func.code.includes('try:') || func.code.includes('except')
+    );
+    if (!hasErrorHandling) {
+      score -= 5; // No error handling reduces score
+    }
+
+    // Check for comments
+    const hasComments = Array.from(userFunctions.values()).some(func =>
+      func.code.includes('#')
+    );
+    if (!hasComments) {
+      score -= 5; // No comments reduces score
+    }
+
+    return Math.max(0, Math.min(100, score));
   }
 
   // Get current execution state

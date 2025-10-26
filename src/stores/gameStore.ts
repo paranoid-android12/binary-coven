@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
-import { Entity, GridTile, CodeWindow, Position, ExecutionContext, TaskState, ProgressInfo, FarmlandState } from '../types/game';
+import { Entity, GridTile, CodeWindow, Position, ExecutionContext, TaskState, ProgressInfo, FarmlandState, Lesson, LessonProgress, LearningPath } from '../types/game';
 import { EventBus } from '../game/EventBus';
+import LessonManager from '../game/systems/LessonManager';
 
 // =====================================================================
 // CENTRALIZED STATE INTERFACES
@@ -24,15 +25,23 @@ export interface GameState {
   selectedCodeWindow?: string;
   isPaused: boolean;
   gameSpeed: number;
-  
+
   // Drone system
   activeDroneId?: string; // Currently selected drone for programming
   droneExecutors: Map<string, any>; // CodeExecutor instances for each drone
-  
+
   // Challenge Grid system
   challengeGridPositions: Set<string>; // Set of position strings "x,y" for challenge grids
   isChallengeMode: boolean; // Whether challenge mode is currently active
-  
+
+  // =====================================================================
+  // LESSON SYSTEM
+  // =====================================================================
+  activeLesson: Lesson | null; // Currently active lesson
+  lessonProgress: Map<string, LessonProgress>; // Progress for all lessons
+  availableLessons: Lesson[]; // Lessons available to start
+  completedLessons: Set<string>; // Set of completed lesson IDs
+
   // =====================================================================
   // CENTRALIZED TASK SYSTEM
   // =====================================================================
@@ -47,7 +56,7 @@ export interface GameState {
     onComplete?: () => void;
     entityId?: string;
   }>;
-  
+
   // Global timer for task management
   taskTimer?: NodeJS.Timeout;
 }
@@ -130,6 +139,17 @@ export interface GameStore extends GameState {
   updateResources: (resources: Partial<GameState['globalResources']>) => void;
   
   // =====================================================================
+  // LESSON MANAGEMENT
+  // =====================================================================
+  startLesson: (lessonId: string) => boolean;
+  endLesson: () => void;
+  completeChallenge: (challengeId: string, score: number, executionTime: number) => void;
+  getLessonProgress: (lessonId: string) => LessonProgress | undefined;
+  getAvailableLessons: () => Lesson[];
+  getNextLesson: () => Lesson | null;
+  resetLessonProgress: (lessonId?: string) => void;
+
+  // =====================================================================
   // UTILITY METHODS
   // =====================================================================
   reset: () => void;
@@ -161,7 +181,13 @@ const createInitialState = (): GameState => ({
   activeDroneId: undefined,
   droneExecutors: new Map(),
   challengeGridPositions: new Set(),
-  isChallengeMode: false
+  isChallengeMode: false,
+
+  // Lesson system
+  activeLesson: null,
+  lessonProgress: new Map(),
+  availableLessons: [],
+  completedLessons: new Set()
 });
 
 // =====================================================================
@@ -892,6 +918,96 @@ export const useGameStore = create<GameStore>()(
     },
 
     // =====================================================================
+    // LESSON MANAGEMENT
+    // =====================================================================
+    startLesson: (lessonId: string) => {
+      const lessonManager = LessonManager.getInstance();
+      const success = lessonManager.startLesson(lessonId);
+
+      if (success) {
+        const lesson = lessonManager.getLesson(lessonId);
+        const progress = lessonManager.getLessonProgress(lessonId);
+
+        set({
+          activeLesson: lesson,
+          lessonProgress: new Map([...get().lessonProgress, [lessonId, progress!]])
+        });
+
+        // Setup challenge grids if lesson has them
+        if (lesson?.challenges.length > 0) {
+          const firstChallenge = lesson.challenges[0];
+          if (firstChallenge.challengeGridPositions) {
+            get().activateChallengeGrids(firstChallenge.challengeGridPositions);
+          }
+        }
+
+        // Load starting code if provided
+        if (lesson?.challenges.length > 0 && lesson.challenges[0].startingCode) {
+          const mainWindow = Array.from(get().codeWindows.values()).find(w => w.isMain);
+          if (mainWindow) {
+            get().updateCodeWindow(mainWindow.id, {
+              code: lesson.challenges[0].startingCode
+            });
+          }
+        }
+      }
+
+      return success;
+    },
+
+    endLesson: () => {
+      const lessonManager = LessonManager.getInstance();
+      lessonManager.endLesson();
+
+      set({
+        activeLesson: null
+      });
+
+      // Clear challenge grids
+      get().deactivateAllChallengeGrids();
+    },
+
+    completeChallenge: (challengeId: string, score: number, executionTime: number) => {
+      const lessonManager = LessonManager.getInstance();
+      lessonManager.completeChallenge(challengeId, score, executionTime);
+
+      // Update local state
+      const state = get();
+      const progress = lessonManager.getLessonProgress(state.activeLesson?.id || '');
+
+      if (progress) {
+        set({
+          lessonProgress: new Map([...state.lessonProgress, [state.activeLesson?.id || '', progress]])
+        });
+      }
+    },
+
+    getLessonProgress: (lessonId: string) => {
+      const lessonManager = LessonManager.getInstance();
+      return lessonManager.getLessonProgress(lessonId);
+    },
+
+    getAvailableLessons: () => {
+      const lessonManager = LessonManager.getInstance();
+      return lessonManager.getAvailableLessons();
+    },
+
+    getNextLesson: () => {
+      const lessonManager = LessonManager.getInstance();
+      return lessonManager.getNextLesson();
+    },
+
+    resetLessonProgress: (lessonId?: string) => {
+      const lessonManager = LessonManager.getInstance();
+      lessonManager.resetProgress(lessonId);
+      set({
+        lessonProgress: lessonId ?
+          new Map([...get().lessonProgress].filter(([id]) => id !== lessonId)) :
+          new Map()
+      });
+    },
+
+    // =====================================================================
     // UTILITY METHODS
     // =====================================================================
     reset: () => {
@@ -911,6 +1027,13 @@ export const useGameStore = create<GameStore>()(
 // Initialize the task system when the store is created
 const store = useGameStore.getState();
 store.initializeTaskSystem();
+
+// Initialize lesson system
+setTimeout(() => {
+  const lessonManager = LessonManager.getInstance();
+  const availableLessons = lessonManager.getAvailableLessons();
+  useGameStore.setState({ availableLessons });
+}, 1000); // Delay to ensure all systems are loaded
 
 // Cleanup on page unload
 if (typeof window !== 'undefined') {

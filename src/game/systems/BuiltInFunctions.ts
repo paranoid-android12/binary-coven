@@ -46,9 +46,17 @@ export const movementFunctions: BuiltInFunction[] = [
       const { width, height } = store.gridSize;
       if (newPosition.x < 0 || newPosition.x >= width || 
           newPosition.y < 0 || newPosition.y >= height) {
+        const educationalError = {
+          userFriendlyMessage: 'You tried to move outside the game world!',
+          suggestion: 'Check your coordinates with get_position() or use smaller movement steps.',
+          concept: 'coordinates',
+          severity: 'warning' as const,
+          explanation: 'The game world uses a grid system. X increases as you move right, Y increases as you move down. Start at (0,0)!'
+        };
         return {
           success: false,
-          message: 'Cannot move up - out of bounds'
+          message: educationalError.userFriendlyMessage,
+          data: educationalError
         };
       }
 
@@ -800,6 +808,363 @@ export const systemFunctions: BuiltInFunction[] = [
   }
 ];
 
+// Array Functions
+export const arrayFunctions: BuiltInFunction[] = [
+  {
+    name: 'append',
+    description: 'Add an item to the end of a list',
+    category: 'utility',
+    parameters: [
+      { name: 'list', type: 'any[]', required: true, description: 'The list to append to' },
+      { name: 'item', type: 'any', required: true, description: 'The item to add' }
+    ],
+    execute: async (context: ExecutionContext, list: any[], item: any): Promise<ExecutionResult> => {
+      if (!Array.isArray(list)) {
+        return {
+          success: false,
+          message: 'append() requires a list as the first argument',
+          data: {
+            userFriendlyMessage: 'You need to pass a list to append()!',
+            suggestion: 'Create a list like: my_list = [1, 2, 3], then append to it.',
+            concept: 'arrays',
+            severity: 'error' as const,
+            explanation: 'Lists (arrays) store multiple values. You can add items with append() or access them by index.'
+          }
+        };
+      }
+
+      list.push(item);
+      return {
+        success: true,
+        message: `Added ${item} to the list. List now has ${list.length} items.`,
+        data: list
+      };
+    }
+  },
+  {
+    name: 'pop',
+    description: 'Remove and return the last item from a list',
+    category: 'utility',
+    parameters: [
+      { name: 'list', type: 'any[]', required: true, description: 'The list to pop from' }
+    ],
+    execute: async (context: ExecutionContext, list: any[]): Promise<ExecutionResult> => {
+      if (!Array.isArray(list)) {
+        return {
+          success: false,
+          message: 'pop() requires a list as the argument',
+          data: {
+            userFriendlyMessage: 'pop() only works with lists!',
+            suggestion: 'Make sure you\'re calling pop() on a list variable.',
+            concept: 'arrays',
+            severity: 'error' as const,
+            explanation: 'pop() removes the last item from a list and returns it. The list becomes shorter!'
+          }
+        };
+      }
+
+      if (list.length === 0) {
+        return {
+          success: false,
+          message: 'Cannot pop from an empty list',
+          data: {
+            userFriendlyMessage: 'The list is empty!',
+            suggestion: 'Add some items to the list before trying to pop them.',
+            concept: 'arrays',
+            severity: 'warning' as const,
+            explanation: 'You can\'t remove items from an empty list. Check the list length first!'
+          }
+        };
+      }
+
+      const item = list.pop();
+      return {
+        success: true,
+        message: `Removed ${item} from the list. List now has ${list.length} items.`,
+        data: item
+      };
+    }
+  },
+  {
+    name: 'get',
+    description: 'Get an item from a list by index (safe access)',
+    category: 'utility',
+    parameters: [
+      { name: 'list', type: 'any[]', required: true, description: 'The list to get from' },
+      { name: 'index', type: 'number', required: true, description: 'The index to get (0-based)' }
+    ],
+    execute: async (context: ExecutionContext, list: any[], index: number): Promise<ExecutionResult> => {
+      if (!Array.isArray(list)) {
+        return {
+          success: false,
+          message: 'get() requires a list as the first argument',
+          data: {
+            userFriendlyMessage: 'get() only works with lists!',
+            suggestion: 'Make sure your first argument is a list variable.',
+            concept: 'arrays',
+            severity: 'error' as const,
+            explanation: 'Lists store items at numbered positions (indices). Index 0 is the first item!'
+          }
+        };
+      }
+
+      if (typeof index !== 'number' || !Number.isInteger(index)) {
+        return {
+          success: false,
+          message: 'get() requires an integer index',
+          data: {
+            userFriendlyMessage: 'Index must be a whole number!',
+            suggestion: 'Use numbers like 0, 1, 2... for list indices.',
+            concept: 'arrays',
+            severity: 'error' as const,
+            explanation: 'List indices are whole numbers starting from 0. Index 0 = first item, index 1 = second item.'
+          }
+        };
+      }
+
+      if (index < 0 || index >= list.length) {
+        return {
+          success: false,
+          message: `Index ${index} is out of range (list has ${list.length} items)`,
+          data: {
+            userFriendlyMessage: 'That index doesn\'t exist in the list!',
+            suggestion: `Use indices from 0 to ${list.length - 1}. Check list length with len().`,
+            concept: 'arrays',
+            severity: 'warning' as const,
+            explanation: 'Lists have a specific number of items. You can only access valid indices!'
+          }
+        };
+      }
+
+      return {
+        success: true,
+        message: `Got ${list[index]} from index ${index}`,
+        data: list[index]
+      };
+    }
+  },
+  {
+    name: 'find',
+    description: 'Find the index of an item in a list, or -1 if not found',
+    category: 'utility',
+    parameters: [
+      { name: 'list', type: 'any[]', required: true, description: 'The list to search in' },
+      { name: 'item', type: 'any', required: true, description: 'The item to find' }
+    ],
+    execute: async (context: ExecutionContext, list: any[], item: any): Promise<ExecutionResult> => {
+      if (!Array.isArray(list)) {
+        return {
+          success: false,
+          message: 'find() requires a list as the first argument',
+          data: {
+            userFriendlyMessage: 'find() only works with lists!',
+            suggestion: 'Make sure your first argument is a list variable.',
+            concept: 'arrays',
+            severity: 'error' as const,
+            explanation: 'find() searches through a list to locate a specific item and returns its position.'
+          }
+        };
+      }
+
+      const index = list.indexOf(item);
+      return {
+        success: true,
+        message: index !== -1 ? `Found ${item} at index ${index}` : `${item} not found in list`,
+        data: index
+      };
+    }
+  },
+  {
+    name: 'slice',
+    description: 'Get a portion of a list (start to end, not including end)',
+    category: 'utility',
+    parameters: [
+      { name: 'list', type: 'any[]', required: true, description: 'The list to slice' },
+      { name: 'start', type: 'number', required: false, description: 'Start index (default: 0)' },
+      { name: 'end', type: 'number', required: false, description: 'End index (default: list length)' }
+    ],
+    execute: async (context: ExecutionContext, list: any[], start: number = 0, end?: number): Promise<ExecutionResult> => {
+      if (!Array.isArray(list)) {
+        return {
+          success: false,
+          message: 'slice() requires a list as the first argument',
+          data: {
+            userFriendlyMessage: 'slice() only works with lists!',
+            suggestion: 'Make sure your first argument is a list variable.',
+            concept: 'arrays',
+            severity: 'error' as const,
+            explanation: 'slice() creates a new list with a portion of the original. It doesn\'t modify the original list.'
+          }
+        };
+      }
+
+      const startIndex = start || 0;
+      const endIndex = end !== undefined ? end : list.length;
+
+      if (startIndex < 0 || startIndex > list.length || endIndex < startIndex || endIndex > list.length) {
+        return {
+          success: false,
+          message: 'Invalid slice indices',
+          data: {
+            userFriendlyMessage: 'Those slice indices don\'t work!',
+            suggestion: `Valid indices are 0 to ${list.length}. Start must be less than or equal to end.`,
+            concept: 'arrays',
+            severity: 'error' as const,
+            explanation: 'Slice indices must be valid positions in the list. Start comes before end!'
+          }
+        };
+      }
+
+      const sliced = list.slice(startIndex, endIndex);
+      return {
+        success: true,
+        message: `Sliced list from index ${startIndex} to ${endIndex - 1} (${sliced.length} items)`,
+        data: sliced
+      };
+    }
+  }
+];
+
+// Object/Dictionary Functions
+export const objectFunctions: BuiltInFunction[] = [
+  {
+    name: 'get_property',
+    description: 'Get a property from an object',
+    category: 'utility',
+    parameters: [
+      { name: 'obj', type: 'object', required: true, description: 'The object to get from' },
+      { name: 'property', type: 'string', required: true, description: 'The property name' }
+    ],
+    execute: async (context: ExecutionContext, obj: any, property: string): Promise<ExecutionResult> => {
+      if (typeof obj !== 'object' || obj === null) {
+        return {
+          success: false,
+          message: 'get_property() requires an object as the first argument',
+          data: {
+            userFriendlyMessage: 'get_property() only works with objects!',
+            suggestion: 'Pass an object like: {"name": "Bob", "age": 25}',
+            concept: 'objects',
+            severity: 'error' as const,
+            explanation: 'Objects store data in key-value pairs. You access values using their keys.'
+          }
+        };
+      }
+
+      if (!(property in obj)) {
+        return {
+          success: false,
+          message: `Property '${property}' not found in object`,
+          data: {
+            userFriendlyMessage: 'That property doesn\'t exist!',
+            suggestion: 'Check the object\'s properties with print() or use valid property names.',
+            concept: 'objects',
+            severity: 'warning' as const,
+            explanation: 'Objects only have the properties you define. Make sure you spelled the property name correctly!'
+          }
+        };
+      }
+
+      return {
+        success: true,
+        message: `Got ${obj[property]} from property '${property}'`,
+        data: obj[property]
+      };
+    }
+  },
+  {
+    name: 'set_property',
+    description: 'Set a property on an object',
+    category: 'utility',
+    parameters: [
+      { name: 'obj', type: 'object', required: true, description: 'The object to modify' },
+      { name: 'property', type: 'string', required: true, description: 'The property name' },
+      { name: 'value', type: 'any', required: true, description: 'The value to set' }
+    ],
+    execute: async (context: ExecutionContext, obj: any, property: string, value: any): Promise<ExecutionResult> => {
+      if (typeof obj !== 'object' || obj === null) {
+        return {
+          success: false,
+          message: 'set_property() requires an object as the first argument',
+          data: {
+            userFriendlyMessage: 'set_property() only works with objects!',
+            suggestion: 'Pass an object like: {"name": "Bob", "age": 25}',
+            concept: 'objects',
+            severity: 'error' as const,
+            explanation: 'Objects store data that you can read and modify. You can add new properties or change existing ones.'
+          }
+        };
+      }
+
+      obj[property] = value;
+      return {
+        success: true,
+        message: `Set property '${property}' to ${value}`,
+        data: obj
+      };
+    }
+  },
+  {
+    name: 'get_keys',
+    description: 'Get all property names (keys) from an object',
+    category: 'utility',
+    parameters: [
+      { name: 'obj', type: 'object', required: true, description: 'The object to get keys from' }
+    ],
+    execute: async (context: ExecutionContext, obj: any): Promise<ExecutionResult> => {
+      if (typeof obj !== 'object' || obj === null) {
+        return {
+          success: false,
+          message: 'get_keys() requires an object as the argument',
+          data: {
+            userFriendlyMessage: 'get_keys() only works with objects!',
+            suggestion: 'Pass an object like: {"name": "Bob", "age": 25}',
+            concept: 'objects',
+            severity: 'error' as const,
+            explanation: 'Objects have keys (property names) and values. Keys are like labels for the data stored in objects.'
+          }
+        };
+      }
+
+      const keys = Object.keys(obj);
+      return {
+        success: true,
+        message: `Found ${keys.length} properties: ${keys.join(', ')}`,
+        data: keys
+      };
+    }
+  }
+];
+
+// Advanced Control Flow Functions
+export const controlFlowFunctions: BuiltInFunction[] = [
+  {
+    name: 'break',
+    description: 'Exit from the current loop immediately',
+    category: 'system',
+    parameters: [],
+    execute: async (context: ExecutionContext): Promise<ExecutionResult> => {
+      return {
+        success: true,
+        message: 'Breaking out of loop',
+        data: { controlFlow: 'break' }
+      };
+    }
+  },
+  {
+    name: 'continue',
+    description: 'Skip to the next iteration of the current loop',
+    category: 'system',
+    parameters: [],
+    execute: async (context: ExecutionContext): Promise<ExecutionResult> => {
+      return {
+        success: true,
+        message: 'Continuing to next loop iteration',
+        data: { controlFlow: 'continue' }
+      };
+    }
+  }
+];
+
 // Utility Functions
 export const utilityFunctions: BuiltInFunction[] = [
   {
@@ -1075,7 +1440,10 @@ export class BuiltInFunctionRegistry {
       ...movementFunctions,
       ...interactionFunctions,
       ...systemFunctions,
-      ...utilityFunctions
+      ...utilityFunctions,
+      ...arrayFunctions,
+      ...objectFunctions,
+      ...controlFlowFunctions
     ]);
     console.log(`Registered ${this.functions.size} built-in functions:`, Array.from(this.functions.keys()));
   }

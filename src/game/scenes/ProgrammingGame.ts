@@ -521,7 +521,30 @@ export class ProgrammingGame extends Scene {
     this.createFarmLand(22, 14, 27);
     this.createFarmLand(23, 14, 28);
     this.createFarmLand(24, 14, 29);
+
+
+    //Challenge grid farms
+
+    this.createFarmLand(19, 19, 30);
+    this.createFarmLand(20, 19, 31);
+    this.createFarmLand(21, 19, 32);
+    this.createFarmLand(22, 19, 33);
+
+    this.createFarmLand(19, 20, 34);
+    this.createFarmLand(20, 20, 35);
+    this.createFarmLand(21, 20, 36);
+    this.createFarmLand(22, 20, 37);
     
+    this.createFarmLand(19, 21, 38);
+    this.createFarmLand(20, 21, 39);
+    this.createFarmLand(21, 21, 40);
+    this.createFarmLand(22, 21, 41);
+
+    this.createFarmLand(19, 22, 42);
+    this.createFarmLand(20, 22, 43);
+    this.createFarmLand(21, 22, 44);
+    this.createFarmLand(22, 22, 45);
+
     const foodData = this.gridSystem.initializeGrid('food', '');
 
     this.createFoodStation(10, 7);
@@ -542,9 +565,9 @@ export class ProgrammingGame extends Scene {
     this.createDrone({
       id: 'drone_alpha',
       name: 'Alpha Drone',
-      position: { x: 15, y: 12 },
+      position: { x: 15, y: 20 },
       spriteKey: 'drone_idle',
-      scale: 1,
+      scale: 2,
       showHoverAnimation: true,
       stats: {
         walkingSpeed: 3.0,
@@ -1797,6 +1820,18 @@ export class ProgrammingGame extends Scene {
     EventBus.on('code-execution-failed', () => {
       this.clearExecutionTexts();
     });
+
+    // Listen for lesson challenge completion
+    EventBus.on('lesson-challenge-completed', (data: {
+      challengeId: string;
+      score: number;
+      executionTime: number;
+      lessonId: string;
+    }) => {
+      console.log('[LESSON] Challenge completed:', data);
+      const store = useGameStore.getState();
+      store.completeChallenge(data.challengeId, data.score, data.executionTime);
+    });
   }
 
   private showExecutionLine(line: string, context: string) {
@@ -2410,7 +2445,8 @@ export class ProgrammingGame extends Scene {
     EventBus.removeAllListeners('farmland-grid-added');
     EventBus.removeAllListeners('farmland-grid-removed');
     EventBus.removeAllListeners('map-editor-loaded');
-    
+    EventBus.removeAllListeners('lesson-challenge-completed');
+
     console.log('[SCENE] ProgrammingGame shutdown complete');
   }
 } 
