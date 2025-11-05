@@ -171,3 +171,4 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ position = { x: 50, 
 };
 
 export default ErrorDisplay;
+
