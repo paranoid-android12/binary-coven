@@ -11,8 +11,9 @@ import { SpriteEnergyDisplay } from './SpriteEnergyDisplay';
 import ImageSpriteEnergyDisplay from './ImageSpriteEnergyDisplay';
 import { SpriteButton } from './SpriteButton';
 import { GlossaryModal } from './GlossaryModal';
-import { LessonModal } from './LessonModal';
+import { QuestModal } from './QuestModal';
 import { ErrorDisplay } from './ErrorDisplay';
+import DialogueManager from '../game/systems/DialogueManager';
 
 // Custom hook for draggable functionality
 const useDraggable = (initialPosition: { x: number; y: number }) => {
@@ -61,48 +62,6 @@ const useDraggable = (initialPosition: { x: number; y: number }) => {
   return { position, elementRef, handleMouseDown };
 };
 
-// Dialogue system types
-interface DialogueRequirement {
-  type: 'movement' | 'open_terminal' | 'code_content' | 'play_button' | 'movement_command' | 'challenge_completion';
-  directions?: string[]; // For movement requirement
-  content?: string; // For code_content requirement
-  commands?: string[]; // For movement_command requirement
-  challengePositions?: Array<{ x: number; y: number }>; // For challenge_completion requirement
-  description: string;
-}
-
-interface DialogueEntry {
-  name: string;
-  content: string;
-  sprite: string;
-  camera?: {
-    x: number;
-    y: number;
-  };
-  mainImage?: string;
-  requirement?: DialogueRequirement;
-  challengeGrids?: {
-    positions: Array<{ x: number; y: number }>;
-    activate: boolean; // true to activate, false to deactivate
-  };
-}
-
-interface DialogueState {
-  isActive: boolean;
-  dialogues: DialogueEntry[];
-  currentIndex: number;
-  isLoading: boolean;
-}
-
-interface TutorialState {
-  movementDirections: Set<string>; // Tracks which directions have been moved
-  terminalOpened: boolean;
-  codeContent: string;
-  playButtonClicked: boolean;
-  movementCommandDetected: boolean;
-  hasAcknowledgedCurrentRequirement: boolean; // Tracks if user has seen and acknowledged the current tutorial step
-}
-
 export const GameInterface: React.FC = () => {
   const phaserRef = useRef<IRefPhaserGame | null>(null);
   const lastRunCodeCall = useRef<number>(0);
@@ -123,25 +82,11 @@ export const GameInterface: React.FC = () => {
   
   // Current scene state
   const [currentScene, setCurrentScene] = useState<string | null>(null);
-  
-  // Dialogue system state
-  const [dialogueState, setDialogueState] = useState<DialogueState>({
-    isActive: false,
-    dialogues: [],
-    currentIndex: 0,
-    isLoading: false
-  });
 
-  // Tutorial state tracking
-  const [tutorialState, setTutorialState] = useState<TutorialState>({
-    movementDirections: new Set<string>(),
-    terminalOpened: false,
-    codeContent: '',
-    playButtonClicked: false,
-    movementCommandDetected: false,
-    hasAcknowledgedCurrentRequirement: false
-  });
-  
+  // Dialogue system state (managed by DialogueManager)
+  const [dialogueState, setDialogueState] = useState(DialogueManager.getState().dialogue);
+  const [tutorialState, setTutorialState] = useState(DialogueManager.getState().tutorial);
+
   // Map editor state
   const [mapEditorState, setMapEditorState] = useState({
     isActive: false,
@@ -182,8 +127,8 @@ export const GameInterface: React.FC = () => {
     isOpen: false
   });
 
-  // Lesson modal state
-  const [lessonModalState, setLessonModalState] = useState({
+  // Quest modal state
+  const [questModalState, setQuestModalState] = useState({
     isOpen: false
   });
 
@@ -211,90 +156,29 @@ export const GameInterface: React.FC = () => {
 
   const [isCodeRunning, setIsCodeRunning] = useState(false);
 
-  // Check if current dialogue requirement is met
-  const isRequirementMet = useCallback((requirement?: DialogueRequirement): boolean => {
-    if (!requirement) return true;
-
-    switch (requirement.type) {
-      case 'movement':
-        // Check if all required directions have been moved
-        if (requirement.directions) {
-          return requirement.directions.every(dir => tutorialState.movementDirections.has(dir));
-        }
-        return false;
-
-      case 'open_terminal':
-        return tutorialState.terminalOpened;
-
-      case 'code_content':
-        // Check if the exact code content is present
-        if (requirement.content) {
-          return tutorialState.codeContent.trim().includes(requirement.content.trim());
-        }
-        return false;
-
-      case 'play_button':
-        return tutorialState.playButtonClicked;
-
-      case 'movement_command':
-        // Check if any of the movement commands are detected
-        if (requirement.commands) {
-          return requirement.commands.some(cmd => 
-            tutorialState.codeContent.includes(cmd)
-          );
-        }
-        return tutorialState.movementCommandDetected;
-
-      case 'challenge_completion':
-        // Check if all Challenge Grid positions have fully-grown wheat
-        if (requirement.challengePositions) {
-          const store = useGameStore.getState();
-          return requirement.challengePositions.every(pos => {
-            const grid = store.getGridAt(pos);
-            if (!grid) return false;
-            // Check if it's farmland with fully grown wheat
-            return grid.type === 'farmland' && 
-                   grid.state?.status === 'ready' && 
-                   grid.state?.isGrown === true &&
-                   grid.state?.plantType === 'wheat';
-          });
-        }
-        return false;
-
-      default:
-        return true;
-    }
-  }, [tutorialState]);
-
-  // Check if we should hide dialogue overlay (during tutorial requirements)
-  const shouldHideDialogue = useCallback(() => {
-    if (!dialogueState.isActive) return false;
-    const currentDialogue = dialogueState.dialogues[dialogueState.currentIndex];
-    // Only hide if there's a requirement, it's not met, AND user has acknowledged the instruction
-    return currentDialogue?.requirement && !isRequirementMet(currentDialogue.requirement) && tutorialState.hasAcknowledgedCurrentRequirement;
-  }, [dialogueState, isRequirementMet, tutorialState.hasAcknowledgedCurrentRequirement]);
-
   // Override modal state when dialogue is hidden for tutorial
   const shouldBlockModalInteractions = useCallback(() => {
+    const shouldHide = DialogueManager.shouldHideDialogue();
+
     // If dialogue is active but hidden for tutorial requirements, don't block anything
-    if (dialogueState.isActive && shouldHideDialogue()) {
+    if (dialogueState.isActive && shouldHide) {
       console.log('[TUTORIAL] Dialogue hidden - allowing all interactions');
       return false; // Allow all interactions during tutorial requirements
     }
-    
+
     // If dialogue is visible and active, block interactions
-    if (dialogueState.isActive && !shouldHideDialogue()) {
+    if (dialogueState.isActive && !shouldHide) {
       console.log('[TUTORIAL] Dialogue visible - blocking interactions');
       return true; // Block interactions during visible dialogue
     }
-    
+
     // For non-dialogue modals, check if any are open
     const nonDialogueModalsOpen = Array.from(globalModalState.openModals).some(modal => modal !== 'dialogue');
     if (nonDialogueModalsOpen) {
       console.log('[TUTORIAL] Non-dialogue modal open - blocking interactions');
     }
     return nonDialogueModalsOpen;
-  }, [dialogueState, shouldHideDialogue, globalModalState.openModals]);
+  }, [dialogueState, globalModalState.openModals]);
   
   // Draggable UI elements  
   const resourcesPanel = useDraggable({ x: window.innerWidth - 220, y: 20 });
@@ -313,8 +197,8 @@ export const GameInterface: React.FC = () => {
   const saveButtonPosition = { x: 30, y: 80 };
   const loadButtonPosition = { x: 80, y: 80 };
   const glossaryButtonPosition = { x: 220, y: 40 };
-  const lessonButtonPosition = { x: 270, y: 40 };
   const quickProgramButtonPosition = { x: 320, y: 40 };
+  const questButtonPosition = { x: 30, y: 120 };
 
   // Modal management functions
   const openModal = useCallback((modalId: string) => {
@@ -428,44 +312,6 @@ export const GameInterface: React.FC = () => {
       }));
     };
 
-      // Handle dialogue requests from EventBus
-      const handleStartDialogue = (dialogueFile: string) => {
-        startDialogue(dialogueFile);
-      };
-
-    // Tutorial tracking event handlers
-    const handleMovementTracking = (data: { direction: string }) => {
-      if (dialogueState.isActive) {
-        setTutorialState(prev => ({
-          ...prev,
-          movementDirections: new Set([...prev.movementDirections, data.direction])
-        }));
-        console.log('[TUTORIAL] Movement tracked:', data.direction);
-      }
-    };
-
-    const handleTerminalOpened = () => {
-      if (dialogueState.isActive) {
-        setTutorialState(prev => ({ ...prev, terminalOpened: true }));
-        console.log('[TUTORIAL] Terminal opened');
-      }
-    };
-
-    const handleCodeContentChanged = (data: { content: string }) => {
-      if (dialogueState.isActive) {
-        setTutorialState(prev => ({ ...prev, codeContent: data.content }));
-        console.log('[TUTORIAL] Code content updated');
-      }
-    };
-
-    const handlePlayButtonClicked = () => {
-      if (dialogueState.isActive) {
-        setTutorialState(prev => ({ ...prev, playButtonClicked: true }));
-        console.log('[TUTORIAL] Play button clicked');
-        // Don't reset immediately - let the dialogue advancement handle it
-      }
-    };
-
     // Handle drone click events
     const handleDroneClick = (drone: Entity) => {
       // Block if any modal is currently open
@@ -547,14 +393,7 @@ export const GameInterface: React.FC = () => {
     EventBus.on('camera-locked-to-qubit', handleCameraLockChanged);
     EventBus.on('current-scene-ready', handleSceneReady);
     EventBus.on('map-editor-tileset-updated', handleTilesetUpdated);
-    EventBus.on('start-dialogue', handleStartDialogue);
     EventBus.on('request-upgrade-modal', handleUpgradeModalRequest);
-    
-    // Tutorial tracking events
-    EventBus.on('tutorial-movement', handleMovementTracking);
-    EventBus.on('tutorial-terminal-opened', handleTerminalOpened);
-    EventBus.on('tutorial-code-changed', handleCodeContentChanged);
-    EventBus.on('tutorial-play-clicked', handlePlayButtonClicked);
     EventBus.on('challenge-movement-blocked', handleChallengeMovementBlocked);
 
     return () => {
@@ -567,33 +406,53 @@ export const GameInterface: React.FC = () => {
       EventBus.removeListener('camera-locked-to-qubit');
       EventBus.removeListener('current-scene-ready');
       EventBus.removeListener('map-editor-tileset-updated');
-      EventBus.removeListener('start-dialogue');
       EventBus.removeListener('request-upgrade-modal');
-      
+
       // Drone event cleanup
       EventBus.removeListener('drone-clicked');
       EventBus.removeListener('drone-execution-started');
       EventBus.removeListener('drone-execution-completed');
       EventBus.removeListener('drone-execution-failed');
       EventBus.removeListener('drone-execution-stopped');
-      
-      // Tutorial tracking events cleanup
-      EventBus.removeListener('tutorial-movement');
-      EventBus.removeListener('tutorial-terminal-opened');
-      EventBus.removeListener('tutorial-code-changed');
-      EventBus.removeListener('tutorial-play-clicked');
       EventBus.removeListener('challenge-movement-blocked');
     };
   }, [globalModalState.isAnyModalOpen, openModal, dialogueState, shouldBlockModalInteractions]);
 
+  // Initialize DialogueManager
+  useEffect(() => {
+    // Register state change callback
+    DialogueManager.onStateChange((dialogueState, tutorialState) => {
+      setDialogueState(dialogueState);
+      setTutorialState(tutorialState);
+
+      // Update modal state when dialogue opens/closes
+      if (dialogueState.isActive && !globalModalState.openModals.has('dialogue')) {
+        openModal('dialogue');
+      } else if (!dialogueState.isActive && globalModalState.openModals.has('dialogue')) {
+        closeModal('dialogue');
+      }
+    });
+
+    // Set Phaser scene reference when scene is ready
+    const handleSceneReady = (scene: ProgrammingGame) => {
+      DialogueManager.setPhaserScene(scene);
+    };
+
+    EventBus.on('current-scene-ready', handleSceneReady);
+
+    return () => {
+      EventBus.removeListener('current-scene-ready', handleSceneReady);
+    };
+  }, [openModal, closeModal, globalModalState.openModals]);
+
   // Initialize game state on first load
   useEffect(() => {
     const store = useGameStore.getState();
-    
+
     // Only initialize if there are no entities (first load)
     if (store.entities.size === 0) {
       console.log('Initializing game state...');
-      
+
       // Create default code window
       const mainWindowId = store.addCodeWindow({
         id: 'main',
@@ -604,9 +463,9 @@ export const GameInterface: React.FC = () => {
         position: { x: 50, y: 50 },
         size: { width: 400, height: 300 }
       });
-      
+
       store.setMainWindow(mainWindowId);
-      
+
       // Create default qubit entity with constant ID
       const qubitId = store.addEntity({
         id: 'qubit',
@@ -629,11 +488,64 @@ export const GameInterface: React.FC = () => {
           progress: undefined
         }
       });
-      
+
       store.setActiveEntity(qubitId);
       console.log('Game state initialized with qubit entity:', qubitId);
     }
   }, []); // Empty dependency array means this runs once on mount
+
+  // Initialize quest system (runs when scene is ready)
+  useEffect(() => {
+    const store = useGameStore.getState();
+
+    const initializeQuests = async () => {
+      try {
+        // Load all quest files
+        await store.loadQuests([
+          'quests/tutorial_basics.json',
+          'quests/farming_loops.json',
+          'quests/functions_intro.json'
+        ]);
+        console.log('[Quest System] Quests loaded');
+
+        // Only auto-start tutorial if we're on the ProgrammingGame scene
+        if (currentScene !== 'ProgrammingGame') {
+          console.log('[Quest System] Not on ProgrammingGame scene yet, skipping auto-start');
+          return;
+        }
+
+        // Check if player has seen tutorial
+        const hasSeenTutorial = localStorage.getItem('hasSeenTutorial');
+
+        if (!hasSeenTutorial) {
+          // Auto-start tutorial for new players
+          console.log('[Quest System] New player detected - auto-starting tutorial');
+
+          // Small delay to ensure game is fully initialized
+          setTimeout(() => {
+            const success = store.startQuest('tutorial_basics');
+
+            if (success) {
+              // Set flag to prevent auto-start on subsequent loads
+              localStorage.setItem('hasSeenTutorial', 'true');
+              console.log('[Quest System] Tutorial started successfully');
+            } else {
+              console.warn('[Quest System] Failed to start tutorial');
+            }
+          }, 500);
+        } else {
+          console.log('[Quest System] Returning player - skipping auto-start');
+        }
+      } catch (error) {
+        console.error('[Quest System] Failed to initialize quests:', error);
+      }
+    };
+
+    // Initialize quests asynchronously only when on ProgrammingGame scene
+    if (currentScene === 'ProgrammingGame') {
+      initializeQuests();
+    }
+  }, [currentScene]); // Depends on currentScene
 
   const handleCloseModal = () => {
     setModalState(prev => ({ ...prev, isOpen: false }));
@@ -709,192 +621,6 @@ export const GameInterface: React.FC = () => {
 
   const [errorMessages, setErrorMessages] = useState<Array<{id: string, message: string, timestamp: number}>>([]);
 
-  // Dialogue system functions
-  const startDialogue = useCallback(async (dialogueFile: string) => {
-    // Block if any modal is currently open
-    if (globalModalState.isAnyModalOpen) {
-      console.log('Dialogue blocked - another modal is open');
-      return;
-    }
-    
-    setDialogueState(prev => ({ ...prev, isLoading: true }));
-    
-    try {
-      const response = await fetch(`/${dialogueFile}`);
-      if (!response.ok) {
-        throw new Error(`Failed to load dialogue file: ${dialogueFile}`);
-      }
-      
-      const dialogues: DialogueEntry[] = await response.json();
-      
-      setDialogueState({
-        isActive: true,
-        dialogues,
-        currentIndex: 0,
-        isLoading: false
-      });
-      
-      // Handle camera panning for first dialogue if specified
-      if (dialogues[0]?.camera) {
-        const scene = phaserRef.current?.scene as ProgrammingGame;
-        if (scene && scene.panCameraTo) {
-          console.log(`[DIALOGUE] Panning camera to (${dialogues[0].camera.x}, ${dialogues[0].camera.y})`);
-          scene.panCameraTo(dialogues[0].camera.x, dialogues[0].camera.y, 1000);
-        }
-      }
-      
-      // Handle Challenge Grid activation for first dialogue if specified
-      if (dialogues[0]?.challengeGrids) {
-        const store = useGameStore.getState();
-        const { positions, activate } = dialogues[0].challengeGrids;
-        
-        if (activate) {
-          store.activateChallengeGrids(positions);
-          console.log(`[CHALLENGE] Activated ${positions.length} challenge grids from dialogue`);
-        } else {
-          store.deactivateAllChallengeGrids();
-          console.log('[CHALLENGE] Deactivated all challenge grids from dialogue');
-        }
-      }
-      
-      openModal('dialogue');
-      console.log(`[DIALOGUE] Started dialogue: ${dialogueFile} with ${dialogues.length} entries`);
-    } catch (error) {
-      console.error('[DIALOGUE] Failed to load dialogue:', error);
-      setDialogueState(prev => ({ ...prev, isLoading: false }));
-    }
-  }, [globalModalState.isAnyModalOpen, openModal]);
-
-  // Check if current dialogue requirement is met
-  const advanceDialogue = useCallback(() => {
-    setDialogueState(prev => {
-      if (!prev.isActive) return prev;
-      
-      // Check if current dialogue has a requirement that must be met
-      const currentDialogue = prev.dialogues[prev.currentIndex];
-      if (currentDialogue?.requirement && !isRequirementMet(currentDialogue.requirement)) {
-        console.log('[TUTORIAL] Requirement not met, hiding dialogue for user to complete task');
-        // Set acknowledgment flag so dialogue will hide and user can complete the task
-        setTutorialState(tutState => ({
-          ...tutState,
-          hasAcknowledgedCurrentRequirement: true
-        }));
-        return prev; // Don't advance but let user complete the task
-      }
-      
-      if (prev.currentIndex >= prev.dialogues.length - 1) {
-        // End dialogue
-        closeModal('dialogue');
-        // Re-lock camera to qubit after dialogue ends
-        const scene = phaserRef.current?.scene as ProgrammingGame;
-        if (scene && scene.lockCameraToQubit) {
-          scene.lockCameraToQubit();
-        }
-        console.log('[DIALOGUE] Dialogue sequence completed');
-        
-        // Deactivate all Challenge Grids when dialogue ends
-        const store = useGameStore.getState();
-        if (store.challengeGridPositions.size > 0) {
-          store.deactivateAllChallengeGrids();
-          console.log('[CHALLENGE] Deactivated all challenge grids at dialogue end');
-        }
-        
-        // Reset tutorial state when dialogue ends
-        setTutorialState({
-          movementDirections: new Set<string>(),
-          terminalOpened: false,
-          codeContent: '',
-          playButtonClicked: false,
-          movementCommandDetected: false,
-          hasAcknowledgedCurrentRequirement: false
-        });
-        
-        return {
-          isActive: false,
-          dialogues: [],
-          currentIndex: 0,
-          isLoading: false
-        };
-      }
-      
-      // Advance to next dialogue
-      const nextIndex = prev.currentIndex + 1;
-      const nextDialogue = prev.dialogues[nextIndex];
-      
-      // Handle camera panning if specified
-      if (nextDialogue?.camera) {
-        const scene = phaserRef.current?.scene as ProgrammingGame;
-        if (scene && scene.panCameraTo) {
-          console.log(`[DIALOGUE] Panning camera to (${nextDialogue.camera.x}, ${nextDialogue.camera.y})`);
-          scene.panCameraTo(nextDialogue.camera.x, nextDialogue.camera.y, 1000);
-        }
-      }
-      
-      // Handle Challenge Grid activation/deactivation if specified
-      if (nextDialogue?.challengeGrids) {
-        const store = useGameStore.getState();
-        const { positions, activate } = nextDialogue.challengeGrids;
-        
-        if (activate) {
-          store.activateChallengeGrids(positions);
-          console.log(`[CHALLENGE] Activated ${positions.length} challenge grids from dialogue advancement`);
-        } else {
-          store.deactivateAllChallengeGrids();
-          console.log('[CHALLENGE] Deactivated all challenge grids from dialogue advancement');
-        }
-      }
-      
-      console.log(`[DIALOGUE] Advanced to dialogue ${nextIndex + 1}/${prev.dialogues.length}`);
-      
-      // Reset acknowledgment flag and play button state for the new dialogue
-      setTutorialState(tutState => ({
-        ...tutState,
-        hasAcknowledgedCurrentRequirement: false,
-        playButtonClicked: false
-      }));
-      
-      return {
-        ...prev,
-        currentIndex: nextIndex
-      };
-    });
-  }, [closeModal, isRequirementMet]);
-
-  // Auto-advance dialogue when requirements are met
-  useEffect(() => {
-    if (dialogueState.isActive) {
-      const currentDialogue = dialogueState.dialogues[dialogueState.currentIndex];
-      if (currentDialogue?.requirement && isRequirementMet(currentDialogue.requirement)) {
-        // Immediately advance when requirement is met
-        advanceDialogue();
-      }
-    }
-  }, [dialogueState, isRequirementMet, advanceDialogue]);
-
-  const closeDialogue = useCallback(() => {
-    setDialogueState({
-      isActive: false,
-      dialogues: [],
-      currentIndex: 0,
-      isLoading: false
-    });
-    closeModal('dialogue');
-    // Re-lock camera to qubit when dialogue is closed manually
-    const scene = phaserRef.current?.scene as ProgrammingGame;
-    if (scene && scene.lockCameraToQubit) {
-      scene.lockCameraToQubit();
-    }
-    
-    // Deactivate all Challenge Grids when dialogue is manually closed
-    const store = useGameStore.getState();
-    if (store.challengeGridPositions.size > 0) {
-      store.deactivateAllChallengeGrids();
-      console.log('[CHALLENGE] Deactivated all challenge grids on manual dialogue close');
-    }
-    
-    console.log('[DIALOGUE] Dialogue closed manually');
-  }, [closeModal]);
-
   // Handle error messages
   useEffect(() => {
     const handleExecutionError = (error: string) => {
@@ -922,24 +648,28 @@ export const GameInterface: React.FC = () => {
   // Handle dialogue interaction events (keyboard and mouse)
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (dialogueState.isActive && !dialogueState.isLoading && !shouldHideDialogue()) {
+      // Check shouldHide in real-time, not just when useEffect runs
+      const shouldHide = DialogueManager.shouldHideDialogue();
+      if (dialogueState.isActive && !dialogueState.isLoading && !shouldHide) {
         event.preventDefault();
-        advanceDialogue();
+        DialogueManager.advanceDialogue();
       }
     };
 
     const handleMouseClick = (event: MouseEvent) => {
-      if (dialogueState.isActive && !dialogueState.isLoading && !shouldHideDialogue()) {
+      // Check shouldHide in real-time, not just when useEffect runs
+      const shouldHide = DialogueManager.shouldHideDialogue();
+      if (dialogueState.isActive && !dialogueState.isLoading && !shouldHide) {
         // Check if click is inside dialogue box (we'll let it propagate to the dialogue component)
         const target = event.target as HTMLElement;
         if (target.closest('.dialogue-container')) {
           event.stopPropagation();
-          advanceDialogue();
+          DialogueManager.advanceDialogue();
         }
       }
     };
 
-    if (dialogueState.isActive && !shouldHideDialogue()) {
+    if (dialogueState.isActive) {
       document.addEventListener('keydown', handleKeyPress);
       document.addEventListener('click', handleMouseClick);
     }
@@ -948,21 +678,7 @@ export const GameInterface: React.FC = () => {
       document.removeEventListener('keydown', handleKeyPress);
       document.removeEventListener('click', handleMouseClick);
     };
-  }, [dialogueState.isActive, dialogueState.isLoading, advanceDialogue, shouldHideDialogue]);
-
-  // Expose startDialogue function globally for easy access
-  useEffect(() => {
-    // Attach to window object for global access
-    (window as any).startDialogue = startDialogue;
-
-    // Also make available through EventBus
-    EventBus.emit('dialogue-system-ready', { startDialogue });
-
-    return () => {
-      // Cleanup
-      delete (window as any).startDialogue;
-    };
-  }, [startDialogue]);
+  }, [dialogueState.isActive, dialogueState.isLoading]);
 
   // Track Challenge Grid status
   useEffect(() => {
@@ -1130,21 +846,6 @@ export const GameInterface: React.FC = () => {
             }}
           />
 
-          {/* Lesson Button */}
-          <SpriteButton
-            position={lessonButtonPosition}
-            backgroundSprite="button.png"
-            upFrame={{ x: 336, y: 496, w: 16, h: 16 }}
-            downFrame={{ x: 336, y: 512, w: 16, h: 16 }}
-            scale={3}
-            onClick={() => {
-              if (!globalModalState.isAnyModalOpen) {
-                setLessonModalState({ isOpen: true });
-                openModal('lesson');
-              }
-            }}
-          />
-
           {/* Quick Programming Button */}
           <SpriteButton
             position={quickProgramButtonPosition}
@@ -1168,6 +869,21 @@ export const GameInterface: React.FC = () => {
                     EventBus.emit('open-programming-tab');
                   }, 100);
                 }
+              }
+            }}
+          />
+
+          {/* Quest Log Button */}
+          <SpriteButton
+            position={questButtonPosition}
+            backgroundSprite="button.png"
+            upFrame={{ x: 384, y: 496, w: 16, h: 16 }}
+            downFrame={{ x: 384, y: 512, w: 16, h: 16 }}
+            scale={3}
+            onClick={() => {
+              if (!globalModalState.isAnyModalOpen) {
+                setQuestModalState({ isOpen: true });
+                openModal('quest');
               }
             }}
           />
@@ -1332,9 +1048,9 @@ export const GameInterface: React.FC = () => {
           )}
 
           {/* Tutorial Task Indicator - Bottom Right */}
-          {dialogueState.isActive && shouldHideDialogue() && (() => {
+          {dialogueState.isActive && DialogueManager.shouldHideDialogue() && (() => {
             const currentDialogue = dialogueState.dialogues[dialogueState.currentIndex];
-            if (currentDialogue?.requirement) {
+            if (currentDialogue?.objectives && currentDialogue.objectives.length > 0) {
               return (
                 <div style={{
                   position: 'absolute',
@@ -1360,10 +1076,10 @@ export const GameInterface: React.FC = () => {
                     <span style={{ fontWeight: 'bold' }}>Current Task:</span>
                   </div>
                   <div style={{ fontSize: '14px', lineHeight: '1.3' }}>
-                    {currentDialogue.requirement.description}
+                    {currentDialogue.objectives[0].description}
                   </div>
                   {/* Progress indicator for movement tutorial */}
-                  {currentDialogue.requirement.type === 'movement' && currentDialogue.requirement.directions && (
+                  {currentDialogue.objectives[0].type === 'movement' && currentDialogue.objectives[0].directions && (
                     <div style={{ 
                       marginTop: '8px', 
                       fontSize: '12px',
@@ -1371,7 +1087,7 @@ export const GameInterface: React.FC = () => {
                       gap: '8px',
                       flexWrap: 'wrap'
                     }}>
-                      {currentDialogue.requirement.directions.map(dir => (
+                      {currentDialogue.objectives[0].directions!.map(dir => (
                         <span 
                           key={dir}
                           style={{
@@ -1387,12 +1103,12 @@ export const GameInterface: React.FC = () => {
                       ))}
                     </div>
                   )}
-                  
+
                   {/* Progress indicator for challenge completion */}
-                  {currentDialogue.requirement.type === 'challenge_completion' && currentDialogue.requirement.challengePositions && (() => {
+                  {currentDialogue.objectives[0].type === 'challenge_completion' && currentDialogue.objectives[0].challengePositions && (() => {
                     const store = useGameStore.getState();
-                    const total = currentDialogue.requirement.challengePositions.length;
-                    const completed = currentDialogue.requirement.challengePositions.filter(pos => {
+                    const total = currentDialogue.objectives[0].challengePositions.length;
+                    const completed = currentDialogue.objectives[0].challengePositions.filter(pos => {
                       const grid = store.getGridAt(pos);
                       return grid?.type === 'farmland' && 
                              grid.state?.status === 'ready' && 
@@ -1460,7 +1176,7 @@ export const GameInterface: React.FC = () => {
       )}
 
       {/* Dialogue System Overlay - Always on top when active and not hidden for tutorial */}
-      {dialogueState.isActive && !shouldHideDialogue() && (
+      {dialogueState.isActive && !DialogueManager.shouldHideDialogue() && (
         <div style={{
           position: 'fixed',
           top: 0,
@@ -1506,7 +1222,7 @@ export const GameInterface: React.FC = () => {
               pointerEvents: 'auto',
               cursor: 'pointer'
             }}
-            onClick={advanceDialogue}
+            onClick={() => DialogueManager.advanceDialogue()}
           >
             {/* Dialogue Background Sprite */}
             <div style={{
@@ -1571,8 +1287,8 @@ export const GameInterface: React.FC = () => {
                   {/* Tutorial Requirement Indicator */}
                   {(() => {
                     const currentDialogue = dialogueState.dialogues[dialogueState.currentIndex];
-                    if (currentDialogue?.requirement) {
-                      const isComplete = isRequirementMet(currentDialogue.requirement);
+                    if (currentDialogue?.objectives && currentDialogue.objectives.length > 0) {
+                      const isComplete = DialogueManager.isRequirementMet(currentDialogue.objectives[0]);
                       return (
                         <div style={{
                           marginTop: '8px',
@@ -1591,20 +1307,20 @@ export const GameInterface: React.FC = () => {
                               {isComplete ? '✓' : '⏳'}
                             </span>
                             <span>
-                              {currentDialogue.requirement.description}
+                              {currentDialogue.objectives[0].description}
                               {!isComplete && ' (In Progress...)'}
                             </span>
                           </div>
-                          
+
                           {/* Challenge completion progress */}
-                          {currentDialogue.requirement.type === 'challenge_completion' && 
-                           currentDialogue.requirement.challengePositions && (() => {
+                          {currentDialogue.objectives[0].type === 'challenge_completion' &&
+                           currentDialogue.objectives[0].challengePositions && (() => {
                             const store = useGameStore.getState();
-                            const total = currentDialogue.requirement.challengePositions.length;
-                            const completed = currentDialogue.requirement.challengePositions.filter(pos => {
+                            const total = currentDialogue.objectives[0].challengePositions.length;
+                            const completed = currentDialogue.objectives[0].challengePositions.filter(pos => {
                               const grid = store.getGridAt(pos);
-                              return grid?.type === 'farmland' && 
-                                     grid.state?.status === 'ready' && 
+                              return grid?.type === 'farmland' &&
+                                     grid.state?.status === 'ready' &&
                                      grid.state?.isGrown === true &&
                                      grid.state?.plantType === 'wheat';
                             }).length;
@@ -1648,17 +1364,19 @@ export const GameInterface: React.FC = () => {
                 transform: 'translateX(-50%)',
                 fontSize: '14px',
                 color: '#1c0a18',
-                animation: dialogueState.dialogues[dialogueState.currentIndex]?.requirement && 
-                          !isRequirementMet(dialogueState.dialogues[dialogueState.currentIndex].requirement) 
+                animation: (dialogueState.dialogues[dialogueState.currentIndex]?.objectives &&
+                          dialogueState.dialogues[dialogueState.currentIndex].objectives!.length > 0 &&
+                          !DialogueManager.isRequirementMet(dialogueState.dialogues[dialogueState.currentIndex].objectives![0]))
                           ? 'none' : 'pulse 1.5s ease-in-out infinite'
               }}>
                 {(() => {
                   const currentDialogue = dialogueState.dialogues[dialogueState.currentIndex];
-                  if (currentDialogue?.requirement && !isRequirementMet(currentDialogue.requirement)) {
-                    return `Complete task: ${currentDialogue.requirement.description}`;
+                  if (currentDialogue?.objectives && currentDialogue.objectives.length > 0 &&
+                      !DialogueManager.isRequirementMet(currentDialogue.objectives[0])) {
+                    return `Complete task: ${currentDialogue.objectives[0].description}`;
                   }
-                  return dialogueState.currentIndex < dialogueState.dialogues.length - 1 
-                    ? 'Click or press any key to continue...' 
+                  return dialogueState.currentIndex < dialogueState.dialogues.length - 1
+                    ? 'Click or press any key to continue...'
                     : 'Click or press any key to close...';
                 })()}
               </div>
@@ -1969,13 +1687,13 @@ export const GameInterface: React.FC = () => {
         />
       )}
 
-      {/* Lesson Modal */}
-      {lessonModalState.isOpen && (
-        <LessonModal
-          isOpen={lessonModalState.isOpen}
+      {/* Quest Modal */}
+      {questModalState.isOpen && (
+        <QuestModal
+          isOpen={questModalState.isOpen}
           onClose={() => {
-            setLessonModalState({ isOpen: false });
-            closeModal('lesson');
+            setQuestModalState({ isOpen: false });
+            closeModal('quest');
           }}
         />
       )}

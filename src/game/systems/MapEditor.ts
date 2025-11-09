@@ -670,17 +670,14 @@ export class MapEditor {
   }
 
   private loadGroundTiles(): void {
-    // Try to load existing ground tiles from localStorage
+    // Try to load existing ground tiles from MAP_EDITOR_DATA
     try {
-      const savedData = MAP_EDITOR_DATA;
-      if (savedData) {
-        const mapData = JSON.parse(savedData);
-        if (mapData.groundTiles) {
-          mapData.groundTiles.forEach((tileData: GroundTileData) => {
-            this.groundTiles.set(tileData.id, tileData);
-          });
-          this.debug('Loaded ground tiles from storage:', this.groundTiles.size);
-        }
+      const mapData = MAP_EDITOR_DATA;
+      if (mapData && mapData.groundTiles) {
+        mapData.groundTiles.forEach((tileData: GroundTileData) => {
+          this.groundTiles.set(tileData.id, tileData);
+        });
+        this.debug('Loaded ground tiles from storage:', this.groundTiles.size);
       }
     } catch (error) {
       this.debug('Error loading ground tiles:', error);

@@ -320,13 +320,9 @@ export class ProgrammingGame extends Scene {
     this.createSampleNPCs();
     
     console.log('Programming Game Scene Created');
-    
+
     // Emit event so React component can get scene reference
     EventBus.emit('current-scene-ready', this);
-
-    if (!this.gameStore.isTutorialDone) {
-      EventBus.emit('start-dialogue', 'sample_dialogue.json');
-    }
   }
 
   private createPlaceholderSprites() {
@@ -1719,22 +1715,22 @@ export class ProgrammingGame extends Scene {
         if (Phaser.Input.Keyboard.JustDown(this.cameraKeys.up)) {
           const targetPos = { x: activeEntity.position.x, y: activeEntity.position.y - 1 };
           this.movementManager.moveEntity(activeEntity, targetPos);
-          EventBus.emit('tutorial-movement', { direction: 'up' });
+          EventBus.emit('tutorial-movement', { direction: 'ArrowUp' });
         }
         if (Phaser.Input.Keyboard.JustDown(this.cameraKeys.down)) {
           const targetPos = { x: activeEntity.position.x, y: activeEntity.position.y + 1 };
           this.movementManager.moveEntity(activeEntity, targetPos);
-          EventBus.emit('tutorial-movement', { direction: 'down' });
+          EventBus.emit('tutorial-movement', { direction: 'ArrowDown' });
         }
         if (Phaser.Input.Keyboard.JustDown(this.cameraKeys.left)) {
           const targetPos = { x: activeEntity.position.x - 1, y: activeEntity.position.y };
           this.movementManager.moveEntity(activeEntity, targetPos);
-          EventBus.emit('tutorial-movement', { direction: 'left' });
+          EventBus.emit('tutorial-movement', { direction: 'ArrowLeft' });
         }
         if (Phaser.Input.Keyboard.JustDown(this.cameraKeys.right)) {
           const targetPos = { x: activeEntity.position.x + 1, y: activeEntity.position.y };
           this.movementManager.moveEntity(activeEntity, targetPos);
-          EventBus.emit('tutorial-movement', { direction: 'right' });
+          EventBus.emit('tutorial-movement', { direction: 'ArrowRight' });
         }
       }
     }
@@ -1819,18 +1815,6 @@ export class ProgrammingGame extends Scene {
     
     EventBus.on('code-execution-failed', () => {
       this.clearExecutionTexts();
-    });
-
-    // Listen for lesson challenge completion
-    EventBus.on('lesson-challenge-completed', (data: {
-      challengeId: string;
-      score: number;
-      executionTime: number;
-      lessonId: string;
-    }) => {
-      console.log('[LESSON] Challenge completed:', data);
-      const store = useGameStore.getState();
-      store.completeChallenge(data.challengeId, data.score, data.executionTime);
     });
   }
 
@@ -2445,7 +2429,6 @@ export class ProgrammingGame extends Scene {
     EventBus.removeAllListeners('farmland-grid-added');
     EventBus.removeAllListeners('farmland-grid-removed');
     EventBus.removeAllListeners('map-editor-loaded');
-    EventBus.removeAllListeners('lesson-challenge-completed');
 
     console.log('[SCENE] ProgrammingGame shutdown complete');
   }

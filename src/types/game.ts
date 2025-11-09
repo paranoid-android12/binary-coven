@@ -286,13 +286,7 @@ export interface Drone extends Entity {
   scale: number;
 }
 
-// Lesson System Types - Educational Framework
-export enum LessonDifficulty {
-  BEGINNER = 'beginner',
-  INTERMEDIATE = 'intermediate',
-  ADVANCED = 'advanced'
-}
-
+// Programming concepts that can be taught
 export enum ProgrammingConcept {
   FUNCTIONS = 'functions',
   VARIABLES = 'variables',
@@ -304,67 +298,4 @@ export enum ProgrammingConcept {
   INTERACTION = 'interaction',
   LOGIC = 'logic',
   DEBUGGING = 'debugging'
-}
-
-export interface LessonObjective {
-  id: string;
-  description: string;
-  concept: ProgrammingConcept;
-  required: boolean;
-  completed: boolean;
-}
-
-export interface LessonChallenge {
-  id: string;
-  title: string;
-  description: string;
-  startingCode?: string;
-  solutionHints: string[];
-  successCriteria: string[];
-  challengeGridPositions?: Position[];
-  requiredFunctions: string[];
-  timeLimit?: number; // in seconds
-  maxAttempts?: number;
-}
-
-export interface Lesson {
-  id: string;
-  title: string;
-  description: string;
-  difficulty: LessonDifficulty;
-  estimatedTime: number; // in minutes
-  prerequisites: string[]; // lesson IDs that should be completed first
-  objectives: LessonObjective[];
-  challenges: LessonChallenge[];
-  introduction: string;
-  concepts: ProgrammingConcept[];
-  reward?: {
-    type: 'function' | 'feature' | 'cosmetic';
-    value: string;
-    description: string;
-  };
-}
-
-export interface LessonProgress {
-  lessonId: string;
-  startedAt: number;
-  completedAt?: number;
-  currentChallengeIndex: number;
-  challengeAttempts: Map<string, number>;
-  challengeCompletions: Set<string>;
-  hintsUsed: Map<string, number>;
-  totalExecutionTime: number;
-  codeQuality: number; // 0-100 score based on efficiency, readability
-  completed: boolean;
-  score: number; // 0-100 overall lesson score
-}
-
-export interface LearningPath {
-  id: string;
-  title: string;
-  description: string;
-  lessons: string[]; // ordered array of lesson IDs
-  targetAudience: string;
-  totalEstimatedTime: number;
-  difficulty: LessonDifficulty;
 } 

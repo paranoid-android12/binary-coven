@@ -1,0 +1,203 @@
+{
+  "id": "tutorial_basics",
+  "title": "Grandpa's Chores",
+  "description": "Wake up and learn the basics of moving around and using the coding terminal to automate farming tasks.",
+  "difficulty": "beginner",
+  "category": "Tutorial",
+  "estimatedTime": 10,
+  "concepts": ["movement", "functions", "interaction"],
+  "prerequisites": [],
+  "icon": "quest_tutorial.png",
+  "thumbnail": "quest_tutorial_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_wake_up",
+      "title": "Wake Up and Move",
+      "description": "Learn to move around using arrow keys",
+      "preDialogues": [
+        {
+          "name": "Lain",
+          "content": "Qubit! Wake up already. Grandpa left you three chores to finish before sunset!",
+          "sprite": "manu-angry.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Chores? Ughhh… can't they wait? I was having such a good dream...",
+          "sprite": "qubit-defeated.png"
+        },
+        {
+          "name": "Lain",
+          "content": "Nope! He said they're important. And he told a few people around town some clues to help you out. But first—you need to get moving. Use the arrow keys ↑, ↓, ←, and → to walk around the farmland. Try walking in all four directions!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "movement",
+          "directions": ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"],
+          "description": "Walk in all four directions using arrow keys"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Alright, alright… walking around… Got it. Maybe this won't be so bad.",
+          "sprite": "qubit-speaking.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_open_terminal",
+      "title": "Open the Coding Terminal",
+      "description": "Learn to access the programming interface",
+      "preDialogues": [
+        {
+          "name": "Lain",
+          "content": "Good! Now, before you start on the chores, Grandpa said you'd need to use his coding terminal to help automate your tasks. Click on the 'Code Editor' button to open it.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "open_terminal",
+          "description": "Open the coding terminal"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Lain",
+          "content": "Perfect! This terminal is your tool for getting chores done faster. You can write commands to handle farming tasks automatically.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_write_plant_code",
+      "title": "Write Your First Command",
+      "description": "Learn to write a plant command",
+      "preDialogues": [
+        {
+          "name": "Lain",
+          "content": "Let's start simple. In the main code window, type exactly this: plant(\"wheat\"). That's how you plant wheat seeds when you're standing on farmland.",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "plant(\"wheat\")",
+          "description": "Type plant(\"wheat\") in the code editor"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Okay, I typed it in. Now what—do I just hope it grows?",
+          "sprite": "qubit-speaking.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_execute_code",
+      "title": "Execute Your Code",
+      "description": "Learn to run code with the play button",
+      "preDialogues": [
+        {
+          "name": "Lain",
+          "content": "Not quite! Click the play button (▶) to execute your code and watch yourself plant those seeds!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click the play button to execute code"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_movement_commands",
+      "title": "Movement Commands",
+      "description": "Learn to move using code",
+      "preDialogues": [
+        {
+          "name": "Lain",
+          "content": "Nice work! Grandpa's first chore involves planting crops, so this'll come in handy. But you'll need to move around, too. Try typing one of these next: move_left(), move_right(), move_up(), or move_down()",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "movement_command",
+          "commands": ["move_left", "move_right", "move_up", "move_down"],
+          "description": "Type any movement command in the code editor"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Oh wow, I can make myself move with code! Grandpa really left some cool tools behind.",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_execute_movement",
+      "title": "Execute Movement Code",
+      "description": "Run your movement command",
+      "preDialogues": [
+        {
+          "name": "Lain",
+          "content": "Exactly! Click the play button again to execute your movement command and see yourself move automatically.",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click the play button to execute movement command"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_7_conclusion",
+      "title": "Tutorial Complete",
+      "description": "Ready to tackle Grandpa's chores",
+      "preDialogues": [
+        {
+          "name": "Lain",
+          "content": "Great job! You've got the hang of it—moving around, planting crops, and coding actions. Now you can use these skills to finish Grandpa's three chores. Talk to the townsfolk to find out what each one is!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Got it! Move around, code smart, and get those chores done. Guess I better start asking around town!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "resource",
+      "value": 50,
+      "description": "Gained 50 energy"
+    },
+    {
+      "type": "unlock_quest",
+      "value": "farming_loops",
+      "description": "Unlocked quest: The Field of Repetition"
+    }
+  ]
+}

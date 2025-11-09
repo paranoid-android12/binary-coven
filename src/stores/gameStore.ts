@@ -1,9 +1,10 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
-import { Entity, GridTile, CodeWindow, Position, ExecutionContext, TaskState, ProgressInfo, FarmlandState, Lesson, LessonProgress, LearningPath } from '../types/game';
+import { Entity, GridTile, CodeWindow, Position, ExecutionContext, TaskState, ProgressInfo, FarmlandState } from '../types/game';
+import { Quest, QuestProgress, QuestState } from '../types/quest';
 import { EventBus } from '../game/EventBus';
-import LessonManager from '../game/systems/LessonManager';
+import QuestManager from '../game/systems/QuestManager';
 
 // =====================================================================
 // CENTRALIZED STATE INTERFACES
@@ -35,12 +36,12 @@ export interface GameState {
   isChallengeMode: boolean; // Whether challenge mode is currently active
 
   // =====================================================================
-  // LESSON SYSTEM
+  // QUEST SYSTEM
   // =====================================================================
-  activeLesson: Lesson | null; // Currently active lesson
-  lessonProgress: Map<string, LessonProgress>; // Progress for all lessons
-  availableLessons: Lesson[]; // Lessons available to start
-  completedLessons: Set<string>; // Set of completed lesson IDs
+  activeQuest: Quest | null; // Currently active quest
+  questProgress: Map<string, QuestProgress>; // Progress for all quests
+  availableQuests: Quest[]; // Quests available to start
+  unlockedQuests: Set<string>; // Set of unlocked quest IDs
 
   // =====================================================================
   // CENTRALIZED TASK SYSTEM
@@ -137,17 +138,22 @@ export interface GameStore extends GameState {
   // RESOURCE MANAGEMENT
   // =====================================================================
   updateResources: (resources: Partial<GameState['globalResources']>) => void;
-  
+
   // =====================================================================
-  // LESSON MANAGEMENT
+  // QUEST MANAGEMENT
   // =====================================================================
-  startLesson: (lessonId: string) => boolean;
-  endLesson: () => void;
-  completeChallenge: (challengeId: string, score: number, executionTime: number) => void;
-  getLessonProgress: (lessonId: string) => LessonProgress | undefined;
-  getAvailableLessons: () => Lesson[];
-  getNextLesson: () => Lesson | null;
-  resetLessonProgress: (lessonId?: string) => void;
+  loadQuests: (questFilePaths: string[]) => Promise<void>;
+  startQuest: (questId: string) => boolean;
+  cancelQuest: () => boolean;
+  restartQuest: () => boolean;
+  getActiveQuest: () => Quest | null;
+  getAvailableQuests: () => Quest[];
+  getCompletedQuests: () => Quest[];
+  getQuestProgress: (questId: string) => QuestProgress | undefined;
+  isQuestUnlocked: (questId: string) => boolean;
+  isQuestStuck: () => { isStuck: boolean; reason?: string; timeStuck?: number };
+  getCurrentPhaseTime: () => number;
+  refreshQuestState: () => void;
 
   // =====================================================================
   // UTILITY METHODS
@@ -183,11 +189,11 @@ const createInitialState = (): GameState => ({
   challengeGridPositions: new Set(),
   isChallengeMode: false,
 
-  // Lesson system
-  activeLesson: null,
-  lessonProgress: new Map(),
-  availableLessons: [],
-  completedLessons: new Set()
+  // Quest system
+  activeQuest: null,
+  questProgress: new Map(),
+  availableQuests: [],
+  unlockedQuests: new Set()
 });
 
 // =====================================================================
@@ -555,46 +561,48 @@ export const useGameStore = create<GameStore>()(
     // =====================================================================
     activateChallengeGrid: (position: Position) => {
       const posKey = `${position.x},${position.y}`;
+
+      // Update the grid tile itself
+      const grid = get().getGridAt(position);
+      if (grid) {
+        get().updateGrid(grid.id, { isChallengeGrid: true });
+      }
+
       set((state: GameState) => {
         const newChallengeGrids = new Set(state.challengeGridPositions);
         newChallengeGrids.add(posKey);
-        
-        // Update the grid tile itself
-        const grid = state.getGridAt(position);
-        if (grid) {
-          state.updateGrid(grid.id, { isChallengeGrid: true });
-        }
-        
+
         console.log(`[CHALLENGE] Activated challenge grid at (${position.x}, ${position.y})`);
-        return { 
+        return {
           challengeGridPositions: newChallengeGrids,
           isChallengeMode: true
         };
       });
-      
+
       // Emit event for visual updates
       EventBus.emit('challenge-grid-activated', { position });
     },
 
     deactivateChallengeGrid: (position: Position) => {
       const posKey = `${position.x},${position.y}`;
+
+      // Update the grid tile itself
+      const grid = get().getGridAt(position);
+      if (grid) {
+        get().updateGrid(grid.id, { isChallengeGrid: false });
+      }
+
       set((state: GameState) => {
         const newChallengeGrids = new Set(state.challengeGridPositions);
         newChallengeGrids.delete(posKey);
-        
-        // Update the grid tile itself
-        const grid = state.getGridAt(position);
-        if (grid) {
-          state.updateGrid(grid.id, { isChallengeGrid: false });
-        }
-        
+
         console.log(`[CHALLENGE] Deactivated challenge grid at (${position.x}, ${position.y})`);
-        return { 
+        return {
           challengeGridPositions: newChallengeGrids,
           isChallengeMode: newChallengeGrids.size > 0
         };
       });
-      
+
       // Emit event for visual updates
       EventBus.emit('challenge-grid-deactivated', { position });
     },
@@ -918,93 +926,134 @@ export const useGameStore = create<GameStore>()(
     },
 
     // =====================================================================
-    // LESSON MANAGEMENT
+    // QUEST MANAGEMENT
     // =====================================================================
-    startLesson: (lessonId: string) => {
-      const lessonManager = LessonManager.getInstance();
-      const success = lessonManager.startLesson(lessonId);
+    loadQuests: async (questFilePaths: string[]) => {
+      const questManager = QuestManager.getInstance();
+      await questManager.loadQuests(questFilePaths);
+
+      // Update local state
+      const availableQuests = questManager.getAvailableQuests();
+      const unlockedQuestIds = questManager.getAllQuests()
+        .filter(q => questManager.isQuestUnlocked(q.id))
+        .map(q => q.id);
+
+      set({
+        availableQuests,
+        unlockedQuests: new Set(unlockedQuestIds)
+      });
+
+      console.log('[STORE] Quests loaded and state updated');
+    },
+
+    startQuest: (questId: string) => {
+      const questManager = QuestManager.getInstance();
+      const success = questManager.startQuest(questId);
 
       if (success) {
-        const lesson = lessonManager.getLesson(lessonId);
-        const progress = lessonManager.getLessonProgress(lessonId);
+        const quest = questManager.getQuest(questId);
+        const progress = questManager.getQuestProgress(questId);
 
         set({
-          activeLesson: lesson,
-          lessonProgress: new Map([...get().lessonProgress, [lessonId, progress!]])
+          activeQuest: quest || null,
+          questProgress: new Map([...get().questProgress, [questId, progress!]])
         });
 
-        // Setup challenge grids if lesson has them
-        if (lesson?.challenges.length > 0) {
-          const firstChallenge = lesson.challenges[0];
-          if (firstChallenge.challengeGridPositions) {
-            get().activateChallengeGrids(firstChallenge.challengeGridPositions);
-          }
-        }
+        console.log(`[STORE] Started quest: ${questId}`);
+      }
 
-        // Load starting code if provided
-        if (lesson?.challenges.length > 0 && lesson.challenges[0].startingCode) {
-          const mainWindow = Array.from(get().codeWindows.values()).find(w => w.isMain);
-          if (mainWindow) {
-            get().updateCodeWindow(mainWindow.id, {
-              code: lesson.challenges[0].startingCode
-            });
-          }
+      return success;
+    },
+
+    cancelQuest: () => {
+      const questManager = QuestManager.getInstance();
+      const success = questManager.cancelQuest();
+
+      if (success) {
+        set({ activeQuest: null });
+
+        // Deactivate challenge grids
+        get().deactivateAllChallengeGrids();
+
+        console.log('[STORE] Quest cancelled');
+      }
+
+      return success;
+    },
+
+    restartQuest: () => {
+      const questManager = QuestManager.getInstance();
+      const success = questManager.restartQuest();
+
+      if (success) {
+        const activeQuest = questManager.getActiveQuest();
+        const questId = activeQuest?.id;
+
+        if (activeQuest && questId) {
+          const progress = questManager.getQuestProgress(questId);
+
+          set({
+            activeQuest: activeQuest,
+            questProgress: new Map([...get().questProgress, [questId, progress!]])
+          });
+
+          console.log('[STORE] Quest restarted');
         }
       }
 
       return success;
     },
 
-    endLesson: () => {
-      const lessonManager = LessonManager.getInstance();
-      lessonManager.endLesson();
+    getActiveQuest: () => {
+      return get().activeQuest;
+    },
+
+    getAvailableQuests: () => {
+      const questManager = QuestManager.getInstance();
+      return questManager.getAvailableQuests();
+    },
+
+    getCompletedQuests: () => {
+      const questManager = QuestManager.getInstance();
+      return questManager.getCompletedQuests();
+    },
+
+    getQuestProgress: (questId: string) => {
+      const questManager = QuestManager.getInstance();
+      return questManager.getQuestProgress(questId);
+    },
+
+    isQuestUnlocked: (questId: string) => {
+      const questManager = QuestManager.getInstance();
+      return questManager.isQuestUnlocked(questId);
+    },
+
+    isQuestStuck: () => {
+      const questManager = QuestManager.getInstance();
+      return questManager.isQuestStuck();
+    },
+
+    getCurrentPhaseTime: () => {
+      const questManager = QuestManager.getInstance();
+      return questManager.getCurrentPhaseTime();
+    },
+
+    refreshQuestState: () => {
+      const questManager = QuestManager.getInstance();
+
+      const availableQuests = questManager.getAvailableQuests();
+      const activeQuest = questManager.getActiveQuest();
+      const unlockedQuestIds = questManager.getAllQuests()
+        .filter(q => questManager.isQuestUnlocked(q.id))
+        .map(q => q.id);
 
       set({
-        activeLesson: null
+        availableQuests,
+        activeQuest: activeQuest || null,
+        unlockedQuests: new Set(unlockedQuestIds)
       });
 
-      // Clear challenge grids
-      get().deactivateAllChallengeGrids();
-    },
-
-    completeChallenge: (challengeId: string, score: number, executionTime: number) => {
-      const lessonManager = LessonManager.getInstance();
-      lessonManager.completeChallenge(challengeId, score, executionTime);
-
-      // Update local state
-      const state = get();
-      const progress = lessonManager.getLessonProgress(state.activeLesson?.id || '');
-
-      if (progress) {
-        set({
-          lessonProgress: new Map([...state.lessonProgress, [state.activeLesson?.id || '', progress]])
-        });
-      }
-    },
-
-    getLessonProgress: (lessonId: string) => {
-      const lessonManager = LessonManager.getInstance();
-      return lessonManager.getLessonProgress(lessonId);
-    },
-
-    getAvailableLessons: () => {
-      const lessonManager = LessonManager.getInstance();
-      return lessonManager.getAvailableLessons();
-    },
-
-    getNextLesson: () => {
-      const lessonManager = LessonManager.getInstance();
-      return lessonManager.getNextLesson();
-    },
-
-    resetLessonProgress: (lessonId?: string) => {
-      const lessonManager = LessonManager.getInstance();
-      lessonManager.resetProgress(lessonId);
-      set({
-        lessonProgress: lessonId ?
-          new Map([...get().lessonProgress].filter(([id]) => id !== lessonId)) :
-          new Map()
-      });
+      console.log('[STORE] Quest state refreshed');
     },
 
     // =====================================================================
@@ -1027,13 +1076,6 @@ export const useGameStore = create<GameStore>()(
 // Initialize the task system when the store is created
 const store = useGameStore.getState();
 store.initializeTaskSystem();
-
-// Initialize lesson system
-setTimeout(() => {
-  const lessonManager = LessonManager.getInstance();
-  const availableLessons = lessonManager.getAvailableLessons();
-  useGameStore.setState({ availableLessons });
-}, 1000); // Delay to ensure all systems are loaded
 
 // Cleanup on page unload
 if (typeof window !== 'undefined') {
