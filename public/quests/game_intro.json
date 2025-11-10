@@ -1,0 +1,125 @@
+{
+  "id": "game_intro",
+  "title": "Welcome to the Farm",
+  "description": "Learn the basics of farm life and how to move around",
+  "difficulty": "beginner",
+  "category": "Tutorial",
+  "estimatedTime": 5,
+  "concepts": ["movement", "manual_controls"],
+  "prerequisites": [],
+  "icon": "quest_icon.png",
+  "thumbnail": "quest_thumb.png",
+  "phases": [
+    {
+      "id": "introduction",
+      "title": "Meeting the Family",
+      "description": "Get to know your responsibilities on the farm",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Hey Qubit! Welcome to Grandpa's farm. He's asked us to take care of things while he's away.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Farming, huh? Sounds... manual.",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Oh, don't worry. You'll love it once you get the hang of it. Trust me, there's a method to all this.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "movement_tutorial",
+      "title": "Learning to Move",
+      "description": "Practice moving around the farm using arrow keys",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "First things first - let's get you moving around. Use the ARROW KEYS to walk in all four directions.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Just... walk around? That's it?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Yes! Try pressing UP, DOWN, LEFT, and RIGHT. Get comfortable with moving - you'll be doing a lot of it.",
+          "sprite": "manu-speaking.png",
+          "objectives": [
+            {
+              "type": "movement",
+              "description": "Move in all four directions using arrow keys",
+              "directions": ["up", "down", "left", "right"]
+            }
+          ]
+        }
+      ],
+      "objectives": [
+        {
+          "type": "movement",
+          "description": "Move in all four directions using arrow keys",
+          "directions": ["up", "down", "left", "right"]
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! See? You're a natural already.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "It's just walking, Maru.",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Baby steps, Qubit. Baby steps. Now, let's talk about what we actually need to do around here...",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "farm_overview",
+      "title": "Understanding the Task",
+      "description": "Learn about your farming responsibilities",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "So here's the deal - Grandpa needs us to grow wheat. Plant seeds, wait for them to grow, then harvest.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "That sounds like a lot of waiting around.",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Well... yes and no. That's where things get interesting. But let's start with the basics first.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "first_harvest",
+      "description": "Unlock 'First Harvest' quest"
+    }
+  ]
+}

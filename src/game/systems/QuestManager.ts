@@ -9,6 +9,7 @@ import {
   QuestReward
 } from '../../types/quest';
 import DialogueManager from './DialogueManager';
+import { ObjectiveTracker } from './ObjectiveTracker';
 
 /**
  * QuestManager - Singleton system for managing quests
@@ -34,10 +35,14 @@ export class QuestManager {
   private activeQuestId?: string;
   private currentPhaseIndex: number = 0;
 
+  // Objective tracker
+  private objectiveTracker: ObjectiveTracker;
+
   // Storage key
   private readonly STORAGE_KEY = 'quest_progress';
 
   private constructor() {
+    this.objectiveTracker = ObjectiveTracker.getInstance();
     this.loadProgressFromStorage();
     this.setupObjectiveTracking();
     console.log('[QuestManager] Initialized');
@@ -47,10 +52,24 @@ export class QuestManager {
    * Set up automatic objective tracking via EventBus
    */
   private setupObjectiveTracking(): void {
-    // Listen to DialogueManager events to track objective completion
-    EventBus.on('dialogue-closed', () => {
+    // Listen to ALL relevant events and check objectives
+    // ObjectiveTracker records events, we just need to validate on each action
+
+    const checkObjectives = (eventName: string) => {
+      console.log(`[QuestManager] ${eventName} - checking objectives`);
       this.checkCurrentPhaseObjectives();
-    });
+    };
+
+    // Dialogue events
+    EventBus.on('dialogue-closed', () => checkObjectives('dialogue-closed'));
+
+    // Action events
+    EventBus.on('tutorial-play-clicked', () => checkObjectives('play-button'));
+    EventBus.on('action-plant-clicked', () => checkObjectives('plant-button'));
+    EventBus.on('action-harvest-clicked', () => checkObjectives('harvest-button'));
+    EventBus.on('tutorial-code-changed', () => checkObjectives('code-changed'));
+    EventBus.on('tutorial-terminal-opened', () => checkObjectives('terminal-opened'));
+    EventBus.on('tutorial-movement', () => checkObjectives('movement'));
 
     console.log('[QuestManager] Objective tracking set up');
   }
@@ -348,6 +367,10 @@ export class QuestManager {
     console.log(`[QuestManager] Auto-advance enabled: ${phase.autoAdvance !== false}`);
     console.log(`[QuestManager] Objectives already completed: ${phaseProgress.objectivesCompleted.size}/${phase.objectives?.length || 0}`);
 
+    // Start tracking objectives for this phase
+    this.objectiveTracker.startPhase(phase.id);
+    console.log(`[QuestManager] Started ObjectiveTracker for phase: ${phase.id}`);
+
     console.log(`[QuestManager] ✓ Started phase: ${phase.title} (${phase.id})`);
     EventBus.emit('quest-phase-started', { questId, phaseIndex, phase });
 
@@ -422,6 +445,10 @@ export class QuestManager {
       }
 
       console.log(`[QuestManager] ✓ Completed phase: ${phase.title} (${phase.id})`);
+
+      // Clear objective tracker for this phase
+      this.objectiveTracker.clearPhase();
+      console.log(`[QuestManager] Cleared ObjectiveTracker for phase: ${phase.id}`);
 
       EventBus.emit('quest-phase-completed', { questId, phaseIndex, phase });
       this.emitNotification({
@@ -521,7 +548,11 @@ export class QuestManager {
 
       console.log(`[QuestManager] Objectives already completed: ${phaseProgress.objectivesCompleted.size}/${phase.objectives.length}`);
 
-      // Check each objective using DialogueManager's requirement checking
+      // Get immutable snapshot of current state for validation
+      const stateSnapshot = this.objectiveTracker.getSnapshot();
+      console.log(`[QuestManager] State snapshot has ${stateSnapshot.events.length} events`);
+
+      // Check each objective using ObjectiveTracker's validation
       for (let i = 0; i < phase.objectives.length; i++) {
         try {
           const objective = phase.objectives[i];
@@ -532,7 +563,8 @@ export class QuestManager {
             continue;
           }
 
-          const isMet = DialogueManager.isRequirementMet(objective);
+          // Validate against immutable snapshot (no timing issues)
+          const isMet = this.objectiveTracker.validateObjective(objective, stateSnapshot);
           console.log(`[QuestManager]   Requirement met: ${isMet}`);
 
           if (isMet) {

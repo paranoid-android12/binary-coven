@@ -153,11 +153,12 @@ export const StatusModal: React.FC<StatusModalProps> = ({
         right: 0,
         bottom: 0,
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        zIndex: 2000,
+        zIndex: 3000,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontFamily: 'BoldPixels'
+        fontFamily: 'BoldPixels',
+        pointerEvents: 'auto'
       }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();

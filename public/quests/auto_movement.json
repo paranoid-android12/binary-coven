@@ -1,0 +1,272 @@
+{
+  "id": "auto_movement",
+  "title": "Automating Movement",
+  "description": "Learn to write code to automate your movements",
+  "difficulty": "beginner",
+  "category": "Tutorial",
+  "estimatedTime": 12,
+  "concepts": ["programming", "code_terminal", "functions", "movement_commands"],
+  "prerequisites": ["first_harvest"],
+  "icon": "quest_icon.png",
+  "thumbnail": "quest_thumb.png",
+  "phases": [
+    {
+      "id": "programming_introduction",
+      "title": "The Power of Code",
+      "description": "Understanding automation",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "You're absolutely right - clicking buttons for every single action won't work. That's where PROGRAMMING comes in!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Programming? On a farm?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Instead of doing everything manually, we can write CODE to automate tasks. Let me show you the terminal.",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "opening_terminal",
+      "title": "Opening the Code Terminal",
+      "description": "Access the programming interface",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click on the QUICK PROGRAM button (looks like a terminal icon) or click directly on yourself to open the programming interface!",
+          "sprite": "manu-speaking.png",
+          "objectives": [
+            {
+              "type": "open_terminal",
+              "description": "Open the code terminal"
+            }
+          ]
+        }
+      ],
+      "objectives": [
+        {
+          "type": "open_terminal",
+          "description": "Open the code terminal"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Okay, I see it. It's... blank.",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect! That's because we're starting from scratch. Let me explain what each part does.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true,
+      "startingCode": ""
+    },
+    {
+      "id": "code_structure_lesson",
+      "title": "Understanding Code Structure",
+      "description": "Learn the basics of code syntax",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Alright, coding lesson time! Every program starts with a MAIN FUNCTION. Think of it as the entry point - where your code begins.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Type this exactly: 'def main():' then press ENTER. 'def' means 'define', and we're defining a function called 'main'.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Why the colon at the end?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Great question! The colon (:) tells Python 'hey, here comes a block of code that belongs to this function'. Everything indented after it is INSIDE the function.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Now, press SPACE or TAB four times to indent, then type 'pass' and press ENTER. 'pass' is a placeholder that says 'nothing here yet'.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "For now, just focus on this: CODE INSIDE THE FUNCTION MUST BE INDENTED. That's how Python knows what belongs together!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "So... 'def main():' creates the function, and everything indented is inside it?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! You're a natural. Now let's make it DO something!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true,
+      "startingCode": ""
+    },
+    {
+      "id": "first_movement_command",
+      "title": "Your First Command",
+      "description": "Write code to move left",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now for the fun part! Clear out that 'pass' and type 'move_left()' instead. This is a FUNCTION CALL - it tells you to move left!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Your code should look like this:\n\ndef main():\n    move_left()\n\nMake sure move_left() is indented under main()!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "And the parentheses? The ()? ",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Those tell Python 'execute this function NOW'. Without them, nothing happens. With them, you move left!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Once you've written the code, click the PLAY button (green triangle, top-right) to run it!",
+          "sprite": "manu-speaking.png",
+          "objectives": [
+            {
+              "type": "code_content",
+              "description": "Write code containing 'move_left()'",
+              "content": "move_left()"
+            },
+            {
+              "type": "play_button",
+              "description": "Click the Play button to run your code"
+            }
+          ]
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Write code containing 'move_left()'",
+          "content": "move_left()"
+        },
+        {
+          "type": "play_button",
+          "description": "Click the Play button to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Whoa! I moved! The code made me move automatically!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "SEE? That's the power of programming! You wrote an instruction, and it executed automatically. No clicking required!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Okay, I'll admit... that's pretty cool.",
+          "sprite": "qubit-speaking.png"
+        }
+      ],
+      "autoAdvance": true,
+      "startingCode": ""
+    },
+    {
+      "id": "movement_practice",
+      "title": "Movement Mastery",
+      "description": "Chain multiple movement commands",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's get fancy! You can write MULTIPLE commands, one per line. Try moving right, then up, then left!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Each command should be on its own line, like this:\n\ndef main():\n    move_right()\n    move_up()\n    move_left()\n\nAll indented under main()!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So it'll execute them in order, top to bottom?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! That's how programs work - they read from top to bottom, doing each thing in sequence. Try it!",
+          "sprite": "manu-pleased.png",
+          "objectives": [
+            {
+              "type": "code_content",
+              "description": "Write code with move_right(), move_up(), and move_left()",
+              "content": "move_right"
+            },
+            {
+              "type": "play_button",
+              "description": "Run your code to test the movement sequence"
+            }
+          ]
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Write code with move_right(), move_up(), and move_left()",
+          "content": "move_right"
+        },
+        {
+          "type": "play_button",
+          "description": "Run your code to test the movement sequence"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "That worked! I moved in a pattern, all from code!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect! Now you understand the basics. But here's where it gets REALLY interesting - we can automate MORE than just movement...",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true,
+      "startingCode": ""
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "farming_scripts",
+      "description": "Unlock 'Farming Scripts' quest"
+    }
+  ]
+}

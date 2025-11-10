@@ -189,16 +189,20 @@ export const GameInterface: React.FC = () => {
   // Button positions (top-right corner)
   const playButtonPosition = { x: window.innerWidth - 180, y: 20 };
   const upgradeButtonPosition = { x: window.innerWidth - 115, y: 20 };
-  
+
   // Drone button position (below main play button)
   const dronePlayButtonPosition = { x: window.innerWidth - 180, y: 90 };
-  
+
   // Save/Load button positions (to the right of energy bar)
   const saveButtonPosition = { x: 30, y: 80 };
   const loadButtonPosition = { x: 80, y: 80 };
   const glossaryButtonPosition = { x: 220, y: 40 };
   const quickProgramButtonPosition = { x: 320, y: 40 };
   const questButtonPosition = { x: 30, y: 120 };
+
+  // Plant/Harvest button positions (lower-right corner)
+  const plantButtonPosition = { x: window.innerWidth - 180, y: window.innerHeight - 140 };
+  const harvestButtonPosition = { x: window.innerWidth - 115, y: window.innerHeight - 140 };
 
   // Modal management functions
   const openModal = useCallback((modalId: string) => {
@@ -502,9 +506,11 @@ export const GameInterface: React.FC = () => {
       try {
         // Load all quest files
         await store.loadQuests([
-          'quests/tutorial_basics.json',
-          'quests/farming_loops.json',
-          'quests/functions_intro.json'
+          'quests/game_intro.json',
+          'quests/first_harvest.json',
+          'quests/auto_movement.json',
+          'quests/farming_scripts.json',
+          'quests/full_automation.json'
         ]);
         console.log('[Quest System] Quests loaded');
 
@@ -523,7 +529,7 @@ export const GameInterface: React.FC = () => {
 
           // Small delay to ensure game is fully initialized
           setTimeout(() => {
-            const success = store.startQuest('tutorial_basics');
+            const success = store.startQuest('game_intro');
 
             if (success) {
               // Set flag to prevent auto-start on subsequent loads
@@ -588,14 +594,14 @@ export const GameInterface: React.FC = () => {
 
   const handleRunDroneCode = (droneId: string) => {
     const scene = phaserRef.current?.scene as any;
-    
+
     if (!scene) {
       console.warn('No scene available for drone execution');
       return;
     }
 
     const isDroneRunning = droneExecutionStates.get(droneId) || false;
-    
+
     if (isDroneRunning) {
       console.log('Stopping drone execution', droneId);
       if (scene.stopDroneExecution) {
@@ -605,6 +611,90 @@ export const GameInterface: React.FC = () => {
       console.log('Starting drone execution', droneId);
       if (scene.startDroneExecution) {
         scene.startDroneExecution(droneId);
+      }
+    }
+  };
+
+  const handlePlantButton = async () => {
+    console.log('[PLANT BUTTON] Clicked');
+    const store = useGameStore.getState();
+    const qubitEntity = store.entities.get('qubit');
+
+    if (!qubitEntity) {
+      console.warn('[PLANT BUTTON] Qubit entity not found');
+      return;
+    }
+
+    // Check if qubit is blocked (code is running)
+    if (qubitEntity.taskState.isBlocked) {
+      console.log('[PLANT BUTTON] Cannot plant - entity is busy');
+      return;
+    }
+
+    // Get current grid
+    const currentGrid = store.getGridAt(qubitEntity.position);
+    if (!currentGrid || currentGrid.type !== 'farmland') {
+      console.log('[PLANT BUTTON] Not on farmland');
+      return;
+    }
+
+    // Execute plant function
+    const scene = phaserRef.current?.scene as ProgrammingGame;
+    if (scene && scene.gridSystem) {
+      try {
+        const result = await scene.gridSystem.executeGridFunction(
+          currentGrid.id,
+          'plant',
+          qubitEntity,
+          ['wheat']
+        );
+        console.log('[PLANT BUTTON] Plant result:', result);
+        // Emit event for quest tracking
+        EventBus.emit('action-plant-clicked', {});
+      } catch (error) {
+        console.error('[PLANT BUTTON] Error:', error);
+      }
+    }
+  };
+
+  const handleHarvestButton = async () => {
+    console.log('[HARVEST BUTTON] Clicked');
+    const store = useGameStore.getState();
+    const qubitEntity = store.entities.get('qubit');
+
+    if (!qubitEntity) {
+      console.warn('[HARVEST BUTTON] Qubit entity not found');
+      return;
+    }
+
+    // Check if qubit is blocked (code is running)
+    if (qubitEntity.taskState.isBlocked) {
+      console.log('[HARVEST BUTTON] Cannot harvest - entity is busy');
+      return;
+    }
+
+    // Get current grid
+    const currentGrid = store.getGridAt(qubitEntity.position);
+    if (!currentGrid || currentGrid.type !== 'farmland') {
+      console.log('[HARVEST BUTTON] Not on farmland');
+      return;
+    }
+
+    // Execute harvest function
+    const scene = phaserRef.current?.scene as ProgrammingGame;
+    if (scene && scene.gridSystem) {
+      try {
+        const result = await scene.gridSystem.executeGridFunction(
+          currentGrid.id,
+          'harvest',
+          qubitEntity,
+          []
+        );
+        console.log('[HARVEST BUTTON] Harvest result:', result);
+        // Emit event for quest tracking
+        EventBus.emit('action-harvest-clicked', {});
+      } catch (error) {
+        console.error('[HARVEST BUTTON] Error:', error);
       }
     }
   };
@@ -721,16 +811,14 @@ export const GameInterface: React.FC = () => {
 
       {/* Status Modal - Only show during ProgrammingGame */}
       {showProgrammingInterface && (
-        <div style={{ zIndex: modalState.isOpen ? 3000 : -1 }}>
-          <StatusModal
-            isOpen={modalState.isOpen}
-            onClose={handleCloseModal}
-            entity={modalState.entity}
-            grid={modalState.grid}
-            position={modalState.position}
-            onPositionChange={handleModalPositionChange}
-          />
-        </div>
+        <StatusModal
+          isOpen={modalState.isOpen}
+          onClose={handleCloseModal}
+          entity={modalState.entity}
+          grid={modalState.grid}
+          position={modalState.position}
+          onPositionChange={handleModalPositionChange}
+        />
       )}
 
       {/* Modal Blocking Overlay - Covers game area when any modal is open */}
@@ -884,6 +972,34 @@ export const GameInterface: React.FC = () => {
               if (!globalModalState.isAnyModalOpen) {
                 setQuestModalState({ isOpen: true });
                 openModal('quest');
+              }
+            }}
+          />
+
+          {/* Plant Button (lower-right corner) */}
+          <SpriteButton
+            position={plantButtonPosition}
+            backgroundSprite="button.png"
+            upFrame={{ x: 480, y: 496, w: 16, h: 16 }}
+            downFrame={{ x: 480, y: 512, w: 16, h: 16 }}
+            scale={4}
+            onClick={() => {
+              if (!isCodeRunning && activeEntity && !activeEntity.taskState.isBlocked) {
+                handlePlantButton();
+              }
+            }}
+          />
+
+          {/* Harvest Button (lower-right corner) */}
+          <SpriteButton
+            position={harvestButtonPosition}
+            backgroundSprite="button.png"
+            upFrame={{ x: 528, y: 496, w: 16, h: 16 }}
+            downFrame={{ x: 528, y: 512, w: 16, h: 16 }}
+            scale={4}
+            onClick={() => {
+              if (!isCodeRunning && activeEntity && !activeEntity.taskState.isBlocked) {
+                handleHarvestButton();
               }
             }}
           />

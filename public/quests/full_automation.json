@@ -1,0 +1,174 @@
+{
+  "id": "full_automation",
+  "title": "Full Automation",
+  "description": "Combine all learned skills to create a complete automated farming system",
+  "difficulty": "beginner",
+  "category": "Tutorial",
+  "estimatedTime": 15,
+  "concepts": ["full_automation", "movement", "farming", "loops"],
+  "prerequisites": ["farming_scripts"],
+  "icon": "quest_icon.png",
+  "thumbnail": "quest_thumb.png",
+  "phases": [
+    {
+      "id": "combining_skills",
+      "title": "Putting It All Together",
+      "description": "Create a multi-step automated script",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Okay Qubit, final test! Let's combine EVERYTHING you've learned - movement, planting, waiting, and harvesting!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So move to farmland, plant, wait, then harvest? All in one script?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! And we'll do it MULTIPLE times to collect 5 wheat total. Ready?",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "script_planning",
+      "title": "Planning Your Script",
+      "description": "Understanding the full automation flow",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Here's the plan: Move to a farmland, plant(), sleep(11000), harvest(). Then move to the NEXT farmland and repeat!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So basically a pattern? Move, farm, move, farm, move, farm?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect! That's exactly it. You'll need to repeat this until you've collected 5 wheat. Let's see your coding skills!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Hint: You can repeat the same commands. Something like:\n\nmove_right()\nplant()\nsleep(11000)\nharvest()\nmove_right()\nplant()\nsleep(11000)\nharvest()\n\n...and so on!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "five_wheat_challenge",
+      "title": "Collect 5 Wheat",
+      "description": "Write and run a script to automate collecting 5 wheat",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Alright, show me what you've got! Write a script that will automatically collect 5 wheat. I'll wait right here!",
+          "sprite": "manu-pleased.png",
+          "objectives": [
+            {
+              "type": "code_content",
+              "description": "Write a script with movement, plant, sleep, and harvest",
+              "content": "plant"
+            },
+            {
+              "type": "play_button",
+              "description": "Run your automation script"
+            }
+          ]
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Write a script with movement, plant, sleep, and harvest",
+          "content": "plant"
+        },
+        {
+          "type": "play_button",
+          "description": "Run your automation script"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Done! Look at that wheat counter go up!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Incredible! You just wrote your first real automation script! No manual clicking, just pure code!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true,
+      "startingCode": ""
+    },
+    {
+      "id": "graduation",
+      "title": "A Programmer is Born",
+      "description": "Celebrating your success",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "You know what this means, right? You're not just a farmer anymore - you're a PROGRAMMER!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "I have to admit... this is way cooler than I expected. Automation is powerful.",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "And this is just the beginning! There's so much more you can do - loops, functions, arrays, conditions...",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Hold on... loops? You mean I could make this even MORE efficient?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Hehe, now you're thinking like a real programmer! But let's master the basics first. Grandpa will be so proud!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Thanks for teaching me all this, Maru. I couldn't have done it without you.",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Anytime! Now go explore - there's a whole farm out there waiting to be automated!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "resource",
+      "value": 5,
+      "description": "Gained 5 wheat from automation"
+    },
+    {
+      "type": "item",
+      "value": "programmer_badge",
+      "description": "Unlocked: Programmer Badge"
+    }
+  ]
+}

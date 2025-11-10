@@ -28,6 +28,8 @@ interface TutorialState {
   playButtonClicked: boolean;          // Has play button been clicked
   movementCommandDetected: boolean;    // Has any movement command been used in code
   hasAcknowledgedCurrentRequirement: boolean; // Has user seen and acknowledged current step
+  plantButtonClicked: boolean;         // Has plant button been clicked
+  harvestButtonClicked: boolean;       // Has harvest button been clicked
 }
 
 /**
@@ -60,7 +62,9 @@ export class DialogueManager {
     codeContent: '',
     playButtonClicked: false,
     movementCommandDetected: false,
-    hasAcknowledgedCurrentRequirement: false
+    hasAcknowledgedCurrentRequirement: false,
+    plantButtonClicked: false,
+    harvestButtonClicked: false
   };
 
   // Callbacks for UI updates
@@ -93,8 +97,9 @@ export class DialogueManager {
     // Tutorial tracking events
     EventBus.on('tutorial-movement', (data: { direction: string }) => {
       if (this.dialogueState.isActive) {
-        this.tutorialState.movementDirections.add(data.direction);
-        console.log(`[DIALOGUE MANAGER] ✓ Movement tracked: ${data.direction}`);
+        const normalizedDirection = this.normalizeDirection(data.direction);
+        this.tutorialState.movementDirections.add(normalizedDirection);
+        console.log(`[DIALOGUE MANAGER] ✓ Movement tracked: ${normalizedDirection} (raw: ${data.direction})`);
         console.log(`[DIALOGUE MANAGER] Total movements recorded: ${this.tutorialState.movementDirections.size}`);
         console.log(`[DIALOGUE MANAGER] Movements: ${Array.from(this.tutorialState.movementDirections).join(', ')}`);
         this.notifyStateChange();
@@ -126,7 +131,23 @@ export class DialogueManager {
     EventBus.on('tutorial-play-clicked', () => {
       if (this.dialogueState.isActive) {
         this.tutorialState.playButtonClicked = true;
-        console.log('[DIALOGUE MANAGER] Play button clicked');
+        console.log('[DIALOGUE MANAGER] ✓ Play button clicked');
+        this.notifyStateChange();
+      }
+    });
+
+    EventBus.on('action-plant-clicked', () => {
+      if (this.dialogueState.isActive) {
+        this.tutorialState.plantButtonClicked = true;
+        console.log('[DIALOGUE MANAGER] ✓ Plant button clicked');
+        this.notifyStateChange();
+      }
+    });
+
+    EventBus.on('action-harvest-clicked', () => {
+      if (this.dialogueState.isActive) {
+        this.tutorialState.harvestButtonClicked = true;
+        console.log('[DIALOGUE MANAGER] ✓ Harvest button clicked');
         this.notifyStateChange();
       }
     });
@@ -204,15 +225,16 @@ export class DialogueManager {
       case 'movement':
         // Check if all required directions have been moved
         if (requirement.directions) {
-          console.log(`[DIALOGUE MANAGER] Required directions: ${requirement.directions.join(', ')}`);
+          const requiredDirections = requirement.directions.map(dir => this.normalizeDirection(dir));
+          console.log(`[DIALOGUE MANAGER] Required directions: ${requiredDirections.join(', ')}`);
           console.log(`[DIALOGUE MANAGER] Current movements: ${Array.from(this.tutorialState.movementDirections).join(', ')}`);
 
-          const allMet = requirement.directions.every(dir => this.tutorialState.movementDirections.has(dir));
+          const allMet = requiredDirections.every(dir => this.tutorialState.movementDirections.has(dir));
           console.log(`[DIALOGUE MANAGER] All directions met: ${allMet}`);
 
           // Log which directions are missing
           if (!allMet) {
-            const missing = requirement.directions.filter(dir => !this.tutorialState.movementDirections.has(dir));
+            const missing = requiredDirections.filter(dir => !this.tutorialState.movementDirections.has(dir));
             console.log(`[DIALOGUE MANAGER] Missing directions: ${missing.join(', ')}`);
           }
 
@@ -270,6 +292,14 @@ export class DialogueManager {
           });
         }
         return false;
+
+      case 'action_plant':
+        console.log(`[DIALOGUE MANAGER] Plant button clicked: ${this.tutorialState.plantButtonClicked}`);
+        return this.tutorialState.plantButtonClicked;
+
+      case 'action_harvest':
+        console.log(`[DIALOGUE MANAGER] Harvest button clicked: ${this.tutorialState.harvestButtonClicked}`);
+        return this.tutorialState.harvestButtonClicked;
 
       default:
         console.log(`[DIALOGUE MANAGER] Unknown requirement type: ${requirement.type}, returning true`);
@@ -453,9 +483,8 @@ export class DialogueManager {
 
     console.log(`[DIALOGUE MANAGER] Advanced to dialogue ${nextIndex + 1}/${this.dialogueState.dialogues.length}`);
 
-    // Reset acknowledgment flag and play button state for the new dialogue
+    // Reset acknowledgment flag for the new dialogue
     this.tutorialState.hasAcknowledgedCurrentRequirement = false;
-    this.tutorialState.playButtonClicked = false;
 
     this.dialogueState.currentIndex = nextIndex;
     this.notifyStateChange();
@@ -497,19 +526,14 @@ export class DialogueManager {
 
     console.log('[DIALOGUE MANAGER] Dialogue state reset');
 
-    // Note: Don't reset tutorial state here! QuestManager needs to check objectives
-    // after 'dialogue-closed' event. Tutorial state will be reset at the start of
-    // the next dialogue sequence (see startDialogueSequence() line 318)
+    // Reset tutorial state immediately - ObjectiveTracker now handles objective validation
+    // No more need for setTimeout timing hacks!
+    this.resetTutorialState();
+    console.log('[DIALOGUE MANAGER] Tutorial state reset');
+
     this.notifyStateChange();
     console.log('[DIALOGUE MANAGER] Emitting dialogue-closed event');
     EventBus.emit('dialogue-closed');
-
-    // Reset tutorial state after a brief delay to allow QuestManager to check objectives
-    console.log('[DIALOGUE MANAGER] Tutorial state will be reset in 100ms (after QuestManager checks objectives)');
-    setTimeout(() => {
-      console.log('[DIALOGUE MANAGER] Resetting tutorial state (delayed)');
-      this.resetTutorialState();
-    }, 100);
 
     console.log('[DIALOGUE MANAGER] ===== Dialogue Closed =====');
   }
@@ -524,7 +548,9 @@ export class DialogueManager {
       codeContent: '',
       playButtonClicked: false,
       movementCommandDetected: false,
-      hasAcknowledgedCurrentRequirement: false
+      hasAcknowledgedCurrentRequirement: false,
+      plantButtonClicked: false,
+      harvestButtonClicked: false
     };
   }
 
@@ -553,6 +579,22 @@ export class DialogueManager {
     EventBus.removeListener('tutorial-code-changed');
     EventBus.removeListener('tutorial-play-clicked');
     console.log('[DIALOGUE MANAGER] Destroyed');
+  }
+
+  /**
+   * Normalize direction strings so gameplay inputs and quest data align
+   */
+  private normalizeDirection(direction: string): string {
+    if (!direction) {
+      return '';
+    }
+
+    const trimmed = direction.trim().toLowerCase();
+    if (trimmed.startsWith('arrow')) {
+      return trimmed.replace('arrow', '');
+    }
+
+    return trimmed;
   }
 }
 

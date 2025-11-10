@@ -1,0 +1,222 @@
+{
+  "id": "farming_scripts",
+  "title": "Farming Scripts",
+  "description": "Automate planting and harvesting with code",
+  "difficulty": "beginner",
+  "category": "Tutorial",
+  "estimatedTime": 10,
+  "concepts": ["plant_function", "harvest_function", "sleep_function", "automation"],
+  "prerequisites": ["auto_movement"],
+  "icon": "quest_icon.png",
+  "thumbnail": "quest_thumb.png",
+  "phases": [
+    {
+      "id": "farming_functions_intro",
+      "title": "Beyond Movement",
+      "description": "Learning farming automation",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Remember those Plant and Harvest buttons? Well, you can trigger them with CODE too!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Wait, so I don't have to click the buttons anymore?",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! We have plant() and harvest() functions. Just like move_left(), but for farming!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "plant_function_lesson",
+      "title": "The plant() Function",
+      "description": "Learn to plant crops with code",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "First, move to a farmland tile. Then call plant() to plant wheat. Simple as that!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Try this: move to farmland (like move_right() a couple times), then add plant() on the next line.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So it's just another function call? plant() with the parentheses?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Yep! You're getting it. Go ahead and write the code, then run it!",
+          "sprite": "manu-pleased.png",
+          "objectives": [
+            {
+              "type": "code_content",
+              "description": "Write code containing 'plant()'",
+              "content": "plant()"
+            },
+            {
+              "type": "play_button",
+              "description": "Run your code"
+            }
+          ]
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Write code containing 'plant()'",
+          "content": "plant()"
+        },
+        {
+          "type": "play_button",
+          "description": "Run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "It worked! The wheat is planted!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Nice! But now we have to WAIT for it to grow... or do we?",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true,
+      "startingCode": ""
+    },
+    {
+      "id": "sleep_function_lesson",
+      "title": "The sleep() Function",
+      "description": "Learn to wait in code",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Here's the thing - we can tell our code to WAIT! The sleep() function pauses execution for a set time.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Pauses? Like... tells the program to do nothing?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! sleep(3000) means 'wait 3000 milliseconds' - that's 3 seconds. Wheat takes about 10 seconds to grow, so use sleep(11000)!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Try this sequence:\n\nplant()\nsleep(11000)\n\nThis plants wheat, waits 11 seconds, then continues!",
+          "sprite": "manu-speaking.png",
+          "objectives": [
+            {
+              "type": "code_content",
+              "description": "Write code with plant() and sleep()",
+              "content": "sleep"
+            }
+          ]
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Write code with plant() and sleep()",
+          "content": "sleep"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "So the code just... waits? That's actually useful.",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Super useful! Now let's harvest what we planted!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true,
+      "startingCode": ""
+    },
+    {
+      "id": "harvest_function_lesson",
+      "title": "The harvest() Function",
+      "description": "Complete the farming cycle",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Last piece of the puzzle: harvest()! After planting and waiting, call harvest() to collect your wheat!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Put it all together:\n\nplant()\nsleep(11000)\nharvest()\n\nA complete automated farming cycle!",
+          "sprite": "manu-pleased.png",
+          "objectives": [
+            {
+              "type": "code_content",
+              "description": "Write code with plant(), sleep(), and harvest()",
+              "content": "harvest()"
+            },
+            {
+              "type": "play_button",
+              "description": "Run your complete farming script"
+            }
+          ]
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Write code with plant(), sleep(), and harvest()",
+          "content": "harvest()"
+        },
+        {
+          "type": "play_button",
+          "description": "Run your complete farming script"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "That... that was completely automated. I didn't touch anything after hitting play!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "THAT'S the magic of programming! Write it once, let it run. No manual clicking needed!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "This changes everything.",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true,
+      "startingCode": ""
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "full_automation",
+      "description": "Unlock 'Full Automation' quest"
+    }
+  ]
+}

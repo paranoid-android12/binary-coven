@@ -37,7 +37,9 @@ export type RequirementType =
   | 'interact_npc'          // Interact with specific NPC
   | 'harvest_crop'          // Harvest specific number of crops
   | 'reach_position'        // Reach a specific position
-  | 'use_function';         // Use a specific function
+  | 'use_function'          // Use a specific function
+  | 'action_plant'          // Player must click the plant button
+  | 'action_harvest';       // Player must click the harvest button
 
 /**
  * Dialogue entry within a quest phase

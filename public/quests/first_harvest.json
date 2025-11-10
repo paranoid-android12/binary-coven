@@ -1,0 +1,150 @@
+{
+  "id": "first_harvest",
+  "title": "First Harvest",
+  "description": "Learn the farming cycle: plant, wait, and harvest",
+  "difficulty": "beginner",
+  "category": "Tutorial",
+  "estimatedTime": 8,
+  "concepts": ["planting", "harvesting", "manual_buttons", "wheat"],
+  "prerequisites": ["game_intro"],
+  "icon": "quest_icon.png",
+  "thumbnail": "quest_thumb.png",
+  "phases": [
+    {
+      "id": "button_introduction",
+      "title": "The Farming Buttons",
+      "description": "Learn about the Plant and Harvest buttons",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Alright! See those buttons in the lower-right corner? Those are your PLANT and HARVEST buttons.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So I just... click them?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Stand on farmland, click PLANT to plant wheat. Wait for it to grow. Then click HARVEST when it's ready.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Simple enough.",
+          "sprite": "qubit-speaking.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "planting_wheat",
+      "title": "Planting Your First Crop",
+      "description": "Use the Plant button to plant wheat",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Go ahead - walk to one of the brown farmland tiles and click the PLANT button!",
+          "sprite": "manu-speaking.png",
+          "objectives": [
+            {
+              "type": "action_plant",
+              "description": "Click the PLANT button on farmland"
+            }
+          ]
+        }
+      ],
+      "objectives": [
+        {
+          "type": "action_plant",
+          "description": "Click the PLANT button on farmland"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Done. Now what?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Now we wait! Watch the farmland - it'll grow over time. You'll see it change!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "harvesting_wheat",
+      "title": "Reaping the Rewards",
+      "description": "Wait for the wheat to grow, then harvest it",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now we wait! Watch the farmland - it'll grow over time. When it's fully grown, click the HARVEST button while standing on it!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "This is going to take forever if I have to watch every single plant grow...",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Oh, you have NO idea what we have planned. But first - let's finish this harvest!",
+          "sprite": "manu-pleased.png",
+          "objectives": [
+            {
+              "type": "action_harvest",
+              "description": "Wait for wheat to grow, then click HARVEST"
+            }
+          ]
+        }
+      ],
+      "objectives": [
+        {
+          "type": "action_harvest",
+          "description": "Wait for wheat to grow, then click HARVEST"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "I see the wheat counter went up. So that's how we measure success here?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Wheat is our currency. The more you grow, the more you can upgrade and improve.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Okay, but seriously - clicking buttons for every plant? That's not going to scale.",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Aha! NOW you're thinking! Come on, let me show you something cool...",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "auto_movement",
+      "description": "Unlock 'Automating Movement' quest"
+    },
+    {
+      "type": "resource",
+      "value": 1,
+      "description": "Gained 1 wheat from tutorial"
+    }
+  ]
+}

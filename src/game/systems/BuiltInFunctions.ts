@@ -573,19 +573,17 @@ export const interactionFunctions: BuiltInFunction[] = [
   },
   {
     name: 'get_inventory',
-    description: 'Get the current inventory of the entity',
+    description: 'Get the global resources (wheat, etc.)',
     category: 'utility',
     parameters: [],
     execute: async (context: ExecutionContext): Promise<ExecutionResult> => {
-      const { entity } = context;
+      const store = useGameStore.getState();
+      const globalResources = store.globalResources;
+
       return {
         success: true,
-        message: `Inventory: ${entity.inventory.items.length}/${entity.inventory.capacity} items`,
-        data: {
-          items: entity.inventory.items,
-          capacity: entity.inventory.capacity,
-          usedSlots: entity.inventory.items.length
-        }
+        message: `Global Resources - Wheat: ${globalResources.wheat || 0}`,
+        data: globalResources
       };
     }
   },
