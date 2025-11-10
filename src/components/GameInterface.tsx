@@ -198,11 +198,17 @@ export const GameInterface: React.FC = () => {
   const loadButtonPosition = { x: 80, y: 80 };
   const glossaryButtonPosition = { x: 220, y: 40 };
   const quickProgramButtonPosition = { x: 320, y: 40 };
-  const questButtonPosition = { x: 30, y: 120 };
+  const questButtonPosition = { x: 270, y: 40 }; // Centered between glossary and programming terminal
 
   // Plant/Harvest button positions (lower-right corner)
   const plantButtonPosition = { x: window.innerWidth - 180, y: window.innerHeight - 140 };
   const harvestButtonPosition = { x: window.innerWidth - 115, y: window.innerHeight - 140 };
+
+  // Grid coordinate position (lower-left corner)
+  const gridCoordinatePosition = { x: 20, y: window.innerHeight - 60 };
+
+  // Wheat counter position (top-middle)
+  const wheatCounterPosition = { x: window.innerWidth / 2 - 80, y: 20 };
 
   // Modal management functions
   const openModal = useCallback((modalId: string) => {
@@ -982,7 +988,7 @@ export const GameInterface: React.FC = () => {
             backgroundSprite="button.png"
             upFrame={{ x: 480, y: 496, w: 16, h: 16 }}
             downFrame={{ x: 480, y: 512, w: 16, h: 16 }}
-            scale={4}
+            scale={5}
             onClick={() => {
               if (!isCodeRunning && activeEntity && !activeEntity.taskState.isBlocked) {
                 handlePlantButton();
@@ -996,13 +1002,81 @@ export const GameInterface: React.FC = () => {
             backgroundSprite="button.png"
             upFrame={{ x: 528, y: 496, w: 16, h: 16 }}
             downFrame={{ x: 528, y: 512, w: 16, h: 16 }}
-            scale={4}
+            scale={5}
             onClick={() => {
               if (!isCodeRunning && activeEntity && !activeEntity.taskState.isBlocked) {
                 handleHarvestButton();
               }
             }}
           />
+
+          {/* Grid Coordinate Indicator (lower-left) */}
+          {activeEntity && (
+            <div style={{
+              position: 'absolute',
+              left: gridCoordinatePosition.x,
+              top: gridCoordinatePosition.y,
+              backgroundColor: 'rgba(0, 0, 0, 0.85)',
+              border: '2px solid #4A90E2',
+              borderRadius: '8px',
+              padding: '8px 12px',
+              fontFamily: 'BoldPixels',
+              fontSize: '16px',
+              color: 'white',
+              pointerEvents: 'auto'
+            }}>
+              <div style={{
+                fontSize: '14px',
+                fontWeight: 'bold',
+                color: '#4A90E2',
+                marginBottom: '4px'
+              }}>
+                Grid Position
+              </div>
+              <div style={{
+                fontSize: '18px',
+                color: '#ffffff'
+              }}>
+                ({Math.floor(activeEntity.position.x)}, {Math.floor(activeEntity.position.y)})
+              </div>
+            </div>
+          )}
+
+          {/* Wheat Counter (top-middle) */}
+          <div style={{
+            position: 'absolute',
+            left: wheatCounterPosition.x,
+            top: wheatCounterPosition.y,
+            backgroundColor: 'rgba(0, 0, 0, 0.85)',
+            border: '3px solid #FFD700',
+            borderRadius: '10px',
+            padding: '10px 20px',
+            fontFamily: 'BoldPixels',
+            fontSize: '18px',
+            color: 'white',
+            pointerEvents: 'auto',
+            minWidth: '160px',
+            textAlign: 'center',
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px'
+            }}>
+              <span style={{
+                fontSize: '24px',
+                color: '#FFD700'
+              }}>🌾</span>
+              <span style={{
+                fontSize: '22px',
+                fontWeight: 'bold',
+                color: '#FFD700'
+              }}>
+                {globalResources.wheat || 0}
+              </span>
+            </div>
+          </div>
 
           {/* Drone Control Panel - Below main play button */}
           {(() => {

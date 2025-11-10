@@ -218,7 +218,6 @@ export class ProgrammingGame extends Scene {
     left: Phaser.Input.Keyboard.Key;
     right: Phaser.Input.Keyboard.Key;
   };
-  private wasdKeys!: { W: Phaser.Input.Keyboard.Key, A: Phaser.Input.Keyboard.Key, S: Phaser.Input.Keyboard.Key, D: Phaser.Input.Keyboard.Key };
   private isLockedToQubit: boolean = true;
   private cameraSpeed: number = 300;
   private isCameraPanning: boolean = false;
@@ -637,14 +636,6 @@ export class ProgrammingGame extends Scene {
   }
 
   private setupCameraControls() {
-    // Set up WASD keys for camera movement
-    this.wasdKeys = {
-      W: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.W, false),
-      A: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.A, false),
-      S: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.S, false),
-      D: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.D, false)
-    };
-    
     // Set up arrow keys individually (instead of createCursorKeys to avoid spacebar capture)
     this.cameraKeys = {
       up: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.UP, false),
@@ -652,43 +643,6 @@ export class ProgrammingGame extends Scene {
       left: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT, false),
       right: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT, false)
     };
-    
-    // Helper function to check if an input element has focus
-    const isTypingInInput = () => {
-      const activeElement = document.activeElement;
-      if (!activeElement) return false;
-      
-      const tagName = activeElement.tagName.toLowerCase();
-      const hasContentEditable = activeElement.getAttribute('contenteditable') === 'true';
-      const isInput = ['input', 'textarea', 'select'].includes(tagName);
-      const isMonacoEditor = activeElement.classList.contains('monaco-editor') || 
-                           activeElement.closest('.monaco-editor') !== null;
-      
-      return isInput || hasContentEditable || isMonacoEditor;
-    };
-    
-    // Add event listeners for WASD manual camera movement only when not typing
-    // Arrow keys will be handled in update() for qubit movement when locked
-    this.input.keyboard!.on('keydown-W', () => {
-      if (!isTypingInInput()) {
-        this.unlockCamera();
-      }
-    });
-    this.input.keyboard!.on('keydown-A', () => {
-      if (!isTypingInInput()) {
-        this.unlockCamera();
-      }
-    });
-    this.input.keyboard!.on('keydown-S', () => {
-      if (!isTypingInInput()) {
-        this.unlockCamera();
-      }
-    });
-    this.input.keyboard!.on('keydown-D', () => {
-      if (!isTypingInInput()) {
-        this.unlockCamera();
-      }
-    });
   }
 
   private setupZoomControls() {
@@ -1653,42 +1607,8 @@ export class ProgrammingGame extends Scene {
       return isInput || hasContentEditable || isMonacoEditor;
     };
     
-    // Handle camera movement when not locked to qubit
-    if (!this.isLockedToQubit) {
-      const camera = this.cameras.main;
-      const moveSpeed = this.cameraSpeed * (delta / 1000); // Smooth movement based on delta time
-      
-      // Only handle camera movement if not typing in input fields
-      if (!isTypingInInput()) {
-        // WASD camera movement (only when unlocked)
-        if (this.wasdKeys.W.isDown) {
-          camera.scrollY -= moveSpeed;
-        }
-        if (this.wasdKeys.S.isDown) {
-          camera.scrollY += moveSpeed;
-        }
-        if (this.wasdKeys.A.isDown) {
-          camera.scrollX -= moveSpeed;
-        }
-        if (this.wasdKeys.D.isDown) {
-          camera.scrollX += moveSpeed;
-        }
-        
-        // Arrow keys also move camera when unlocked (using our custom keys)
-        if (this.cameraKeys.up.isDown) {
-          camera.scrollY -= moveSpeed;
-        }
-        if (this.cameraKeys.down.isDown) {
-          camera.scrollY += moveSpeed;
-        }
-        if (this.cameraKeys.left.isDown) {
-          camera.scrollX -= moveSpeed;
-        }
-        if (this.cameraKeys.right.isDown) {
-          camera.scrollX += moveSpeed;
-        }
-      }
-    }
+    // Camera movement via WASD has been removed
+    // Camera now stays locked to the active entity
     
     if (!activeEntity) return;
     
