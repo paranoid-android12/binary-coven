@@ -19996,6 +19996,150 @@ export const MAP_EDITOR_DATA = {
       "frame": 18,
       "tilesetKey": "Fence_Wood",
       "layer": 2
+    },
+    {
+      "id": "ground_15_21_2",
+      "position": {
+        "x": 15,
+        "y": 21
+      },
+      "tilesetX": 0,
+      "tilesetY": 0,
+      "frame": 0,
+      "tilesetKey": "wood_moss",
+      "layer": 2
+    },
+    {
+      "id": "ground_16_21_2",
+      "position": {
+        "x": 16,
+        "y": 21
+      },
+      "tilesetX": 16,
+      "tilesetY": 0,
+      "frame": 1,
+      "tilesetKey": "wood_moss",
+      "layer": 2
+    },
+    {
+      "id": "ground_17_19_2",
+      "position": {
+        "x": 17,
+        "y": 19
+      },
+      "tilesetX": 32,
+      "tilesetY": 0,
+      "frame": 2,
+      "tilesetKey": "wood_moss",
+      "layer": 2
+    },
+    {
+      "id": "ground_13_20_2",
+      "position": {
+        "x": 13,
+        "y": 20
+      },
+      "tilesetX": 32,
+      "tilesetY": 0,
+      "frame": 2,
+      "tilesetKey": "wood_moss",
+      "layer": 2
+    },
+    {
+      "id": "ground_14_21_2",
+      "position": {
+        "x": 14,
+        "y": 21
+      },
+      "tilesetX": 80,
+      "tilesetY": 48,
+      "frame": 80,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_17_20_2",
+      "position": {
+        "x": 17,
+        "y": 20
+      },
+      "tilesetX": 96,
+      "tilesetY": 48,
+      "frame": 81,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_14_19_2",
+      "position": {
+        "x": 14,
+        "y": 19
+      },
+      "tilesetX": 96,
+      "tilesetY": 48,
+      "frame": 81,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_12_22_2",
+      "position": {
+        "x": 12,
+        "y": 22
+      },
+      "tilesetX": 96,
+      "tilesetY": 48,
+      "frame": 81,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_14_20_2",
+      "position": {
+        "x": 14,
+        "y": 20
+      },
+      "tilesetX": 96,
+      "tilesetY": 336,
+      "frame": 531,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_17_22_2",
+      "position": {
+        "x": 17,
+        "y": 22
+      },
+      "tilesetX": 96,
+      "tilesetY": 336,
+      "frame": 531,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_12_21_2",
+      "position": {
+        "x": 12,
+        "y": 21
+      },
+      "tilesetX": 48,
+      "tilesetY": 336,
+      "frame": 528,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_11_19_2",
+      "position": {
+        "x": 11,
+        "y": 19
+      },
+      "tilesetX": 48,
+      "tilesetY": 336,
+      "frame": 528,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
     }
   ],
   "farmlandGrids": [],
@@ -20875,8 +21019,20 @@ export const MAP_EDITOR_DATA = {
     {
       "x": 23,
       "y": 18
+    },
+    {
+      "x": 18,
+      "y": 19
+    },
+    {
+      "x": 18,
+      "y": 20
+    },
+    {
+      "x": 18,
+      "y": 21
     }
   ],
   "gameGrids": [],
-  "timestamp": "2025-10-13T07:50:54.573Z"
+  "timestamp": "2025-11-11T09:29:57.977Z"
 }

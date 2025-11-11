@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { EventBus } from '../game/EventBus';
+import tilesetConfig from '../config/tilesets.json';
 
 interface TilesetInfo {
   key: string;
@@ -7,6 +8,18 @@ interface TilesetInfo {
   columns: number;
   rows: number;
   name: string;
+}
+
+interface TilesetConfigItem {
+  key: string;
+  name: string;
+  filename: string;
+  path: string;
+  tileSize: number;
+  columns: number;
+  rows: number;
+  width: number;
+  height: number;
 }
 
 interface TileData {
@@ -150,45 +163,43 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
   }, []);
 
   const loadTilesetImage = () => {
-    // Map tileset keys to actual filenames
-    const tilesetFilenames: { [key: string]: string } = {
-      'Ground_Tileset': 'Ground_Tileset.png',
-      'Fence_Wood': 'Fence Wood.png'
-    };
-    
-    const filename = tilesetFilenames[activeTileset] || `${activeTileset}.png`;
-    
-    console.log(`Loading tileset: ${activeTileset} -> ${filename}`);
-    
+    // Find tileset in config to get the correct path
+    const tilesetInfo = (tilesetConfig as TilesetConfigItem[]).find(ts => ts.key === activeTileset);
+
+    // Use path from config if available, otherwise try default path
+    const filepath = tilesetInfo ? tilesetInfo.path : `tilesets/${activeTileset}.png`;
+
+    console.log(`Loading tileset: ${activeTileset} -> ${filepath}`);
+
     const img = new Image();
     img.onload = () => {
       console.log(`Tileset loaded: ${img.width}x${img.height} pixels`);
-      
+
       // Calculate actual dimensions based on image size and 16px tile size
       const actualColumns = Math.floor(img.width / TILE_SIZE);
       const actualRows = Math.floor(img.height / TILE_SIZE);
-      
+
       console.log(`Calculated tileset dimensions: ${actualColumns}x${actualRows} tiles`);
-      
+
       // Set actual dimensions based on the loaded image
       setActualTilesetColumns(actualColumns);
       setActualTilesetRows(actualRows);
-      
+
       // Store the image reference
       imageRef.current = img;
-      
+
       // Use setTimeout to ensure state is updated before drawing
       setTimeout(() => {
         drawTileset(img, actualColumns, actualRows);
       }, 0);
-      
+
       setStatus(`${tilesets[activeTileset]?.name || activeTileset} loaded: ${actualColumns}x${actualRows} tiles`);
     };
-    
+
     img.onerror = (error) => {
-      console.error(`Failed to load tileset: ${filename}`, error);
-      setStatus(`ERROR: Failed to load ${filename}`);
-      
+      console.error(`Failed to load tileset: ${filepath}`, error);
+      setStatus(`ERROR: Failed to load ${filepath}`);
+
       // Clear the canvas on error and show error message
       const canvas = canvasRef.current;
       if (canvas) {
@@ -202,12 +213,12 @@ export const MapEditorUI: React.FC<MapEditorUIProps> = ({
           ctx.fillStyle = '#fff';
           ctx.font = '14px Arial';
           ctx.textAlign = 'center';
-          ctx.fillText(`Failed to load ${filename}`, canvas.width / 2, canvas.height / 2);
+          ctx.fillText(`Failed to load ${filepath}`, canvas.width / 2, canvas.height / 2);
         }
       }
     };
-    
-    img.src = `/${filename}`;
+
+    img.src = `/${filepath}`;
   };
 
   const drawTileset = (img: HTMLImageElement, columns?: number, rows?: number) => {

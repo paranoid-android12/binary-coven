@@ -86,17 +86,20 @@ export class Preloader extends Scene
             frameHeight: 32
         });
 
-        // Load the Ground_Tileset for map editor (16x16 tiles in a spritesheet)
-        this.load.spritesheet('Ground_Tileset', 'Ground_Tileset.png', {
-            frameWidth: 16,
-            frameHeight: 16
-        });
-
-        // Load the Fence_Wood tileset for map editor (16x16 tiles in a spritesheet)
-        this.load.spritesheet('Fence_Wood', 'Fence Wood.png', {
-            frameWidth: 16,
-            frameHeight: 16
-        });
+        // AUTO-GENERATED TILESETS START
+    this.load.spritesheet('Fence_Wood', 'tilesets/Fence Wood.png', {
+      frameWidth: 16,
+      frameHeight: 16
+    });
+    this.load.spritesheet('Ground_Tileset', 'tilesets/Ground_Tileset.png', {
+      frameWidth: 16,
+      frameHeight: 16
+    });
+    this.load.spritesheet('wood_moss', 'tilesets/wood moss.png', {
+      frameWidth: 16,
+      frameHeight: 16
+    });
+    // AUTO-GENERATED TILESETS END
 
         // Load the Well spritesheet
         this.load.spritesheet('Well', 'Well.png', {

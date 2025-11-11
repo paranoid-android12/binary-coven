@@ -1845,7 +1845,7 @@ export const GameInterface: React.FC = () => {
         </div>
       )}
 
-      {/* <MapEditorUI
+      <MapEditorUI
         tilesets={mapEditorState.tilesets}
         activeTileset={mapEditorState.activeTileset}
         selectedLayer={mapEditorState.selectedLayer}
@@ -1866,7 +1866,7 @@ export const GameInterface: React.FC = () => {
           EventBus.emit('toggle-map-editor');
         }}
         isActive={mapEditorState.isActive}
-      /> */}
+      />
 
       {/* Glossary Modal */}
       {glossaryModalState.isOpen && (

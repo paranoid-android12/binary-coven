@@ -2,13 +2,14 @@ import { Scene } from 'phaser';
 import { useGameStore } from '../../stores/gameStore';
 import { EventBus } from '../EventBus';
 import { Position } from '../../types/game';
-import { 
-  MapEditorState, 
-  TileData, 
+import {
+  MapEditorState,
+  TileData,
   TilesetInfo
 } from '../../types/mapEditor';
 
 import { MAP_EDITOR_DATA } from '../../../public/map/map_editor_data';
+import tilesetConfig from '../../config/tilesets.json';
 
 export interface GroundTileData {
   id: string;
@@ -48,41 +49,46 @@ export class MapEditor {
   constructor(scene: Scene) {
     this.scene = scene;
     this.gameStore = useGameStore.getState();
+
+    // Dynamically load tilesets from generated config
+    const dynamicTilesets: { [key: string]: TilesetInfo } = {};
+
+    // Add auto-discovered tilesets from config
+    (tilesetConfig as any[]).forEach((tileset: any) => {
+      dynamicTilesets[tileset.key] = {
+        key: tileset.key,
+        name: tileset.name,
+        tileSize: tileset.tileSize,
+        columns: tileset.columns,
+        rows: tileset.rows
+      };
+    });
+
+    // Add special grid tools (non-tileset based)
+    dynamicTilesets['Farmland_Grid'] = {
+      key: 'editor_farmland',
+      name: 'Farmland Grids',
+      tileSize: this.GAME_GRID_SIZE,
+      columns: 1,
+      rows: 1
+    };
+    dynamicTilesets['Wall_Grid'] = {
+      key: 'editor_wall',
+      name: 'Wall Grids',
+      tileSize: this.GAME_GRID_SIZE,
+      columns: 1,
+      rows: 1
+    };
+
+    // Get first tileset key as default
+    const firstTilesetKey = (tilesetConfig as any[]).length > 0 ? (tilesetConfig as any[])[0].key : 'Ground_Tileset';
+
     this.state = {
       isActive: false,
       selectedTile: null,
-      activeTileset: 'Ground_Tileset',
+      activeTileset: firstTilesetKey,
       selectedLayer: 1,
-      tilesets: {
-        'Ground_Tileset': {
-          key: 'Ground_Tileset',
-          name: 'Ground Tiles',
-          tileSize: this.TILE_SIZE,
-          columns: 25, // 400px ÷ 16px = 25 columns
-          rows: 27    // 432px ÷ 16px = 27 rows
-        },
-        'Fence_Wood': {
-          key: 'Fence_Wood',
-          name: 'Fence Wood',
-          tileSize: this.TILE_SIZE,
-          columns: 12, // 192px ÷ 16px = 12 columns
-          rows: 14     // 224px ÷ 16px = 14 rows
-        },
-        'Farmland_Grid': {
-          key: 'editor_farmland',
-          name: 'Farmland Grids',
-          tileSize: this.GAME_GRID_SIZE,
-          columns: 1,
-          rows: 1
-        },
-        'Wall_Grid': {
-          key: 'editor_wall',
-          name: 'Wall Grids',
-          tileSize: this.GAME_GRID_SIZE,
-          columns: 1,
-          rows: 1
-        }
-      }
+      tilesets: dynamicTilesets
     };
 
     this.loadGroundTiles();

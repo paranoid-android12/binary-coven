@@ -1,0 +1,35 @@
+[
+  {
+    "key": "Fence_Wood",
+    "name": "Fence Wood",
+    "filename": "Fence Wood.png",
+    "path": "tilesets/Fence Wood.png",
+    "tileSize": 16,
+    "columns": 12,
+    "rows": 14,
+    "width": 192,
+    "height": 224
+  },
+  {
+    "key": "Ground_Tileset",
+    "name": "Ground_Tileset",
+    "filename": "Ground_Tileset.png",
+    "path": "tilesets/Ground_Tileset.png",
+    "tileSize": 16,
+    "columns": 25,
+    "rows": 27,
+    "width": 400,
+    "height": 432
+  },
+  {
+    "key": "wood_moss",
+    "name": "wood moss",
+    "filename": "wood moss.png",
+    "path": "tilesets/wood moss.png",
+    "tileSize": 16,
+    "columns": 3,
+    "rows": 2,
+    "width": 48,
+    "height": 32
+  }
+]

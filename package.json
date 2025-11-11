@@ -22,10 +22,11 @@
         "typescript"
     ],
     "scripts": {
-        "dev": "node log.js dev & next dev -p 8080",
-        "build": "node log.js build & next build",
-        "dev-nolog": "next dev -p 8080",
-        "build-nolog": "next build"
+        "dev": "npm run generate:tilesets && node log.js dev & next dev -p 8080",
+        "build": "npm run generate:tilesets && node log.js build & next build",
+        "dev-nolog": "npm run generate:tilesets && next dev -p 8080",
+        "build-nolog": "npm run generate:tilesets && next build",
+        "generate:tilesets": "node scripts/generate-tilesets.js"
     },
     "dependencies": {
         "@monaco-editor/react": "^4.6.0",
@@ -44,6 +45,7 @@
         "@types/react": "^19",
         "@types/react-dom": "^19",
         "@types/uuid": "^9.0.7",
+        "image-size": "^1.2.1",
         "typescript": "^5"
     }
 }
