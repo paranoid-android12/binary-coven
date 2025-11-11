@@ -1,0 +1,99 @@
+{
+  "id": "drone_farming_quest",
+  "title": "Drone Farming Test",
+  "description": "Program the alpha drone to plant and harvest wheat crops",
+  "difficulty": "intermediate",
+  "category": "Automation",
+  "estimatedTime": 15,
+  "concepts": ["drones", "automation", "functions", "loops"],
+  "prerequisites": ["alpha_drone_intro"],
+  "icon": "quest_icon.png",
+  "thumbnail": "quest_thumb.png",
+  "phases": [
+    {
+      "id": "program_drone_intro",
+      "title": "Programming the Drone",
+      "description": "Learn how to program the alpha drone",
+      "preDialogues": [
+        {
+          "name": "Lain",
+          "content": "Now that you know about the alpha drone, let's see if you can get it working!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Lain",
+          "content": "Click on the drone to open its programming interface. It works just like yours - you can write Python code to control it.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Lain",
+          "content": "The drone knows all the same functions you do: move_up(), move_down(), move_left(), move_right(), plant(), and harvest().",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "drone_farming_task",
+      "title": "Test the Drone",
+      "description": "Have the drone plant and harvest 5 wheat crops",
+      "preDialogues": [
+        {
+          "name": "Lain",
+          "content": "Here's your first task: Program the drone to plant wheat on 5 farmland tiles, wait for them to grow, then harvest them.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Lain",
+          "content": "Remember, the drone needs to move to farmland, call plant('wheat'), wait for the crops to grow, then call harvest().",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Lain",
+          "content": "You'll need to use loops to make this efficient. The drone should complete all 5 plant-and-harvest cycles on its own!",
+          "sprite": "manu-speaking.png",
+          "objectives": [
+            {
+              "type": "drone_farming",
+              "description": "Program the drone to plant and harvest 5 wheat crops",
+              "droneId": "drone_alpha",
+              "plantCount": 5,
+              "harvestCount": 5
+            }
+          ]
+        }
+      ],
+      "objectives": [
+        {
+          "type": "drone_farming",
+          "description": "Program the drone to plant and harvest 5 wheat crops",
+          "droneId": "drone_alpha",
+          "plantCount": 5,
+          "harvestCount": 5
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Lain",
+          "content": "Excellent work! The drone completed the entire farming cycle successfully!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Lain",
+          "content": "Grandpa would be proud. This old drone still has plenty of life left in it after all!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "resource",
+      "value": 5,
+      "description": "Gained 5 wheat from drone harvest"
+    }
+  ]
+}

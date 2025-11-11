@@ -94,6 +94,16 @@ export class ObjectiveTracker {
       this.recordEvent('action_harvest', {});
     });
 
+    // Entity plant events (for drone/player planting via code)
+    EventBus.on('entity-plant', (data: { entityId: string; entityType: string; cropType: string; position: any }) => {
+      this.recordEvent('entity_plant', data);
+    });
+
+    // Entity harvest events (for drone/player harvesting via code)
+    EventBus.on('entity-harvest', (data: { entityId: string; entityType: string; position: any }) => {
+      this.recordEvent('entity_harvest', data);
+    });
+
     console.log('[ObjectiveTracker] Event listeners set up');
   }
 
@@ -174,6 +184,9 @@ export class ObjectiveTracker {
 
       case 'challenge_completion':
         return this.validateChallengeCompletion(objective);
+
+      case 'drone_farming':
+        return this.validateDroneFarming(objective, state);
 
       default:
         console.warn(`[ObjectiveTracker] Unknown objective type: ${objective.type}`);
@@ -262,6 +275,34 @@ export class ObjectiveTracker {
     const hasEvent = state.events.some(e => e.type === 'action_harvest');
     console.log(`[ObjectiveTracker] Action harvest: ${hasEvent}`);
     return hasEvent;
+  }
+
+  private validateDroneFarming(objective: QuestRequirement, state: ObjectiveStateSnapshot): boolean {
+    // Get the required drone ID from the objective
+    const droneId = (objective as any).droneId;
+    const plantCount = (objective as any).plantCount || 0;
+    const harvestCount = (objective as any).harvestCount || 0;
+
+    if (!droneId) {
+      console.warn('[ObjectiveTracker] drone_farming objective requires droneId');
+      return false;
+    }
+
+    // Count plant events by the specific drone
+    const dronePlants = state.events.filter(e =>
+      e.type === 'entity_plant' &&
+      e.data.entityId === droneId
+    ).length;
+
+    // Count harvest events by the specific drone
+    const droneHarvests = state.events.filter(e =>
+      e.type === 'entity_harvest' &&
+      e.data.entityId === droneId
+    ).length;
+
+    console.log(`[ObjectiveTracker] Drone farming (${droneId}): plants=${dronePlants}/${plantCount}, harvests=${droneHarvests}/${harvestCount}`);
+
+    return dronePlants >= plantCount && droneHarvests >= harvestCount;
   }
 
   private validateChallengeCompletion(objective: QuestRequirement): boolean {

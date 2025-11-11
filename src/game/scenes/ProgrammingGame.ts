@@ -1711,17 +1711,17 @@ export class ProgrammingGame extends Scene {
       functionName: string;
       entityId: string;
     }) => {
-      this.showExecutionLine(data.line, data.functionName);
+      this.showExecutionLine(data.line, data.functionName, data.entityId);
     });
     
-    // Listen for function call events 
+    // Listen for function call events
     EventBus.on('code-execution-function-call', (data: {
       functionName: string;
       args: any[];
       entityId: string;
     }) => {
       const argsString = data.args.length > 0 ? `(${data.args.join(', ')})` : '()';
-      this.showExecutionLine(`${data.functionName}${argsString}`, 'function');
+      this.showExecutionLine(`${data.functionName}${argsString}`, 'function', data.entityId);
     });
     
     // Clear execution texts when execution stops or completes
@@ -1738,28 +1738,28 @@ export class ProgrammingGame extends Scene {
     });
   }
 
-  private showExecutionLine(line: string, context: string) {
+  private showExecutionLine(line: string, context: string, entityId: string) {
     const gameState = useGameStore.getState();
-    const activeEntity = gameState.entities.get(gameState.activeEntityId);
-    
-    if (!activeEntity) return;
-    
-    const entitySprite = this.entitySprites.get(activeEntity.id);
+    const executingEntity = gameState.entities.get(entityId);
+
+    if (!executingEntity) return;
+
+    const entitySprite = this.entitySprites.get(executingEntity.id);
     if (!entitySprite) return;
-    
-    // Limit text length for better display
-    const displayText = line.length > 30 ? line.substring(0, 27) + '...' : line;
-    
+
+    // Limit text length for better display (increased from 30 to 40)
+    const displayText = line.length > 40 ? line.substring(0, 37) + '...' : line;
+
     // Create floating text above the entity
     const textY = entitySprite.y - (this.GRID_SIZE * this.QUBIT_SCALE_FACTOR / 2) - 60;
     const executionText = this.add.text(entitySprite.x, textY, displayText, {
-      fontSize: '12px',
+      fontSize: '16px',
       color: '#00ff00',
       backgroundColor: '#000000',
-      padding: { x: 8, y: 4 },
+      padding: { x: 12, y: 6 },
       align: 'center',
       stroke: '#000000',
-      strokeThickness: 2
+      strokeThickness: 3
     });
     
     executionText.setOrigin(0.5);

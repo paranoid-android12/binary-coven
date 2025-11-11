@@ -516,7 +516,9 @@ export const GameInterface: React.FC = () => {
           'quests/first_harvest.json',
           'quests/auto_movement.json',
           'quests/farming_scripts.json',
-          'quests/full_automation.json'
+          'quests/full_automation.json',
+          'quests/alpha_drone_intro.json',
+          'quests/drone_farming_quest.json'
         ]);
         console.log('[Quest System] Quests loaded');
 
@@ -1037,7 +1039,7 @@ export const GameInterface: React.FC = () => {
                 fontSize: '18px',
                 color: '#ffffff'
               }}>
-                ({Math.floor(activeEntity.position.x)}, {Math.floor(activeEntity.position.y)})
+                ({Math.floor(activeEntity.visualPosition?.x ?? activeEntity.position.x)}, {Math.floor(activeEntity.visualPosition?.y ?? activeEntity.position.y)})
               </div>
             </div>
           )}

@@ -351,16 +351,26 @@ export const interactionFunctions: BuiltInFunction[] = [
       }
 
       const result = await gridSystem.executeGridFunction(grid.id, 'plant', latestEntity, [cropType || 'wheat']);
-      
+
+      // Emit event for quest tracking if plant was successful
+      if (result.success) {
+        EventBus.emit('entity-plant', {
+          entityId: latestEntity.id,
+          entityType: latestEntity.type,
+          cropType: cropType || 'wheat',
+          position: latestEntity.position
+        });
+      }
+
       // Check if the grid function blocks the entity and propagate the flag
       const gridFunction = grid.functions.find(f => f.name === 'plant');
       if (gridFunction?.blocksEntity && result.success) {
         result.blocksEntity = true;
       }
-      
+
       // Sync context entity with updated game store after grid function
       syncContextEntity(context);
-      
+
       return result;
     }
   },
@@ -403,13 +413,22 @@ export const interactionFunctions: BuiltInFunction[] = [
       }
 
       const result = await gridSystem.executeGridFunction(grid.id, 'harvest', latestEntity);
-      
+
+      // Emit event for quest tracking if harvest was successful
+      if (result.success) {
+        EventBus.emit('entity-harvest', {
+          entityId: latestEntity.id,
+          entityType: latestEntity.type,
+          position: latestEntity.position
+        });
+      }
+
       // Check if the grid function blocks the entity and propagate the flag
       const gridFunction = grid.functions.find(f => f.name === 'harvest');
       if (gridFunction?.blocksEntity && result.success) {
         result.blocksEntity = true;
       }
-      
+
       // Sync context entity with updated game store after grid function
       syncContextEntity(context);
       

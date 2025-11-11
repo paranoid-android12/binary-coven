@@ -1,0 +1,51 @@
+{
+  "id": "alpha_drone_intro",
+  "title": "The Alpha Drone",
+  "description": "Discover the rusty drone left behind by Lain's grandfather",
+  "difficulty": "beginner",
+  "category": "Discovery",
+  "estimatedTime": 2,
+  "concepts": ["automation", "drones"],
+  "prerequisites": [],
+  "icon": "quest_icon.png",
+  "thumbnail": "quest_thumb.png",
+  "phases": [
+    {
+      "id": "drone_discovery",
+      "title": "A Rusty Companion",
+      "description": "Learn about the alpha drone",
+      "preDialogues": [
+        {
+          "name": "Lain",
+          "content": "Oh, you found the alpha drone! My grandfather built it years ago.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Lain",
+          "content": "It was supposed to help with farm work, but it's been sitting here rusting for quite some time now.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Lain",
+          "content": "Grandpa always said it could plant and harvest crops all on its own... if only someone could figure out how to program it properly.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Lain",
+          "content": "Maybe you could give it a try? It might still work if you know how to code.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "drone_farming_quest",
+      "description": "Unlock 'Drone Farming Test' quest"
+    }
+  ]
+}

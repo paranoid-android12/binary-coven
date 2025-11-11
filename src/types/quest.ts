@@ -39,7 +39,8 @@ export type RequirementType =
   | 'reach_position'        // Reach a specific position
   | 'use_function'          // Use a specific function
   | 'action_plant'          // Player must click the plant button
-  | 'action_harvest';       // Player must click the harvest button
+  | 'action_harvest'        // Player must click the harvest button
+  | 'drone_farming';        // Drone must complete farming tasks
 
 /**
  * Dialogue entry within a quest phase
@@ -77,6 +78,9 @@ export interface QuestRequirement {
   cropCount?: number;                 // For harvest_crop requirement
   position?: Position;                // For reach_position requirement
   functionName?: string;              // For use_function requirement
+  droneId?: string;                   // For drone_farming requirement
+  plantCount?: number;                // For drone_farming requirement
+  harvestCount?: number;              // For drone_farming requirement
 }
 
 /**

@@ -338,6 +338,19 @@ def main():
    * Handle drone click interaction - opens programming interface
    */
   private handleDroneClick(drone: Entity): void {
+    // Check if this is the alpha drone and if the intro quest hasn't been completed
+    if (drone.id === 'drone_alpha') {
+      const QuestManager = require('./QuestManager').QuestManager;
+      const questManager = QuestManager.getInstance();
+
+      // If the intro quest hasn't been completed yet, start it
+      if (!questManager.isQuestCompleted('alpha_drone_intro')) {
+        console.log('[DRONE-CLICK] Starting alpha drone introduction quest');
+        questManager.startQuest('alpha_drone_intro');
+        return; // Don't open programming interface on first click
+      }
+    }
+
     // Emit event to open drone programming interface
     EventBus.emit('drone-clicked', drone);
   }
