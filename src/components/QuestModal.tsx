@@ -71,6 +71,7 @@ export const QuestModal: React.FC<QuestModalProps> = ({ isOpen, onClose }) => {
     if (success) {
       setActiveTab('active');
       setSelectedQuest(null);
+      onClose();
     }
   };
 
@@ -85,6 +86,7 @@ export const QuestModal: React.FC<QuestModalProps> = ({ isOpen, onClose }) => {
     const success = gameStore.restartQuest();
     if (success) {
       setSelectedQuest(null);
+      onClose();
       // Show a notification
       console.log('[QuestModal] Quest restarted successfully');
     }

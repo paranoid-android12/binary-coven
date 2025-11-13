@@ -1,5 +1,27 @@
 [
   {
+    "key": "Box",
+    "name": "Box",
+    "filename": "Box.png",
+    "path": "tilesets/Box.png",
+    "tileSize": 16,
+    "columns": 9,
+    "rows": 20,
+    "width": 144,
+    "height": 320
+  },
+  {
+    "key": "Exterior",
+    "name": "Exterior",
+    "filename": "Exterior.png",
+    "path": "tilesets/Exterior.png",
+    "tileSize": 16,
+    "columns": 32,
+    "rows": 24,
+    "width": 512,
+    "height": 384
+  },
+  {
     "key": "Fence_Wood",
     "name": "Fence Wood",
     "filename": "Fence Wood.png",

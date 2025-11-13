@@ -1679,12 +1679,20 @@ export class ProgrammingGame extends Scene {
       
       // Update game store with new position if successful
       if (success) {
-        gameState.updateEntity(data.entityId, { 
+        gameState.updateEntity(data.entityId, {
           position: data.targetPosition,
           visualPosition: data.targetPosition
         });
+
+        // Update hover indicator for drones
+        if (entity.isDrone) {
+          const droneManager = this.getDroneManager();
+          if (droneManager) {
+            droneManager.updateDronePosition(data.entityId, data.targetPosition);
+          }
+        }
       }
-      
+
       // Call the callback with result
       data.callback(success);
     });

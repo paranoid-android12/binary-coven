@@ -17022,18 +17022,6 @@ export const MAP_EDITOR_DATA = {
       "layer": 2
     },
     {
-      "id": "ground_29_15_2",
-      "position": {
-        "x": 29,
-        "y": 15
-      },
-      "tilesetX": 64,
-      "tilesetY": 16,
-      "frame": 29,
-      "tilesetKey": "Ground_Tileset",
-      "layer": 2
-    },
-    {
       "id": "ground_29_14_2",
       "position": {
         "x": 29,
@@ -18574,18 +18562,6 @@ export const MAP_EDITOR_DATA = {
       "position": {
         "x": 20,
         "y": 13
-      },
-      "tilesetX": 96,
-      "tilesetY": 48,
-      "frame": 81,
-      "tilesetKey": "Ground_Tileset",
-      "layer": 3
-    },
-    {
-      "id": "ground_15_12_3",
-      "position": {
-        "x": 15,
-        "y": 12
       },
       "tilesetX": 96,
       "tilesetY": 48,
@@ -20140,6 +20116,498 @@ export const MAP_EDITOR_DATA = {
       "frame": 528,
       "tilesetKey": "Ground_Tileset",
       "layer": 2
+    },
+    {
+      "id": "ground_31_16_2",
+      "position": {
+        "x": 31,
+        "y": 16
+      },
+      "tilesetX": 0,
+      "tilesetY": 0,
+      "frame": 0,
+      "tilesetKey": "Exterior",
+      "layer": 2
+    },
+    {
+      "id": "ground_30_13_2",
+      "position": {
+        "x": 30,
+        "y": 13
+      },
+      "tilesetX": 32,
+      "tilesetY": 176,
+      "frame": 354,
+      "tilesetKey": "Exterior",
+      "layer": 2
+    },
+    {
+      "id": "ground_30_14_2",
+      "position": {
+        "x": 30,
+        "y": 14
+      },
+      "tilesetX": 32,
+      "tilesetY": 192,
+      "frame": 386,
+      "tilesetKey": "Exterior",
+      "layer": 2
+    },
+    {
+      "id": "ground_30_15_2",
+      "position": {
+        "x": 30,
+        "y": 15
+      },
+      "tilesetX": 32,
+      "tilesetY": 208,
+      "frame": 418,
+      "tilesetKey": "Exterior",
+      "layer": 2
+    },
+    {
+      "id": "ground_29_15_2",
+      "position": {
+        "x": 29,
+        "y": 15
+      },
+      "tilesetX": 64,
+      "tilesetY": 16,
+      "frame": 29,
+      "tilesetKey": "Ground_Tileset",
+      "layer": 2
+    },
+    {
+      "id": "ground_29_15_3",
+      "position": {
+        "x": 29,
+        "y": 15
+      },
+      "tilesetX": 16,
+      "tilesetY": 208,
+      "frame": 417,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_28_15_3",
+      "position": {
+        "x": 28,
+        "y": 15
+      },
+      "tilesetX": 0,
+      "tilesetY": 208,
+      "frame": 416,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_28_14_3",
+      "position": {
+        "x": 28,
+        "y": 14
+      },
+      "tilesetX": 0,
+      "tilesetY": 192,
+      "frame": 384,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_28_13_3",
+      "position": {
+        "x": 28,
+        "y": 13
+      },
+      "tilesetX": 0,
+      "tilesetY": 176,
+      "frame": 352,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_29_13_3",
+      "position": {
+        "x": 29,
+        "y": 13
+      },
+      "tilesetX": 16,
+      "tilesetY": 176,
+      "frame": 353,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_29_14_3",
+      "position": {
+        "x": 29,
+        "y": 14
+      },
+      "tilesetX": 16,
+      "tilesetY": 192,
+      "frame": 385,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_30_13_5",
+      "position": {
+        "x": 30,
+        "y": 13
+      },
+      "tilesetX": 64,
+      "tilesetY": 176,
+      "frame": 356,
+      "tilesetKey": "Exterior",
+      "layer": 5
+    },
+    {
+      "id": "ground_29_15_5",
+      "position": {
+        "x": 29,
+        "y": 15
+      },
+      "tilesetX": 32,
+      "tilesetY": 112,
+      "frame": 226,
+      "tilesetKey": "Exterior",
+      "layer": 5
+    },
+    {
+      "id": "ground_25_19_2",
+      "position": {
+        "x": 25,
+        "y": 19
+      },
+      "tilesetX": 176,
+      "tilesetY": 16,
+      "frame": 43,
+      "tilesetKey": "Exterior",
+      "layer": 2
+    },
+    {
+      "id": "ground_25_18_2",
+      "position": {
+        "x": 25,
+        "y": 18
+      },
+      "tilesetX": 176,
+      "tilesetY": 0,
+      "frame": 11,
+      "tilesetKey": "Exterior",
+      "layer": 2
+    },
+    {
+      "id": "ground_26_18_2",
+      "position": {
+        "x": 26,
+        "y": 18
+      },
+      "tilesetX": 192,
+      "tilesetY": 0,
+      "frame": 12,
+      "tilesetKey": "Exterior",
+      "layer": 2
+    },
+    {
+      "id": "ground_26_19_2",
+      "position": {
+        "x": 26,
+        "y": 19
+      },
+      "tilesetX": 192,
+      "tilesetY": 16,
+      "frame": 44,
+      "tilesetKey": "Exterior",
+      "layer": 2
+    },
+    {
+      "id": "ground_15_7_3",
+      "position": {
+        "x": 15,
+        "y": 7
+      },
+      "tilesetX": 176,
+      "tilesetY": 80,
+      "frame": 171,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_16_7_3",
+      "position": {
+        "x": 16,
+        "y": 7
+      },
+      "tilesetX": 192,
+      "tilesetY": 80,
+      "frame": 172,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_17_7_3",
+      "position": {
+        "x": 17,
+        "y": 7
+      },
+      "tilesetX": 208,
+      "tilesetY": 80,
+      "frame": 173,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_17_6_3",
+      "position": {
+        "x": 17,
+        "y": 6
+      },
+      "tilesetX": 208,
+      "tilesetY": 64,
+      "frame": 141,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_16_6_3",
+      "position": {
+        "x": 16,
+        "y": 6
+      },
+      "tilesetX": 192,
+      "tilesetY": 64,
+      "frame": 140,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_15_6_3",
+      "position": {
+        "x": 15,
+        "y": 6
+      },
+      "tilesetX": 176,
+      "tilesetY": 64,
+      "frame": 139,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_11_9_3",
+      "position": {
+        "x": 11,
+        "y": 9
+      },
+      "tilesetX": 64,
+      "tilesetY": 160,
+      "frame": 324,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_11_8_3",
+      "position": {
+        "x": 11,
+        "y": 8
+      },
+      "tilesetX": 64,
+      "tilesetY": 144,
+      "frame": 292,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_15_12_3",
+      "position": {
+        "x": 15,
+        "y": 12
+      },
+      "tilesetX": 128,
+      "tilesetY": 160,
+      "frame": 328,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_20_13_4",
+      "position": {
+        "x": 20,
+        "y": 13
+      },
+      "tilesetX": 112,
+      "tilesetY": 160,
+      "frame": 327,
+      "tilesetKey": "Exterior",
+      "layer": 4
+    },
+    {
+      "id": "ground_11_16_3",
+      "position": {
+        "x": 11,
+        "y": 16
+      },
+      "tilesetX": 96,
+      "tilesetY": 32,
+      "frame": 70,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_12_16_3",
+      "position": {
+        "x": 12,
+        "y": 16
+      },
+      "tilesetX": 112,
+      "tilesetY": 32,
+      "frame": 71,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_27_25_3",
+      "position": {
+        "x": 27,
+        "y": 25
+      },
+      "tilesetX": 0,
+      "tilesetY": 240,
+      "frame": 480,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_28_25_3",
+      "position": {
+        "x": 28,
+        "y": 25
+      },
+      "tilesetX": 16,
+      "tilesetY": 240,
+      "frame": 481,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_29_25_3",
+      "position": {
+        "x": 29,
+        "y": 25
+      },
+      "tilesetX": 32,
+      "tilesetY": 240,
+      "frame": 482,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_30_25_3",
+      "position": {
+        "x": 30,
+        "y": 25
+      },
+      "tilesetX": 48,
+      "tilesetY": 240,
+      "frame": 483,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_30_24_3",
+      "position": {
+        "x": 30,
+        "y": 24
+      },
+      "tilesetX": 48,
+      "tilesetY": 224,
+      "frame": 451,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_29_24_3",
+      "position": {
+        "x": 29,
+        "y": 24
+      },
+      "tilesetX": 32,
+      "tilesetY": 224,
+      "frame": 450,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_28_24_3",
+      "position": {
+        "x": 28,
+        "y": 24
+      },
+      "tilesetX": 16,
+      "tilesetY": 224,
+      "frame": 449,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_27_24_3",
+      "position": {
+        "x": 27,
+        "y": 24
+      },
+      "tilesetX": 0,
+      "tilesetY": 224,
+      "frame": 448,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_24_8_3",
+      "position": {
+        "x": 24,
+        "y": 8
+      },
+      "tilesetX": 16,
+      "tilesetY": 96,
+      "frame": 193,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_23_8_3",
+      "position": {
+        "x": 23,
+        "y": 8
+      },
+      "tilesetX": 0,
+      "tilesetY": 96,
+      "frame": 192,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_23_7_3",
+      "position": {
+        "x": 23,
+        "y": 7
+      },
+      "tilesetX": 0,
+      "tilesetY": 80,
+      "frame": 160,
+      "tilesetKey": "Exterior",
+      "layer": 3
+    },
+    {
+      "id": "ground_24_7_3",
+      "position": {
+        "x": 24,
+        "y": 7
+      },
+      "tilesetX": 16,
+      "tilesetY": 80,
+      "frame": 161,
+      "tilesetKey": "Exterior",
+      "layer": 3
     }
   ],
   "farmlandGrids": [],
@@ -21034,5 +21502,5 @@ export const MAP_EDITOR_DATA = {
     }
   ],
   "gameGrids": [],
-  "timestamp": "2025-11-11T09:29:57.977Z"
+  "timestamp": "2025-11-13T09:08:01.383Z"
 }

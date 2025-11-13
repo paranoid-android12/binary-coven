@@ -87,6 +87,14 @@ export class Preloader extends Scene
         });
 
         // AUTO-GENERATED TILESETS START
+    this.load.spritesheet('Box', 'tilesets/Box.png', {
+      frameWidth: 16,
+      frameHeight: 16
+    });
+    this.load.spritesheet('Exterior', 'tilesets/Exterior.png', {
+      frameWidth: 16,
+      frameHeight: 16
+    });
     this.load.spritesheet('Fence_Wood', 'tilesets/Fence Wood.png', {
       frameWidth: 16,
       frameHeight: 16
