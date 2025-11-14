@@ -64,6 +64,47 @@ const useDraggable = (initialPosition: { x: number; y: number }) => {
   return { position, elementRef, handleMouseDown };
 };
 
+// Menu Button Component with CSS background
+interface MenuButtonProps {
+  text: string;
+  onClick: () => void;
+  color?: string;
+}
+
+const MenuButton: React.FC<MenuButtonProps> = ({ text, onClick, color = '#210714' }) => {
+  const [isPressed, setIsPressed] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <button
+      onClick={onClick}
+      onMouseDown={() => setIsPressed(true)}
+      onMouseUp={() => setIsPressed(false)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsPressed(false);
+        setIsHovered(false);
+      }}
+      style={{
+        width: '100%',
+        padding: '15px 20px',
+        backgroundColor: isHovered ? (color === '#210714' ? '#210714' : color) : 'transparent',
+        color: isHovered ? (color === '#210714' ? '#d8a888' : '#ffffff') : color,
+        border: `2px solid ${color}`,
+        borderRadius: '6px',
+        cursor: 'pointer',
+        fontSize: '18px',
+        fontFamily: 'BoldPixels',
+        transition: 'all 0.15s',
+        transform: isPressed ? 'translateY(2px)' : 'translateY(0)',
+        boxShadow: isPressed ? 'none' : `0 4px 0 ${color}`,
+      }}
+    >
+      {text}
+    </button>
+  );
+};
+
 export const GameInterface: React.FC = () => {
   const phaserRef = useRef<IRefPhaserGame | null>(null);
   const lastRunCodeCall = useRef<number>(0);
@@ -149,6 +190,7 @@ export const GameInterface: React.FC = () => {
   const [gameMenuModalState, setGameMenuModalState] = useState({
     isOpen: false
   });
+  const gameMenuModalRef = useRef<HTMLDivElement>(null);
 
   // Drone state
   const [activeDroneId, setActiveDroneId] = useState<string | undefined>(undefined);
@@ -249,6 +291,24 @@ export const GameInterface: React.FC = () => {
       };
     });
   }, []);
+
+  // Handle click outside game menu modal to close
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (gameMenuModalRef.current && !gameMenuModalRef.current.contains(event.target as Node)) {
+        setGameMenuModalState({ isOpen: false });
+        closeModal('game-menu');
+      }
+    };
+
+    if (gameMenuModalState.isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [gameMenuModalState.isOpen, closeModal]);
 
   // Handle entity/grid clicks from Phaser
   useEffect(() => {
@@ -852,6 +912,8 @@ export const GameInterface: React.FC = () => {
           {/* User Info Panel - Top Left */}
           {user && isStudentUser(user) && (
             <div style={{
+              position: 'absolute',
+              top: '10px',
               left: '10px',
               backgroundColor: 'rgba(0, 0, 0, 0.8)',
               border: '2px solid #0ec3c9',
@@ -2243,159 +2305,122 @@ export const GameInterface: React.FC = () => {
           zIndex: 5000,
           pointerEvents: 'auto'
         }}>
-          <div style={{
-            backgroundColor: '#d8a888',
-            border: '10px solid #210714',
-            borderRadius: '12px',
-            padding: '30px',
-            maxWidth: '400px',
-            width: '90%',
-            boxShadow: '0 0 30px rgba(33, 7, 20, 0.5)',
-          }}>
+          <div 
+            ref={gameMenuModalRef}
+            style={{
+              backgroundColor: '#d8a888',
+              border: '4px solid #210714',
+              borderRadius: '12px',
+              padding: '30px 35px',
+              maxWidth: '350px',
+              width: '90%',
+              boxShadow: '0 8px 0 #210714, 0 12px 20px rgba(0, 0, 0, 0.5)',
+              position: 'relative',
+            }}>
+            {/* X Close Button */}
+            <button
+              onClick={() => {
+                setGameMenuModalState({ isOpen: false });
+                closeModal('game-menu');
+              }}
+              style={{
+                position: 'absolute',
+                top: '15px',
+                right: '15px',
+                width: '32px',
+                height: '32px',
+                backgroundColor: 'transparent',
+                border: '2px solid #210714',
+                borderRadius: '6px',
+                color: '#210714',
+                fontSize: '20px',
+                fontFamily: 'BoldPixels',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                lineHeight: '1',
+                padding: 0,
+                transition: 'all 0.15s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#210714';
+                e.currentTarget.style.color = '#d8a888';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = '#210714';
+              }}
+            >
+              ×
+            </button>
             <div style={{
-              fontSize: '28px',
+              fontSize: '32px',
               color: '#210714',
               fontFamily: 'BoldPixels',
-              marginBottom: '25px',
+              marginBottom: '20px',
               textAlign: 'center',
+              textShadow: '2px 2px 0px rgba(255, 255, 255, 0.3)',
             }}>
               GAME MENU
             </div>
 
+            <hr style={{
+              border: 'none',
+              borderTop: '2px solid #210714',
+              margin: '0 0 20px 0',
+              opacity: 0.3,
+            }} />
+
             <div style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: '12px',
+              gap: '16px',
+              width: '100%',
+              maxWidth: '280px',
+              margin: '0 auto',
             }}>
               {/* Save Button */}
-              <button
+              <MenuButton
+                text="SAVE GAME"
                 onClick={() => {
                   EventBus.emit('save-game-state');
                   setGameMenuModalState({ isOpen: false });
                   closeModal('game-menu');
                 }}
-                style={{
-                  padding: '12px 20px',
-                  backgroundColor: 'transparent',
-                  color: '#210714',
-                  border: '2px solid #210714',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  fontFamily: 'BoldPixels',
-                  transition: 'all 0.3s',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#210714';
-                  e.currentTarget.style.color = '#d8a888';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = '#210714';
-                }}
-              >
-                SAVE GAME
-              </button>
+              />
 
               {/* Load Button */}
-              <button
+              <MenuButton
+                text="LOAD GAME"
                 onClick={() => {
                   EventBus.emit('load-game-state');
                   setGameMenuModalState({ isOpen: false });
                   closeModal('game-menu');
                 }}
-                style={{
-                  padding: '12px 20px',
-                  backgroundColor: 'transparent',
-                  color: '#210714',
-                  border: '2px solid #210714',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  fontFamily: 'BoldPixels',
-                  transition: 'all 0.3s',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#210714';
-                  e.currentTarget.style.color = '#d8a888';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = '#210714';
-                }}
-              >
-                LOAD GAME
-              </button>
+              />
 
               {/* Logout Button */}
-              <button
+              <MenuButton
+                text="LOGOUT"
                 onClick={() => {
-                  // Clear localStorage
-                  localStorage.clear();
-                  // Clear cookies
-                  document.cookie.split(";").forEach((c) => {
-                    document.cookie = c
-                      .replace(/^ +/, "")
-                      .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-                  });
-                  // Logout user
-                  logout();
                   setGameMenuModalState({ isOpen: false });
                   closeModal('game-menu');
+                  // Call logout which handles clearing localStorage, cookies, and redirecting
+                  logout();
                 }}
-                style={{
-                  padding: '12px 20px',
-                  backgroundColor: 'transparent',
-                  color: '#ff0000',
-                  border: '2px solid #ff0000',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  fontFamily: 'BoldPixels',
-                  transition: 'all 0.3s',
-                  marginTop: '8px',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#ff0000';
-                  e.currentTarget.style.color = '#ffffff';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = '#ff0000';
-                }}
-              >
-                LOGOUT
-              </button>
+                color="#ff0000"
+              />
 
               {/* Close Button */}
-              <button
+              <MenuButton
+                text="CANCEL"
                 onClick={() => {
                   setGameMenuModalState({ isOpen: false });
                   closeModal('game-menu');
                 }}
-                style={{
-                  padding: '12px 20px',
-                  backgroundColor: 'transparent',
-                  color: '#666666',
-                  border: '2px solid #666666',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontFamily: 'BoldPixels',
-                  transition: 'all 0.3s',
-                  marginTop: '8px',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#666666';
-                  e.currentTarget.style.color = '#ffffff';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = '#666666';
-                }}
-              >
-                CANCEL
-              </button>
+                color="#666666"
+              />
             </div>
           </div>
         </div>

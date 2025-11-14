@@ -1,6 +1,5 @@
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useRef, useEffect } from 'react';
 import { useUser } from '@/contexts/UserContext';
-import styles from '@/styles/LoginModal.module.css';
 import { clearAllGameState, loadAndSyncGameState, logLocalStorageState } from '@/utils/localStorageManager';
 
 interface StudentLoginResponse {
@@ -23,6 +22,7 @@ interface LoginModalProps {
 
 export default function LoginModal({ isVisible, onLoginSuccess, onClose }: LoginModalProps) {
   const { login } = useUser();
+  const modalRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -32,6 +32,25 @@ export default function LoginModal({ isVisible, onLoginSuccess, onClose }: Login
   const [isLoading, setIsLoading] = useState(false);
   const [isValidatingCode, setIsValidatingCode] = useState(false);
   const [codeValidationMessage, setCodeValidationMessage] = useState<string>('');
+
+  // Handle click outside modal to close
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        if (onClose) {
+          onClose();
+        }
+      }
+    };
+
+    if (isVisible) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isVisible, onClose]);
 
   // Validate session code as user types
   const handleSessionCodeChange = async (code: string) => {
@@ -143,26 +162,128 @@ export default function LoginModal({ isVisible, onLoginSuccess, onClose }: Login
   if (!isVisible) return null;
 
   return (
-    <div className={styles.modalOverlay}>
-      <div className={styles.loginBox}>
-        <h1 className={styles.title}>Binary Coven</h1>
-        <p className={styles.subtitle}>Student Portal</p>
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100vw',
+      height: '100vh',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 9999,
+      backgroundColor: 'rgba(0, 0, 0, 0.3)',
+      backdropFilter: 'blur(2px)',
+    }}>
+      <div 
+        ref={modalRef}
+        style={{
+          backgroundColor: '#d8a888',
+          border: '4px solid #210714',
+          borderRadius: '12px',
+          padding: '40px 50px',
+          maxWidth: '350px',
+          width: '90%',
+          boxShadow: '0 8px 0 #210714, 0 12px 20px rgba(0, 0, 0, 0.5)',
+          position: 'relative',
+        }}>
+        {/* X Close Button */}
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: '15px',
+            right: '15px',
+            width: '32px',
+            height: '32px',
+            backgroundColor: 'transparent',
+            border: '2px solid #210714',
+            borderRadius: '6px',
+            color: '#210714',
+            fontSize: '20px',
+            fontFamily: 'BoldPixels',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            lineHeight: '1',
+            padding: 0,
+            transition: 'all 0.15s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#210714';
+            e.currentTarget.style.color = '#d8a888';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.color = '#210714';
+          }}
+        >
+          ×
+        </button>
+        <h1 style={{
+          fontFamily: 'BoldPixels',
+          fontSize: '2.5em',
+          color: '#210714',
+          textAlign: 'center',
+          margin: '0 0 10px 0',
+          textShadow: '2px 2px 0px rgba(255, 255, 255, 0.3)',
+        }}>Binary Coven</h1>
+        <p style={{
+          fontFamily: 'BoldPixels',
+          fontSize: '1.2em',
+          color: '#210714',
+          textAlign: 'center',
+          margin: '0 0 30px 0',
+          opacity: 0.8,
+        }}>Student Portal</p>
 
-        <form onSubmit={handleSubmit} className={styles.form}>
+        <form onSubmit={handleSubmit} style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '20px',
+          width: '100%',
+          maxWidth: '360px',
+          margin: '0 auto',
+        }}>
           {error && (
-            <div className={styles.errorMessage}>
+            <div style={{
+              fontFamily: 'Arial, Helvetica, sans-serif',
+              backgroundColor: 'rgba(255, 0, 0, 0.1)',
+              border: '2px solid #ff0000',
+              color: '#ff0000',
+              padding: '12px 15px',
+              marginBottom: '10px',
+              fontSize: '0.9em',
+              borderRadius: '4px',
+            }}>
               {error}
             </div>
           )}
 
-          <div className={styles.formGroup}>
-            <label htmlFor="sessionCode" className={styles.label}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <label htmlFor="sessionCode" style={{
+              fontFamily: 'BoldPixels',
+              fontSize: '0.9em',
+              color: '#210714',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+            }}>
               Session Code
             </label>
             <input
               type="text"
               id="sessionCode"
-              className={styles.input}
+              style={{
+                fontFamily: 'Arial, Helvetica, sans-serif',
+                fontSize: '1em',
+                padding: '12px 15px',
+                backgroundColor: '#e8c4a8',
+                color: '#210714',
+                border: '2px solid #210714',
+                borderRadius: '6px',
+                outline: 'none',
+              }}
               value={formData.sessionCode}
               onChange={(e) => handleSessionCodeChange(e.target.value.toUpperCase())}
               placeholder="Enter session code"
@@ -170,29 +291,44 @@ export default function LoginModal({ isVisible, onLoginSuccess, onClose }: Login
               required
             />
             {isValidatingCode && (
-              <p className={styles.validationMessage}>Validating...</p>
+              <p style={{ fontFamily: 'Arial', fontSize: '0.85em', margin: 0, padding: '5px 0' }}>Validating...</p>
             )}
             {codeValidationMessage && (
-              <p
-                className={`${styles.validationMessage} ${
-                  codeValidationMessage.startsWith('✓')
-                    ? styles.validationSuccess
-                    : styles.validationError
-                }`}
-              >
+              <p style={{
+                fontFamily: 'Arial',
+                fontSize: '0.85em',
+                margin: 0,
+                padding: '5px 0',
+                color: codeValidationMessage.startsWith('✓') ? '#16c60c' : '#ff0000'
+              }}>
                 {codeValidationMessage}
               </p>
             )}
           </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="username" className={styles.label}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <label htmlFor="username" style={{
+              fontFamily: 'BoldPixels',
+              fontSize: '0.9em',
+              color: '#210714',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+            }}>
               Username
             </label>
             <input
               type="text"
               id="username"
-              className={styles.input}
+              style={{
+                fontFamily: 'Arial, Helvetica, sans-serif',
+                fontSize: '1em',
+                padding: '12px 15px',
+                backgroundColor: '#e8c4a8',
+                color: '#210714',
+                border: '2px solid #210714',
+                borderRadius: '6px',
+                outline: 'none',
+              }}
               value={formData.username}
               onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               placeholder="Choose a username"
@@ -201,14 +337,29 @@ export default function LoginModal({ isVisible, onLoginSuccess, onClose }: Login
             />
           </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="password" className={styles.label}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <label htmlFor="password" style={{
+              fontFamily: 'BoldPixels',
+              fontSize: '0.9em',
+              color: '#210714',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+            }}>
               Password
             </label>
             <input
               type="password"
               id="password"
-              className={styles.input}
+              style={{
+                fontFamily: 'Arial, Helvetica, sans-serif',
+                fontSize: '1em',
+                padding: '12px 15px',
+                backgroundColor: '#e8c4a8',
+                color: '#210714',
+                border: '2px solid #210714',
+                borderRadius: '6px',
+                outline: 'none',
+              }}
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               placeholder="Enter password"
@@ -217,17 +368,26 @@ export default function LoginModal({ isVisible, onLoginSuccess, onClose }: Login
             />
           </div>
 
-          <button
-            type="submit"
-            className={styles.submitButton}
+          <LoginButton
+            text={isLoading ? 'Logging in...' : 'Enter Game'}
             disabled={isLoading}
-          >
-            {isLoading ? 'Logging in...' : 'Enter Game'}
-          </button>
+          />
         </form>
 
-        <div className={styles.footer}>
-          <p className={styles.footerText}>
+        <div style={{
+          marginTop: '30px',
+          paddingTop: '20px',
+          borderTop: '2px solid rgba(33, 7, 20, 0.2)',
+        }}>
+          <p style={{
+            fontFamily: 'Arial, Helvetica, sans-serif',
+            fontSize: '0.8em',
+            color: '#210714',
+            textAlign: 'center',
+            margin: 0,
+            lineHeight: '1.5',
+            opacity: 0.7,
+          }}>
             First time? Just enter your session code and create a username/password.
           </p>
         </div>
@@ -235,3 +395,47 @@ export default function LoginModal({ isVisible, onLoginSuccess, onClose }: Login
     </div>
   );
 }
+
+// Login Button Component with CSS background
+interface LoginButtonProps {
+  text: string;
+  disabled?: boolean;
+}
+
+const LoginButton: React.FC<LoginButtonProps> = ({ text, disabled = false }) => {
+  const [isPressed, setIsPressed] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <button
+      type="submit"
+      disabled={disabled}
+      onMouseDown={() => !disabled && setIsPressed(true)}
+      onMouseUp={() => setIsPressed(false)}
+      onMouseEnter={() => !disabled && setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsPressed(false);
+        setIsHovered(false);
+      }}
+      style={{
+        width: '100%',
+        padding: '15px 20px',
+        backgroundColor: isHovered && !disabled ? '#210714' : 'transparent',
+        color: isHovered && !disabled ? '#d8a888' : '#210714',
+        border: '3px solid #210714',
+        borderRadius: '6px',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        fontSize: '18px',
+        fontFamily: 'BoldPixels',
+        transition: 'all 0.15s',
+        transform: isPressed && !disabled ? 'translateY(2px)' : 'translateY(0)',
+        boxShadow: isPressed && !disabled ? 'none' : '0 4px 0 #210714',
+        opacity: disabled ? 0.5 : 1,
+        textTransform: 'uppercase',
+        letterSpacing: '2px',
+      }}
+    >
+      {text}
+    </button>
+  );
+};

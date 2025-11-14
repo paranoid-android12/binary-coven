@@ -61,6 +61,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
+    // Capture userType before clearing (needed for redirect)
+    const currentUserType = userType;
+    
     try {
       console.log('[UserContext] Logging out...');
 
@@ -74,20 +77,32 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
       // Call logout API to clear session cookies
       await fetch('/api/auth/logout', { method: 'POST' });
+      
+      // Clear any additional cookies manually (in case API doesn't catch all)
+      document.cookie.split(";").forEach((c) => {
+        const eqPos = c.indexOf("=");
+        const name = eqPos > -1 ? c.substr(0, eqPos).trim() : c.trim();
+        // Clear common session cookies
+        if (name.includes('session') || name.includes('auth') || name.includes('token')) {
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
+        }
+      });
+
       setUser(null);
       setUserType(null);
 
-      // Redirect to appropriate page
-      if (userType === 'admin') {
-        router.push('/admin/login');
-      } else {
-        // Redirect to main menu (which will show login modal when Start is clicked)
-        router.push('/');
-      }
+      // Force a full page refresh by navigating to the appropriate page
+      // This ensures all state is cleared and the page is completely reloaded
+      const redirectPath = currentUserType === 'admin' ? '/admin/login' : '/';
+      window.location.href = redirectPath;
 
-      console.log('[UserContext] Logout complete');
+      console.log('[UserContext] Logout complete - forcing page refresh');
     } catch (error) {
       console.error('Logout error:', error);
+      // Even on error, force refresh to ensure clean state
+      const redirectPath = currentUserType === 'admin' ? '/admin/login' : '/';
+      window.location.href = redirectPath;
     }
   };
 
