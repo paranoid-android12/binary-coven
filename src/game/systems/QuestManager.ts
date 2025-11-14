@@ -10,6 +10,7 @@ import {
 } from '../../types/quest';
 import DialogueManager from './DialogueManager';
 import { ObjectiveTracker } from './ObjectiveTracker';
+import analyticsService from '../../services/analyticsService';
 
 /**
  * QuestManager - Singleton system for managing quests
@@ -197,6 +198,9 @@ export class QuestManager {
 
     console.log(`[QuestManager] ✓ Started quest: ${quest.title} (${questId})`);
 
+    // Track quest start in analytics
+    analyticsService.trackQuestStart(questId, quest.title);
+
     // Emit events
     EventBus.emit('quest-started', { questId, quest });
     this.emitNotification({
@@ -292,6 +296,18 @@ export class QuestManager {
 
     progress.state = QuestState.COMPLETED;
     progress.completedAt = Date.now();
+
+    // Calculate time spent
+    const timeSpentSeconds = Math.floor((progress.completedAt - progress.startedAt) / 1000);
+
+    // Track quest completion in analytics
+    analyticsService.trackQuestComplete(
+      questId,
+      quest.title,
+      timeSpentSeconds,
+      progress.attempts,
+      undefined // score - can be added if needed
+    );
 
     // Grant rewards
     if (quest.rewards) {
@@ -626,6 +642,20 @@ export class QuestManager {
 
       console.log(`[QuestManager] ✓ Completed objective ${objectiveIndex}: "${objective.description}"`);
       console.log(`[QuestManager] Objectives completed: ${phaseProgress.objectivesCompleted.size}/${phase.objectives.length}`);
+
+      // Calculate time spent on this objective (approximate - from phase start)
+      const objectiveTimeSpent = Math.floor((Date.now() - phaseProgress.startedAt) / 1000);
+
+      // Track objective completion in analytics
+      analyticsService.trackObjectiveComplete(
+        questId,
+        phase.id,
+        objectiveIndex,
+        objective.description,
+        objectiveTimeSpent,
+        1, // attempts - can be tracked more accurately if needed
+        phaseProgress.hintsUsed || 0
+      );
 
       EventBus.emit('quest-objective-completed', { questId, phaseIndex, objectiveIndex });
 

@@ -10,6 +10,7 @@ import { MapEditor } from '../systems/MapEditor';
 import { NPCManager } from '../systems/NPCManager';
 import { GridHoverAnimation } from '../systems/GridHoverAnimation';
 import { DroneManager } from '../systems/DroneManager';
+import { GameStateService } from '../../services/gameStateService';
 
 // Movement Manager for smooth entity transitions
 export class MovementManager {
@@ -807,13 +808,28 @@ export class ProgrammingGame extends Scene {
       }
     });
 
-    // Handle save/load game state events
+    // Handle save/load/reset game state events
     EventBus.on('save-game-state', () => {
       this.saveGameState();
     });
 
     EventBus.on('load-game-state', () => {
       this.loadGameState();
+    });
+
+    EventBus.on('reset-game-state', () => {
+      this.resetGameState();
+    });
+
+    // Auto-save on critical game events
+    EventBus.on('quest-completed', () => {
+      console.log('[AUTO-SAVE] Quest completed - auto-saving...');
+      this.saveGameState();
+    });
+
+    EventBus.on('quest-phase-completed', () => {
+      console.log('[AUTO-SAVE] Quest phase completed - auto-saving...');
+      this.saveGameState();
     });
 
     // Handle debug requests from map editor UI
@@ -1981,13 +1997,13 @@ export class ProgrammingGame extends Scene {
     console.log('[SPRITES] All sprites cleared');
   }
 
-  private saveGameState(): void {
+  private async saveGameState(): Promise<void> {
     try {
       const gameState = useGameStore.getState();
 
       console.log('Saving game state');
       console.log(gameState);
-      
+
       const saveData = {
         version: '1.0',
         timestamp: Date.now(),
@@ -2037,30 +2053,38 @@ export class ProgrammingGame extends Scene {
         mainWindowId: gameState.mainWindowId
         // Note: activeTasks and taskTimer are runtime-only and should NOT be saved
       };
-      
-      localStorage.setItem('binary-coven-save', JSON.stringify(saveData));
+
+      // Use GameStateService to save (handles both cloud and localStorage)
+      await GameStateService.saveGameState(
+        saveData,
+        'autosave',
+        (message, color) => this.showNotification(message, color)
+      );
+
       console.log('[SAVE] Game state saved successfully');
-      
-      // Show save confirmation
-      this.showNotification('Game Saved!', 0x16c60c);
-      console.log("Finalized save", gameState)
+      console.log("Finalized save", gameState);
     } catch (error) {
       console.error('[SAVE] Failed to save game state:', error);
       this.showNotification('Save Failed!', 0xff0000);
     }
   }
 
-  private loadGameState(): void {
+  private async loadGameState(): Promise<void> {
     try {
-      const saveDataStr = localStorage.getItem('binary-coven-save');
-      if (!saveDataStr) {
-        this.showNotification('No Save Found!', 0xff6600);
+      // Use GameStateService to load (handles both cloud and localStorage)
+      const result = await GameStateService.loadGameState(
+        'autosave',
+        (message, color) => this.showNotification(message, color)
+      );
+
+      if (!result.success || !result.gameState) {
+        // Notification already shown by GameStateService
         return;
       }
-      
-      const saveData = JSON.parse(saveDataStr);
+
+      const saveData = result.gameState;
       const gameState = useGameStore.getState();
-      
+
       console.log('[LOAD] Starting game state load...');
       
       // Clear and destroy all existing sprites first
@@ -2220,13 +2244,32 @@ export class ProgrammingGame extends Scene {
       console.log('[LOAD] Active entity ID:', saveData.activeEntityId);
       console.log('[LOAD] Entities loaded:', newEntities.size);
       console.log('[LOAD] Grids loaded:', newGrids.size);
-      
-      this.showNotification('Game Loaded!', 0x16c60c);
+
+      // Note: Notification already shown by GameStateService
       console.log("Finalized load", gameState)
       
     } catch (error) {
       console.error('[LOAD] Failed to load game state:', error);
       this.showNotification('Load Failed!', 0xff0000);
+    }
+  }
+
+  private async resetGameState(): Promise<void> {
+    try {
+      console.log('[RESET] Resetting game state...');
+
+      // Use GameStateService to reset (handles both cloud and localStorage)
+      await GameStateService.resetGameState(
+        (message, color) => this.showNotification(message, color)
+      );
+
+      console.log('[RESET] Game state reset successfully');
+
+      // Reload the scene to start fresh
+      this.scene.restart();
+    } catch (error) {
+      console.error('[RESET] Failed to reset game state:', error);
+      this.showNotification('Reset Failed!', 0xff0000);
     }
   }
 

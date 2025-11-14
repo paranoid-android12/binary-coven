@@ -3,6 +3,8 @@ import { BuiltInFunctionRegistry } from './BuiltInFunctions';
 import GridSystem from './GridSystem';
 import { useGameStore } from '../../stores/gameStore';
 import { EventBus } from '../EventBus';
+import analyticsService from '../../services/analyticsService';
+import QuestManager from './QuestManager';
 
 interface CodeExecutionState {
   isRunning: boolean;
@@ -84,18 +86,29 @@ export class CodeExecutor {
     this.executionState.isRunning = true;
     this.executionState.variables = { ...this.context.globalVariables };
 
+    const executionStartTime = Date.now();
+
     try {
       console.log('[DEBUG] executeMain: About to call executeFunction("main", [])');
       const result = await this.executeFunction('main', []);
       console.log('[DEBUG] executeMain: executeFunction returned:', result);
       this.executionState.isRunning = false;
+
+      // Track code execution in analytics
+      this.trackCodeExecution(mainFunction, result, Date.now() - executionStartTime);
+
       return result;
     } catch (error) {
       this.executionState.isRunning = false;
-      return {
+      const errorResult = {
         success: false,
         message: `Execution error: ${error instanceof Error ? error.message : 'Unknown error'}`
       };
+
+      // Track failed execution in analytics
+      this.trackCodeExecution(mainFunction, errorResult, Date.now() - executionStartTime);
+
+      return errorResult;
     }
   }
 
@@ -1030,5 +1043,34 @@ export class CodeExecutor {
   // Get current execution state
   getExecutionState(): CodeExecutionState {
     return { ...this.executionState };
+  }
+
+  // Track code execution in analytics
+  private trackCodeExecution(codeWindow: CodeWindow, result: ExecutionResult, durationMs: number): void {
+    try {
+      // Get active quest and phase from QuestManager
+      const questManager = QuestManager.getInstance();
+      const activeQuest = questManager.getActiveQuest();
+      const currentPhase = questManager.getCurrentPhase();
+
+      // Track the execution
+      analyticsService.trackCodeExecution(
+        codeWindow.id,
+        codeWindow.code,
+        {
+          success: result.success,
+          errors: result.success ? [] : [result.message],
+          output: result.message,
+          executionTime: durationMs
+        },
+        activeQuest?.id,
+        currentPhase?.id,
+        this.context.entity.id,
+        durationMs
+      );
+    } catch (error) {
+      // Don't let analytics errors break code execution
+      console.warn('[CodeExecutor] Failed to track code execution:', error);
+    }
   }
 } 

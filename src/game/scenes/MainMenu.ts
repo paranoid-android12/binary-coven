@@ -7,11 +7,9 @@ import { EventBus } from '../EventBus';
 export class MainMenu extends Scene
 {
     background: GameObjects.Sprite;
-    logo: GameObjects.Image;
     mainTitle: GameObjects.Image;
     mainButton: GameObjects.Sprite;
-    optionsButton: GameObjects.Sprite;
-    exitButton: GameObjects.Sprite;
+    startText: GameObjects.Text;
     overlay: GameObjects.Rectangle;
     constructor ()
     {
@@ -19,12 +17,6 @@ export class MainMenu extends Scene
     }
 
     preload() {
-        const SCALE = 4
-        // this.load.spritesheet("mainButton", "/button.png", {
-        //     frameWidth: 16,
-        //     frameHeight: 16
-        // })
-
         // Load animated background frames
         for (let i = 0; i <= 7; i++) {
             this.load.image(`background_frame_${i}`, `/assets/f${i}.png`);
@@ -84,40 +76,44 @@ export class MainMenu extends Scene
 
         this.mainTitle = this.add.image(width / 2, (height / 2) - 170, "mainTitle").setScale(0.7);
 
-        this.mainButton = this.add.sprite(width / 2, (height / 2 + 90), "mainButton", "startButtonUp").setScale(4);
+        this.mainButton = this.add.sprite(width / 2, (height / 2 + 190), "mainButton", "startButtonUp").setScale(8);
         this.mainButton.setInteractive();
+        
+        // Add "Start" text in the middle of the button
+        const startTextY = (height / 2 + 185);
+        this.startText = this.add.text(width / 2, startTextY, "Start", {
+            fontSize: '60px',
+            color: '#1e0818',
+            fontFamily: 'BoldPixels',
+            fontStyle: 'bold'
+        });
+        this.startText.setOrigin(0.5, 0.5);
+        
         this.mainButton.on("pointerdown", () => {
             this.mainButton.setFrame("startButtonDown");
+            // Move text down by 20px when button is pressed
+            this.startText.setY(startTextY + 10);
         });
         this.mainButton.on("pointerup", () => {
             // When pressed down, wait to be pressed up to change frame
             this.mainButton.setFrame("startButtonUp");
+            // Move text back to original position
+            this.startText.setY(startTextY);
+
+            // Check if user is authenticated by emitting event to show login modal
+            // The React side will check authentication and show modal if needed
+            EventBus.emit('show-login-modal');
+        });
+
+        // Listen for successful login to start the game
+        EventBus.on('login-success', () => {
             this.scene.start('ProgrammingGame');
-        });
-
-        this.optionsButton = this.add.sprite(width / 2, (height / 2) + 90 + 80, "mainButton", "startButtonUp").setScale(4);
-        this.optionsButton.setInteractive();
-        this.optionsButton.on("pointerdown", () => {
-            this.optionsButton.setFrame("startButtonDown");
-        });
-        this.optionsButton.on("pointerup", () => {
-            this.optionsButton.setFrame("startButtonUp");
-        });
-
-        this.exitButton = this.add.sprite(width / 2, (height / 2) + 90 +160, "mainButton", "startButtonUp").setScale(4);
-        this.exitButton.setInteractive();
-        this.exitButton.on("pointerdown", () => {
-            this.exitButton.setFrame("startButtonDown");
-        });
-        this.exitButton.on("pointerup", () => {
-            this.exitButton.setFrame("startButtonUp");
         });
 
         // All buttons and title should be higher than overlay
         this.mainTitle.setDepth(101);
         this.mainButton.setDepth(101);
-        this.optionsButton.setDepth(101);
-        this.exitButton.setDepth(101);
+        this.startText.setDepth(102);
 
         EventBus.emit('current-scene-ready', this);
     }

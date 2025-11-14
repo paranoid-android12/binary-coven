@@ -1,9 +1,18 @@
+@font-face {
+    font-family: "BoldPixels";
+    src: url("/fonts/BoldPixels.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
     margin: 0;
     padding: 0;
     color: rgba(255, 255, 255, 0.87);
-    background-color: #000000; 
-    font-family: "BoldPixels", Arial, Helvetica, sans-serif;
+    background-color: #000000;
+    /* Use Arial for small text by default */
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
 }
 
 #app {
@@ -66,4 +75,35 @@ body {
         transform: translateX(0);
         opacity: 1;
     }
+}
+
+/* Typography hierarchy */
+h1, h2, h3, h4, h5, h6 {
+    font-family: "BoldPixels", Arial, Helvetica, sans-serif;
+}
+
+/* Large text classes for blocky font */
+.title, .header, .large-text {
+    font-family: "BoldPixels", Arial, Helvetica, sans-serif;
+}
+
+/* Explicitly set font sizes for headers */
+h1 {
+    font-size: 32px;
+    font-family: "BoldPixels", Arial, Helvetica, sans-serif;
+}
+
+h2 {
+    font-size: 24px;
+    font-family: "BoldPixels", Arial, Helvetica, sans-serif;
+}
+
+h3 {
+    font-size: 20px;
+    font-family: "BoldPixels", Arial, Helvetica, sans-serif;
+}
+
+h4, h5, h6 {
+    font-size: 16px;
+    font-family: "BoldPixels", Arial, Helvetica, sans-serif;
 }

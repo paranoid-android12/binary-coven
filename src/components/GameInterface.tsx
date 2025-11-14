@@ -14,6 +14,8 @@ import { GlossaryModal } from './GlossaryModal';
 import { QuestModal } from './QuestModal';
 import { ErrorDisplay } from './ErrorDisplay';
 import DialogueManager from '../game/systems/DialogueManager';
+import { useUser, isStudentUser } from '../contexts/UserContext';
+import LoginModal from './LoginModal';
 
 // Custom hook for draggable functionality
 const useDraggable = (initialPosition: { x: number; y: number }) => {
@@ -65,7 +67,8 @@ const useDraggable = (initialPosition: { x: number; y: number }) => {
 export const GameInterface: React.FC = () => {
   const phaserRef = useRef<IRefPhaserGame | null>(null);
   const lastRunCodeCall = useRef<number>(0);
-  
+  const { user, logout } = useUser();
+
   // Modal state
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
@@ -129,6 +132,16 @@ export const GameInterface: React.FC = () => {
 
   // Quest modal state
   const [questModalState, setQuestModalState] = useState({
+    isOpen: false
+  });
+
+  // Reset confirmation modal state
+  const [resetConfirmModalState, setResetConfirmModalState] = useState({
+    isOpen: false
+  });
+
+  // Login modal state
+  const [loginModalState, setLoginModalState] = useState({
     isOpen: false
   });
 
@@ -389,6 +402,22 @@ export const GameInterface: React.FC = () => {
       }, 2000);
     };
 
+    // Handle login modal events
+    const handleShowLoginModal = () => {
+      console.log('[LOGIN] Checking authentication status');
+
+      // If already authenticated, go straight to the game
+      if (user && isStudentUser(user)) {
+        console.log('[LOGIN] User already authenticated, starting game');
+        EventBus.emit('login-success');
+        return;
+      }
+
+      // Otherwise, show login modal
+      console.log('[LOGIN] User not authenticated, showing login modal');
+      setLoginModalState({ isOpen: true });
+    };
+
     EventBus.on('entity-clicked', handleEntityClick);
     EventBus.on('grid-clicked', handleGridClick);
     EventBus.on('drone-clicked', handleDroneClick);
@@ -405,6 +434,7 @@ export const GameInterface: React.FC = () => {
     EventBus.on('map-editor-tileset-updated', handleTilesetUpdated);
     EventBus.on('request-upgrade-modal', handleUpgradeModalRequest);
     EventBus.on('challenge-movement-blocked', handleChallengeMovementBlocked);
+    EventBus.on('show-login-modal', handleShowLoginModal);
 
     return () => {
       EventBus.removeListener('entity-clicked');
@@ -425,8 +455,9 @@ export const GameInterface: React.FC = () => {
       EventBus.removeListener('drone-execution-failed');
       EventBus.removeListener('drone-execution-stopped');
       EventBus.removeListener('challenge-movement-blocked');
+      EventBus.removeListener('show-login-modal');
     };
-  }, [globalModalState.isAnyModalOpen, openModal, dialogueState, shouldBlockModalInteractions]);
+  }, [globalModalState.isAnyModalOpen, openModal, dialogueState, shouldBlockModalInteractions, user]);
 
   // Initialize DialogueManager
   useEffect(() => {
@@ -813,6 +844,170 @@ export const GameInterface: React.FC = () => {
         {/* Game Area */}
         <div style={{ flex: 1, position: 'relative' }}>
           <PhaserGame ref={phaserRef} currentActiveScene={currentActiveScene} />
+
+          {/* User Info Panel - Top Left */}
+          {user && isStudentUser(user) && (
+            <div style={{
+              left: '10px',
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              border: '2px solid #0ec3c9',
+              borderRadius: '8px',
+              padding: '10px 15px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '15px',
+              zIndex: 1000,
+              fontFamily: 'BoldPixels',
+              pointerEvents: 'auto',
+            }}>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2px',
+              }}>
+                <div style={{
+                  fontSize: '14px',
+                  color: '#0ec3c9',
+                  textShadow: '0 0 5px rgba(14, 195, 201, 0.5)',
+                }}>
+                  {user.username}
+                </div>
+                <div style={{
+                  fontSize: '10px',
+                  color: 'rgba(255, 255, 255, 0.6)',
+                }}>
+                  Student
+                </div>
+              </div>
+
+              <button
+                onClick={() => logout()}
+                style={{
+                  padding: '6px 12px',
+                  backgroundColor: 'transparent',
+                  color: '#ff6b6b',
+                  border: '1px solid #ff6b6b',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '11px',
+                  fontFamily: 'BoldPixels',
+                  transition: 'all 0.3s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#ff6b6b';
+                  e.currentTarget.style.color = '#000000';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#ff6b6b';
+                }}
+              >
+                LOGOUT
+              </button>
+            </div>
+          )}
+
+          {/* Save/Load/Reset Control Panel - Top Left (below user info) */}
+          {/* {user && isStudentUser(user) && showProgrammingInterface && (
+            <div style={{
+              position: 'absolute',
+              top: '80px', // Below user info panel
+              left: '10px',
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              border: '2px solid #16c60c',
+              borderRadius: '8px',
+              padding: '10px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px',
+              zIndex: 1000,
+              fontFamily: 'BoldPixels',
+              pointerEvents: 'auto',
+            }}>
+              <div style={{
+                fontSize: '11px',
+                color: 'rgba(255, 255, 255, 0.7)',
+                marginBottom: '4px',
+              }}>
+                GAME PROGRESS
+              </div>
+
+              <button
+                onClick={() => EventBus.emit('save-game-state')}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: 'transparent',
+                  color: '#16c60c',
+                  border: '1px solid #16c60c',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '11px',
+                  fontFamily: 'BoldPixels',
+                  transition: 'all 0.3s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#16c60c';
+                  e.currentTarget.style.color = '#000000';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#16c60c';
+                }}
+              >
+                SAVE GAME
+              </button>
+
+              <button
+                onClick={() => EventBus.emit('load-game-state')}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: 'transparent',
+                  color: '#0ec3c9',
+                  border: '1px solid #0ec3c9',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '11px',
+                  fontFamily: 'BoldPixels',
+                  transition: 'all 0.3s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#0ec3c9';
+                  e.currentTarget.style.color = '#000000';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#0ec3c9';
+                }}
+              >
+                LOAD GAME
+              </button>
+
+              <button
+                onClick={() => setResetConfirmModalState({ isOpen: true })}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: 'transparent',
+                  color: '#ff6600',
+                  border: '1px solid #ff6600',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '11px',
+                  fontFamily: 'BoldPixels',
+                  transition: 'all 0.3s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#ff6600';
+                  e.currentTarget.style.color = '#000000';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#ff6600';
+                }}
+              >
+                RESET
+              </button>
+            </div>
+          )} */}
         </div>
 
       </div>
@@ -1845,7 +2040,7 @@ export const GameInterface: React.FC = () => {
         </div>
       )}
 
-      <MapEditorUI
+      {/* <MapEditorUI
         tilesets={mapEditorState.tilesets}
         activeTileset={mapEditorState.activeTileset}
         selectedLayer={mapEditorState.selectedLayer}
@@ -1866,7 +2061,7 @@ export const GameInterface: React.FC = () => {
           EventBus.emit('toggle-map-editor');
         }}
         isActive={mapEditorState.isActive}
-      />
+      /> */}
 
       {/* Glossary Modal */}
       {glossaryModalState.isOpen && (
@@ -1893,6 +2088,117 @@ export const GameInterface: React.FC = () => {
       {/* Educational Error Display */}
       <ErrorDisplay />
 
+      {/* Reset Confirmation Modal */}
+      {resetConfirmModalState.isOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 3000,
+        }}>
+          <div style={{
+            backgroundColor: '#1a1a1a',
+            border: '3px solid #ff6600',
+            borderRadius: '12px',
+            padding: '30px',
+            maxWidth: '500px',
+            boxShadow: '0 0 30px rgba(255, 102, 0, 0.5)',
+          }}>
+            <div style={{
+              fontSize: '24px',
+              color: '#ff6600',
+              fontFamily: 'BoldPixels',
+              marginBottom: '20px',
+              textAlign: 'center',
+            }}>
+              RESET PROGRESS?
+            </div>
+
+            <div style={{
+              fontSize: '14px',
+              color: 'rgba(255, 255, 255, 0.87)',
+              fontFamily: 'BoldPixels',
+              marginBottom: '30px',
+              lineHeight: '1.6',
+            }}>
+              This will permanently delete all your progress, including:
+              <ul style={{ marginTop: '10px', paddingLeft: '20px' }}>
+                <li>All quest completions</li>
+                <li>Code windows and entity positions</li>
+                <li>Resources and upgrades</li>
+                <li>Map progress</li>
+              </ul>
+              This action cannot be undone!
+            </div>
+
+            <div style={{
+              display: 'flex',
+              gap: '15px',
+              justifyContent: 'center',
+            }}>
+              <button
+                onClick={() => setResetConfirmModalState({ isOpen: false })}
+                style={{
+                  padding: '12px 24px',
+                  backgroundColor: 'transparent',
+                  color: '#16c60c',
+                  border: '2px solid #16c60c',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontFamily: 'BoldPixels',
+                  transition: 'all 0.3s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#16c60c';
+                  e.currentTarget.style.color = '#000000';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#16c60c';
+                }}
+              >
+                CANCEL
+              </button>
+
+              <button
+                onClick={() => {
+                  setResetConfirmModalState({ isOpen: false });
+                  EventBus.emit('reset-game-state');
+                }}
+                style={{
+                  padding: '12px 24px',
+                  backgroundColor: 'transparent',
+                  color: '#ff0000',
+                  border: '2px solid #ff0000',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontFamily: 'BoldPixels',
+                  transition: 'all 0.3s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#ff0000';
+                  e.currentTarget.style.color = '#ffffff';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#ff0000';
+                }}
+              >
+                YES, RESET
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Loading indicator for dialogue */}
       {dialogueState.isLoading && (
         <div style={{
@@ -1911,6 +2217,20 @@ export const GameInterface: React.FC = () => {
           Loading dialogue...
         </div>
       )}
+
+      {/* Login Modal - Shows when user clicks Start on main menu */}
+      <LoginModal
+        isVisible={loginModalState.isOpen}
+        onLoginSuccess={() => {
+          console.log('[LOGIN] Login successful');
+          setLoginModalState({ isOpen: false });
+          // Transition to the game scene
+          EventBus.emit('login-success');
+        }}
+        onClose={() => {
+          setLoginModalState({ isOpen: false });
+        }}
+      />
     </div>
   );
 };

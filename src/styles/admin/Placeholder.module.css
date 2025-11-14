@@ -1,0 +1,65 @@
+.placeholder {
+  background: #ffffff;
+  border: 2px dashed #e5e7eb;
+  border-radius: 12px;
+  padding: 60px 40px;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.placeholderIcon {
+  font-size: 72px;
+  margin-bottom: 20px;
+}
+
+.placeholderTitle {
+  font-size: 28px;
+  font-weight: bold;
+  color: #1a1a2e;
+  margin: 0 0 15px 0;
+}
+
+.placeholderText {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 0 0 20px 0;
+  line-height: 1.6;
+}
+
+.placeholderList {
+  text-align: left;
+  max-width: 500px;
+  margin: 20px auto 0;
+  padding-left: 20px;
+}
+
+.placeholderList li {
+  font-size: 15px;
+  color: #374151;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .placeholder {
+    padding: 40px 20px;
+  }
+
+  .placeholderIcon {
+    font-size: 56px;
+  }
+
+  .placeholderTitle {
+    font-size: 22px;
+  }
+
+  .placeholderText {
+    font-size: 14px;
+  }
+
+  .placeholderList li {
+    font-size: 14px;
+  }
+}
