@@ -299,7 +299,7 @@ export default function LoginModal({ isVisible, onLoginSuccess, onClose }: Login
                 fontSize: '0.85em',
                 margin: 0,
                 padding: '5px 0',
-                color: codeValidationMessage.startsWith('✓') ? '#16c60c' : '#ff0000'
+                color: codeValidationMessage.startsWith('✓') ? '#0b7607' : '#b10000'
               }}>
                 {codeValidationMessage}
               </p>

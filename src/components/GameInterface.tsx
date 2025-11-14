@@ -260,7 +260,7 @@ export const GameInterface: React.FC = () => {
   const questButtonPosition = { x: 270, y: 40 }; // Centered between glossary and programming terminal
 
   // Plant/Harvest button positions (lower-right corner)
-  const plantButtonPosition = { x: window.innerWidth - 180, y: window.innerHeight - 140 };
+  const plantButtonPosition = { x: window.innerWidth - 220, y: window.innerHeight - 140 };
   const harvestButtonPosition = { x: window.innerWidth - 115, y: window.innerHeight - 140 };
 
   // Grid coordinate position (lower-left corner)
@@ -910,7 +910,7 @@ export const GameInterface: React.FC = () => {
           <PhaserGame ref={phaserRef} currentActiveScene={currentActiveScene} />
 
           {/* User Info Panel - Top Left */}
-          {user && isStudentUser(user) && (
+          {/* {user && isStudentUser(user) && (
             <div style={{
               position: 'absolute',
               top: '10px',
@@ -971,7 +971,7 @@ export const GameInterface: React.FC = () => {
                 LOGOUT
               </button>
             </div>
-          )}
+          )} */}
 
           {/* Save/Load/Reset Control Panel - Top Left (below user info) */}
           {/* {user && isStudentUser(user) && showProgrammingInterface && (
