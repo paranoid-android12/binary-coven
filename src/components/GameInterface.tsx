@@ -145,6 +145,11 @@ export const GameInterface: React.FC = () => {
     isOpen: false
   });
 
+  // Game menu modal state
+  const [gameMenuModalState, setGameMenuModalState] = useState({
+    isOpen: false
+  });
+
   // Drone state
   const [activeDroneId, setActiveDroneId] = useState<string | undefined>(undefined);
   const [droneExecutionStates, setDroneExecutionStates] = useState<Map<string, boolean>>(new Map());
@@ -206,9 +211,8 @@ export const GameInterface: React.FC = () => {
   // Drone button position (below main play button)
   const dronePlayButtonPosition = { x: window.innerWidth - 180, y: 90 };
 
-  // Save/Load button positions (to the right of energy bar)
-  const saveButtonPosition = { x: 30, y: 80 };
-  const loadButtonPosition = { x: 80, y: 80 };
+  // Menu button position (to the right of energy bar)
+  const menuButtonPosition = { x: 30, y: 80 };
   const glossaryButtonPosition = { x: 220, y: 40 };
   const quickProgramButtonPosition = { x: 320, y: 40 };
   const questButtonPosition = { x: 270, y: 40 }; // Centered between glossary and programming terminal
@@ -1099,26 +1103,18 @@ export const GameInterface: React.FC = () => {
             }}
           />
 
-          {/* Save and Load Buttons - To the right of energy bar */}
+          {/* Menu Button - To the right of energy bar */}
           <SpriteButton
-            position={saveButtonPosition}
+            position={menuButtonPosition}
             backgroundSprite="button.png"
-            upFrame={{ x: 832, y: 208, w: 16, h: 16 }}
-            downFrame={{ x: 832, y: 224, w: 16, h: 16 }}
+            upFrame={{ x: 688, y: 256, w: 16, h: 16 }}
+            downFrame={{ x: 688, y: 272, w: 16, h: 16 }}
             scale={3}
             onClick={() => {
-              EventBus.emit('save-game-state');
-            }}
-          />
-          
-          <SpriteButton
-            position={loadButtonPosition}
-            backgroundSprite="button.png"
-            upFrame={{ x: 624, y: 256, w: 16, h: 16 }}
-            downFrame={{ x: 624, y: 272, w: 16, h: 16 }}
-            scale={3}
-            onClick={() => {
-              EventBus.emit('load-game-state');
+              if (!globalModalState.isAnyModalOpen) {
+                setGameMenuModalState({ isOpen: true });
+                openModal('game-menu');
+              }
             }}
           />
 
@@ -2231,6 +2227,179 @@ export const GameInterface: React.FC = () => {
           setLoginModalState({ isOpen: false });
         }}
       />
+
+      {/* Game Menu Modal */}
+      {gameMenuModalState.isOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 5000,
+          pointerEvents: 'auto'
+        }}>
+          <div style={{
+            backgroundColor: '#d8a888',
+            border: '10px solid #210714',
+            borderRadius: '12px',
+            padding: '30px',
+            maxWidth: '400px',
+            width: '90%',
+            boxShadow: '0 0 30px rgba(33, 7, 20, 0.5)',
+          }}>
+            <div style={{
+              fontSize: '28px',
+              color: '#210714',
+              fontFamily: 'BoldPixels',
+              marginBottom: '25px',
+              textAlign: 'center',
+            }}>
+              GAME MENU
+            </div>
+
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+            }}>
+              {/* Save Button */}
+              <button
+                onClick={() => {
+                  EventBus.emit('save-game-state');
+                  setGameMenuModalState({ isOpen: false });
+                  closeModal('game-menu');
+                }}
+                style={{
+                  padding: '12px 20px',
+                  backgroundColor: 'transparent',
+                  color: '#210714',
+                  border: '2px solid #210714',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '16px',
+                  fontFamily: 'BoldPixels',
+                  transition: 'all 0.3s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#210714';
+                  e.currentTarget.style.color = '#d8a888';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#210714';
+                }}
+              >
+                SAVE GAME
+              </button>
+
+              {/* Load Button */}
+              <button
+                onClick={() => {
+                  EventBus.emit('load-game-state');
+                  setGameMenuModalState({ isOpen: false });
+                  closeModal('game-menu');
+                }}
+                style={{
+                  padding: '12px 20px',
+                  backgroundColor: 'transparent',
+                  color: '#210714',
+                  border: '2px solid #210714',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '16px',
+                  fontFamily: 'BoldPixels',
+                  transition: 'all 0.3s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#210714';
+                  e.currentTarget.style.color = '#d8a888';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#210714';
+                }}
+              >
+                LOAD GAME
+              </button>
+
+              {/* Logout Button */}
+              <button
+                onClick={() => {
+                  // Clear localStorage
+                  localStorage.clear();
+                  // Clear cookies
+                  document.cookie.split(";").forEach((c) => {
+                    document.cookie = c
+                      .replace(/^ +/, "")
+                      .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                  });
+                  // Logout user
+                  logout();
+                  setGameMenuModalState({ isOpen: false });
+                  closeModal('game-menu');
+                }}
+                style={{
+                  padding: '12px 20px',
+                  backgroundColor: 'transparent',
+                  color: '#ff0000',
+                  border: '2px solid #ff0000',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '16px',
+                  fontFamily: 'BoldPixels',
+                  transition: 'all 0.3s',
+                  marginTop: '8px',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#ff0000';
+                  e.currentTarget.style.color = '#ffffff';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#ff0000';
+                }}
+              >
+                LOGOUT
+              </button>
+
+              {/* Close Button */}
+              <button
+                onClick={() => {
+                  setGameMenuModalState({ isOpen: false });
+                  closeModal('game-menu');
+                }}
+                style={{
+                  padding: '12px 20px',
+                  backgroundColor: 'transparent',
+                  color: '#666666',
+                  border: '2px solid #666666',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontFamily: 'BoldPixels',
+                  transition: 'all 0.3s',
+                  marginTop: '8px',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#666666';
+                  e.currentTarget.style.color = '#ffffff';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#666666';
+                }}
+              >
+                CANCEL
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

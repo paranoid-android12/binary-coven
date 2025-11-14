@@ -16,10 +16,10 @@
 .loginBox {
   width: 100%;
   max-width: 450px;
-  background-color: rgba(17, 17, 17, 0.95);
-  border: 2px solid #0ec3c9;
+  background-color: #d8a888;
+  border: 3px solid #210714;
   padding: 40px 30px;
-  box-shadow: 0 0 20px rgba(14, 195, 201, 0.3);
+  box-shadow: 0 0 20px rgba(33, 7, 20, 0.5);
   animation: slideIn 0.3s ease-out;
 }
 
@@ -37,18 +37,19 @@
 .title {
   font-family: "BoldPixels", Arial, Helvetica, sans-serif;
   font-size: 2.5em;
-  color: #0ec3c9;
+  color: #210714;
   text-align: center;
   margin: 0 0 10px 0;
-  text-shadow: 0 0 10px rgba(14, 195, 201, 0.5);
+  text-shadow: none;
 }
 
 .subtitle {
   font-family: "BoldPixels", Arial, Helvetica, sans-serif;
   font-size: 1.2em;
-  color: rgba(255, 255, 255, 0.7);
+  color: #210714;
   text-align: center;
   margin: 0 0 30px 0;
+  opacity: 0.8;
 }
 
 .form {
@@ -66,7 +67,7 @@
 .label {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 0.9em;
-  color: rgba(255, 255, 255, 0.87);
+  color: #210714;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -75,16 +76,16 @@
   font-family: Arial, Helvetica, sans-serif;
   font-size: 1em;
   padding: 12px 15px;
-  background-color: #000000;
-  color: rgba(255, 255, 255, 0.87);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: #ffffff;
+  color: #210714;
+  border: 2px solid #210714;
   outline: none;
   transition: all 0.3s;
 }
 
 .input:focus {
-  border-color: #0ec3c9;
-  box-shadow: 0 0 5px rgba(14, 195, 201, 0.5);
+  border-color: #210714;
+  box-shadow: 0 0 5px rgba(33, 7, 20, 0.3);
 }
 
 .input:disabled {
@@ -93,7 +94,7 @@
 }
 
 .input::placeholder {
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(33, 7, 20, 0.4);
 }
 
 .validationMessage {
@@ -104,21 +105,22 @@
 }
 
 .validationSuccess {
-  color: #0ec3c9;
+  color: #16c60c;
 }
 
 .validationError {
-  color: #ff6b6b;
+  color: #ff0000;
 }
 
 .errorMessage {
   font-family: Arial, Helvetica, sans-serif;
-  background-color: rgba(255, 107, 107, 0.1);
-  border: 1px solid #ff6b6b;
-  color: #ff6b6b;
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 2px solid #ff0000;
+  color: #ff0000;
   padding: 12px 15px;
   margin-bottom: 10px;
   font-size: 0.9em;
+  border-radius: 4px;
 }
 
 .submitButton {
@@ -126,19 +128,20 @@
   font-size: 1.1em;
   padding: 15px;
   margin-top: 10px;
-  background-color: #000000;
-  color: rgba(255, 255, 255, 0.87);
-  border: 2px solid #0ec3c9;
+  background-color: transparent;
+  color: #210714;
+  border: 3px solid #210714;
   cursor: pointer;
   transition: all 0.3s;
   text-transform: uppercase;
   letter-spacing: 2px;
+  border-radius: 6px;
 }
 
 .submitButton:hover:not(:disabled) {
-  background-color: #0ec3c9;
-  color: #000000;
-  box-shadow: 0 0 15px rgba(14, 195, 201, 0.5);
+  background-color: #210714;
+  color: #d8a888;
+  box-shadow: 0 0 15px rgba(33, 7, 20, 0.3);
 }
 
 .submitButton:active:not(:disabled) {
@@ -148,22 +151,23 @@
 .submitButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(33, 7, 20, 0.3);
 }
 
 .footer {
   margin-top: 30px;
   padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 2px solid rgba(33, 7, 20, 0.2);
 }
 
 .footerText {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 0.8em;
-  color: rgba(255, 255, 255, 0.5);
+  color: #210714;
   text-align: center;
   margin: 0;
   line-height: 1.5;
+  opacity: 0.7;
 }
 
 /* Responsive design */

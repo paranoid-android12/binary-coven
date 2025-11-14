@@ -202,7 +202,7 @@ export default function StudentDetailPage() {
               {/* Summary Stats */}
               <div className={styles.summaryStats}>
                 <div className={styles.summaryItem}>
-                  <Target className={styles.summaryIcon} size={10} />
+                  <Target className={styles.summaryIcon} size={20} />
                   <div className={styles.summaryContent}>
                     <div className={styles.summaryValue}>{analytics.summary.questsCompleted}</div>
                     <div className={styles.summaryLabel}>Quests Completed</div>
