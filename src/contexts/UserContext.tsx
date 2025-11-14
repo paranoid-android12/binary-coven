@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/router';
+import { clearAllGameState, logLocalStorageState, validateAndRepairLocalStorage } from '@/utils/localStorageManager';
 
 export interface StudentUser {
   id: string;
@@ -61,6 +62,17 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
+      console.log('[UserContext] Logging out...');
+
+      // Log current state before clearing
+      logLocalStorageState();
+
+      // Clear all game-related localStorage data
+      clearAllGameState();
+
+      console.log('[UserContext] LocalStorage cleared');
+
+      // Call logout API to clear session cookies
       await fetch('/api/auth/logout', { method: 'POST' });
       setUser(null);
       setUserType(null);
@@ -72,6 +84,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
         // Redirect to main menu (which will show login modal when Start is clicked)
         router.push('/');
       }
+
+      console.log('[UserContext] Logout complete');
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -79,6 +93,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   // Check session on mount
   useEffect(() => {
+    // Validate and repair localStorage on app startup
+    validateAndRepairLocalStorage();
+
+    // Then check session
     checkSession();
   }, []);
 

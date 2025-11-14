@@ -881,27 +881,43 @@ export class QuestManager {
 
       const progressData = JSON.parse(storedData);
 
-      // Restore quest progress
-      this.questProgress = new Map(
-        progressData.questProgress.map((progressItem: any) => [
-          progressItem.questId,
-          {
-            ...progressItem,
-            phaseProgress: new Map(
-              progressItem.phaseProgress.map((phaseItem: any) => [
-                phaseItem.phaseId,
-                {
-                  ...phaseItem,
-                  objectivesCompleted: new Set(phaseItem.objectivesCompleted)
-                }
-              ])
-            )
-          }
-        ])
-      );
+      // Validate that progressData has the expected structure
+      if (!progressData || typeof progressData !== 'object') {
+        console.warn('[QuestManager] Invalid progress data structure, skipping load');
+        return;
+      }
 
-      // Restore unlocked quests
-      this.unlockedQuests = new Set(progressData.unlockedQuests);
+      // Restore quest progress (with validation)
+      if (Array.isArray(progressData.questProgress)) {
+        this.questProgress = new Map(
+          progressData.questProgress.map((progressItem: any) => [
+            progressItem.questId,
+            {
+              ...progressItem,
+              phaseProgress: new Map(
+                (Array.isArray(progressItem.phaseProgress) ? progressItem.phaseProgress : []).map((phaseItem: any) => [
+                  phaseItem.phaseId,
+                  {
+                    ...phaseItem,
+                    objectivesCompleted: new Set(phaseItem.objectivesCompleted || [])
+                  }
+                ])
+              )
+            }
+          ])
+        );
+      } else {
+        console.log('[QuestManager] No quest progress array found, starting fresh');
+        this.questProgress = new Map();
+      }
+
+      // Restore unlocked quests (with validation)
+      if (Array.isArray(progressData.unlockedQuests)) {
+        this.unlockedQuests = new Set(progressData.unlockedQuests);
+      } else {
+        console.log('[QuestManager] No unlocked quests array found, starting fresh');
+        this.unlockedQuests = new Set();
+      }
 
       // Restore active quest
       this.activeQuestId = progressData.activeQuestId;
@@ -910,6 +926,11 @@ export class QuestManager {
       console.log('[QuestManager] Progress loaded from storage');
     } catch (error) {
       console.error('[QuestManager] Error loading progress:', error);
+      // Initialize with empty state on error
+      this.questProgress = new Map();
+      this.unlockedQuests = new Set();
+      this.activeQuestId = undefined;
+      this.currentPhaseIndex = 0;
     }
   }
 

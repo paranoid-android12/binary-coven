@@ -1,6 +1,7 @@
 import { useState, FormEvent } from 'react';
 import { useUser } from '@/contexts/UserContext';
 import styles from '@/styles/LoginModal.module.css';
+import { clearAllGameState, loadAndSyncGameState, logLocalStorageState } from '@/utils/localStorageManager';
 
 interface StudentLoginResponse {
   success: boolean;
@@ -77,6 +78,16 @@ export default function LoginModal({ isVisible, onLoginSuccess, onClose }: Login
     setIsLoading(true);
 
     try {
+      console.log('[LoginModal] Logging in...');
+
+      // STEP 1: Clear any existing localStorage state BEFORE login
+      // This ensures fresh state for both new and existing accounts
+      console.log('[LoginModal] Clearing existing localStorage state...');
+      logLocalStorageState();
+      clearAllGameState();
+      console.log('[LoginModal] localStorage cleared');
+
+      // STEP 2: Perform login
       const response = await fetch('/api/auth/student-login', {
         method: 'POST',
         headers: {
@@ -92,15 +103,34 @@ export default function LoginModal({ isVisible, onLoginSuccess, onClose }: Login
       const data: StudentLoginResponse = await response.json();
 
       if (data.success && data.student) {
-        // Update user context
+        console.log('[LoginModal] Login successful:', data.student.username);
+
+        // STEP 3: Load and sync game state from database to localStorage
+        console.log('[LoginModal] Loading game state from database...');
+        const syncSuccess = await loadAndSyncGameState(data.student.id);
+
+        if (syncSuccess) {
+          console.log('[LoginModal] Game state loaded and synced successfully');
+        } else {
+          console.warn('[LoginModal] Failed to load game state, but continuing with login');
+        }
+
+        // STEP 4: Update user context
         login(data.student, 'student');
+
         // Reset form
         setFormData({ username: '', password: '', sessionCode: '' });
         setError('');
+
+        // Log final state
+        console.log('[LoginModal] Login complete. Final localStorage state:');
+        logLocalStorageState();
+
         // Notify parent component
         onLoginSuccess();
       } else {
         setError(data.error || data.message || 'Login failed');
+        console.error('[LoginModal] Login failed:', data.message);
       }
     } catch (err) {
       console.error('Login error:', err);
