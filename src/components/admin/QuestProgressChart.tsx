@@ -43,7 +43,7 @@ export default function QuestProgressChart({ questProgress, showDetails = false 
   const getStateColor = (state: string) => {
     switch (state.toLowerCase()) {
       case 'completed':
-        return '#00ff88';
+        return '#75ba75';
       case 'active':
         return '#0ec3c9';
       case 'failed':

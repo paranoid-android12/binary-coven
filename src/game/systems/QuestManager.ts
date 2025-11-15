@@ -273,7 +273,7 @@ export class QuestManager {
       this.emitNotification({
         type: 'quest_started',
         questId,
-        questTitle: quest?.title || 'Unknown Quest',
+        questTitle: quest?.title || 'Overworld',
         message: `Restarted quest: ${quest?.title}`,
         timestamp: Date.now()
       });

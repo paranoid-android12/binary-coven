@@ -93,7 +93,7 @@ export default function CodeExecutionViewer({ codeExecutions, compact = false }:
               <div className={styles.summaryLabel}>Total Runs</div>
             </div>
             <div className={styles.summaryCard}>
-              <div className={styles.summaryValue} style={{ color: '#00ff88' }}>
+              <div className={styles.summaryValue} style={{ color: '#75ba75' }}>
                 {successCount}
               </div>
               <div className={styles.summaryLabel}>Successful</div>
@@ -153,13 +153,17 @@ export default function CodeExecutionViewer({ codeExecutions, compact = false }:
               <div key={exec.id} className={styles.executionItem}>
                 <div className={styles.executionHeader} onClick={() => toggleExpand(exec.id)}>
                   {success ? (
-                    <Check className={styles.statusIcon} size={20} style={{ color: '#00ff88' }} />
+                    <Check className={styles.statusIcon} size={20} style={{ color: '#75ba75' }} />
                   ) : (
                     <X className={styles.statusIcon} size={20} style={{ color: '#ff4444' }} />
                   )}
                   <div className={styles.executionInfo}>
                     <div className={styles.executionTitle}>
-                      <span className={styles.questId}>{exec.questId || 'Unknown Quest'}</span>
+                      <span className={styles.questId}>
+                        {exec.questId
+                          ? exec.questId
+                          : 'Overworld'}
+                      </span>
                       {exec.phaseId && (
                         <>
                           <span className={styles.separator}>›</span>
