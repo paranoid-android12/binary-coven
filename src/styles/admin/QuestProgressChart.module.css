@@ -5,18 +5,21 @@
 .empty {
   text-align: center;
   padding: 3rem 2rem;
-  background: #0f0f0f;
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .emptyIcon {
   font-size: 3rem;
   margin-bottom: 1rem;
-  opacity: 0.5;
+  opacity: 0.3;
+  color: #9ca3af;
 }
 
 .emptyText {
-  color: #888888;
+  color: #6b7280;
   font-size: 1rem;
   margin: 0;
 }
@@ -30,16 +33,17 @@
 }
 
 .summaryCard {
-  background: #0f0f0f;
-  border: 2px solid #2a2a2a;
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   padding: 1.5rem;
   text-align: center;
   transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .summaryCard:hover {
-  border-color: #0ec3c9;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
 }
 
@@ -49,13 +53,15 @@
   color: #0ec3c9;
   line-height: 1;
   margin-bottom: 0.5rem;
+  font-weight: bold;
 }
 
 .summaryLabel {
-  color: #888888;
+  color: #6b7280;
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  font-weight: 500;
 }
 
 /* Quest List */
@@ -66,15 +72,16 @@
 }
 
 .questItem {
-  background: #0f0f0f;
-  border: 2px solid #2a2a2a;
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   padding: 1.5rem;
   transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .questItem:hover {
-  border-color: #444444;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .questHeader {
@@ -99,7 +106,7 @@
 .questStateBadge {
   font-family: 'BoldPixels', monospace;
   font-size: 0.7rem;
-  color: #000000;
+  color: #ffffff;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   text-transform: uppercase;
@@ -114,7 +121,7 @@
 .questTitle {
   font-family: 'BoldPixels', monospace;
   font-size: 1.25rem;
-  color: #ffffff;
+  color: #1f2937;
   margin: 0 0 0.5rem 0;
 }
 
@@ -126,19 +133,19 @@
 }
 
 .questMetaItem {
-  color: #888888;
+  color: #6b7280;
   font-size: 0.85rem;
 }
 
 .questMetaSeparator {
-  color: #444444;
+  color: #d1d5db;
 }
 
 /* Quest Details */
 .questDetails {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 2px solid #2a2a2a;
+  border-top: 1px solid #e5e7eb;
 }
 
 .detailsGrid {
@@ -154,16 +161,18 @@
 }
 
 .detailLabel {
-  color: #888888;
+  color: #6b7280;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  font-weight: 500;
 }
 
 .detailValue {
-  color: #ffffff;
+  color: #1f2937;
   font-family: 'BoldPixels', monospace;
   font-size: 0.95rem;
+  font-weight: bold;
 }
 
 /* Responsive Design */

@@ -5,24 +5,27 @@
 .empty {
   text-align: center;
   padding: 3rem 2rem;
-  background: #0f0f0f;
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .emptyIcon {
   font-size: 3rem;
   margin-bottom: 1rem;
-  opacity: 0.5;
+  opacity: 0.3;
+  color: #9ca3af;
 }
 
 .emptyText {
-  color: #ffffff;
+  color: #1f2937;
   font-size: 1.1rem;
   margin: 0 0 0.5rem 0;
 }
 
 .emptySubtext {
-  color: #888888;
+  color: #6b7280;
   font-size: 0.9rem;
   margin: 0;
 }
@@ -43,11 +46,11 @@
 }
 
 .modeButton {
-  background: #0f0f0f;
-  border: 2px solid #2a2a2a;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
   border-radius: 6px;
   padding: 0.5rem 1rem;
-  color: #888888;
+  color: #6b7280;
   font-family: 'BoldPixels', monospace;
   font-size: 0.85rem;
   cursor: pointer;
@@ -55,18 +58,19 @@
 }
 
 .modeButton:hover {
-  border-color: #444444;
-  color: #ffffff;
+  border-color: #d1d5db;
+  color: #374151;
+  background: #f9fafb;
 }
 
 .modeButtonActive {
   background: #0ec3c9;
   border-color: #0ec3c9;
-  color: #000000;
+  color: #ffffff;
 }
 
 .lastSaved {
-  color: #888888;
+  color: #6b7280;
   font-size: 0.85rem;
 }
 
@@ -78,15 +82,16 @@
 }
 
 .section {
-  background: #0f0f0f;
-  border: 2px solid #2a2a2a;
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .section:hover {
-  border-color: #444444;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .sectionHeader {
@@ -100,7 +105,7 @@
 }
 
 .sectionHeader:hover {
-  background: rgba(14, 195, 201, 0.05);
+  background: #f9fafb;
 }
 
 .expandIcon {
@@ -112,13 +117,13 @@
 .sectionTitle {
   font-family: 'BoldPixels', monospace;
   font-size: 1.1rem;
-  color: #ffffff;
+  color: #1f2937;
   margin: 0;
 }
 
 .sectionContent {
   padding: 0 1rem 1rem 1rem;
-  border-top: 2px solid #2a2a2a;
+  border-top: 1px solid #e5e7eb;
 }
 
 /* Summary Grid */
@@ -136,16 +141,18 @@
 }
 
 .summaryLabel {
-  color: #888888;
+  color: #6b7280;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  font-weight: 500;
 }
 
 .summaryValue {
   color: #0ec3c9;
   font-family: 'BoldPixels', monospace;
   font-size: 1.1rem;
+  font-weight: bold;
 }
 
 /* Resource Grid */
@@ -157,25 +164,33 @@
 }
 
 .resourceItem {
-  background: #000000;
-  border: 2px solid #2a2a2a;
-  border-radius: 6px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.resourceItem:hover {
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .resourceName {
-  color: #888888;
+  color: #6b7280;
   font-size: 0.8rem;
   text-transform: capitalize;
+  font-weight: 500;
 }
 
 .resourceValue {
-  color: #00ff88;
+  color: #0ec3c9;
   font-family: 'BoldPixels', monospace;
   font-size: 1.5rem;
+  font-weight: bold;
 }
 
 /* Entity List */
@@ -187,10 +202,16 @@
 }
 
 .entityItem {
-  background: #000000;
-  border: 2px solid #2a2a2a;
-  border-radius: 6px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.entityItem:hover {
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .entityHeader {
@@ -208,11 +229,12 @@
 }
 
 .entityType {
-  color: #888888;
+  color: #6b7280;
   font-size: 0.85rem;
   padding: 0.25rem 0.5rem;
-  background: #1a1a1a;
+  background: #e5e7eb;
   border-radius: 4px;
+  font-weight: 500;
 }
 
 .entityProps {
@@ -222,7 +244,7 @@
 }
 
 .entityProp {
-  color: #888888;
+  color: #6b7280;
   font-size: 0.85rem;
 }
 
@@ -235,10 +257,16 @@
 }
 
 .codeWindowItem {
-  background: #000000;
-  border: 2px solid #2a2a2a;
-  border-radius: 6px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.codeWindowItem:hover {
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .codeWindowHeader {
@@ -256,16 +284,16 @@
 }
 
 .codeWindowEntity {
-  color: #888888;
+  color: #6b7280;
   font-size: 0.8rem;
 }
 
 .codeBlock {
-  background: #1a1a1a;
-  border: 2px solid #2a2a2a;
+  background: #1f2937;
+  border: 1px solid #374151;
   border-radius: 6px;
   padding: 1rem;
-  color: #00ff88;
+  color: #10b981;
   font-family: 'BoldPixels', monospace;
   font-size: 0.85rem;
   overflow-x: auto;
@@ -278,18 +306,19 @@
 
 /* JSON View */
 .jsonView {
-  background: #0f0f0f;
-  border: 2px solid #2a2a2a;
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .jsonBlock {
-  background: #000000;
-  border: 2px solid #2a2a2a;
+  background: #1f2937;
+  border: 1px solid #374151;
   border-radius: 6px;
   padding: 1rem;
-  color: #00ff88;
+  color: #10b981;
   font-family: 'BoldPixels', monospace;
   font-size: 0.85rem;
   overflow-x: auto;

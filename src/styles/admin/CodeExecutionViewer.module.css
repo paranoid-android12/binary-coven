@@ -5,18 +5,21 @@
 .empty {
   text-align: center;
   padding: 3rem 2rem;
-  background: #0f0f0f;
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .emptyIcon {
   font-size: 3rem;
   margin-bottom: 1rem;
-  opacity: 0.5;
+  opacity: 0.3;
+  color: #9ca3af;
 }
 
 .emptyText {
-  color: #888888;
+  color: #6b7280;
   font-size: 1rem;
   margin: 0;
 }
@@ -30,16 +33,17 @@
 }
 
 .summaryCard {
-  background: #0f0f0f;
-  border: 2px solid #2a2a2a;
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   padding: 1.5rem;
   text-align: center;
   transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .summaryCard:hover {
-  border-color: #0ec3c9;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
 }
 
@@ -49,13 +53,15 @@
   color: #0ec3c9;
   line-height: 1;
   margin-bottom: 0.5rem;
+  font-weight: bold;
 }
 
 .summaryLabel {
-  color: #888888;
+  color: #6b7280;
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  font-weight: 500;
 }
 
 /* Filters */
@@ -67,11 +73,11 @@
 }
 
 .filterSelect {
-  background: #0f0f0f;
-  border: 2px solid #2a2a2a;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
   padding: 0.75rem 1rem;
-  color: #ffffff;
+  color: #374151;
   font-family: 'BoldPixels', monospace;
   font-size: 0.95rem;
   cursor: pointer;
@@ -82,10 +88,11 @@
 .filterSelect:focus {
   outline: none;
   border-color: #0ec3c9;
+  box-shadow: 0 0 0 3px rgba(14, 195, 201, 0.1);
 }
 
 .filterSelect:hover {
-  border-color: #444444;
+  border-color: #d1d5db;
 }
 
 /* Execution List */
@@ -98,21 +105,24 @@
 .noResults {
   text-align: center;
   padding: 2rem;
-  color: #888888;
-  background: #0f0f0f;
-  border-radius: 8px;
+  color: #6b7280;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .executionItem {
-  background: #0f0f0f;
-  border: 2px solid #2a2a2a;
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .executionItem:hover {
-  border-color: #444444;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .executionHeader {
@@ -146,12 +156,12 @@
 .questId {
   font-family: 'BoldPixels', monospace;
   font-size: 1rem;
-  color: #ffffff;
+  color: #1f2937;
   font-weight: bold;
 }
 
 .separator {
-  color: #666666;
+  color: #d1d5db;
 }
 
 .phaseId {
@@ -168,16 +178,16 @@
 }
 
 .metaItem {
-  color: #888888;
+  color: #6b7280;
   font-size: 0.85rem;
 }
 
 .metaSeparator {
-  color: #444444;
+  color: #d1d5db;
 }
 
 .expandIcon {
-  color: #666666;
+  color: #9ca3af;
   font-size: 0.85rem;
   transition: transform 0.3s ease;
 }
@@ -185,7 +195,8 @@
 /* Execution Details */
 .executionDetails {
   padding: 0 1rem 1rem 1rem;
-  border-top: 2px solid #2a2a2a;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
 }
 
 .codeSection,
@@ -200,14 +211,15 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 0.5rem;
+  font-weight: bold;
 }
 
 .codeBlock {
-  background: #000000;
-  border: 2px solid #2a2a2a;
+  background: #1f2937;
+  border: 1px solid #374151;
   border-radius: 6px;
   padding: 1rem;
-  color: #00ff88;
+  color: #10b981;
   font-family: 'BoldPixels', monospace;
   font-size: 0.9rem;
   overflow-x: auto;
@@ -217,14 +229,14 @@
 }
 
 .errorBlock {
-  background: rgba(255, 68, 68, 0.1);
-  border: 2px solid #ff4444;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
   border-radius: 6px;
   padding: 1rem;
 }
 
 .errorItem {
-  color: #ff4444;
+  color: #dc2626;
   font-family: 'BoldPixels', monospace;
   font-size: 0.85rem;
   margin-bottom: 0.5rem;
@@ -235,11 +247,11 @@
 }
 
 .successBlock {
-  background: rgba(0, 255, 136, 0.05);
-  border: 2px solid #00ff88;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
   border-radius: 6px;
   padding: 1rem;
-  color: #00ff88;
+  color: #16a34a;
   font-family: 'BoldPixels', monospace;
   font-size: 0.85rem;
 }
@@ -248,18 +260,19 @@
   margin: 0;
   white-space: pre-wrap;
   word-wrap: break-word;
+  color: #16a34a;
 }
 
 /* Footer */
 .footer {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 2px solid #2a2a2a;
+  border-top: 1px solid #e5e7eb;
   text-align: center;
 }
 
 .resultCount {
-  color: #888888;
+  color: #6b7280;
   margin: 0;
   font-size: 0.9rem;
 }
