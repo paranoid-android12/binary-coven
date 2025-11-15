@@ -34,13 +34,13 @@ export const QuestModal: React.FC<QuestModalProps> = ({ isOpen, onClose }) => {
     EventBus.on('quest-objective-completed', handleQuestEvent);
 
     return () => {
-      EventBus.removeListener('quest-started');
-      EventBus.removeListener('quest-completed');
-      EventBus.removeListener('quest-cancelled');
-      EventBus.removeListener('quest-unlocked');
-      EventBus.removeListener('quest-phase-started');
-      EventBus.removeListener('quest-phase-completed');
-      EventBus.removeListener('quest-objective-completed');
+      EventBus.removeListener('quest-started', handleQuestEvent);
+      EventBus.removeListener('quest-completed', handleQuestEvent);
+      EventBus.removeListener('quest-cancelled', handleQuestEvent);
+      EventBus.removeListener('quest-unlocked', handleQuestEvent);
+      EventBus.removeListener('quest-phase-started', handleQuestEvent);
+      EventBus.removeListener('quest-phase-completed', handleQuestEvent);
+      EventBus.removeListener('quest-objective-completed', handleQuestEvent);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -139,23 +139,6 @@ export const QuestModal: React.FC<QuestModalProps> = ({ isOpen, onClose }) => {
         }}
       >
         <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-          {/* Quest Icon */}
-          {quest.icon && (
-            <div
-              style={{
-                width: '64px',
-                height: '64px',
-                minWidth: '64px',
-                backgroundImage: `url(/assets/${quest.icon})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                imageRendering: 'pixelated',
-                border: '2px solid #3c3c3c',
-                borderRadius: '4px',
-              }}
-            />
-          )}
-
           {/* Quest Content */}
           <div style={{ flex: 1, minWidth: 0 }}>
             {/* Title */}
@@ -336,22 +319,6 @@ export const QuestModal: React.FC<QuestModalProps> = ({ isOpen, onClose }) => {
         <div style={{ flex: 1, overflowY: 'auto', paddingRight: '8px' }}>
           {/* Quest Header */}
           <div style={{ marginBottom: '24px' }}>
-            {quest.icon && (
-              <div
-                style={{
-                  width: '128px',
-                  height: '128px',
-                  backgroundImage: `url(/assets/${quest.icon})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  imageRendering: 'pixelated',
-                  border: '2px solid #3c3c3c',
-                  borderRadius: '8px',
-                  marginBottom: '16px',
-                }}
-              />
-            )}
-
             <h2
               style={{
                 fontSize: '28px',

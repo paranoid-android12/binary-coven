@@ -106,7 +106,17 @@
         },
         {
           "name": "Maru",
-          "content": "Well... yes and no. That's where things get interesting. But let's start with the basics first.",
+          "content": "Well... yes and no. That's where things get interesting. You've learned the fundamentals - now let's put them to use!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Alright, I've got the basics down. I'm ready to start farming!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect! You've completed the introduction! Welcome to farm life, Qubit. Let's grow some wheat!",
           "sprite": "manu-pleased.png"
         }
       ],

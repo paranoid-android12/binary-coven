@@ -194,18 +194,23 @@
       "postDialogues": [
         {
           "name": "Qubit",
-          "content": "That... that was completely automated. I didn't touch anything after hitting play!",
+          "content": "It worked! That was completely automated. I didn't touch anything after hitting play!",
           "sprite": "qubit-pleased.png"
         },
         {
           "name": "Maru",
-          "content": "THAT'S the magic of programming! Write it once, let it run. No manual clicking needed!",
+          "content": "THAT'S the magic of programming! Write it once, let it run. No manual clicking needed! You've mastered the complete farming cycle!",
           "sprite": "manu-pleased.png"
         },
         {
           "name": "Qubit",
-          "content": "This changes everything.",
+          "content": "I actually did it! I wrote a full automation script from start to finish. This changes everything!",
           "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Congratulations! You've completed the farming scripts quest! You're officially a farmer-programmer now!",
+          "sprite": "manu-pleased.png"
         }
       ],
       "autoAdvance": true,

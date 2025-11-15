@@ -249,12 +249,22 @@
       "postDialogues": [
         {
           "name": "Qubit",
-          "content": "That worked! I moved in a pattern, all from code!",
+          "content": "That worked perfectly! I moved in a pattern, all from code! This is amazing!",
           "sprite": "qubit-pleased.png"
         },
         {
           "name": "Maru",
-          "content": "Perfect! Now you understand the basics. But here's where it gets REALLY interesting - we can automate MORE than just movement...",
+          "content": "You've done it! You've mastered automated movement! You wrote code that executes multiple commands in sequence - that's real programming!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "I can't believe I just wrote my first program. If I can automate movement... what else can I automate?",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Now you're thinking like a true coder! You've completed this quest, and you're ready for even more automation. Excellent work!",
           "sprite": "manu-pleased.png"
         }
       ],

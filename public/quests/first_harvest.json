@@ -113,22 +113,22 @@
       "postDialogues": [
         {
           "name": "Qubit",
-          "content": "I see the wheat counter went up. So that's how we measure success here?",
-          "sprite": "qubit-speaking.png"
+          "content": "I did it! I see the wheat counter went up. So that's how we measure success here?",
+          "sprite": "qubit-pleased.png"
         },
         {
           "name": "Maru",
-          "content": "Exactly! Wheat is our currency. The more you grow, the more you can upgrade and improve.",
+          "content": "Exactly! You've completed your first full farming cycle - plant, wait, and harvest. Wheat is our currency, and you just earned your first batch!",
           "sprite": "manu-pleased.png"
         },
         {
           "name": "Qubit",
-          "content": "Okay, but seriously - clicking buttons for every plant? That's not going to scale.",
+          "content": "Nice! Though... clicking buttons for every plant? There has to be a better way.",
           "sprite": "qubit-speaking.png"
         },
         {
           "name": "Maru",
-          "content": "Aha! NOW you're thinking! Come on, let me show you something cool...",
+          "content": "Aha! You're already thinking like a programmer! You've mastered the basics, and now you're ready to learn automation. Great work!",
           "sprite": "manu-pleased.png"
         }
       ],

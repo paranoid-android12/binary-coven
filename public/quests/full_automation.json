@@ -140,17 +140,17 @@
         },
         {
           "name": "Maru",
-          "content": "Hehe, now you're thinking like a real programmer! But let's master the basics first. Grandpa will be so proud!",
+          "content": "Hehe, now you're thinking like a real programmer! You've completed the full automation quest - you've mastered the fundamentals!",
           "sprite": "manu-pleased.png"
         },
         {
           "name": "Qubit",
-          "content": "Thanks for teaching me all this, Maru. I couldn't have done it without you.",
+          "content": "Thanks for teaching me all this, Maru. I've gone from manual farming to full automation. What a journey!",
           "sprite": "qubit-pleased.png"
         },
         {
           "name": "Maru",
-          "content": "Anytime! Now go explore - there's a whole farm out there waiting to be automated!",
+          "content": "You've earned it! Quest complete! Grandpa will be so proud of how far you've come. Now go explore - there's a whole farm out there waiting to be automated!",
           "sprite": "manu-pleased.png"
         }
       ],

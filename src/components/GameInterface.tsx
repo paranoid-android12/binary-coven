@@ -16,6 +16,7 @@ import { ErrorDisplay } from './ErrorDisplay';
 import DialogueManager from '../game/systems/DialogueManager';
 import { useUser, isStudentUser } from '../contexts/UserContext';
 import LoginModal from './LoginModal';
+import ToastContainer from './ToastContainer';
 
 // Custom hook for draggable functionality
 const useDraggable = (initialPosition: { x: number; y: number }) => {
@@ -380,12 +381,12 @@ export const GameInterface: React.FC = () => {
     
     // Handle upgrade modal requests
     const handleUpgradeModalRequest = () => {
-      // Block if any modal is currently open
-      if (globalModalState.isAnyModalOpen) {
-        console.log('Upgrade modal blocked - another modal is open');
+      // Block if modal interactions should be blocked
+      if (shouldBlockModalInteractions()) {
+        console.log('Upgrade modal blocked - modal interactions are blocked');
         return;
       }
-      
+
       setUpgradeModalState(prev => ({ ...prev, isOpen: true }));
       openModal('upgrade');
     };
@@ -1158,7 +1159,7 @@ export const GameInterface: React.FC = () => {
             downFrame={{ x: 592, y: 272, w: 16, h: 16 }}
             scale={4}
             onClick={() => {
-              if (!globalModalState.isAnyModalOpen) {
+              if (!shouldBlockModalInteractions()) {
                 setUpgradeModalState(prev => ({ ...prev, isOpen: true }));
                 openModal('upgrade');
               }
@@ -1173,7 +1174,7 @@ export const GameInterface: React.FC = () => {
             downFrame={{ x: 688, y: 272, w: 16, h: 16 }}
             scale={3}
             onClick={() => {
-              if (!globalModalState.isAnyModalOpen) {
+              if (!shouldBlockModalInteractions()) {
                 setGameMenuModalState({ isOpen: true });
                 openModal('game-menu');
               }
@@ -1188,7 +1189,7 @@ export const GameInterface: React.FC = () => {
             downFrame={{ x: 320, y: 512, w: 16, h: 16 }}
             scale={3}
             onClick={() => {
-              if (!globalModalState.isAnyModalOpen) {
+              if (!shouldBlockModalInteractions()) {
                 setGlossaryModalState({ isOpen: true });
                 openModal('glossary');
               }
@@ -1203,7 +1204,7 @@ export const GameInterface: React.FC = () => {
             downFrame={{ x: 432, y: 512, w: 16, h: 16 }}
             scale={3}
             onClick={() => {
-              if (!globalModalState.isAnyModalOpen) {
+              if (!shouldBlockModalInteractions()) {
                 const qubitEntity = entities.get('qubit');
                 if (qubitEntity) {
                   setModalState({
@@ -1230,7 +1231,7 @@ export const GameInterface: React.FC = () => {
             downFrame={{ x: 384, y: 512, w: 16, h: 16 }}
             scale={3}
             onClick={() => {
-              if (!globalModalState.isAnyModalOpen) {
+              if (!shouldBlockModalInteractions()) {
                 setQuestModalState({ isOpen: true });
                 openModal('quest');
               }
@@ -1266,7 +1267,7 @@ export const GameInterface: React.FC = () => {
           />
 
           {/* Grid Coordinate Indicator (lower-left) */}
-          {activeEntity && (
+          {/* {activeEntity && (
             <div style={{
               position: 'absolute',
               left: gridCoordinatePosition.x,
@@ -1295,7 +1296,7 @@ export const GameInterface: React.FC = () => {
                 ({Math.floor(activeEntity.visualPosition?.x ?? activeEntity.position.x)}, {Math.floor(activeEntity.visualPosition?.y ?? activeEntity.position.y)})
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Wheat Counter (top-middle) */}
           <div style={{
@@ -2425,6 +2426,9 @@ export const GameInterface: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Toast Notification System */}
+      <ToastContainer />
     </div>
   );
 };

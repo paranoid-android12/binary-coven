@@ -190,7 +190,7 @@ export default function SessionStudentsPage() {
                       <td>{formatDate(student.lastLogin)}</td>
                       <td className={styles.centerCell}>
                         <span className={styles.questBadge}>
-                          {student.questsCompleted} / {student.questsCompleted + student.questsActive}
+                          {student.questsCompleted} / 9
                         </span>
                       </td>
                       <td className={styles.centerCell}>

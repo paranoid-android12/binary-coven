@@ -174,13 +174,18 @@
       "preDialogues": [
         {
           "name": "Lain",
-          "content": "Great job! You've got the hang of it—moving around, planting crops, and coding actions. Now you can use these skills to finish Grandpa's three chores. Talk to the townsfolk to find out what each one is!",
+          "content": "Excellent! You've mastered the basics—moving around, planting crops, and coding actions. You're ready to take on Grandpa's chores now!",
           "sprite": "manu-pleased.png"
         },
         {
           "name": "Qubit",
-          "content": "Got it! Move around, code smart, and get those chores done. Guess I better start asking around town!",
+          "content": "I did it! I actually learned how to code and farm at the same time. Grandpa's chores don't stand a chance!",
           "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Lain",
+          "content": "That's the spirit! You've completed your basic training. Now go show the town what you can do!",
+          "sprite": "manu-pleased.png"
         }
       ],
       "objectives": [],
