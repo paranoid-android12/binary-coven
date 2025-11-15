@@ -323,6 +323,9 @@ export class ProgrammingGame extends Scene {
 
     // Emit event so React component can get scene reference
     EventBus.emit('current-scene-ready', this);
+
+    // Auto-load saved game if one exists
+    this.autoLoadSavedGame();
   }
 
   private createPlaceholderSprites() {
@@ -2251,6 +2254,34 @@ export class ProgrammingGame extends Scene {
     } catch (error) {
       console.error('[LOAD] Failed to load game state:', error);
       this.showNotification('Load Failed!', 0xff0000);
+    }
+  }
+
+  /**
+   * Auto-loads saved game if one exists
+   * Called automatically when the game scene is created
+   */
+  private async autoLoadSavedGame(): Promise<void> {
+    try {
+      console.log('[AUTO-LOAD] Checking for existing save...');
+
+      // Check if a saved game exists
+      const hasSave = await GameStateService.hasSavedGame('autosave');
+
+      if (hasSave) {
+        console.log('[AUTO-LOAD] Found existing save, loading...');
+
+        // Load the saved game state
+        await this.loadGameState();
+
+        console.log('[AUTO-LOAD] Auto-load completed successfully');
+      } else {
+        console.log('[AUTO-LOAD] No existing save found, starting fresh');
+      }
+    } catch (error) {
+      console.error('[AUTO-LOAD] Failed to auto-load saved game:', error);
+      // Don't show error notification - just proceed with normal initialization
+      console.log('[AUTO-LOAD] Proceeding with fresh start due to error');
     }
   }
 
