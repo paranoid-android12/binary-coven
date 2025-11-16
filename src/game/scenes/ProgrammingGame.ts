@@ -324,8 +324,8 @@ export class ProgrammingGame extends Scene {
     // Emit event so React component can get scene reference
     EventBus.emit('current-scene-ready', this);
 
-    // Auto-load saved game if one exists
-    this.autoLoadSavedGame();
+    // Note: Auto-load removed to prevent race condition with React initialization
+    // Users can manually load their save via the menu if needed
   }
 
   private createPlaceholderSprites() {
@@ -893,15 +893,25 @@ export class ProgrammingGame extends Scene {
 
   private updateVisuals() {
     const gameState = useGameStore.getState();
-    
-    // Update entity sprites
+
+    // Update entity sprites (with error handling to prevent crashes)
     gameState.entities.forEach((entity, id) => {
-      this.updateEntitySprite(entity);
+      try {
+        this.updateEntitySprite(entity);
+      } catch (error) {
+        console.error(`[VISUALS] Failed to update sprite for entity ${id}:`, error);
+        // Continue updating other sprites even if one fails
+      }
     });
-    
-    // Update grid sprites
+
+    // Update grid sprites (with error handling to prevent crashes)
     gameState.grids.forEach((grid, id) => {
-      this.updateGridSprite(grid);
+      try {
+        this.updateGridSprite(grid);
+      } catch (error) {
+        console.error(`[VISUALS] Failed to update sprite for grid ${id}:`, error);
+        // Continue updating other sprites even if one fails
+      }
     });
   }
 
@@ -2081,7 +2091,9 @@ export class ProgrammingGame extends Scene {
       );
 
       if (!result.success || !result.gameState) {
-        // Notification already shown by GameStateService
+        // No valid save data - return early WITHOUT clearing sprites
+        // This prevents destroying existing sprites when there's nothing to load
+        console.log('[LOAD] No valid save data, keeping current state');
         return;
       }
 
@@ -2089,8 +2101,9 @@ export class ProgrammingGame extends Scene {
       const gameState = useGameStore.getState();
 
       console.log('[LOAD] Starting game state load...');
-      
-      // Clear and destroy all existing sprites first
+
+      // Only clear sprites AFTER confirming we have valid data to load
+      // This prevents the bug where sprites are destroyed but never recreated
       this.clearAllSprites();
       
       // Clear current state completely
@@ -2260,23 +2273,24 @@ export class ProgrammingGame extends Scene {
   /**
    * Auto-loads saved game if one exists
    * Called automatically when the game scene is created
+   * Only loads from database saves, not localStorage
    */
   private async autoLoadSavedGame(): Promise<void> {
     try {
-      console.log('[AUTO-LOAD] Checking for existing save...');
+      console.log('[AUTO-LOAD] Checking for existing database save...');
 
-      // Check if a saved game exists
-      const hasSave = await GameStateService.hasSavedGame('autosave');
+      // Check if a saved game exists in the database only (no localStorage fallback)
+      const hasSave = await GameStateService.hasDatabaseSave('autosave');
 
       if (hasSave) {
-        console.log('[AUTO-LOAD] Found existing save, loading...');
+        console.log('[AUTO-LOAD] Found existing database save, loading...');
 
         // Load the saved game state
         await this.loadGameState();
 
         console.log('[AUTO-LOAD] Auto-load completed successfully');
       } else {
-        console.log('[AUTO-LOAD] No existing save found, starting fresh');
+        console.log('[AUTO-LOAD] No database save found, starting fresh');
       }
     } catch (error) {
       console.error('[AUTO-LOAD] Failed to auto-load saved game:', error);

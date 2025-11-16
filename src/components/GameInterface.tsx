@@ -254,8 +254,8 @@ export const GameInterface: React.FC = () => {
   // Drone button position (below main play button)
   const dronePlayButtonPosition = { x: window.innerWidth - 180, y: 90 };
 
-  // Menu button position (to the right of energy bar)
-  const menuButtonPosition = { x: 30, y: 80 };
+  // Menu button position (beside quick programming button)
+  const menuButtonPosition = { x: 370, y: 40 };
   const glossaryButtonPosition = { x: 220, y: 40 };
   const quickProgramButtonPosition = { x: 320, y: 40 };
   const questButtonPosition = { x: 270, y: 40 }; // Centered between glossary and programming terminal
@@ -267,8 +267,8 @@ export const GameInterface: React.FC = () => {
   // Grid coordinate position (lower-left corner)
   const gridCoordinatePosition = { x: 20, y: window.innerHeight - 60 };
 
-  // Wheat counter position (top-middle)
-  const wheatCounterPosition = { x: window.innerWidth / 2 - 80, y: 20 };
+  // Wheat counter position (left side, below energy bar)
+  const wheatCounterPosition = { x: 20, y: 110 };
 
   // Modal management functions
   const openModal = useCallback((modalId: string) => {
@@ -1242,8 +1242,8 @@ export const GameInterface: React.FC = () => {
           <SpriteButton
             position={plantButtonPosition}
             backgroundSprite="button.png"
-            upFrame={{ x: 480, y: 496, w: 16, h: 16 }}
-            downFrame={{ x: 480, y: 512, w: 16, h: 16 }}
+            upFrame={{ x: 608, y: 112, w: 16, h: 16 }}
+            downFrame={{ x: 608, y: 128, w: 16, h: 16 }}
             scale={5}
             onClick={() => {
               if (!isCodeRunning && activeEntity && !activeEntity.taskState.isBlocked) {
@@ -1256,8 +1256,8 @@ export const GameInterface: React.FC = () => {
           <SpriteButton
             position={harvestButtonPosition}
             backgroundSprite="button.png"
-            upFrame={{ x: 528, y: 496, w: 16, h: 16 }}
-            downFrame={{ x: 528, y: 512, w: 16, h: 16 }}
+            upFrame={{ x: 656, y: 112, w: 16, h: 16 }}
+            downFrame={{ x: 656, y: 128, w: 16, h: 16 }}
             scale={5}
             onClick={() => {
               if (!isCodeRunning && activeEntity && !activeEntity.taskState.isBlocked) {
@@ -1298,40 +1298,36 @@ export const GameInterface: React.FC = () => {
             </div>
           )} */}
 
-          {/* Wheat Counter (top-middle) */}
+          {/* Wheat Counter (left side, below energy bar) */}
           <div style={{
             position: 'absolute',
             left: wheatCounterPosition.x,
             top: wheatCounterPosition.y,
-            backgroundColor: 'rgba(0, 0, 0, 0.85)',
-            border: '3px solid #FFD700',
-            borderRadius: '10px',
-            padding: '10px 20px',
             fontFamily: 'BoldPixels',
             fontSize: '18px',
             color: 'white',
             pointerEvents: 'auto',
-            minWidth: '160px',
-            textAlign: 'center',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px'
           }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '10px'
+            <img
+              src="/assets/wheat.png"
+              alt="wheat"
+              style={{
+                width: '48px',
+                height: '48px',
+                imageRendering: 'pixelated'
+              }}
+            />
+            <span style={{
+              fontSize: '32px',
+              fontWeight: 'bold',
+              color: '#FFD700',
+              textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)'
             }}>
-              <span style={{
-                fontSize: '24px',
-                color: '#FFD700'
-              }}>🌾</span>
-              <span style={{
-                fontSize: '22px',
-                fontWeight: 'bold',
-                color: '#FFD700'
-              }}>
-                {globalResources.wheat || 0}
-              </span>
-            </div>
+              {globalResources.wheat || 0}
+            </span>
           </div>
 
           {/* Drone Control Panel - Below main play button */}
@@ -1493,7 +1489,7 @@ export const GameInterface: React.FC = () => {
             </div>
           )}
 
-          {/* Tutorial Task Indicator - Bottom Right */}
+          {/* Tutorial Task Indicator - Bottom Left */}
           {dialogueState.isActive && DialogueManager.shouldHideDialogue() && (() => {
             const currentDialogue = dialogueState.dialogues[dialogueState.currentIndex];
             if (currentDialogue?.objectives && currentDialogue.objectives.length > 0) {
@@ -1501,23 +1497,24 @@ export const GameInterface: React.FC = () => {
                 <div style={{
                   position: 'absolute',
                   bottom: '20px',
-                  right: '20px',
-                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                  border: '2px solid #FFD700',
-                  borderRadius: '8px',
-                  padding: '12px 16px',
-                  color: '#FFD700',
+                  left: '20px',
+                  backgroundColor: '#d8a888',
+                  border: '4px solid #210714',
+                  borderRadius: '12px',
+                  padding: '16px 20px',
+                  color: '#210714',
                   fontSize: '16px',
                   fontFamily: 'BoldPixels',
                   maxWidth: '300px',
                   zIndex: 2000,
-                  pointerEvents: 'none'
+                  pointerEvents: 'none',
+                  boxShadow: '0 4px 0 #210714'
                 }}>
-                  <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
                     gap: '8px',
-                    marginBottom: '4px'
+                    marginBottom: '6px'
                   }}>
                     <span style={{ fontWeight: 'bold' }}>Current Task:</span>
                   </div>
@@ -1526,22 +1523,23 @@ export const GameInterface: React.FC = () => {
                   </div>
                   {/* Progress indicator for movement tutorial */}
                   {currentDialogue.objectives[0].type === 'movement' && currentDialogue.objectives[0].directions && (
-                    <div style={{ 
-                      marginTop: '8px', 
+                    <div style={{
+                      marginTop: '8px',
                       fontSize: '12px',
                       display: 'flex',
                       gap: '8px',
                       flexWrap: 'wrap'
                     }}>
                       {currentDialogue.objectives[0].directions!.map(dir => (
-                        <span 
+                        <span
                           key={dir}
                           style={{
-                            padding: '2px 6px',
-                            backgroundColor: tutorialState.movementDirections.has(dir) ? 'rgba(0, 200, 0, 0.3)' : 'rgba(100, 100, 100, 0.3)',
-                            border: `1px solid ${tutorialState.movementDirections.has(dir) ? '#00CC00' : '#666666'}`,
+                            padding: '3px 8px',
+                            backgroundColor: tutorialState.movementDirections.has(dir) ? '#16c60c' : 'rgba(0, 0, 0, 0.2)',
+                            border: `2px solid ${tutorialState.movementDirections.has(dir) ? '#16c60c' : '#210714'}`,
                             borderRadius: '4px',
-                            fontSize: '10px'
+                            fontSize: '10px',
+                            color: tutorialState.movementDirections.has(dir) ? '#ffffff' : '#210714'
                           }}
                         >
                           {dir.toUpperCase()} {tutorialState.movementDirections.has(dir) ? '✓' : ''}
@@ -1556,23 +1554,24 @@ export const GameInterface: React.FC = () => {
                     const total = currentDialogue.objectives[0].challengePositions.length;
                     const completed = currentDialogue.objectives[0].challengePositions.filter(pos => {
                       const grid = store.getGridAt(pos);
-                      return grid?.type === 'farmland' && 
-                             grid.state?.status === 'ready' && 
+                      return grid?.type === 'farmland' &&
+                             grid.state?.status === 'ready' &&
                              grid.state?.isGrown === true &&
                              grid.state?.plantType === 'wheat';
                     }).length;
-                    
+
                     return (
-                      <div style={{ 
-                        marginTop: '8px', 
+                      <div style={{
+                        marginTop: '8px',
                         fontSize: '12px'
                       }}>
                         <div style={{
-                          padding: '4px 8px',
-                          backgroundColor: completed === total ? 'rgba(0, 200, 0, 0.3)' : 'rgba(100, 100, 100, 0.3)',
-                          border: `1px solid ${completed === total ? '#00CC00' : '#666666'}`,
+                          padding: '6px 10px',
+                          backgroundColor: completed === total ? '#16c60c' : 'rgba(0, 0, 0, 0.2)',
+                          border: `2px solid ${completed === total ? '#16c60c' : '#210714'}`,
                           borderRadius: '4px',
-                          fontSize: '11px'
+                          fontSize: '11px',
+                          color: completed === total ? '#ffffff' : '#210714'
                         }}>
                           Progress: {completed} / {total} wheat plants grown {completed === total ? '✓' : ''}
                         </div>
@@ -1585,10 +1584,10 @@ export const GameInterface: React.FC = () => {
             return null;
           })()}
 
-          {/* Bottom Left - Error Messages */}
+          {/* Bottom Left - Error Messages (positioned above Current Task) */}
           <div style={{
             position: 'absolute',
-            bottom: '20px',
+            bottom: '200px',
             left: '20px',
             pointerEvents: 'auto',
             maxWidth: '400px'

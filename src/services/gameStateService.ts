@@ -240,6 +240,22 @@ export class GameStateService {
   }
 
   /**
+   * Check if there's a saved game in the database only (no localStorage fallback)
+   * Use this for auto-load checks to ensure we only load from active database saves
+   */
+  static async hasDatabaseSave(saveName: string = 'autosave'): Promise<boolean> {
+    try {
+      const response = await fetch(`/api/game/load?saveName=${encodeURIComponent(saveName)}`);
+      const data: LoadGameStateResponse = await response.json();
+      return data.success && data.saveExists;
+    } catch (error) {
+      // No fallback - return false if database check fails
+      console.log('[GAME STATE SERVICE] Database save check failed, no save found');
+      return false;
+    }
+  }
+
+  /**
    * Get last saved timestamp
    */
   static async getLastSavedTime(saveName: string = 'autosave'): Promise<Date | null> {
