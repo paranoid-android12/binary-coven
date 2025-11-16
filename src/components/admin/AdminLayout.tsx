@@ -2,8 +2,15 @@ import { ReactNode, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
-import { BarChart3, Key, Users, LogOut, Menu, User } from 'lucide-react';
+import { BarChart3, Key, Users, LogOut, Menu, User, UserCog } from 'lucide-react';
 import styles from '../../styles/admin/AdminLayout.module.css';
+
+interface AdminUser {
+  id: string;
+  username: string;
+  email: string | null;
+  role: 'super_admin' | 'admin';
+}
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -14,6 +21,7 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -26,6 +34,7 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
           router.push('/admin/login');
         } else {
           setAuthenticated(true);
+          setAdminUser(data.user as AdminUser);
         }
       } catch (err) {
         console.error('Auth check failed:', err);
@@ -60,11 +69,16 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
     return null;
   }
 
-  const navItems = [
+  const baseNavItems = [
     { href: '/admin', label: 'Dashboard', icon: BarChart3 },
     { href: '/admin/sessions', label: 'Session Codes', icon: Key },
     { href: '/admin/students', label: 'Students', icon: Users },
   ];
+
+  // Add Users management link for super admins
+  const navItems = adminUser?.role === 'super_admin'
+    ? [...baseNavItems, { href: '/admin/users', label: 'Admin Users', icon: UserCog }]
+    : baseNavItems;
 
   const currentPath = router.pathname;
 
@@ -123,7 +137,12 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
               <div className={styles.headerActions}>
                 <div className={styles.adminBadge}>
                   <User className={styles.adminIcon} size={18} />
-                  <span className={styles.adminLabel}>Administrator</span>
+                  <div className={styles.adminInfo}>
+                    <span className={styles.adminUsername}>{adminUser?.username || 'Admin'}</span>
+                    <span className={styles.adminRole}>
+                      {adminUser?.role === 'super_admin' ? 'Super Admin' : 'Admin'}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

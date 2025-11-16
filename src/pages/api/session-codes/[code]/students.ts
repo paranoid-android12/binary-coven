@@ -1,6 +1,7 @@
 // API route to get all students for a specific session code (admin only)
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getSupabaseAdminClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/auth/adminAuth'
 
 type StudentInfo = {
   id: string
@@ -39,12 +40,10 @@ export default async function handler(
   }
 
   // Check admin authentication
-  const adminSession = req.cookies.admin_session
-  if (adminSession !== 'true') {
-    return res.status(401).json({
-      success: false,
-      message: 'Unauthorized - Admin access required',
-    })
+  const admin = await requireAdmin(req, res);
+  if (!admin) {
+    // Response already sent by requireAdmin
+    return;
   }
 
   try {
@@ -59,10 +58,10 @@ export default async function handler(
 
     const supabase = getSupabaseAdminClient()
 
-    // Get session code info
+    // Get session code info with admin ownership
     const { data: sessionCodeData, error: codeError } = await supabase
       .from('session_codes')
-      .select('id, code, validity_end')
+      .select('id, code, validity_end, created_by_admin_id')
       .eq('code', code)
       .single()
 
@@ -70,6 +69,14 @@ export default async function handler(
       return res.status(404).json({
         success: false,
         message: 'Session code not found',
+      })
+    }
+
+    // Verify ownership for non-super admins
+    if (admin.role !== 'super_admin' && sessionCodeData.created_by_admin_id !== admin.id) {
+      return res.status(403).json({
+        success: false,
+        message: 'You do not have permission to view students for this session code',
       })
     }
 

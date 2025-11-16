@@ -11,7 +11,9 @@ export interface StudentUser {
 
 export interface AdminUser {
   id: string;
-  role: 'admin';
+  username: string;
+  email: string | null;
+  role: 'super_admin' | 'admin';
 }
 
 export type User = StudentUser | AdminUser | null;
@@ -144,9 +146,9 @@ export function useUser() {
 
 // Type guard helpers
 export function isStudentUser(user: User): user is StudentUser {
-  return user !== null && 'username' in user;
+  return user !== null && 'sessionCodeId' in user;
 }
 
 export function isAdminUser(user: User): user is AdminUser {
-  return user !== null && 'role' in user && user.role === 'admin';
+  return user !== null && 'role' in user && (user.role === 'admin' || user.role === 'super_admin');
 }

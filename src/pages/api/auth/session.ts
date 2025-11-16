@@ -1,6 +1,7 @@
 // API route to get current session info
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getSupabaseApiClient } from '@/lib/supabase/server'
+import { verifyAdminSession } from '@/lib/auth/adminAuth'
 
 type SessionResponse = {
   authenticated: boolean
@@ -10,6 +11,8 @@ type SessionResponse = {
     username?: string
     displayName?: string
     sessionCodeId?: string
+    email?: string | null
+    role?: 'super_admin' | 'admin'
   }
 }
 
@@ -26,16 +29,24 @@ export default async function handler(
 
   try {
     // Check for admin session first
-    const adminSession = req.cookies.admin_session
+    const adminSessionId = req.cookies.admin_session
 
-    if (adminSession === 'true') {
-      return res.status(200).json({
-        authenticated: true,
-        userType: 'admin',
-        user: {
-          id: 'admin',
-        },
-      })
+    if (adminSessionId) {
+      const adminUser = await verifyAdminSession(adminSessionId)
+
+      if (adminUser) {
+        return res.status(200).json({
+          authenticated: true,
+          userType: 'admin',
+          user: {
+            id: adminUser.id,
+            username: adminUser.username,
+            email: adminUser.email,
+            role: adminUser.role,
+          },
+        })
+      }
+      // If session ID is invalid or admin is inactive, continue to check student session
     }
 
     // Check for student session

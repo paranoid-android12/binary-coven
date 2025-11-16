@@ -32,6 +32,38 @@ export interface Database {
           updated_at?: string
         }
       }
+      admin_users: {
+        Row: {
+          id: string
+          username: string
+          email: string | null
+          password_hash: string
+          role: 'super_admin' | 'admin'
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          username: string
+          email?: string | null
+          password_hash: string
+          role: 'super_admin' | 'admin'
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          username?: string
+          email?: string | null
+          password_hash?: string
+          role?: 'super_admin' | 'admin'
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
       session_codes: {
         Row: {
           id: string
@@ -42,6 +74,7 @@ export interface Database {
           max_students: number | null
           created_at: string
           created_by: string
+          created_by_admin_id: string | null
         }
         Insert: {
           id?: string
@@ -52,6 +85,7 @@ export interface Database {
           max_students?: number | null
           created_at?: string
           created_by?: string
+          created_by_admin_id?: string | null
         }
         Update: {
           id?: string
@@ -62,6 +96,7 @@ export interface Database {
           max_students?: number | null
           created_at?: string
           created_by?: string
+          created_by_admin_id?: string | null
         }
       }
       student_profiles: {

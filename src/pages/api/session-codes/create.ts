@@ -1,6 +1,7 @@
 // API route to create a new session code (admin only)
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getSupabaseAdminClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/auth/adminAuth'
 
 type CreateSessionRequest = {
   code?: string // Optional - will generate if not provided
@@ -45,12 +46,10 @@ export default async function handler(
   }
 
   // Check admin authentication
-  const adminSession = req.cookies.admin_session
-  if (adminSession !== 'true') {
-    return res.status(401).json({
-      success: false,
-      message: 'Unauthorized - Admin access required',
-    })
+  const admin = await requireAdmin(req, res);
+  if (!admin) {
+    // Response already sent by requireAdmin
+    return;
   }
 
   try {
@@ -106,6 +105,7 @@ export default async function handler(
         code: sessionCode,
         validity_end: endDate.toISOString(),
         max_students: maxStudents || null,
+        created_by_admin_id: admin.id,
       })
       .select()
       .single()

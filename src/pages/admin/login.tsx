@@ -5,6 +5,7 @@ import styles from '../../styles/admin/AdminLogin.module.css';
 
 export default function AdminLogin() {
   const router = useRouter();
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -32,8 +33,8 @@ export default function AdminLogin() {
     setError('');
     setLoading(true);
 
-    if (!password.trim()) {
-      setError('Please enter a password');
+    if (!username.trim() || !password.trim()) {
+      setError('Please enter both username and password');
       setLoading(false);
       return;
     }
@@ -44,7 +45,7 @@ export default function AdminLogin() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ username, password }),
       });
 
       const data = await response.json();
@@ -52,7 +53,7 @@ export default function AdminLogin() {
       if (data.success) {
         router.push('/admin');
       } else {
-        setError(data.message || 'Invalid password');
+        setError(data.message || 'Invalid username or password');
       }
     } catch (err) {
       setError('An error occurred. Please try again.');
@@ -77,8 +78,24 @@ export default function AdminLogin() {
 
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.formGroup}>
+              <label htmlFor="username" className={styles.label}>
+                Username
+              </label>
+              <input
+                type="text"
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className={styles.input}
+                placeholder="Enter admin username"
+                disabled={loading}
+                autoFocus
+              />
+            </div>
+
+            <div className={styles.formGroup}>
               <label htmlFor="password" className={styles.label}>
-                Admin Password
+                Password
               </label>
               <input
                 type="password"
@@ -88,7 +105,6 @@ export default function AdminLogin() {
                 className={styles.input}
                 placeholder="Enter admin password"
                 disabled={loading}
-                autoFocus
               />
             </div>
 

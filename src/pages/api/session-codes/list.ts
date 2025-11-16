@@ -1,6 +1,7 @@
 // API route to list all session codes (admin only)
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getSupabaseAdminClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/auth/adminAuth'
 
 type SessionCodeItem = {
   id: string
@@ -33,22 +34,26 @@ export default async function handler(
   }
 
   // Check admin authentication
-  const adminSession = req.cookies.admin_session
-  if (adminSession !== 'true') {
-    return res.status(401).json({
-      success: false,
-      message: 'Unauthorized - Admin access required',
-    })
+  const admin = await requireAdmin(req, res);
+  if (!admin) {
+    // Response already sent by requireAdmin
+    return;
   }
 
   try {
     const supabase = getSupabaseAdminClient()
 
-    // Fetch session code stats from the view
-    const { data: sessionCodes, error } = await supabase
+    // Build query - super admins see all sessions, regular admins see only their own
+    let query = supabase
       .from('session_code_stats')
-      .select('*')
-      .order('created_at', { ascending: false })
+      .select('*');
+
+    // Filter by admin for non-super admins
+    if (admin.role !== 'super_admin') {
+      query = query.eq('created_by_admin_id', admin.id);
+    }
+
+    const { data: sessionCodes, error } = await query.order('created_at', { ascending: false })
 
     if (error) {
       console.error('Error fetching session codes:', error)
