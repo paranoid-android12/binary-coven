@@ -1849,70 +1849,114 @@ export const GameInterface: React.FC = () => {
             position: 'relative',
             width: '600px',
             maxWidth: '90vw',
-            height: '500px',
             maxHeight: '90vh',
-            pointerEvents: 'auto'
+            pointerEvents: 'auto',
+            backgroundColor: '#d8a888',
+            border: '4px solid #210714',
+            borderRadius: '12px',
+            boxShadow: '0 8px 0 #210714, 0 12px 20px rgba(0, 0, 0, 0.5)',
+            padding: '30px 35px',
+            display: 'flex',
+            flexDirection: 'column'
           }}>
-            {/* Modal Background - Using title.png as fallback, can be replaced with sprite */}
-            <div style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              border: '4px solid #f5a623',
-              borderRadius: '12px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.8)'
+            {/* X Close Button */}
+            <button
+              onClick={() => {
+                setUpgradeModalState(prev => ({ ...prev, isOpen: false }));
+                closeModal('upgrade');
+              }}
+              style={{
+                position: 'absolute',
+                top: '15px',
+                right: '15px',
+                width: '32px',
+                height: '32px',
+                backgroundColor: 'transparent',
+                border: '2px solid #210714',
+                borderRadius: '6px',
+                color: '#210714',
+                fontSize: '20px',
+                fontFamily: 'BoldPixels',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                lineHeight: '1',
+                padding: 0,
+                transition: 'all 0.15s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#210714';
+                e.currentTarget.style.color = '#d8a888';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = '#210714';
+              }}
+            >
+              ×
+            </button>
+
+            {/* Title */}
+            <h2 style={{
+              color: '#210714',
+              fontSize: '32px',
+              fontFamily: 'BoldPixels',
+              margin: '0 0 20px 0',
+              textAlign: 'center',
+              textShadow: '2px 2px 0px rgba(255, 255, 255, 0.3)',
+            }}>
+              UPGRADES
+            </h2>
+
+            <hr style={{
+              border: 'none',
+              borderTop: '2px solid #210714',
+              margin: '0 0 20px 0',
+              opacity: 0.3,
             }} />
-            
-            {/* Modal Content */}
+
+            {/* Current Wheat Display */}
             <div style={{
-              position: 'relative',
-              padding: '20px',
-              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '12px',
+              marginBottom: '20px',
+              padding: '12px 20px',
+              backgroundColor: 'rgba(0, 0, 0, 0.1)',
+              border: '2px solid #210714',
+              borderRadius: '8px'
+            }}>
+              <img
+                src="/assets/wheat.png"
+                alt="wheat"
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  imageRendering: 'pixelated'
+                }}
+              />
+              <span style={{
+                color: '#210714',
+                fontSize: '24px',
+                fontFamily: 'BoldPixels',
+                fontWeight: 'bold'
+              }}>
+                {globalResources.wheat || 0}
+              </span>
+            </div>
+
+            {/* Upgrades List */}
+            <div style={{
+              flex: 1,
+              width: '100%',
+              overflowY: 'auto',
               display: 'flex',
               flexDirection: 'column',
-              alignItems: 'center'
+              gap: '12px',
+              maxHeight: '400px'
             }}>
-              {/* Title */}
-              <h2 style={{
-                color: '#f5a623',
-                fontSize: '32px',
-                fontFamily: 'BoldPixels',
-                textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)',
-                margin: '10px 0 20px 0',
-                textAlign: 'center'
-              }}>
-                UPGRADES
-              </h2>
-
-              {/* Current Wheat Display */}
-              <div style={{
-                color: '#ffffff',
-                fontSize: '18px',
-                fontFamily: 'BoldPixels',
-                textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)',
-                marginBottom: '20px',
-                backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                padding: '8px 16px',
-                borderRadius: '8px'
-              }}>
-                Available Wheat: {globalResources.wheat || 0}
-              </div>
-
-              {/* Upgrades List */}
-              <div style={{
-                flex: 1,
-                width: '100%',
-                overflowY: 'auto',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '12px',
-                maxHeight: '300px'
-              }}>
                 {activeEntity && (() => {
                   const upgrades = [
                     {
@@ -1980,63 +2024,74 @@ export const GameInterface: React.FC = () => {
                     
                     return (
                       <div key={index} style={{
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        border: `2px solid ${canAfford ? '#16c60c' : '#666666'}`,
+                        backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                        border: `3px solid ${canAfford ? '#16c60c' : '#210714'}`,
                         borderRadius: '8px',
-                        padding: '12px',
+                        padding: '14px',
                         display: 'flex',
                         justifyContent: 'space-between',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        boxShadow: canAfford ? '0 2px 0 #16c60c' : '0 2px 0 #210714'
                       }}>
                         <div style={{ flex: 1 }}>
                           <div style={{
-                            color: '#ffffff',
+                            color: '#210714',
                             fontSize: '16px',
                             fontFamily: 'BoldPixels',
-                            textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)',
-                            marginBottom: '4px'
+                            marginBottom: '4px',
+                            fontWeight: 'bold'
                           }}>
                             {upgrade.name}
                           </div>
                           <div style={{
-                            color: '#cccccc',
+                            color: 'rgba(33, 7, 20, 0.7)',
                             fontSize: '12px',
-                            fontFamily: 'BoldPixels',
-                            textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)'
+                            fontFamily: 'BoldPixels'
                           }}>
                             Current: {upgrade.current}
                           </div>
                         </div>
-                        
+
                         <div style={{
                           display: 'flex',
                           flexDirection: 'column',
-                          alignItems: 'center',
+                          alignItems: 'flex-end',
                           gap: '8px'
                         }}>
                           <div style={{
-                            color: '#f5a623',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            color: '#210714',
                             fontSize: '14px',
-                            fontFamily: 'BoldPixels',
-                            textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)'
+                            fontFamily: 'BoldPixels'
                           }}>
-                            Cost: {upgrade.cost} Wheat
+                            <img
+                              src="/assets/wheat.png"
+                              alt="wheat"
+                              style={{
+                                width: '20px',
+                                height: '20px',
+                                imageRendering: 'pixelated'
+                              }}
+                            />
+                            <span>{upgrade.cost}</span>
                           </div>
-                          
-                          {/* Buy Button - Can be replaced with SpriteButton */}
+
+                          {/* Buy Button */}
                           <div
                             style={{
                               padding: '8px 16px',
-                              backgroundColor: canAfford ? '#16c60c' : '#444444',
-                              color: canAfford ? '#ffffff' : '#888888',
-                              border: '2px solid ' + (canAfford ? '#16c60c' : '#666666'),
-                              borderRadius: '4px',
+                              backgroundColor: canAfford ? '#16c60c' : 'rgba(0, 0, 0, 0.2)',
+                              color: canAfford ? '#ffffff' : 'rgba(33, 7, 20, 0.4)',
+                              border: `2px solid ${canAfford ? '#16c60c' : '#210714'}`,
+                              borderRadius: '6px',
                               cursor: canAfford ? 'pointer' : 'not-allowed',
                               fontSize: '14px',
                               fontFamily: 'BoldPixels',
-                              textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)',
                               userSelect: 'none',
-                              transition: 'all 0.2s ease'
+                              transition: 'all 0.15s',
+                              boxShadow: canAfford ? '0 2px 0 #16c60c' : 'none'
                             }}
                             onClick={() => {
                               if (canAfford) {
@@ -2062,39 +2117,8 @@ export const GameInterface: React.FC = () => {
                     );
                   });
                 })()}
-              </div>
-
-              {/* Close Button - Can be replaced with SpriteButton */}
-              <div
-                style={{
-                  marginTop: '20px',
-                  padding: '12px 24px',
-                  backgroundColor: '#666666',
-                  color: '#ffffff',
-                  border: '2px solid #888888',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  fontFamily: 'BoldPixels',
-                  textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)',
-                  userSelect: 'none',
-                  transition: 'all 0.2s ease'
-                }}
-                onClick={() => {
-                  setUpgradeModalState(prev => ({ ...prev, isOpen: false }));
-                  closeModal('upgrade');
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#777777';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#666666';
-                }}
-              >
-                CLOSE
-              </div>
-            </div>
           </div>
+        </div>
         </div>
       )}
 
