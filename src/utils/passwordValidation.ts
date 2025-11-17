@@ -1,6 +1,8 @@
 /**
  * Password validation utility
  * Validates that passwords meet security requirements
+ * 
+ * Can be disabled by setting NEXT_PUBLIC_DISABLE_PASSWORD_VALIDATION=true in .env.local
  */
 
 export interface PasswordValidationResult {
@@ -17,14 +19,32 @@ export interface PasswordRequirements {
 }
 
 /**
+ * Check if password validation is enabled
+ */
+const isPasswordValidationEnabled = (): boolean => {
+  return process.env.NEXT_PUBLIC_DISABLE_PASSWORD_VALIDATION !== 'true';
+};
+
+/**
  * Validates password against security requirements:
  * - At least one uppercase letter
  * - At least one number
  * - At least one special character
+ * 
+ * Returns valid if NEXT_PUBLIC_DISABLE_PASSWORD_VALIDATION=true
  */
 export function validatePassword(password: string): PasswordValidationResult {
   const errors: string[] = [];
   const suggestions: string[] = [];
+
+  // If validation is disabled, always return valid
+  if (!isPasswordValidationEnabled()) {
+    return {
+      isValid: true,
+      errors,
+      suggestions,
+    };
+  }
 
   // Check for uppercase letter
   if (!/[A-Z]/.test(password)) {
@@ -53,8 +73,19 @@ export function validatePassword(password: string): PasswordValidationResult {
 
 /**
  * Check which password requirements are met
+ * Returns all true if validation is disabled
  */
 export function checkPasswordRequirements(password: string): PasswordRequirements {
+  // If validation is disabled, return all requirements as met
+  if (!isPasswordValidationEnabled()) {
+    return {
+      hasUpperCase: true,
+      hasNumber: true,
+      hasSpecialChar: true,
+      meetsAllRequirements: true,
+    };
+  }
+
   const hasUpperCase = /[A-Z]/.test(password);
   const hasNumber = /[0-9]/.test(password);
   const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);

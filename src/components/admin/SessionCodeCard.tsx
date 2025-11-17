@@ -161,10 +161,10 @@ export default function SessionCodeCard({ sessionCode, onRefresh }: SessionCodeC
 
           {showMenu && (
             <div className={styles.menu}>
-              <button className={styles.menuItem} disabled>
+              <button className={styles.menuItem}>
                 Extend Validity
               </button>
-              <button className={styles.menuItem} disabled>
+              <button className={styles.menuItem}>
                 Deactivate
               </button>
             </div>

@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getSupabaseApiClient, getSupabaseAdminClient } from '@/lib/supabase/server'
 import type { SessionCode, StudentProfile } from '@/types/database'
-import bcrypt from 'bcryptjs'
+// import bcrypt from 'bcryptjs'
 
 type LoginRequest = {
   username: string
@@ -108,7 +108,8 @@ export default async function handler(
 
     if (studentError || !studentData) {
       // Student doesn't exist - create new student account
-      const passwordHash = await bcrypt.hash(password, 10)
+      // Store password unhashed for now
+      const passwordHash = password
 
       const { data: newStudent, error: createError } = await supabase
         .from('student_profiles')
@@ -164,8 +165,8 @@ export default async function handler(
       })
     }
 
-    // Student exists - verify password
-    const passwordMatch = await bcrypt.compare(password, studentData.password_hash)
+    // Student exists - verify password (unhashed comparison for now)
+    const passwordMatch = password === studentData.password_hash
 
     if (!passwordMatch) {
       return res.status(401).json({

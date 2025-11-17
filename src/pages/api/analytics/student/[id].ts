@@ -1,6 +1,7 @@
 // API route to get detailed student analytics (admin only)
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getSupabaseAdminClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/auth/adminAuth'
 
 type StudentAnalytics = {
   profile: {
@@ -66,12 +67,10 @@ export default async function handler(
   }
 
   // Check admin authentication
-  const adminSession = req.cookies.admin_session
-  if (adminSession !== 'true') {
-    return res.status(401).json({
-      success: false,
-      message: 'Unauthorized - Admin access required',
-    })
+  const admin = await requireAdmin(req, res)
+  if (!admin) {
+    // Response already sent by requireAdmin
+    return
   }
 
   try {

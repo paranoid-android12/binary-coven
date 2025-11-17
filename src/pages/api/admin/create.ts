@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getSupabaseAdminClient } from '@/lib/supabase/server';
 import { requireSuperAdmin } from '@/lib/auth/adminAuth';
-import bcrypt from 'bcryptjs';
+// import bcrypt from 'bcryptjs';
 
 type CreateAdminRequest = {
   username: string;
@@ -116,8 +116,8 @@ export default async function handler(
       }
     }
 
-    // Hash password
-    const passwordHash = await bcrypt.hash(password, 10);
+    // Store password unhashed for now
+    const passwordHash = password;
 
     // Create admin user
     const { data: newAdmin, error: createError } = await supabase
