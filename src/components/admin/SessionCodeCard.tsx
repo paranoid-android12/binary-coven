@@ -22,6 +22,12 @@ interface SessionCodeCardProps {
 export default function SessionCodeCard({ sessionCode, onRefresh }: SessionCodeCardProps) {
   const [copied, setCopied] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [isExtending, setIsExtending] = useState(false);
+  const [isDeactivating, setIsDeactivating] = useState(false);
+  const [showExtendDialog, setShowExtendDialog] = useState(false);
+  const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);
+  const [extensionDays, setExtensionDays] = useState(30);
+  const [error, setError] = useState<string | null>(null);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -41,6 +47,67 @@ export default function SessionCodeCard({ sessionCode, onRefresh }: SessionCodeC
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
+    }
+  };
+
+  const handleExtendValidity = async () => {
+    setIsExtending(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/session-codes/${sessionCode.code}/extend`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          extensionDays,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Failed to extend validity');
+      }
+
+      setShowExtendDialog(false);
+      if (onRefresh) {
+        onRefresh();
+      }
+    } catch (err) {
+      console.error('Error extending validity:', err);
+      setError(err instanceof Error ? err.message : 'Failed to extend validity');
+    } finally {
+      setIsExtending(false);
+    }
+  };
+
+  const handleDeactivate = async () => {
+    setIsDeactivating(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/session-codes/${sessionCode.code}/deactivate`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Failed to deactivate');
+      }
+
+      setShowDeactivateConfirm(false);
+      if (onRefresh) {
+        onRefresh();
+      }
+    } catch (err) {
+      console.error('Error deactivating:', err);
+      setError(err instanceof Error ? err.message : 'Failed to deactivate');
+    } finally {
+      setIsDeactivating(false);
     }
   };
 
@@ -161,16 +228,105 @@ export default function SessionCodeCard({ sessionCode, onRefresh }: SessionCodeC
 
           {showMenu && (
             <div className={styles.menu}>
-              <button className={styles.menuItem}>
+              <button
+                className={styles.menuItem}
+                onClick={() => {
+                  setShowExtendDialog(true);
+                  setShowMenu(false);
+                }}
+                disabled={isExtending}
+              >
                 Extend Validity
               </button>
-              <button className={styles.menuItem}>
+              <button
+                className={styles.menuItem}
+                onClick={() => {
+                  setShowDeactivateConfirm(true);
+                  setShowMenu(false);
+                }}
+                disabled={isDeactivating || !sessionCode.isActive}
+              >
                 Deactivate
               </button>
             </div>
           )}
         </div>
       </div>
+
+      {error && (
+        <div className={styles.errorBanner}>
+          <AlertTriangle size={16} style={{ display: 'inline', marginRight: '8px' }} />
+          {error}
+        </div>
+      )}
+
+      {showExtendDialog && (
+        <div className={styles.modalOverlay} onClick={() => setShowExtendDialog(false)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.modalTitle}>Extend Validity</h3>
+            <p className={styles.modalText}>
+              How many days do you want to extend the validity of this session code?
+            </p>
+            <div className={styles.inputGroup}>
+              <label htmlFor="extensionDays" className={styles.inputLabel}>
+                Extension Days:
+              </label>
+              <input
+                id="extensionDays"
+                type="number"
+                min="1"
+                max="365"
+                value={extensionDays}
+                onChange={(e) => setExtensionDays(parseInt(e.target.value) || 1)}
+                className={styles.input}
+              />
+            </div>
+            <div className={styles.modalActions}>
+              <button
+                className={styles.modalButtonSecondary}
+                onClick={() => setShowExtendDialog(false)}
+                disabled={isExtending}
+              >
+                Cancel
+              </button>
+              <button
+                className={styles.modalButtonPrimary}
+                onClick={handleExtendValidity}
+                disabled={isExtending}
+              >
+                {isExtending ? 'Extending...' : 'Extend'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeactivateConfirm && (
+        <div className={styles.modalOverlay} onClick={() => setShowDeactivateConfirm(false)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.modalTitle}>Deactivate Session Code</h3>
+            <p className={styles.modalText}>
+              Are you sure you want to deactivate this session code? Students will no longer be able to use it to access the platform.
+            </p>
+            <div className={styles.modalActions}>
+              <button
+                className={styles.modalButtonSecondary}
+                onClick={() => setShowDeactivateConfirm(false)}
+                disabled={isDeactivating}
+              >
+                Cancel
+              </button>
+              <button
+                className={styles.modalButtonDanger}
+                onClick={handleDeactivate}
+                disabled={isDeactivating}
+              >
+                {isDeactivating ? 'Deactivating...' : 'Deactivate'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
