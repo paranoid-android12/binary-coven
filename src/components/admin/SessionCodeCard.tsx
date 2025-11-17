@@ -113,7 +113,6 @@ export default function SessionCodeCard({ sessionCode, onRefresh }: SessionCodeC
 
       <div className={styles.stats}>
         <div className={styles.stat}>
-          <Users className={styles.statIcon} size={20} />
           <div className={styles.statContent}>
             <span className={styles.statValue}>
               {sessionCode.studentCount}
@@ -124,7 +123,6 @@ export default function SessionCodeCard({ sessionCode, onRefresh }: SessionCodeC
         </div>
 
         <div className={styles.stat}>
-          <Zap className={styles.statIcon} size={20} />
           <div className={styles.statContent}>
             <span className={styles.statValue}>{sessionCode.activeStudents24h}</span>
             <span className={styles.statLabel}>Active (24h)</span>

@@ -29,6 +29,11 @@ export async function middleware(request: NextRequest) {
   // ADMIN SUBDOMAIN ROUTING
   // ============================================
   if (isAdminSubdomain) {
+    // Allow all API routes to pass through on admin subdomain
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.next();
+    }
+
     // If accessing admin subdomain but not on /admin path, rewrite to /admin
     if (!pathname.startsWith('/admin')) {
       url.pathname = `/admin${pathname === '/' ? '' : pathname}`;
@@ -57,6 +62,37 @@ export async function middleware(request: NextRequest) {
   // ============================================
   // MAIN DOMAIN (STUDENT) ROUTING
   // ============================================
+
+  // Allow all API routes to pass through on main domain
+  // (API routes handle their own authentication)
+  if (pathname.startsWith('/api/')) {
+    return NextResponse.next();
+  }
+
+  // Block admin routes on main domain - redirect to admin subdomain
+  if (pathname.startsWith('/admin')) {
+    // Construct admin subdomain URL
+    const protocol = request.headers.get('x-forwarded-proto') || 
+                     (hostname.includes('localhost') || hostname.includes('127.0.0.1') ? 'http' : 'https');
+    
+    // Handle different hostname formats
+    let adminHost: string;
+    if (hostname.includes('localhost') || hostname.includes('127.0.0.1')) {
+      // For local development, use admin.localhost
+      const port = host.split(':')[1] || '';
+      adminHost = `admin.localhost${port ? `:${port}` : ''}`;
+    } else {
+      // Extract root domain (handles www.example.com -> example.com)
+      const parts = hostname.split('.');
+      const rootDomain = parts.length >= 2 
+        ? parts.slice(-2).join('.') // Get last 2 parts (example.com)
+        : hostname; // Fallback for single-part domains
+      adminHost = `admin.${rootDomain}`;
+    }
+    
+    const adminUrl = `${protocol}://${adminHost}${pathname}`;
+    return NextResponse.redirect(adminUrl);
+  }
 
   // Public routes that don't require authentication (including main page)
   const publicRoutes = [

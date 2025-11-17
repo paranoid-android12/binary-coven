@@ -189,7 +189,6 @@ export default function SessionsPage() {
               </>
             ) : (
               <>
-                <div className={styles.emptyIcon}>🔑</div>
                 <h3 className={styles.emptyTitle}>No session codes yet</h3>
                 <p className={styles.emptyText}>
                   Create your first session code to get started

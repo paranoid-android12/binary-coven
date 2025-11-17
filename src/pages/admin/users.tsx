@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { Eye, EyeOff } from 'lucide-react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { useUser, isAdminUser } from '../../contexts/UserContext';
 import styles from '../../styles/admin/Users.module.css';
@@ -24,7 +25,7 @@ interface CreateAdminForm {
 
 export default function UsersPage() {
   const router = useRouter();
-  const { user, userType } = useUser();
+  const { user, userType, isLoading } = useUser();
   const [adminUsers, setAdminUsers] = useState<AdminUserItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -35,11 +36,17 @@ export default function UsersPage() {
     email: '',
     role: 'admin',
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   // Check if user is super admin
   useEffect(() => {
+    // Wait for user session to load before checking permissions
+    if (isLoading) {
+      return;
+    }
+
     if (!user || !isAdminUser(user)) {
       router.push('/admin');
       return;
@@ -51,7 +58,7 @@ export default function UsersPage() {
     }
 
     fetchAdminUsers();
-  }, [user, router]);
+  }, [user, router, isLoading]);
 
   const fetchAdminUsers = async () => {
     try {
@@ -134,7 +141,7 @@ export default function UsersPage() {
     });
   };
 
-  if (loading) {
+  if (isLoading || loading) {
     return (
       <AdminLayout>
         <div className={styles.loading}>Loading admin users...</div>
@@ -256,13 +263,40 @@ export default function UsersPage() {
 
                 <div className={styles.formGroup}>
                   <label>Password</label>
-                  <input
-                    type="password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    placeholder="Enter password (min 8 characters)"
-                    required
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      placeholder="Enter password (min 8 characters)"
+                      required
+                      style={{ paddingRight: '40px' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '10px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#666',
+                        transition: 'color 0.2s',
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#000'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
                 </div>
 
                 <div className={styles.formGroup}>

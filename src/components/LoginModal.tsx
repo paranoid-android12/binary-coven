@@ -1,4 +1,5 @@
 import { useState, FormEvent, useRef, useEffect } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
 import { clearAllGameState, loadAndSyncGameState, logLocalStorageState } from '@/utils/localStorageManager';
 
@@ -28,6 +29,7 @@ export default function LoginModal({ isVisible, onLoginSuccess, onClose }: Login
     password: '',
     sessionCode: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [isValidatingCode, setIsValidatingCode] = useState(false);
@@ -347,25 +349,55 @@ export default function LoginModal({ isVisible, onLoginSuccess, onClose }: Login
             }}>
               Password
             </label>
-            <input
-              type="password"
-              id="password"
-              style={{
-                fontFamily: 'Arial, Helvetica, sans-serif',
-                fontSize: '1em',
-                padding: '12px 15px',
-                backgroundColor: '#e8c4a8',
-                color: '#210714',
-                border: '2px solid #210714',
-                borderRadius: '6px',
-                outline: 'none',
-              }}
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              placeholder="Enter password"
-              disabled={isLoading}
-              required
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                style={{
+                  fontFamily: 'Arial, Helvetica, sans-serif',
+                  fontSize: '1em',
+                  padding: '12px 15px',
+                  paddingRight: '45px',
+                  backgroundColor: '#e8c4a8',
+                  color: '#210714',
+                  border: '2px solid #210714',
+                  borderRadius: '6px',
+                  outline: 'none',
+                  width: '100%',
+                  boxSizing: 'border-box',
+                }}
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                placeholder="Enter password"
+                disabled={isLoading}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#210714',
+                  opacity: 0.6,
+                  transition: 'opacity 0.2s',
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = '0.6'}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
           </div>
 
           <LoginButton
