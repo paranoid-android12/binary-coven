@@ -279,6 +279,7 @@
 }
 
 .viewButton {
+  display: inline-block;
   padding: 8px 16px;
   background: linear-gradient(135deg, #0ec3c9 0%, #0a9ba0 100%);
   color: #ffffff;
@@ -287,6 +288,7 @@
   font-size: 13px;
   font-weight: 600;
   font-family: 'BoldPixels', monospace, sans-serif;
+  text-decoration: none;
   cursor: pointer;
   transition: all 0.3s ease;
 }

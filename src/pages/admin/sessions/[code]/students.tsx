@@ -200,9 +200,12 @@ export default function SessionStudentsPage() {
                         {student.totalCodeExecutions}
                       </td>
                       <td>
-                        <button className={styles.viewButton} disabled title="Coming in Phase 9">
+                        <Link
+                          href={`/admin/students/${student.id}`}
+                          className={styles.viewButton}
+                        >
                           View Details
-                        </button>
+                        </Link>
                       </td>
                     </tr>
                   ))}
