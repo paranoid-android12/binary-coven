@@ -16,6 +16,7 @@ interface SpriteButtonProps {
   onClick?: () => void;
   onMouseDown?: () => void;
   onMouseUp?: () => void;
+  tooltip?: string; // Tooltip text to display on hover
 }
 
 export const SpriteButton: React.FC<SpriteButtonProps> = ({
@@ -26,7 +27,8 @@ export const SpriteButton: React.FC<SpriteButtonProps> = ({
   scale = 4,
   onClick,
   onMouseDown,
-  onMouseUp
+  onMouseUp,
+  tooltip
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [spriteImage, setSpriteImage] = useState<HTMLImageElement | null>(null);
@@ -112,6 +114,7 @@ export const SpriteButton: React.FC<SpriteButtonProps> = ({
 
   return (
     <div
+      title={tooltip}
       style={{
         position: 'absolute',
         left: position.x,

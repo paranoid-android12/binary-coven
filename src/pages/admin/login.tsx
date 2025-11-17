@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { Eye, EyeOff } from 'lucide-react';
 import styles from '../../styles/admin/AdminLogin.module.css';
+import { validatePassword, checkPasswordRequirements } from '@/utils/passwordValidation';
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -11,6 +12,7 @@ export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [passwordTouched, setPasswordTouched] = useState(false);
 
   // Check if already authenticated
   useEffect(() => {
@@ -37,6 +39,15 @@ export default function AdminLogin() {
 
     if (!username.trim() || !password.trim()) {
       setError('Please enter both username and password');
+      setLoading(false);
+      return;
+    }
+
+    // Validate password requirements
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      setError(passwordValidation.errors[0]);
+      setPasswordTouched(true);
       setLoading(false);
       return;
     }
@@ -104,7 +115,11 @@ export default function AdminLogin() {
                   type={showPassword ? 'text' : 'password'}
                   id="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setPasswordTouched(true);
+                  }}
+                  onBlur={() => setPasswordTouched(true)}
                   className={styles.input}
                   placeholder="Enter admin password"
                   disabled={loading}
@@ -135,6 +150,38 @@ export default function AdminLogin() {
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
+              {/* Password requirements indicator */}
+              {passwordTouched && password && (() => {
+                const requirements = checkPasswordRequirements(password);
+                return (
+                  <div style={{
+                    fontSize: '0.8em',
+                    padding: '8px 10px',
+                    backgroundColor: '#f5f5f5',
+                    borderRadius: '4px',
+                    marginTop: '8px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '4px',
+                  }}>
+                    <div style={{
+                      color: requirements.hasUpperCase ? '#0b7607' : '#b10000',
+                    }}>
+                      {requirements.hasUpperCase ? '✓' : '✗'} One uppercase letter
+                    </div>
+                    <div style={{
+                      color: requirements.hasNumber ? '#0b7607' : '#b10000',
+                    }}>
+                      {requirements.hasNumber ? '✓' : '✗'} One number
+                    </div>
+                    <div style={{
+                      color: requirements.hasSpecialChar ? '#0b7607' : '#b10000',
+                    }}>
+                      {requirements.hasSpecialChar ? '✓' : '✗'} One special character (!@#$%^&*...)
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
 
             {error && (

@@ -1173,6 +1173,7 @@ export const GameInterface: React.FC = () => {
             upFrame={{ x: 688, y: 256, w: 16, h: 16 }}
             downFrame={{ x: 688, y: 272, w: 16, h: 16 }}
             scale={3}
+            tooltip="Menu"
             onClick={() => {
               if (!shouldBlockModalInteractions()) {
                 setGameMenuModalState({ isOpen: true });
@@ -1188,6 +1189,7 @@ export const GameInterface: React.FC = () => {
             upFrame={{ x: 320, y: 496, w: 16, h: 16 }}
             downFrame={{ x: 320, y: 512, w: 16, h: 16 }}
             scale={3}
+            tooltip="Function Glossary"
             onClick={() => {
               if (!shouldBlockModalInteractions()) {
                 setGlossaryModalState({ isOpen: true });
@@ -1203,6 +1205,7 @@ export const GameInterface: React.FC = () => {
             upFrame={{ x: 432, y: 496, w: 16, h: 16 }}
             downFrame={{ x: 432, y: 512, w: 16, h: 16 }}
             scale={3}
+            tooltip="Programming Terminal"
             onClick={() => {
               if (!shouldBlockModalInteractions()) {
                 const qubitEntity = entities.get('qubit');
@@ -1230,6 +1233,7 @@ export const GameInterface: React.FC = () => {
             upFrame={{ x: 384, y: 496, w: 16, h: 16 }}
             downFrame={{ x: 384, y: 512, w: 16, h: 16 }}
             scale={3}
+            tooltip="Quests"
             onClick={() => {
               if (!shouldBlockModalInteractions()) {
                 setQuestModalState({ isOpen: true });

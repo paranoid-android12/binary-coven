@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { Eye, EyeOff } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
+import { validatePassword, checkPasswordRequirements } from '@/utils/passwordValidation';
 
 interface StudentLoginResponse {
   success: boolean;
@@ -29,6 +30,7 @@ export default function StudentLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const [isValidatingCode, setIsValidatingCode] = useState(false);
   const [codeValidationMessage, setCodeValidationMessage] = useState<string>('');
+  const [passwordTouched, setPasswordTouched] = useState(false);
 
   // Validate session code as user types
   const handleSessionCodeChange = async (code: string) => {
@@ -67,6 +69,15 @@ export default function StudentLogin() {
       setError('Please enter a password');
       return;
     }
+
+    // Validate password requirements
+    const passwordValidation = validatePassword(formData.password);
+    if (!passwordValidation.isValid) {
+      setError(passwordValidation.errors[0]);
+      setPasswordTouched(true);
+      return;
+    }
+
     if (!formData.sessionCode.trim()) {
       setError('Please enter a session code');
       return;
@@ -269,7 +280,11 @@ export default function StudentLogin() {
                     boxSizing: 'border-box',
                   }}
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, password: e.target.value });
+                    setPasswordTouched(true);
+                  }}
+                  onBlur={() => setPasswordTouched(true)}
                   placeholder="Enter password"
                   disabled={isLoading}
                   required
@@ -300,6 +315,40 @@ export default function StudentLogin() {
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
+              {/* Password requirements indicator */}
+              {passwordTouched && formData.password && (() => {
+                const requirements = checkPasswordRequirements(formData.password);
+                return (
+                  <div style={{
+                    fontSize: '0.75em',
+                    padding: '8px 10px',
+                    backgroundColor: 'rgba(33, 7, 20, 0.1)',
+                    borderRadius: '4px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '4px',
+                  }}>
+                    <div style={{
+                      color: requirements.hasUpperCase ? '#0b7607' : '#b10000',
+                      fontFamily: 'Arial',
+                    }}>
+                      {requirements.hasUpperCase ? '✓' : '✗'} One uppercase letter
+                    </div>
+                    <div style={{
+                      color: requirements.hasNumber ? '#0b7607' : '#b10000',
+                      fontFamily: 'Arial',
+                    }}>
+                      {requirements.hasNumber ? '✓' : '✗'} One number
+                    </div>
+                    <div style={{
+                      color: requirements.hasSpecialChar ? '#0b7607' : '#b10000',
+                      fontFamily: 'Arial',
+                    }}>
+                      {requirements.hasSpecialChar ? '✓' : '✗'} One special character (!@#$%^&*...)
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
 
             <StudentLoginButton
