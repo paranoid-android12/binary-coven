@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
 import { BarChart3, Key, Users, LogOut, Menu, User, UserCog } from 'lucide-react';
-import styles from '../../styles/admin/AdminLayout.module.css';
 
 interface AdminUser {
   id: string;
@@ -58,8 +57,8 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
 
   if (loading) {
     return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.loadingSpinner}></div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-admin-gradient text-white font-[family-name:var(--font-family-pixel)]">
+        <div className="w-[50px] h-[50px] border-4 border-[rgba(14,195,201,0.2)] border-t-admin-primary rounded-full animate-spin-slow mb-5"></div>
         <p>Loading...</p>
       </div>
     );
@@ -88,58 +87,68 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
         <title>{title} - Binary Coven Admin</title>
       </Head>
 
-      <div className={styles.container}>
+      <div className="flex min-h-screen bg-[#f5f7fa] font-[family-name:var(--font-family-pixel)]">
         {/* Sidebar Navigation */}
-        <aside className={`${styles.sidebar} ${mobileMenuOpen ? styles.mobileOpen : ''}`}>
-          <div className={styles.sidebarHeader}>
-            <h1 className={styles.logo}>Binary Coven</h1>
-            <p className={styles.logoSubtitle}>Admin Panel</p>
+        <aside className={`w-[260px] bg-admin-gradient-vertical text-white flex flex-col fixed h-screen left-0 top-0 z-[1000] shadow-[2px_0_10px_rgba(0,0,0,0.1)] transition-transform duration-300 ease-in-out ${
+          mobileMenuOpen ? 'translate-x-0' : 'max-laptop:-translate-x-full'
+        }`}>
+          <div className="p-[30px_20px] border-b border-[rgba(14,195,201,0.2)] text-center">
+            <h1 className="text-2xl font-bold text-admin-primary m-0 mb-[5px] uppercase tracking-wider">Binary Coven</h1>
+            <p className="text-[13px] text-white/70 m-0">Admin Panel</p>
           </div>
 
-          <nav className={styles.nav}>
+          <nav className="flex-1 py-5 overflow-y-auto">
             {navItems.map((item) => {
               const IconComponent = item.icon;
+              const isActive = currentPath === item.href;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`${styles.navItem} ${currentPath === item.href ? styles.navItemActive : ''}`}
+                  className={`flex items-center py-[14px] px-[25px] text-white/80 no-underline transition-all duration-300 ease-in-out border-l-[3px] ${
+                    isActive
+                      ? 'bg-[rgba(14,195,201,0.15)] text-admin-primary border-l-admin-primary font-bold'
+                      : 'border-l-transparent hover:bg-[rgba(14,195,201,0.1)] hover:text-white hover:border-l-[rgba(14,195,201,0.5)]'
+                  }`}
                 >
-                  <IconComponent className={styles.navIcon} size={20} />
-                  <span className={styles.navLabel}>{item.label}</span>
+                  <IconComponent className="text-xl mr-3 w-6 text-center" size={20} />
+                  <span className="text-[15px]">{item.label}</span>
                 </Link>
               );
             })}
           </nav>
 
-          <div className={styles.sidebarFooter}>
-            <button onClick={handleLogout} className={styles.logoutButton}>
-              <LogOut className={styles.navIcon} size={20} />
-              <span className={styles.navLabel}>Logout</span>
+          <div className="p-5 border-t border-[rgba(14,195,201,0.2)]">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center py-[14px] px-5 bg-[rgba(255,82,82,0.1)] border border-[rgba(255,82,82,0.3)] rounded-lg text-[#ff8a8a] text-[15px] font-[family-name:var(--font-family-pixel)] cursor-pointer transition-all duration-300 ease-in-out hover:bg-[rgba(255,82,82,0.2)] hover:border-[rgba(255,82,82,0.5)]"
+            >
+              <LogOut className="text-xl mr-3 w-6 text-center" size={20} />
+              <span className="text-[15px]">Logout</span>
             </button>
           </div>
         </aside>
 
         {/* Main Content Area */}
-        <div className={styles.mainContent}>
+        <div className="flex-1 ml-[260px] flex flex-col min-h-screen max-laptop:ml-0">
           {/* Top Header */}
-          <header className={styles.header}>
+          <header className="bg-white border-b border-[#e5e7eb] py-5 px-[30px] sticky top-0 z-[100] shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
             <button
-              className={styles.mobileMenuButton}
+              className="hidden max-laptop:block bg-none border-none text-2xl text-admin-dark cursor-pointer p-[5px_10px] mr-[15px]"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               <Menu size={24} />
             </button>
 
-            <div className={styles.headerContent}>
-              <h2 className={styles.pageTitle}>{title}</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-admin-dark m-0">{title}</h2>
 
-              <div className={styles.headerActions}>
-                <div className={styles.adminBadge}>
-                  <User className={styles.adminIcon} size={18} />
-                  <div className={styles.adminInfo}>
-                    <span className={styles.adminUsername}>{adminUser?.username || 'Admin'}</span>
-                    <span className={styles.adminRole}>
+              <div className="flex items-center gap-[15px]">
+                <div className="flex items-center gap-[10px] bg-admin-primary-gradient text-white py-[10px] px-4 rounded-3xl text-sm">
+                  <User className="text-base flex-shrink-0" size={18} />
+                  <div className="flex flex-col gap-[2px] leading-[1.2]">
+                    <span className="font-bold text-sm">{adminUser?.username || 'Admin'}</span>
+                    <span className="text-[11px] opacity-90 font-medium">
                       {adminUser?.role === 'super_admin' ? 'Super Admin' : 'Admin'}
                     </span>
                   </div>
@@ -149,20 +158,20 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
           </header>
 
           {/* Page Content */}
-          <main className={styles.content}>
+          <main className="flex-1 p-[30px] bg-[#f5f7fa]">
             {children}
           </main>
 
           {/* Footer */}
-          <footer className={styles.footer}>
-            <p>Binary Coven Learning Management System © 2025</p>
+          <footer className="bg-white border-t border-[#e5e7eb] py-5 px-[30px] text-center">
+            <p className="m-0 text-[#6b7280] text-[13px]">Binary Coven Learning Management System © 2025</p>
           </footer>
         </div>
 
         {/* Mobile Menu Overlay */}
         {mobileMenuOpen && (
           <div
-            className={styles.mobileOverlay}
+            className="hidden max-laptop:block fixed top-0 left-0 right-0 bottom-0 bg-black/50 z-[999]"
             onClick={() => setMobileMenuOpen(false)}
           />
         )}

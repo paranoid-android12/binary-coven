@@ -7,7 +7,6 @@ import QuestProgressChart from '../../../components/admin/QuestProgressChart';
 import CodeExecutionViewer from '../../../components/admin/CodeExecutionViewer';
 import ObjectiveProgressList from '../../../components/admin/ObjectiveProgressList';
 import GameStateViewer from '../../../components/admin/GameStateViewer';
-import styles from '../../../styles/admin/StudentDetail.module.css';
 
 interface StudentProfile {
   id: string;
@@ -143,27 +142,27 @@ export default function StudentDetailPage() {
 
   return (
     <AdminLayout title={analytics?.profile.username || 'Student Details'}>
-      <div className={styles.container}>
+      <div className="max-w-[1400px] mx-auto">
         {/* Header */}
-        <div className={styles.header}>
-          <Link href="/admin/students" className={styles.backButton}>
+        <div className="mb-8">
+          <Link href="/admin/students" className="inline-block text-admin-primary no-underline text-[15px] font-medium mb-5 transition-colors duration-300 ease-in-out hover:text-admin-primary-dark">
             ← Back to Students
           </Link>
         </div>
 
         {/* Loading State */}
         {loading && (
-          <div className={styles.loading}>
-            <div className={styles.spinner}></div>
+          <div className="flex flex-col items-center justify-center py-[60px] px-5 text-[#6b7280]">
+            <div className="w-[50px] h-[50px] border-4 border-[#e5e7eb] border-t-admin-primary rounded-full animate-spin-slow mb-5"></div>
             <p>Loading student analytics...</p>
           </div>
         )}
 
         {/* Error State */}
         {error && (
-          <div className={styles.error}>
-            <p>{error}</p>
-            <button onClick={fetchStudentAnalytics} className={styles.retryButton}>
+          <div className="bg-[#fef2f2] border border-[#fecaca] rounded-xl p-[30px] text-center text-[#dc2626]">
+            <p className="m-0 mb-[15px] text-base">{error}</p>
+            <button onClick={fetchStudentAnalytics} className="bg-[#dc2626] text-white border-none py-[10px] px-5 rounded-lg text-sm font-[family-name:var(--font-family-pixel)] cursor-pointer transition-colors duration-300 ease-in-out hover:bg-[#b91c1c]">
               Retry
             </button>
           </div>
@@ -173,26 +172,26 @@ export default function StudentDetailPage() {
         {!loading && !error && analytics && (
           <>
             {/* Student Info Card */}
-            <div className={styles.infoCard}>
-              <div className={styles.infoHeader}>
-                <div className={styles.avatar}>
+            <div className="bg-white border border-[#e5e7eb] rounded-xl p-[30px] mb-8 shadow-[0_1px_3px_rgba(0,0,0,0.05)] max-tablet:p-5">
+              <div className="flex items-start gap-5 mb-8 max-tablet:flex-col">
+                <div className="w-[80px] h-[80px] rounded-full bg-admin-primary-gradient flex items-center justify-center text-white text-[32px] font-bold flex-shrink-0 max-tablet:w-[60px] max-tablet:h-[60px] max-tablet:text-[24px]">
                   {analytics.profile.username.charAt(0).toUpperCase()}
                 </div>
-                <div className={styles.infoText}>
-                  <h1 className={styles.studentName}>{analytics.profile.username}</h1>
+                <div className="flex-1">
+                  <h1 className="text-[28px] font-bold text-admin-dark m-0 mb-[5px] max-tablet:text-[24px]">{analytics.profile.username}</h1>
                   {analytics.profile.displayName && analytics.profile.displayName !== analytics.profile.username && (
-                    <p className={styles.displayName}>{analytics.profile.displayName}</p>
+                    <p className="text-base text-[#6b7280] m-0 mb-[10px]">{analytics.profile.displayName}</p>
                   )}
-                  <div className={styles.metadata}>
-                    <span className={styles.metaItem}>
-                      Session: <Link href={`/admin/sessions/${analytics.profile.sessionCode}/students`} className={styles.sessionLink}>{analytics.profile.sessionCode}</Link>
+                  <div className="flex items-center gap-[10px] flex-wrap text-sm text-[#6b7280]">
+                    <span>
+                      Session: <Link href={`/admin/sessions/${analytics.profile.sessionCode}/students`} className="text-admin-primary no-underline font-semibold transition-colors duration-300 ease-in-out hover:text-admin-primary-dark">{analytics.profile.sessionCode}</Link>
                     </span>
-                    <span className={styles.metaSeparator}>•</span>
-                    <span className={styles.metaItem}>
+                    <span className="text-[#d1d5db]">•</span>
+                    <span>
                       Joined: {formatDate(analytics.profile.joinedAt)}
                     </span>
-                    <span className={styles.metaSeparator}>•</span>
-                    <span className={styles.metaItem}>
+                    <span className="text-[#d1d5db]">•</span>
+                    <span>
                       Last active: {getRelativeTime(analytics.profile.lastLogin)}
                     </span>
                   </div>
@@ -200,44 +199,44 @@ export default function StudentDetailPage() {
               </div>
 
               {/* Summary Stats */}
-              <div className={styles.summaryStats}>
-                <div className={styles.summaryItem}>
-                  <Target className={styles.summaryIcon} size={20} />
-                  <div className={styles.summaryContent}>
-                    <div className={styles.summaryValue}>{analytics.summary.questsCompleted}</div>
-                    <div className={styles.summaryLabel}>Quests Completed</div>
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-5 max-tablet:grid-cols-2">
+                <div className="flex items-center gap-[12px]">
+                  <Target className="text-admin-primary flex-shrink-0" size={20} />
+                  <div>
+                    <div className="text-[20px] font-bold text-admin-dark m-0">{analytics.summary.questsCompleted}</div>
+                    <div className="text-xs text-[#6b7280] m-0">Quests Completed</div>
                   </div>
                 </div>
-                <div className={styles.summaryItem}>
-                  <FileText className={styles.summaryIcon} size={20} />
-                  <div className={styles.summaryContent}>
-                    <div className={styles.summaryValue}>{analytics.summary.questsActive}</div>
-                    <div className={styles.summaryLabel}>Quests Active</div>
+                <div className="flex items-center gap-[12px]">
+                  <FileText className="text-admin-primary flex-shrink-0" size={20} />
+                  <div>
+                    <div className="text-[20px] font-bold text-admin-dark m-0">{analytics.summary.questsActive}</div>
+                    <div className="text-xs text-[#6b7280] m-0">Quests Active</div>
                   </div>
                 </div>
-                <div className={styles.summaryItem}>
-                  <Clock className={styles.summaryIcon} size={20} />
-                  <div className={styles.summaryContent}>
-                    <div className={styles.summaryValue}>{formatTime(analytics.summary.totalTimeSpentSeconds)}</div>
-                    <div className={styles.summaryLabel}>Total Time</div>
+                <div className="flex items-center gap-[12px]">
+                  <Clock className="text-admin-primary flex-shrink-0" size={20} />
+                  <div>
+                    <div className="text-[20px] font-bold text-admin-dark m-0">{formatTime(analytics.summary.totalTimeSpentSeconds)}</div>
+                    <div className="text-xs text-[#6b7280] m-0">Total Time</div>
                   </div>
                 </div>
-                <div className={styles.summaryItem}>
-                  <Play className={styles.summaryIcon} size={20} />
-                  <div className={styles.summaryContent}>
-                    <div className={styles.summaryValue}>{analytics.summary.totalCodeExecutions}</div>
-                    <div className={styles.summaryLabel}>Code Runs</div>
+                <div className="flex items-center gap-[12px]">
+                  <Play className="text-admin-primary flex-shrink-0" size={20} />
+                  <div>
+                    <div className="text-[20px] font-bold text-admin-dark m-0">{analytics.summary.totalCodeExecutions}</div>
+                    <div className="text-xs text-[#6b7280] m-0">Code Runs</div>
                   </div>
                 </div>
-                <div className={styles.summaryItem}>
-                  <Save className={styles.summaryIcon} size={20} />
-                  <div className={styles.summaryContent}>
-                    <div className={styles.summaryValue}>
+                <div className="flex items-center gap-[12px]">
+                  <Save className="text-admin-primary flex-shrink-0" size={20} />
+                  <div>
+                    <div className="text-[20px] font-bold text-admin-dark m-0">
                       {analytics.summary.lastSaveTime ? '✓' : '✕'}
                     </div>
-                    <div className={styles.summaryLabel}>Last Saved</div>
+                    <div className="text-xs text-[#6b7280] m-0">Last Saved</div>
                     {analytics.summary.lastSaveTime && (
-                      <div className={styles.summaryNote}>{getRelativeTime(analytics.summary.lastSaveTime)}</div>
+                      <div className="text-[10px] text-[#9ca3af] mt-[2px]">{getRelativeTime(analytics.summary.lastSaveTime)}</div>
                     )}
                   </div>
                 </div>
@@ -245,33 +244,53 @@ export default function StudentDetailPage() {
             </div>
 
             {/* Tabs */}
-            <div className={styles.tabs}>
+            <div className="flex gap-[10px] mb-8 border-b-2 border-[#e5e7eb] overflow-x-auto max-tablet:gap-[5px]">
               <button
-                className={`${styles.tab} ${activeTab === 'overview' ? styles.tabActive : ''}`}
+                className={`py-[12px] px-5 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-300 ease-in-out whitespace-nowrap ${
+                  activeTab === 'overview'
+                    ? 'text-admin-primary border-b-2 border-admin-primary mb-[-2px]'
+                    : 'text-[#6b7280] hover:text-admin-dark'
+                }`}
                 onClick={() => setActiveTab('overview')}
               >
                 Overview
               </button>
               <button
-                className={`${styles.tab} ${activeTab === 'quests' ? styles.tabActive : ''}`}
+                className={`py-[12px] px-5 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-300 ease-in-out whitespace-nowrap ${
+                  activeTab === 'quests'
+                    ? 'text-admin-primary border-b-2 border-admin-primary mb-[-2px]'
+                    : 'text-[#6b7280] hover:text-admin-dark'
+                }`}
                 onClick={() => setActiveTab('quests')}
               >
                 Quest Progress
               </button>
               <button
-                className={`${styles.tab} ${activeTab === 'objectives' ? styles.tabActive : ''}`}
+                className={`py-[12px] px-5 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-300 ease-in-out whitespace-nowrap ${
+                  activeTab === 'objectives'
+                    ? 'text-admin-primary border-b-2 border-admin-primary mb-[-2px]'
+                    : 'text-[#6b7280] hover:text-admin-dark'
+                }`}
                 onClick={() => setActiveTab('objectives')}
               >
                 Objectives
               </button>
               <button
-                className={`${styles.tab} ${activeTab === 'code' ? styles.tabActive : ''}`}
+                className={`py-[12px] px-5 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-300 ease-in-out whitespace-nowrap ${
+                  activeTab === 'code'
+                    ? 'text-admin-primary border-b-2 border-admin-primary mb-[-2px]'
+                    : 'text-[#6b7280] hover:text-admin-dark'
+                }`}
                 onClick={() => setActiveTab('code')}
               >
                 Code History
               </button>
               <button
-                className={`${styles.tab} ${activeTab === 'gamestate' ? styles.tabActive : ''}`}
+                className={`py-[12px] px-5 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-300 ease-in-out whitespace-nowrap ${
+                  activeTab === 'gamestate'
+                    ? 'text-admin-primary border-b-2 border-admin-primary mb-[-2px]'
+                    : 'text-[#6b7280] hover:text-admin-dark'
+                }`}
                 onClick={() => setActiveTab('gamestate')}
               >
                 Game State
@@ -279,16 +298,16 @@ export default function StudentDetailPage() {
             </div>
 
             {/* Tab Content */}
-            <div className={styles.tabContent}>
+            <div>
               {activeTab === 'overview' && (
-                <div className={styles.overviewContent}>
-                  <div className={styles.section}>
-                    <h2 className={styles.sectionTitle}>Quest Progress Summary</h2>
+                <div>
+                  <div className="mb-8">
+                    <h2 className="text-[22px] font-bold text-admin-dark m-0 mb-5">Quest Progress Summary</h2>
                     <QuestProgressChart questProgress={analytics.questProgress} />
                   </div>
 
-                  <div className={styles.section}>
-                    <h2 className={styles.sectionTitle}>Recent Code Executions</h2>
+                  <div className="mb-8">
+                    <h2 className="text-[22px] font-bold text-admin-dark m-0 mb-5">Recent Code Executions</h2>
                     <CodeExecutionViewer
                       codeExecutions={analytics.recentCodeExecutions.slice(0, 10)}
                       compact={true}
@@ -298,15 +317,15 @@ export default function StudentDetailPage() {
               )}
 
               {activeTab === 'quests' && (
-                <div className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Quest Progress Details</h2>
+                <div className="mb-8">
+                  <h2 className="text-[22px] font-bold text-admin-dark m-0 mb-5">Quest Progress Details</h2>
                   <QuestProgressChart questProgress={analytics.questProgress} showDetails={true} />
                 </div>
               )}
 
               {activeTab === 'objectives' && (
-                <div className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Objective Completion Details</h2>
+                <div className="mb-8">
+                  <h2 className="text-[22px] font-bold text-admin-dark m-0 mb-5">Objective Completion Details</h2>
                   <ObjectiveProgressList
                     objectiveProgress={analytics.objectiveProgress}
                     questProgress={analytics.questProgress}
@@ -315,8 +334,8 @@ export default function StudentDetailPage() {
               )}
 
               {activeTab === 'code' && (
-                <div className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Code Execution History</h2>
+                <div className="mb-8">
+                  <h2 className="text-[22px] font-bold text-admin-dark m-0 mb-5">Code Execution History</h2>
                   <CodeExecutionViewer
                     codeExecutions={analytics.recentCodeExecutions}
                     compact={false}
@@ -325,8 +344,8 @@ export default function StudentDetailPage() {
               )}
 
               {activeTab === 'gamestate' && (
-                <div className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Game State</h2>
+                <div className="mb-8">
+                  <h2 className="text-[22px] font-bold text-admin-dark m-0 mb-5">Game State</h2>
                   <GameStateViewer gameState={analytics.gameState} />
                 </div>
               )}

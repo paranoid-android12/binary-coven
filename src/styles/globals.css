@@ -1,3 +1,26 @@
+@import "tailwindcss";
+
+@theme {
+  /* Custom Colors for Admin UI */
+  --color-admin-dark: #1a1a2e;
+  --color-admin-darker: #16213e;
+  --color-admin-primary: #0ec3c9;
+  --color-admin-primary-dark: #0a9ba0;
+  --color-admin-primary-darker: #087074;
+  --color-admin-purple: #210714;
+  --color-admin-purple-light: #3b1522;
+  --color-admin-purple-darker: #12040c;
+  --color-admin-tan: #d8a888;
+  --color-admin-tan-light: #e8c4a8;
+
+  /* Breakpoints */
+  --breakpoint-tablet: 768px;
+  --breakpoint-laptop: 1024px;
+
+  /* Font Family */
+  --font-family-pixel: 'BoldPixels', monospace, sans-serif;
+}
+
 @font-face {
     font-family: "BoldPixels";
     src: url("/fonts/BoldPixels.ttf") format("truetype");
@@ -106,4 +129,56 @@ h3 {
 h4, h5, h6 {
     font-size: 16px;
     font-family: "BoldPixels", Arial, Helvetica, sans-serif;
+}
+
+/* Tailwind Custom Utilities */
+@layer utilities {
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-spin-slow {
+    animation: spin 1s linear infinite;
+  }
+
+  /* Admin gradient backgrounds */
+  .bg-admin-gradient {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  }
+
+  .bg-admin-gradient-vertical {
+    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+  }
+
+  .bg-admin-primary-gradient {
+    background: linear-gradient(135deg, #0ec3c9 0%, #0a9ba0 100%);
+  }
+
+  .bg-admin-primary-gradient-hover {
+    background: linear-gradient(135deg, #0a9ba0 0%, #087074 100%);
+  }
+
+  .bg-admin-purple-gradient {
+    background: radial-gradient(circle at top, #3b1522 0%, #210714 60%, #12040c 100%);
+  }
+
+  /* Custom text shadow for admin login */
+  .text-shadow-admin {
+    text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.3);
+  }
+
+  /* Custom box shadows */
+  .shadow-admin-card {
+    box-shadow: 0 8px 0 #210714, 0 12px 20px rgba(0, 0, 0, 0.45);
+  }
+
+  .shadow-admin-button {
+    box-shadow: 0 4px 0 #210714;
+  }
+
+  .shadow-admin-button-hover {
+    box-shadow: 0 2px 0 #210714;
+  }
 }

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { Eye, EyeOff } from 'lucide-react';
-import styles from '../../styles/admin/AdminLogin.module.css';
 import { validatePassword, checkPasswordRequirements } from '@/utils/passwordValidation';
 
 export default function AdminLogin() {
@@ -82,16 +81,16 @@ export default function AdminLogin() {
         <title>Admin Login - Binary Coven</title>
       </Head>
 
-      <div className={styles.container}>
-        <div className={styles.loginBox}>
-          <div className={styles.header}>
-            <h1 className={styles.title}>Binary Coven</h1>
-            <p className={styles.subtitle}>Admin Dashboard</p>
+      <div className="min-h-screen flex items-center justify-center bg-admin-purple-gradient font-[family-name:var(--font-family-pixel)] p-5">
+        <div className="bg-admin-tan border-4 border-admin-purple rounded-xl py-10 px-[50px] w-full max-w-[420px] shadow-admin-card relative">
+          <div className="text-center mb-[35px]">
+            <h1 className="text-[32px] font-bold text-admin-purple m-0 mb-[10px] uppercase tracking-[2px] text-shadow-admin">Binary Coven</h1>
+            <p className="text-base text-admin-purple m-0 opacity-85 uppercase tracking-wider">Admin Dashboard</p>
           </div>
 
-          <form onSubmit={handleSubmit} className={styles.form}>
-            <div className={styles.formGroup}>
-              <label htmlFor="username" className={styles.label}>
+          <form onSubmit={handleSubmit} className="mb-5">
+            <div className="mb-[25px]">
+              <label htmlFor="username" className="block text-admin-purple text-[13px] mb-2 tracking-wider uppercase">
                 Username
               </label>
               <input
@@ -99,18 +98,18 @@ export default function AdminLogin() {
                 id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className={styles.input}
+                className="w-full py-[14px] px-4 bg-admin-tan-light border-2 border-admin-purple rounded-md text-admin-purple text-[15px] font-[family-name:var(--font-family-pixel)] transition-all duration-200 ease-in-out box-border outline-none focus:border-admin-purple focus:shadow-[0_0_0_2px_rgba(33,7,20,0.2)] disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-admin-purple/60"
                 placeholder="Enter admin username"
                 disabled={loading}
                 autoFocus
               />
             </div>
 
-            <div className={styles.formGroup}>
-              <label htmlFor="password" className={styles.label}>
+            <div className="mb-[25px]">
+              <label htmlFor="password" className="block text-admin-purple text-[13px] mb-2 tracking-wider uppercase">
                 Password
               </label>
-              <div style={{ position: 'relative' }}>
+              <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   id="password"
@@ -120,63 +119,30 @@ export default function AdminLogin() {
                     setPasswordTouched(true);
                   }}
                   onBlur={() => setPasswordTouched(true)}
-                  className={styles.input}
+                  className="w-full py-[14px] px-4 pr-10 bg-admin-tan-light border-2 border-admin-purple rounded-md text-admin-purple text-[15px] font-[family-name:var(--font-family-pixel)] transition-all duration-200 ease-in-out box-border outline-none focus:border-admin-purple focus:shadow-[0_0_0_2px_rgba(33,7,20,0.2)] disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-admin-purple/60"
                   placeholder="Enter admin password"
                   disabled={loading}
-                  style={{ paddingRight: '40px' }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  style={{
-                    position: 'absolute',
-                    right: '10px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: '4px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#666',
-                    transition: 'color 0.2s',
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = '#000'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
+                  className="absolute right-[10px] top-1/2 -translate-y-1/2 bg-none border-none cursor-pointer p-1 flex items-center justify-center text-[#666] transition-colors duration-200 hover:text-black"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
-              {/* Password requirements indicator */}
               {passwordTouched && password && (() => {
                 const requirements = checkPasswordRequirements(password);
                 return (
-                  <div style={{
-                    fontSize: '0.8em',
-                    padding: '8px 10px',
-                    backgroundColor: '#f5f5f5',
-                    borderRadius: '4px',
-                    marginTop: '8px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '4px',
-                  }}>
-                    <div style={{
-                      color: requirements.hasUpperCase ? '#0b7607' : '#b10000',
-                    }}>
+                  <div className="text-[0.8em] p-2 bg-[#f5f5f5] rounded mt-2 flex flex-col gap-1">
+                    <div className={requirements.hasUpperCase ? 'text-[#0b7607]' : 'text-[#b10000]'}>
                       {requirements.hasUpperCase ? '✓' : '✗'} One uppercase letter
                     </div>
-                    <div style={{
-                      color: requirements.hasNumber ? '#0b7607' : '#b10000',
-                    }}>
+                    <div className={requirements.hasNumber ? 'text-[#0b7607]' : 'text-[#b10000]'}>
                       {requirements.hasNumber ? '✓' : '✗'} One number
                     </div>
-                    <div style={{
-                      color: requirements.hasSpecialChar ? '#0b7607' : '#b10000',
-                    }}>
+                    <div className={requirements.hasSpecialChar ? 'text-[#0b7607]' : 'text-[#b10000]'}>
                       {requirements.hasSpecialChar ? '✓' : '✗'} One special character (!@#$%^&*...)
                     </div>
                   </div>
@@ -185,22 +151,22 @@ export default function AdminLogin() {
             </div>
 
             {error && (
-              <div className={styles.error}>
+              <div className="bg-red-500/10 border-2 border-red-500 text-red-500 py-3 px-4 rounded-md mb-5 text-sm text-center font-[Arial,sans-serif]">
                 {error}
               </div>
             )}
 
             <button
               type="submit"
-              className={styles.submitButton}
+              className="w-full py-[14px] px-6 bg-transparent text-admin-purple border-[3px] border-admin-purple rounded-md text-lg font-bold font-[family-name:var(--font-family-pixel)] cursor-pointer transition-all duration-200 ease-in-out uppercase tracking-[2px] shadow-admin-button hover:bg-admin-purple hover:text-admin-tan hover:translate-y-px hover:shadow-admin-button-hover active:translate-y-[2px] active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:bg-transparent disabled:hover:text-admin-purple disabled:hover:translate-y-0"
               disabled={loading}
             >
               {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
 
-          <div className={styles.footer}>
-            <p>LMS Administration Panel</p>
+          <div className="text-center mt-[25px] pt-5 border-t-2 border-admin-purple/20">
+            <p className="text-admin-purple/75 text-[13px] m-0">LMS Administration Panel</p>
           </div>
         </div>
       </div>
