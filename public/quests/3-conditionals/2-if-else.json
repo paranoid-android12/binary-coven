@@ -1,0 +1,214 @@
+{
+  "id": "if_else",
+  "title": "Either Or",
+  "description": "Learn to handle both true and false cases with if/else statements.",
+  "difficulty": "beginner",
+  "category": "Conditionals",
+  "estimatedTime": 10,
+  "concepts": ["if_else", "branching", "two_paths"],
+  "prerequisites": ["conditionals_intro"],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "Two Paths",
+      "description": "Learn about the else statement",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Sometimes you want to do something when the condition is true, and something ELSE when it's false.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "That's where the 'else' statement comes in!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So it's like: if this, do that, otherwise do something else?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Let me show you.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_setup",
+      "title": "Setting Up",
+      "description": "Create a variable to test",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's check if our crops are ready. First, type: crop_ready = False",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "crop_ready = False",
+          "description": "Type: crop_ready = False"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Our crops are not ready yet!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_if_part",
+      "title": "The If Part",
+      "description": "Write the if statement",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's write an if statement. Type: if crop_ready:",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "if crop_ready:",
+          "description": "Type: if crop_ready:"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Notice we can use a boolean directly! No need for == True.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_if_action",
+      "title": "What to Do If True",
+      "description": "Add the true action",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Add the action for when crops are ready (indented). Type:     print(\"Time to harvest!\")",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"Time to harvest!\")",
+          "description": "Type: print(\"Time to harvest!\") (indented)"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_else",
+      "title": "The Else Part",
+      "description": "Add the else statement",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now add the else. It should be at the same level as 'if' (not indented). Type: else:",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "else:",
+          "description": "Type: else:"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! Now we need to add what happens when it's false.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_else_action",
+      "title": "What to Do If False",
+      "description": "Add the false action",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Add the action for when crops are NOT ready (indented). Type:     print(\"Still growing...\")",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"Still growing...\")",
+          "description": "Type: print(\"Still growing...\") (indented)"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now your code handles both cases!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_7_execute",
+      "title": "Run Your Code",
+      "description": "See both paths in action",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play! Since crop_ready is False, you should see 'Still growing...'",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "It worked! Your code chose the else path because crop_ready was False!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "And if I change crop_ready to True, it would show 'Time to harvest!'?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Now you can handle any situation with if/else!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "elif_chains",
+      "description": "Unlock 'Multiple Paths' quest"
+    }
+  ]
+}

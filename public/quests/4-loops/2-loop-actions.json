@@ -1,0 +1,221 @@
+{
+  "id": "loop_actions",
+  "title": "Harvest in Bulk",
+  "description": "Use loops to harvest multiple crops efficiently! Learn about loop patterns.",
+  "difficulty": "beginner",
+  "category": "Loops",
+  "estimatedTime": 12,
+  "concepts": ["for_loops_practical", "range_variations", "loop_patterns"],
+  "prerequisites": ["loop_movement"],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "Bulk Harvesting",
+      "description": "Loops for farm work",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Time to use loops for real farm work! We'll harvest crops in bulk!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "I can harvest multiple crops with one command?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "With loops, you can harvest 10, 100, or even 1000 crops easily!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_harvest_loop",
+      "title": "Harvest Many",
+      "description": "Write a harvest loop",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's harvest 3 crops. Remember: for loop, then the action inside!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "for i in range(3):",
+          "description": "Type: for i in range(3):"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Harvesting crop\")",
+          "description": "Type: print(\"Harvesting crop\") with indent"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_run_harvest",
+      "title": "See Your Harvest",
+      "description": "Run the harvest loop",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to harvest!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "It harvested 3 crops! So easy!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_range_start",
+      "title": "Starting from 1",
+      "description": "Use range with two numbers",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "What if we want to count starting from 1 instead of 0?",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "We can use range(1, 4) - this means: start at 1, stop before 4!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "for crop in range(1, 4):",
+          "description": "Type: for crop in range(1, 4):"
+        },
+        {
+          "type": "code_content",
+          "content": "print(crop)",
+          "description": "Type: print(crop) to see the numbers"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "I named the variable 'crop' instead of 'i' - you can name it anything!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_run_range",
+      "title": "See 1, 2, 3",
+      "description": "Run the new range",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to see 1, 2, 3!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "It printed 1, 2, 3! So range(1, 4) is 1, 2, 3!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Remember: the second number is where we STOP, but we don't include it!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_combined",
+      "title": "Numbered Harvest",
+      "description": "Combine the concepts",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's combine! Harvest crops and number them. Use 'crop' in the print!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "for crop in range(1, 6):",
+          "description": "Type: for crop in range(1, 6):"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Harvesting crop\")",
+          "description": "Type: print(\"Harvesting crop\", crop)"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_7_final_run",
+      "title": "Harvest Complete",
+      "description": "Run the final harvest",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to see your numbered harvest!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "It numbered each harvest from 1 to 5! This is so useful!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Great job! You've mastered for loops! Next: while loops!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "while_loops",
+      "description": "Unlock 'Loop Until Done' quest"
+    }
+  ]
+}

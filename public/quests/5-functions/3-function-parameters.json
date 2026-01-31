@@ -1,0 +1,202 @@
+{
+  "id": "function_parameters",
+  "title": "Function Parameters",
+  "description": "Make functions flexible by passing information into them! Parameters make functions customizable.",
+  "difficulty": "intermediate",
+  "category": "Functions",
+  "estimatedTime": 12,
+  "concepts": ["parameters", "arguments", "flexible_functions"],
+  "prerequisites": ["helper_functions"],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "Flexible Functions",
+      "description": "Learn about parameters",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Our greet function always says the same thing. But what if we want to greet different people?",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Make a different function for each person?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "No! We use PARAMETERS to pass information INTO the function!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_parameter",
+      "title": "Adding a Parameter",
+      "description": "Create a function with parameter",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Put a variable name inside the parentheses - that's the parameter!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "def greet(name):",
+          "description": "Type: def greet(name):"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "'name' is a parameter - a placeholder for whatever we pass in later!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_use_parameter",
+      "title": "Use the Parameter",
+      "description": "Use the parameter inside function",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now use 'name' in your print statement!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"Hello,\", name)",
+          "description": "Type: print(\"Hello,\", name) with indent"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_call_with_arg",
+      "title": "Pass an Argument",
+      "description": "Call function with a value",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now call the function and give it a name to use!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "greet(\"Qubit\")",
+          "description": "Type: greet(\"Qubit\")"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "The value \"Qubit\" becomes the 'name' parameter inside the function!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_run_param",
+      "title": "See the Magic",
+      "description": "Run the parameterized function",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to see it work!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "It said 'Hello, Qubit'! My name went into the function!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_different_args",
+      "title": "Different Names",
+      "description": "Call with different values",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Call the function with different names!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "greet(\"Maru\")",
+          "description": "Type: greet(\"Maru\")"
+        },
+        {
+          "type": "code_content",
+          "content": "greet(\"Farmer\")",
+          "description": "Type: greet(\"Farmer\")"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_7_run_all",
+      "title": "Greet Everyone",
+      "description": "Run all the greetings",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to greet everyone!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Same function, different outputs! Parameters are amazing!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Now you can make flexible, reusable functions! Next: return values!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "return_values",
+      "description": "Unlock 'Return Values' quest"
+    }
+  ]
+}

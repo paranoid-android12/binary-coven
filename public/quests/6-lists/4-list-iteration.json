@@ -1,0 +1,227 @@
+{
+  "id": "list_iteration",
+  "title": "Looping Through Lists",
+  "description": "Combine loops and lists to process every item automatically!",
+  "difficulty": "intermediate",
+  "category": "Lists",
+  "estimatedTime": 12,
+  "concepts": ["for_each_loops", "list_processing", "combined_concepts"],
+  "prerequisites": ["list_modification"],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "Lists + Loops",
+      "description": "The powerful combination",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Here's where the magic happens: combining lists with loops!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "I can process every item automatically?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Yes! This is one of the most powerful patterns in programming!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_setup",
+      "title": "Create a List",
+      "description": "Set up our crop list",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's create a list of crops to process!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "crops = [\"wheat\", \"corn\", \"potato\", \"carrot\"]",
+          "description": "Type: crops = [\"wheat\", \"corn\", \"potato\", \"carrot\"]"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_for_each",
+      "title": "Loop Through List",
+      "description": "Use for to iterate",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Use 'for item in list' to go through each item!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "for crop in crops:",
+          "description": "Type: for crop in crops:"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Harvesting:\", crop)",
+          "description": "Type: print(\"Harvesting:\", crop)"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "'crop' will become each item in 'crops' one at a time!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_run_loop",
+      "title": "See the Loop",
+      "description": "Run the list loop",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to harvest all crops!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "It harvested each crop! wheat, corn, potato, carrot!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_numbers",
+      "title": "Number Lists",
+      "description": "Process number lists",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's calculate total value of our harvest!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "prices = [10, 15, 8, 12]",
+          "description": "Type: prices = [10, 15, 8, 12]"
+        },
+        {
+          "type": "code_content",
+          "content": "total = 0",
+          "description": "Type: total = 0"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_sum_loop",
+      "title": "Sum the Prices",
+      "description": "Loop to add up values",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now loop through prices and add each to total!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "for price in prices:",
+          "description": "Type: for price in prices:"
+        },
+        {
+          "type": "code_content",
+          "content": "total = total + price",
+          "description": "Type: total = total + price"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_7_print_total",
+      "title": "Show Total",
+      "description": "Print the sum",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "After the loop, print the total! (no indent)",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"Total value:\", total)",
+          "description": "Type: print(\"Total value:\", total)"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_8_run_sum",
+      "title": "Calculate Total",
+      "description": "Run the sum calculation",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to see the total value!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Total value: 45! It added 10+15+8+12 automatically!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Lists + loops = powerful automation! One more challenge awaits!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "lists_challenge",
+      "description": "Unlock 'Lists Challenge' quest"
+    }
+  ]
+}

@@ -1,0 +1,222 @@
+{
+  "id": "boolean_variables",
+  "title": "True or False",
+  "description": "Learn about booleans - the yes/no values that control program logic.",
+  "difficulty": "beginner",
+  "category": "Variables",
+  "estimatedTime": 10,
+  "concepts": ["booleans", "true_false", "logic"],
+  "prerequisites": ["string_variables"],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "What Are Booleans?",
+      "description": "Learn about True and False values",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "There's one more important type of variable - booleans!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Booleans? That sounds fancy.",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "It's actually simple! A boolean can only be one of two values: True or False.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Think of it like a light switch - it's either ON (True) or OFF (False).",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_create_boolean",
+      "title": "Creating Booleans",
+      "description": "Create your first boolean variable",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's track if our crop is ready to harvest. Type: is_ready = True",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Notice that True starts with a capital T!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "is_ready = True",
+          "description": "Type: is_ready = True"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! Now is_ready is True - the crop is ready!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_false_value",
+      "title": "The False Value",
+      "description": "Learn about False",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's create another boolean. Let's say our basket is not empty. Type: is_empty = False",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "is_empty = False",
+          "description": "Type: is_empty = False"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "So False means 'no' or 'not true'?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! True = yes, False = no. Simple as that!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_comparison",
+      "title": "Booleans from Comparisons",
+      "description": "Learn how comparisons create booleans",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Here's something cool - comparisons automatically give you booleans!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Let's check if we have any crops. First, set: crop_count = 5",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "crop_count = 5",
+          "description": "Type: crop_count = 5"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_comparison_result",
+      "title": "Comparison Result",
+      "description": "See how comparisons work",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's check if crop_count is greater than 0. Type: has_crops = crop_count > 0",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "The > symbol means 'greater than'. This comparison gives us True or False!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "has_crops = crop_count > 0",
+          "description": "Type: has_crops = crop_count > 0"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Since 5 is greater than 0, has_crops is now True!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So the computer figured out if 5 > 0 is true or false?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Booleans are the foundation of making decisions in code!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_execute",
+      "title": "Run Your Code",
+      "description": "Execute to see booleans in action",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's print has_crops and run the code. Type: print(has_crops)",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(has_crops)",
+          "description": "Type: print(has_crops)"
+        },
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Congratulations! You now know all the basic variable types!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Numbers, text, and true/false. Got it!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Time to put it all together in a challenge!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "variables_challenge",
+      "description": "Unlock 'Variables Challenge' quest"
+    }
+  ]
+}

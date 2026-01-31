@@ -1,0 +1,201 @@
+{
+  "id": "helper_functions",
+  "title": "Helper Functions",
+  "description": "Learn how to create reusable code blocks called functions! Write once, use many times.",
+  "difficulty": "intermediate",
+  "category": "Functions",
+  "estimatedTime": 12,
+  "concepts": ["function_definition", "function_calls", "code_reuse"],
+  "prerequisites": [],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "Why Functions?",
+      "description": "Learn the power of functions",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Welcome to functions! These are like mini-programs inside your program!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Why would I need mini-programs?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "So you can write code ONCE and use it MANY times! Watch this!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_first_function",
+      "title": "Your First Function",
+      "description": "Create a simple function",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's create a 'greet' function! Type: def greet():",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "'def' means 'define' - we're defining a new function!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "def greet():",
+          "description": "Type: def greet():"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_function_body",
+      "title": "Inside the Function",
+      "description": "Add code inside the function",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now add what the function does - with an indent!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"Hello, farmer!\")",
+          "description": "Type: print(\"Hello, farmer!\") with indent"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Your function is defined! But it won't run until you CALL it!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_call_function",
+      "title": "Call the Function",
+      "description": "Execute your function",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "To run a function, just type its name with parentheses!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "greet()",
+          "description": "Type: greet() (no indent - outside the function)"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_run_function",
+      "title": "See It Work",
+      "description": "Run your function",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to see your function run!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "It said 'Hello, farmer!'! The function worked!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_reuse",
+      "title": "Call It Again!",
+      "description": "Functions can be called multiple times",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "The power of functions: you can call them many times! Add more calls!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "greet()",
+          "description": "Type: greet() again"
+        },
+        {
+          "type": "code_content",
+          "content": "greet()",
+          "description": "Type: greet() one more time"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_7_run_multiple",
+      "title": "Triple Greet",
+      "description": "Run multiple calls",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to see the function run 3 times!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Three greetings! I wrote the print once but it ran 3 times!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "That's the power of functions! Write once, use forever!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "function_parameters",
+      "description": "Unlock 'Function Parameters' quest"
+    }
+  ]
+}

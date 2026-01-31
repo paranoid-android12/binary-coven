@@ -1,0 +1,180 @@
+{
+  "id": "lists_intro",
+  "title": "Lists Introduction",
+  "description": "Learn how to store multiple items in a single variable! Lists are like containers for data.",
+  "difficulty": "intermediate",
+  "category": "Lists",
+  "estimatedTime": 10,
+  "concepts": ["list_creation", "list_basics", "multiple_items"],
+  "prerequisites": [],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "Why Lists?",
+      "description": "Learn why we need lists",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Welcome to lists! Imagine you have 5 crops. Without lists:",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "crop1 = 'wheat'\ncrop2 = 'corn'\ncrop3 = 'potato'\ncrop4 = 'carrot'\ncrop5 = 'tomato'",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "That's so many variables! There must be a better way!",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "There is! A LIST can hold all of them in ONE variable!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_first_list",
+      "title": "Your First List",
+      "description": "Create a list",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Lists use square brackets [ ] with items separated by commas!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "crops = [\"wheat\", \"corn\", \"potato\"]",
+          "description": "Type: crops = [\"wheat\", \"corn\", \"potato\"]"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Boom! Three items in ONE variable! That's a list!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_print_list",
+      "title": "See the List",
+      "description": "Print the list",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's print it to see what's inside!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(crops)",
+          "description": "Type: print(crops)"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_run_list",
+      "title": "See Your Crops",
+      "description": "Run and see the list",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to see your list!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "It shows all three crops! ['wheat', 'corn', 'potato']",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_number_list",
+      "title": "Lists of Numbers",
+      "description": "Create a number list",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Lists can hold any type! Let's make a list of harvest amounts!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "amounts = [10, 25, 15, 30]",
+          "description": "Type: amounts = [10, 25, 15, 30]"
+        },
+        {
+          "type": "code_content",
+          "content": "print(amounts)",
+          "description": "Type: print(amounts)"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_run_numbers",
+      "title": "Number List",
+      "description": "Run the number list",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to see your numbers!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "A list of numbers! I can store any type in a list!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Strings, numbers, even other lists! Lists are super flexible!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "list_indexing",
+      "description": "Unlock 'List Indexing' quest"
+    }
+  ]
+}

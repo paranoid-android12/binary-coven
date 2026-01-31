@@ -1,0 +1,274 @@
+{
+  "id": "functions_challenge",
+  "title": "Functions Challenge",
+  "description": "Put your function skills to the test! Build a complete farm management system using functions.",
+  "difficulty": "advanced",
+  "category": "Functions",
+  "estimatedTime": 15,
+  "concepts": ["function_mastery", "multiple_functions", "practical_application"],
+  "prerequisites": ["return_values"],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "Farm Management System",
+      "description": "Build a complete system with functions",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Time for the ultimate functions challenge! Let's build a farm management system!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "A whole system? With multiple functions?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Yes! We'll make functions for harvesting, selling, and calculating profits!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_harvest_function",
+      "title": "Harvest Function",
+      "description": "Create the harvest function",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "First, let's make a function to calculate harvest amount!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "def harvest(plots, yield_per_plot):",
+          "description": "Type: def harvest(plots, yield_per_plot):"
+        },
+        {
+          "type": "code_content",
+          "content": "return plots * yield_per_plot",
+          "description": "Type: return plots * yield_per_plot"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "This function calculates total harvest from plots and yield!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_sell_function",
+      "title": "Sell Function",
+      "description": "Create the sell function",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's make a function to calculate sale earnings!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "def sell(amount, price):",
+          "description": "Type: def sell(amount, price):"
+        },
+        {
+          "type": "code_content",
+          "content": "return amount * price",
+          "description": "Type: return amount * price"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_profit_function",
+      "title": "Profit Function",
+      "description": "Create the profit calculator",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now a function to calculate profit after costs!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "def profit(earnings, costs):",
+          "description": "Type: def profit(earnings, costs):"
+        },
+        {
+          "type": "code_content",
+          "content": "return earnings - costs",
+          "description": "Type: return earnings - costs"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Three functions ready! Now let's use them together!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_use_system",
+      "title": "Run the Farm",
+      "description": "Use all functions together",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's simulate a day on the farm! Set up your plots and costs:",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "my_plots = 5",
+          "description": "Type: my_plots = 5"
+        },
+        {
+          "type": "code_content",
+          "content": "seed_cost = 15",
+          "description": "Type: seed_cost = 15"
+        },
+        {
+          "type": "code_content",
+          "content": "crop_price = 8",
+          "description": "Type: crop_price = 8"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_call_functions",
+      "title": "Calculate Everything",
+      "description": "Call all the functions",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's harvest, sell, and calculate profit!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "total_harvest = harvest(my_plots, 3)",
+          "description": "Type: total_harvest = harvest(my_plots, 3)"
+        },
+        {
+          "type": "code_content",
+          "content": "total_sales = sell(total_harvest, crop_price)",
+          "description": "Type: total_sales = sell(total_harvest, crop_price)"
+        },
+        {
+          "type": "code_content",
+          "content": "my_profit = profit(total_sales, seed_cost)",
+          "description": "Type: my_profit = profit(total_sales, seed_cost)"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Notice how we use results from one function as input to another!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_7_report",
+      "title": "Print the Report",
+      "description": "Show the results",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Finally, let's print a farm report!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"=== FARM REPORT ===\")",
+          "description": "Type: print(\"=== FARM REPORT ===\")"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Harvested:\", total_harvest)",
+          "description": "Type: print(\"Harvested:\", total_harvest)"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Sales:\", total_sales)",
+          "description": "Type: print(\"Sales:\", total_sales)"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Profit:\", my_profit)",
+          "description": "Type: print(\"Profit:\", my_profit)"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_8_run_system",
+      "title": "See Your Farm's Success",
+      "description": "Run the complete system",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to see your farm management system in action!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "15 harvested, 120 in sales, 105 profit! The system works!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "INCREDIBLE! You've mastered functions completely!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "You can create, call, pass parameters, and return values! Next up: Lists!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "lists_intro",
+      "description": "Unlock 'Lists Introduction' quest (Lists Track)"
+    }
+  ]
+}

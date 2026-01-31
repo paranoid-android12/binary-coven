@@ -1,0 +1,196 @@
+{
+  "id": "conditionals_intro",
+  "title": "The Crossroads",
+  "description": "Learn how to make your program choose different paths with if statements.",
+  "difficulty": "beginner",
+  "category": "Conditionals",
+  "estimatedTime": 10,
+  "concepts": ["if_statement", "conditions", "comparison"],
+  "prerequisites": [],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "Making Decisions",
+      "description": "Learn why conditionals are important",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Qubit, what if you wanted your code to do different things based on a situation?",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Like... if it's raining, stay inside, otherwise go outside?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! That's what 'conditionals' do! They let your code make decisions!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "The most basic conditional is the 'if' statement. Let me show you!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_setup",
+      "title": "Setting Up",
+      "description": "Create a variable to check",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "First, let's create an energy variable. Type: energy = 15",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "energy = 15",
+          "description": "Type: energy = 15"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Good! Now we have 15 energy to work with.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_if_statement",
+      "title": "The If Statement",
+      "description": "Write your first if statement",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's check if we have enough energy to work. We need at least 10 energy.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Type: if energy > 10:",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "The colon (:) at the end is important! It tells Python there's code coming next.",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "if energy > 10:",
+          "description": "Type: if energy > 10:"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! This checks if energy is greater than 10.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_indented_code",
+      "title": "The Action",
+      "description": "Add code inside the if block",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now we need to add what happens when the condition is true.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "This code must be INDENTED (spaces at the start). Type:     print(\"Ready to work!\")",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Use 4 spaces or press Tab for indentation!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"Ready to work!\")",
+          "description": "Type: print(\"Ready to work!\") (indented)"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Great! This line only runs if energy > 10 is true!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So if energy was 5, this line wouldn't run?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! The code only runs when the condition is True!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_execute",
+      "title": "Run Your Code",
+      "description": "See the conditional in action",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to run your code. Since energy is 15, and 15 > 10 is true, you should see the message!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "It worked! Your code made a decision!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "But what if the condition is false? Nothing happens?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Good question! That's where 'else' comes in. Let's learn about that next!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "if_else",
+      "description": "Unlock 'Either Or' quest"
+    }
+  ]
+}

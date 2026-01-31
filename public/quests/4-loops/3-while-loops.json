@@ -1,0 +1,212 @@
+{
+  "id": "while_loops",
+  "title": "Loop Until Done",
+  "description": "Learn while loops that repeat until a condition becomes false. Perfect for unknown iterations!",
+  "difficulty": "intermediate",
+  "category": "Loops",
+  "estimatedTime": 12,
+  "concepts": ["while_loops", "condition_based_loops", "loop_control"],
+  "prerequisites": ["loop_actions"],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "A Different Kind of Loop",
+      "description": "Learn about while loops",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "For loops are great when you know how many times to repeat. But what if you don't?",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Like harvesting until my energy runs out?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! That's where WHILE loops come in! They repeat WHILE something is true!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_setup",
+      "title": "Set Up Energy",
+      "description": "Create an energy variable",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's simulate energy! We'll start with 5 energy.",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "energy = 5",
+          "description": "Type: energy = 5"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now we'll use a while loop to work until energy is gone!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_while_loop",
+      "title": "The While Loop",
+      "description": "Write your first while loop",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Type: while energy > 0:",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "This means: keep going AS LONG AS energy is more than 0!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "while energy > 0:",
+          "description": "Type: while energy > 0:"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_loop_body",
+      "title": "Inside the While",
+      "description": "Add the loop body",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's add what happens in the loop. We'll work and lose energy!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"Working! Energy:\", energy)",
+          "description": "Type: print(\"Working! Energy:\", energy)"
+        },
+        {
+          "type": "code_content",
+          "content": "energy = energy - 1",
+          "description": "Type: energy = energy - 1"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "IMPORTANT: We decrease energy each time! Without this, the loop would run forever!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_run_while",
+      "title": "Watch the Loop",
+      "description": "Run the while loop",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play and watch energy go down!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "It worked 5 times and then stopped when energy hit 0!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "The while loop checks the condition BEFORE each time it runs!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_done_message",
+      "title": "After the Loop",
+      "description": "Add code after the loop",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "We can add code AFTER the loop too! Add this at the END (no indent):",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"Out of energy!\")",
+          "description": "Type: print(\"Out of energy!\") at the end, no indent"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_7_complete",
+      "title": "Complete Program",
+      "description": "Run the complete program",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to see the full program run!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "It worked until energy was 0, then said 'Out of energy!'!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect! While loops are great for: games, simulations, reading input, and more!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "loops_challenge",
+      "description": "Unlock 'Loops Challenge' quest"
+    }
+  ]
+}

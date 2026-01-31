@@ -1,0 +1,232 @@
+{
+  "id": "list_indexing",
+  "title": "List Indexing",
+  "description": "Learn how to access specific items in a list using index numbers!",
+  "difficulty": "intermediate",
+  "category": "Lists",
+  "estimatedTime": 12,
+  "concepts": ["indexing", "zero_indexed", "accessing_items"],
+  "prerequisites": ["lists_intro"],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "Accessing Items",
+      "description": "Learn about indexing",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Lists are great, but how do we get ONE item from a list?",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Can I just ask for 'wheat'?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "We use INDEXES - the position number of each item!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_setup",
+      "title": "Create Our List",
+      "description": "Set up a list to work with",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "First, let's create a list of crops.",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "crops = [\"wheat\", \"corn\", \"potato\", \"carrot\"]",
+          "description": "Type: crops = [\"wheat\", \"corn\", \"potato\", \"carrot\"]"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "IMPORTANT: In programming, counting starts at 0, not 1!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "wheat=0, corn=1, potato=2, carrot=3",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_first_item",
+      "title": "Get First Item",
+      "description": "Access index 0",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Use square brackets with the index number! Get the first item:",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(crops[0])",
+          "description": "Type: print(crops[0])"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_run_first",
+      "title": "See First Item",
+      "description": "Run to see index 0",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to see the first item!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "It printed 'wheat'! Index 0 is the first item!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_other_items",
+      "title": "Access Other Items",
+      "description": "Try different indexes",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's get more items! Try indexes 1 and 2!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(crops[1])",
+          "description": "Type: print(crops[1])"
+        },
+        {
+          "type": "code_content",
+          "content": "print(crops[2])",
+          "description": "Type: print(crops[2])"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_run_others",
+      "title": "See All Items",
+      "description": "Run all the accesses",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to see items at each index!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Index 0=wheat, 1=corn, 2=potato! I understand now!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_7_negative",
+      "title": "Negative Index",
+      "description": "Access from the end",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Cool trick: use negative numbers to count from the END!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "-1 is the LAST item, -2 is second to last!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(crops[-1])",
+          "description": "Type: print(crops[-1])"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_8_run_negative",
+      "title": "See Last Item",
+      "description": "Run the negative index",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to see the last item!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "It printed 'carrot'! Negative index counts from the end!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Great job! Now you can access any item in a list!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "list_modification",
+      "description": "Unlock 'Modifying Lists' quest"
+    }
+  ]
+}

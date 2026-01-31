@@ -1,0 +1,254 @@
+{
+  "id": "conditionals_challenge",
+  "title": "Conditionals Challenge",
+  "description": "Put your conditional knowledge to the test! Build a smart farming decision system.",
+  "difficulty": "intermediate",
+  "category": "Conditionals",
+  "estimatedTime": 15,
+  "concepts": ["conditionals_mastery", "decision_making", "practical_application"],
+  "prerequisites": ["complex_conditions"],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "The Smart Farmer",
+      "description": "Build an intelligent farming system",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Time for the ultimate challenge! Let's build a smart farming decision system!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "What kind of decisions?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "We'll check energy, weather, and inventory to decide what to do. Ready?",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_setup",
+      "title": "Set Up the Farm State",
+      "description": "Create all necessary variables",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "First, let's set up our farm's current state. Type these variables:",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "energy = 25",
+          "description": "Type: energy = 25"
+        },
+        {
+          "type": "code_content",
+          "content": "weather = \"sunny\"",
+          "description": "Type: weather = \"sunny\""
+        },
+        {
+          "type": "code_content",
+          "content": "wheat_count = 8",
+          "description": "Type: wheat_count = 8"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Good! We have 25 energy, it's sunny, and we have 8 wheat.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_energy_check",
+      "title": "Check Energy First",
+      "description": "Make sure we have enough energy",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "First, let's check if we have enough energy to work. We need at least 10.",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "if energy >= 10:",
+          "description": "Type: if energy >= 10:"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_weather_check",
+      "title": "Check Weather",
+      "description": "Nested condition for weather",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Inside the energy check, let's also check the weather. If it's sunny, we can farm!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Type (with extra indent):     if weather == \"sunny\":",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "if weather == \"sunny\":",
+          "description": "Type: if weather == \"sunny\": (double indented)"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Perfect day for farming!\")",
+          "description": "Type: print(\"Perfect day for farming!\") (triple indented)"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "This is a NESTED if - an if inside another if! Very powerful!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_inventory_decision",
+      "title": "Check Inventory",
+      "description": "Decide based on wheat count",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's decide: if we have 10+ wheat, sell. Otherwise, harvest more!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "if wheat_count >= 10:",
+          "description": "Type: if wheat_count >= 10: (inside the sunny block)"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Time to sell wheat!\")",
+          "description": "Type: print(\"Time to sell wheat!\")"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Need to harvest more wheat.\")",
+          "description": "Type: else: and print(\"Need to harvest more wheat.\")"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Since we only have 8 wheat, it will say 'Need to harvest more wheat.'!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_rainy_backup",
+      "title": "Handle Rainy Days",
+      "description": "Add else for bad weather",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "What if it's not sunny? Let's add an else for the weather check.",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"Stay inside, bad weather!\")",
+          "description": "Add else: for weather and print(\"Stay inside, bad weather!\")"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_7_low_energy",
+      "title": "Handle Low Energy",
+      "description": "Add else for low energy",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Finally, add an else for when energy is too low.",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"Need to rest and recharge!\")",
+          "description": "Add else: for energy and print(\"Need to rest and recharge!\")"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_8_execute",
+      "title": "Run Your Smart System",
+      "description": "Execute the complete decision system",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to run your smart farming system!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "AMAZING! You've mastered conditionals!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "I can make my programs think and decide!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "You've learned if, else, elif, and, or, and nested conditions. You're ready for loops next!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "farming_loops",
+      "description": "Unlock 'The Field of Repetition' quest (Loops)"
+    }
+  ]
+}

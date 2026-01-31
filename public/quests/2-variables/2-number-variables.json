@@ -1,0 +1,218 @@
+{
+  "id": "number_variables",
+  "title": "Counting Crops",
+  "description": "Learn to work with numbers - addition, subtraction, and arithmetic operations.",
+  "difficulty": "beginner",
+  "category": "Variables",
+  "estimatedTime": 10,
+  "concepts": ["integers", "arithmetic", "math_operations"],
+  "prerequisites": ["variables_intro"],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "Working with Numbers",
+      "description": "Learn about number variables",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now that you know about variables, let's work with numbers!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Numbers are one of the most common types of data you'll store in variables.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Like counting crops?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Let's create a variable to track our wheat. Type: wheat = 10",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "wheat = 10",
+          "description": "Type: wheat = 10"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Great! Now you have 10 wheat stored in a variable!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_addition",
+      "title": "Addition",
+      "description": "Learn to add numbers",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's say you harvested 5 more wheat. We can use addition (+) to calculate the total!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Type: total = wheat + 5",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "total = wheat + 5",
+          "description": "Type: total = wheat + 5"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "So total is now 15?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "You got it! 10 + 5 = 15!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_subtraction",
+      "title": "Subtraction",
+      "description": "Learn to subtract numbers",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's say you sold 3 wheat. Subtraction uses the minus sign (-).",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Type: remaining = total - 3",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "remaining = total - 3",
+          "description": "Type: remaining = total - 3"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! 15 - 3 = 12 wheat remaining!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_multiplication",
+      "title": "Multiplication and Division",
+      "description": "Learn about multiplication and division",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "You can also multiply (*) and divide (/). Let's calculate how much 4 wheat is worth if each costs 5 coins.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Type: value = 4 * 5",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "value = 4 * 5",
+          "description": "Type: value = 4 * 5"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "That's 20 coins! Multiplication is really useful for calculating totals.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "What about division?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Division uses the forward slash (/). Like: half = 20 / 2 would give you 10!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_execute",
+      "title": "Run Your Code",
+      "description": "Execute to see your calculations",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Add a print statement to see your value, then click play!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Type: print(value)",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(value)",
+          "description": "Type: print(value)"
+        },
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Excellent! You now know how to do math with variables!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "This will be super useful for managing the farm inventory!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Absolutely! Next, let's learn about storing text in variables!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "string_variables",
+      "description": "Unlock 'Naming Things' quest"
+    }
+  ]
+}

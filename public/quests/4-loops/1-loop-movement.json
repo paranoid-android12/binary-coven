@@ -1,0 +1,226 @@
+{
+  "id": "loop_movement",
+  "title": "Walk in Circles",
+  "description": "Learn how loops can repeat actions! Make your character move multiple times automatically.",
+  "difficulty": "beginner",
+  "category": "Loops",
+  "estimatedTime": 10,
+  "concepts": ["for_loops", "range_function", "repetition"],
+  "prerequisites": [],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "The Power of Repetition",
+      "description": "Learn why loops are amazing",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Welcome to loops! This is where programming gets REALLY powerful!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Loops? Like going in circles?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Kind of! Loops let us repeat actions without typing them over and over!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_the_problem",
+      "title": "The Long Way",
+      "description": "See why we need loops",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Imagine you want to print 'hello' 5 times. Without loops, you'd write:",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "print('hello')\nprint('hello')\nprint('hello')\nprint('hello')\nprint('hello')",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "That's so much typing! There must be a better way!",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "There is! With a loop, we can do it in just 2 lines!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_first_loop",
+      "title": "Your First For Loop",
+      "description": "Write a for loop",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "A 'for' loop repeats code a certain number of times. Watch this!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Type: for i in range(5):",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "for i in range(5):",
+          "description": "Type: for i in range(5):"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "'range(5)' creates numbers 0, 1, 2, 3, 4 - that's 5 numbers!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_loop_body",
+      "title": "Inside the Loop",
+      "description": "Add the repeated action",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now add the code to repeat. Remember the indent!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"hello\")",
+          "description": "Type: print(\"hello\") with indent"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "That's it! This will print 'hello' exactly 5 times!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_run_loop",
+      "title": "See the Magic",
+      "description": "Run your first loop",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play and watch the loop repeat!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your loop"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Wow! It printed 'hello' 5 times from just 2 lines!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "That's the power of loops! Now let's use the loop variable 'i'!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_counting",
+      "title": "Counting with Loops",
+      "description": "Use the loop variable",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "The variable 'i' changes each time the loop runs. Let's see it!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Clear your code and type:\nfor i in range(5):",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "for i in range(5):",
+          "description": "Type: for i in range(5):"
+        },
+        {
+          "type": "code_content",
+          "content": "print(i)",
+          "description": "Type: print(i) to see the numbers"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_7_run_counting",
+      "title": "See the Numbers",
+      "description": "Run the counting loop",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to see what 'i' becomes each time!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "It printed 0, 1, 2, 3, 4! The 'i' changes each time!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! range(5) gives us 5 numbers starting from 0. Great job!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "loop_actions",
+      "description": "Unlock 'Harvest in Bulk' quest"
+    }
+  ]
+}

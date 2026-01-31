@@ -1,0 +1,269 @@
+{
+  "id": "lists_challenge",
+  "title": "Lists Challenge",
+  "description": "Put all your list skills together! Build an inventory management system for the farm.",
+  "difficulty": "advanced",
+  "category": "Lists",
+  "estimatedTime": 15,
+  "concepts": ["lists_mastery", "inventory_system", "practical_application"],
+  "prerequisites": ["list_iteration"],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "Inventory System",
+      "description": "Build a complete inventory",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Final challenge! Let's build a complete farm inventory system!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "An inventory system? With all the list skills?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Yes! Creating, modifying, and processing lists all in one!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_create",
+      "title": "Create Inventory",
+      "description": "Set up the inventory lists",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's create two lists: items and their quantities!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "items = [\"wheat\", \"corn\", \"potato\"]",
+          "description": "Type: items = [\"wheat\", \"corn\", \"potato\"]"
+        },
+        {
+          "type": "code_content",
+          "content": "quantities = [10, 5, 8]",
+          "description": "Type: quantities = [10, 5, 8]"
+        },
+        {
+          "type": "code_content",
+          "content": "prices = [5, 8, 6]",
+          "description": "Type: prices = [5, 8, 6]"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Three parallel lists! Index 0 in each relates to wheat!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_add_item",
+      "title": "Add New Item",
+      "description": "Add a new crop to inventory",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's add carrots to our inventory!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "items.append(\"carrot\")",
+          "description": "Type: items.append(\"carrot\")"
+        },
+        {
+          "type": "code_content",
+          "content": "quantities.append(12)",
+          "description": "Type: quantities.append(12)"
+        },
+        {
+          "type": "code_content",
+          "content": "prices.append(7)",
+          "description": "Type: prices.append(7)"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Added carrot with 12 quantity at 7 gold price!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_display",
+      "title": "Display Inventory",
+      "description": "Print inventory header",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's display our inventory using a loop!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"=== FARM INVENTORY ===\")",
+          "description": "Type: print(\"=== FARM INVENTORY ===\")"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_loop_display",
+      "title": "Loop Through Items",
+      "description": "Display each item with index",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "We'll use range with len() to get indexes and access all three lists!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "for i in range(len(items)):",
+          "description": "Type: for i in range(len(items)):"
+        },
+        {
+          "type": "code_content",
+          "content": "print(items[i], \"-\", quantities[i], \"x\", prices[i], \"gold\")",
+          "description": "Type: print(items[i], \"-\", quantities[i], \"x\", prices[i], \"gold\")"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "len(items) gives us the list length! We loop with index 'i'.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_total_value",
+      "title": "Calculate Total Value",
+      "description": "Sum up all inventory value",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's calculate the total value of everything!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "total = 0",
+          "description": "Type: total = 0"
+        },
+        {
+          "type": "code_content",
+          "content": "for i in range(len(items)):",
+          "description": "Type: for i in range(len(items)):"
+        },
+        {
+          "type": "code_content",
+          "content": "total = total + (quantities[i] * prices[i])",
+          "description": "Type: total = total + (quantities[i] * prices[i])"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_7_final_report",
+      "title": "Print Total",
+      "description": "Show the final value",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Print the total value after the loop!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"====================\")",
+          "description": "Type: print(\"====================\")"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Total Value:\", total, \"gold\")",
+          "description": "Type: print(\"Total Value:\", total, \"gold\")"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_8_run",
+      "title": "Run Inventory System",
+      "description": "See the complete system",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to see your complete inventory system!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "AMAZING! It shows all items and calculates total value!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "CONGRATULATIONS! You've mastered ALL the core programming concepts!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Variables, conditionals, loops, functions, and lists! You're a true programmer now!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Thank you, Maru! I've learned so much!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "achievement",
+      "value": "curriculum_complete",
+      "description": "Completed the entire CS curriculum! You're a programming master!"
+    }
+  ]
+}

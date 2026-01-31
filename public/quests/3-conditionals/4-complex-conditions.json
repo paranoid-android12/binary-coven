@@ -1,0 +1,227 @@
+{
+  "id": "complex_conditions",
+  "title": "Complex Decisions",
+  "description": "Learn to combine conditions with and, or, and comparison operators.",
+  "difficulty": "intermediate",
+  "category": "Conditionals",
+  "estimatedTime": 12,
+  "concepts": ["and_or", "comparison_operators", "compound_conditions"],
+  "prerequisites": ["elif_chains"],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "Combining Conditions",
+      "description": "Learn about and, or operators",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Sometimes you need to check multiple things at once. Like: 'Do I have enough energy AND is the crop ready?'",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Both conditions need to be true?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! That's what 'and' does. There's also 'or' - where only ONE needs to be true.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_setup",
+      "title": "Setting Up",
+      "description": "Create variables to test",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's set up some variables. Type: energy = 20",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "energy = 20",
+          "description": "Type: energy = 20"
+        },
+        {
+          "type": "code_content",
+          "content": "crop_ready = True",
+          "description": "Type: crop_ready = True"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_and",
+      "title": "Using 'and'",
+      "description": "Both conditions must be true",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's check if we can harvest - we need energy > 10 AND crop_ready to be true.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Type: if energy > 10 and crop_ready:",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "if energy > 10 and crop_ready:",
+          "description": "Type: if energy > 10 and crop_ready:"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Let's harvest!\")",
+          "description": "Type: print(\"Let's harvest!\") (indented)"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "With 'and', BOTH conditions must be true for the code to run!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_or",
+      "title": "Using 'or'",
+      "description": "At least one condition must be true",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's add an else with a different check. First, add: else:",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "else:",
+          "description": "Type: else:"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Not ready yet\")",
+          "description": "Type: print(\"Not ready yet\") (indented)"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Good! Now let me explain 'or'. With 'or', only ONE condition needs to be true.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So 'and' = both must be true, 'or' = at least one must be true?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "You got it!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_comparison",
+      "title": "Comparison Operators",
+      "description": "Learn all comparison operators",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Here are all the comparison operators you can use:",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "== (equals), != (not equals), < (less than), > (greater than), <= (less or equal), >= (greater or equal)",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Let's add a check for low energy. Type: low_energy = energy < 5",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "low_energy = energy < 5",
+          "description": "Type: low_energy = energy < 5"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Since energy is 20, and 20 is NOT less than 5, low_energy is False!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_execute",
+      "title": "Run Your Code",
+      "description": "See complex conditions work",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Add a print for low_energy, then click play!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(low_energy)",
+          "description": "Type: print(low_energy)"
+        },
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "You should see 'Let's harvest!' (because both conditions are true) and 'False' (because energy is not low)!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "This is powerful! I can make really smart decisions now!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "One more quest to master conditionals!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "conditionals_challenge",
+      "description": "Unlock 'Conditionals Challenge' quest"
+    }
+  ]
+}

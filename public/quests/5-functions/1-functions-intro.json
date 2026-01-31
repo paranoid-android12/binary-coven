@@ -1,0 +1,291 @@
+{
+  "id": "functions_intro",
+  "title": "The Art of Functions",
+  "description": "Master the creation and use of custom functions to organize your code better.",
+  "difficulty": "intermediate",
+  "category": "Programming",
+  "estimatedTime": 20,
+  "concepts": ["functions", "def", "parameters", "return", "code-organization"],
+  "prerequisites": ["farming_loops"],
+  "icon": "quest_functions.png",
+  "thumbnail": "quest_functions_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "The Librarian's Challenge",
+      "description": "Meet the librarian and learn about functions",
+      "preDialogues": [
+        {
+          "name": "Librarian Ada",
+          "content": "Hello Qubit! I see you've mastered loops. Now it's time to learn about functions—the building blocks of organized code.",
+          "sprite": "librarian-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Functions? Aren't those just... math things?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Librarian Ada",
+          "content": "In programming, functions are reusable pieces of code! Instead of writing the same code over and over, you create a function once and call it whenever you need it. Let me show you!",
+          "sprite": "librarian-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_function_syntax",
+      "title": "Function Definition",
+      "description": "Learn how to define a function",
+      "preDialogues": [
+        {
+          "name": "Librarian Ada",
+          "content": "To create a function, you use the 'def' keyword. Try typing: def plant_wheat(): This defines a function named plant_wheat that we can use later.",
+          "sprite": "librarian-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So 'def' means define? And the parentheses... are those for parameters?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Librarian Ada",
+          "content": "Exactly! The parentheses hold parameters, but we'll leave them empty for now. First, just write the function definition.",
+          "sprite": "librarian-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "def plant_wheat():",
+          "description": "Type the function definition: def plant_wheat():"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Librarian Ada",
+          "content": "Perfect! Now we need to add what the function does—the function body.",
+          "sprite": "librarian-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_function_body",
+      "title": "Function Body",
+      "description": "Add code inside the function",
+      "preDialogues": [
+        {
+          "name": "Librarian Ada",
+          "content": "The function body is indented, just like in loops! Under your def line, add indented code: plant(\"wheat\"). This tells the function what to do when called.",
+          "sprite": "librarian-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "plant(\"wheat\")",
+          "description": "Add plant(\"wheat\") inside the function (indented)"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "So now I have a function that plants wheat. But... how do I actually use it?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Librarian Ada",
+          "content": "Great question! After defining a function, you 'call' it by typing its name with parentheses. Try typing: plant_wheat() on a new line outside the function.",
+          "sprite": "librarian-speaking.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_function_call",
+      "title": "Calling Functions",
+      "description": "Learn to call your custom function",
+      "preDialogues": [
+        {
+          "name": "Librarian Ada",
+          "content": "To use your function, type plant_wheat() on a new line that's NOT indented—it should be at the same level as the def line.",
+          "sprite": "librarian-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "plant_wheat()",
+          "description": "Call the function by typing: plant_wheat()"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "So I define it once with 'def', then I can call it as many times as I want?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Librarian Ada",
+          "content": "Precisely! Now click the play button to see your function in action.",
+          "sprite": "librarian-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_execute_function",
+      "title": "Execute Function Code",
+      "description": "Run your function",
+      "preDialogues": [],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click the play button to execute your function"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "It worked! The function ran and planted wheat!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Librarian Ada",
+          "content": "Excellent! Now you could call plant_wheat() multiple times, or even use it inside a loop. Functions make code reusable!",
+          "sprite": "librarian-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_function_parameters",
+      "title": "Function Parameters",
+      "description": "Learn to use parameters in functions",
+      "preDialogues": [
+        {
+          "name": "Librarian Ada",
+          "content": "Let's make it more flexible. What if you want to plant different crops? You can add parameters! Try: def plant_crop(crop_type): and then plant(crop_type) inside.",
+          "sprite": "librarian-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So crop_type is like a variable that gets filled in when I call the function?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Librarian Ada",
+          "content": "Exactly! Then you could call plant_crop(\"wheat\") or plant_crop(\"carrot\"). The parameter makes it reusable for any crop!",
+          "sprite": "librarian-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "def plant_crop(crop_type):",
+          "description": "Create a function with a parameter: def plant_crop(crop_type):"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Librarian Ada",
+          "content": "Good! Now add plant(crop_type) inside the function, and call it with plant_crop(\"wheat\").",
+          "sprite": "librarian-speaking.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_7_call_with_parameter",
+      "title": "Call Parameterized Function",
+      "description": "Call your function with a parameter",
+      "preDialogues": [
+        {
+          "name": "Librarian Ada",
+          "content": "Now call your new function with a parameter. Type: plant_crop(\"wheat\") outside the function definition.",
+          "sprite": "librarian-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "plant_crop(",
+          "description": "Call the function with a parameter: plant_crop(\"wheat\")"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "This is so much more flexible! I could use this function for any crop!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Librarian Ada",
+          "content": "Exactly! Now run it to see your parameterized function in action.",
+          "sprite": "librarian-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_8_execute_parameterized",
+      "title": "Execute Parameterized Function",
+      "description": "Run your function with parameters",
+      "preDialogues": [],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click the play button to execute your parameterized function"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Perfect! The function used the parameter I passed in!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_9_conclusion",
+      "title": "Function Master",
+      "description": "Complete the functions introduction quest",
+      "preDialogues": [
+        {
+          "name": "Librarian Ada",
+          "content": "Wonderful work, Qubit! You've learned to create functions, use parameters, and organize your code. Functions are the foundation of good programming—they make your code cleaner, reusable, and easier to understand.",
+          "sprite": "librarian-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "This is amazing! I can already think of so many ways to use functions for Grandpa's chores. Thanks for teaching me, Ada!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Librarian Ada",
+          "content": "You're very welcome! Remember: good functions do one thing well, have clear names, and make your code easier to read. Keep practicing!",
+          "sprite": "librarian-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "resource",
+      "value": 150,
+      "description": "Gained 150 energy"
+    },
+    {
+      "type": "function",
+      "value": "plant_crop",
+      "description": "Unlocked custom function: plant_crop()"
+    }
+  ]
+}

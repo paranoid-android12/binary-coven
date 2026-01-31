@@ -1,0 +1,203 @@
+{
+  "id": "string_variables",
+  "title": "Naming Things",
+  "description": "Learn to store and work with text (strings) in your programs.",
+  "difficulty": "beginner",
+  "category": "Variables",
+  "estimatedTime": 10,
+  "concepts": ["strings", "text", "quotes"],
+  "prerequisites": ["number_variables"],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "What Are Strings?",
+      "description": "Learn about text variables",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Variables can hold more than just numbers. They can also hold text!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "In programming, we call text a 'string'. It's like a string of characters tied together!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So I can store words?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! But strings need to be wrapped in quotes. Try typing: crop_type = \"wheat\"",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "crop_type = \"wheat\"",
+          "description": "Type: crop_type = \"wheat\""
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! You created a string variable that stores the word 'wheat'!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_quotes",
+      "title": "Quotes Matter",
+      "description": "Learn about single and double quotes",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "You can use double quotes (\") or single quotes ('). Both work the same!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Let's create another string. Type: farmer_name = 'Qubit'",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "farmer_name = 'Qubit'",
+          "description": "Type: farmer_name = 'Qubit'"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "So I used single quotes this time. Both work?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Yes! Just make sure you start and end with the same type of quote!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_concatenation",
+      "title": "Combining Strings",
+      "description": "Learn to join strings together",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Here's something cool - you can join strings together using the + sign!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "This is called 'concatenation'. Try typing: message = \"Growing \" + crop_type",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "message = \"Growing \" + crop_type",
+          "description": "Type: message = \"Growing \" + crop_type"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now 'message' contains \"Growing wheat\"! The two strings are joined together!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "I noticed you added a space after 'Growing'. Is that important?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Good catch! Without the space, it would be \"Growingwheat\" - no space between!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_print_strings",
+      "title": "Printing Strings",
+      "description": "Display your strings",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's print our message to see it! Type: print(message)",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(message)",
+          "description": "Type: print(message)"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Great! When you run this, you'll see \"Growing wheat\" in the output!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_execute",
+      "title": "Run Your Code",
+      "description": "Execute to see your strings",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click the play button to see your strings in action!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Excellent! You now know how to work with text in your programs!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "I can store crop names, messages, anything that's text!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Next, let's learn about a special type of variable - booleans!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "boolean_variables",
+      "description": "Unlock 'True or False' quest"
+    }
+  ]
+}

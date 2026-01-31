@@ -1,0 +1,234 @@
+{
+  "id": "variables_challenge",
+  "title": "Variables Challenge",
+  "description": "Put your variable knowledge to the test! Create a complete farm inventory system.",
+  "difficulty": "beginner",
+  "category": "Variables",
+  "estimatedTime": 15,
+  "concepts": ["variables_mastery", "all_types", "practical_application"],
+  "prerequisites": ["boolean_variables"],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "The Challenge",
+      "description": "Time to prove your skills!",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Alright Qubit, time for a challenge! Let's build a simple farm inventory system using everything you've learned!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Bring it on!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "You'll need to track: wheat count (number), crop name (string), and if you're ready to sell (boolean).",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_number",
+      "title": "Track the Count",
+      "description": "Create a number variable for wheat count",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "First, let's track how much wheat we have. Type: wheat_count = 25",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "wheat_count = 25",
+          "description": "Type: wheat_count = 25"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "We have 25 wheat in stock!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_string",
+      "title": "Name the Crop",
+      "description": "Create a string variable for the crop name",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's store the crop name. Type: crop_name = \"Golden Wheat\"",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "crop_name = \"Golden Wheat\"",
+          "description": "Type: crop_name = \"Golden Wheat\""
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Golden Wheat! Fancy name!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_boolean",
+      "title": "Ready to Sell?",
+      "description": "Create a boolean to check if ready",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's determine if we have enough to sell. We need at least 20 wheat.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Type: ready_to_sell = wheat_count >= 20",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "ready_to_sell = wheat_count >= 20",
+          "description": "Type: ready_to_sell = wheat_count >= 20"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "The >= means 'greater than or equal to'. Since 25 >= 20, ready_to_sell is True!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_combine",
+      "title": "Create Status Message",
+      "description": "Combine variables into a message",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's create a status message! We'll combine the crop name with the count.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Type: status = crop_name + \" inventory: \" + str(wheat_count)",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "str() converts the number to text so we can combine them!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "status = crop_name + \" inventory: \" + str(wheat_count)",
+          "description": "Type: status = crop_name + \" inventory: \" + str(wheat_count)"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "The status now says 'Golden Wheat inventory: 25'!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_print_all",
+      "title": "Display Everything",
+      "description": "Print all your variables",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's print everything! Type: print(status)",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(status)",
+          "description": "Type: print(status)"
+        },
+        {
+          "type": "code_content",
+          "content": "print(ready_to_sell)",
+          "description": "Type: print(ready_to_sell)"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_7_execute",
+      "title": "Run Your Inventory System",
+      "description": "Execute your complete inventory system",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to run your complete inventory system!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "AMAZING! You've completed the Variables Challenge!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "I can track numbers, text, and true/false values now!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "You've mastered the foundation of programming! Variables will be used in everything we do from now on!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Ready to learn how to make decisions in your code? Let's explore conditionals!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "conditionals_intro",
+      "description": "Unlock 'The Crossroads' quest (Conditionals)"
+    }
+  ]
+}

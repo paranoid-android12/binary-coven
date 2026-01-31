@@ -1,0 +1,274 @@
+{
+  "id": "loops_challenge",
+  "title": "Loops Challenge",
+  "description": "Master loops by creating a farming automation system with both for and while loops!",
+  "difficulty": "intermediate",
+  "category": "Loops",
+  "estimatedTime": 15,
+  "concepts": ["loop_mastery", "for_and_while", "loop_applications"],
+  "prerequisites": ["while_loops"],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "The Ultimate Farm",
+      "description": "Build a smart farming system",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Time for the loops challenge! Let's build a complete farm automation!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "What kind of automation?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "We'll plant crops in rows, then harvest until we're tired!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_setup",
+      "title": "Set Up Variables",
+      "description": "Create the farm state",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "First, let's set up our farm. We'll have rows and energy.",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "rows = 3",
+          "description": "Type: rows = 3"
+        },
+        {
+          "type": "code_content",
+          "content": "crops_per_row = 4",
+          "description": "Type: crops_per_row = 4"
+        },
+        {
+          "type": "code_content",
+          "content": "energy = 10",
+          "description": "Type: energy = 10"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "We have 3 rows, 4 crops per row, and 10 energy to work with!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_planting",
+      "title": "Plant the Rows",
+      "description": "Use for loop to plant",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's use a for loop to plant crops in each row!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"--- PLANTING ---\")",
+          "description": "Type: print(\"--- PLANTING ---\")"
+        },
+        {
+          "type": "code_content",
+          "content": "for row in range(1, rows + 1):",
+          "description": "Type: for row in range(1, rows + 1):"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Planted\", crops_per_row, \"crops in row\", row)",
+          "description": "Type: print(\"Planted\", crops_per_row, \"crops in row\", row)"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Notice we used 'rows + 1' to go from 1 to 3!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_calculate",
+      "title": "Calculate Total",
+      "description": "Calculate total crops",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's calculate total crops. This goes AFTER the loop (no indent)!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "total_crops = rows * crops_per_row",
+          "description": "Type: total_crops = rows * crops_per_row"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Total crops:\", total_crops)",
+          "description": "Type: print(\"Total crops:\", total_crops)"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_harvesting",
+      "title": "Harvest Loop",
+      "description": "Use while to harvest",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's harvest! We'll use a while loop to work until energy is low.",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"--- HARVESTING ---\")",
+          "description": "Type: print(\"--- HARVESTING ---\")"
+        },
+        {
+          "type": "code_content",
+          "content": "harvested = 0",
+          "description": "Type: harvested = 0"
+        },
+        {
+          "type": "code_content",
+          "content": "while energy > 2:",
+          "description": "Type: while energy > 2:"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "We harvest while energy is above 2 - saving some energy!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_harvest_body",
+      "title": "Harvesting Actions",
+      "description": "Add while loop body",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Inside the while loop, harvest and update counters.",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "harvested = harvested + 1",
+          "description": "Type: harvested = harvested + 1"
+        },
+        {
+          "type": "code_content",
+          "content": "energy = energy - 1",
+          "description": "Type: energy = energy - 1"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Harvested crop\", harvested, \"- Energy:\", energy)",
+          "description": "Type: print(\"Harvested crop\", harvested, \"- Energy:\", energy)"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_7_summary",
+      "title": "Final Summary",
+      "description": "Add the summary output",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "After the while loop, let's print a summary (no indent)!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"--- DONE ---\")",
+          "description": "Type: print(\"--- DONE ---\")"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Harvested\", harvested, \"of\", total_crops, \"crops\")",
+          "description": "Type: print(\"Harvested\", harvested, \"of\", total_crops, \"crops\")"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_8_run",
+      "title": "Run Farm Automation",
+      "description": "Execute the complete system",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to run your complete farm automation!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "WOW! It planted 12 crops and harvested 8 before getting tired!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "AMAZING! You've mastered both for loops AND while loops!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Next up: Functions - making your code even more powerful and reusable!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "helper_functions",
+      "description": "Unlock 'Helper Functions' quest (Functions Track)"
+    }
+  ]
+}

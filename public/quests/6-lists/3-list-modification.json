@@ -1,0 +1,231 @@
+{
+  "id": "list_modification",
+  "title": "Modifying Lists",
+  "description": "Learn how to add, remove, and change items in lists! Lists are dynamic and flexible.",
+  "difficulty": "intermediate",
+  "category": "Lists",
+  "estimatedTime": 12,
+  "concepts": ["append", "remove", "modifying_items"],
+  "prerequisites": ["list_indexing"],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "Changing Lists",
+      "description": "Learn to modify lists",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Lists aren't fixed - you can add, remove, and change items!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So my inventory can grow and shrink?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Let's learn how to modify lists!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_setup",
+      "title": "Create Inventory",
+      "description": "Set up a list",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's create an inventory list!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "inventory = [\"wheat\", \"corn\"]",
+          "description": "Type: inventory = [\"wheat\", \"corn\"]"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Start:\", inventory)",
+          "description": "Type: print(\"Start:\", inventory)"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_append",
+      "title": "Add Items",
+      "description": "Use append to add",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "To add an item, use .append()! It adds to the END of the list.",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "inventory.append(\"potato\")",
+          "description": "Type: inventory.append(\"potato\")"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"After append:\", inventory)",
+          "description": "Type: print(\"After append:\", inventory)"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_run_append",
+      "title": "See the Addition",
+      "description": "Run append",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to see the potato added!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "It added 'potato' to the end! Now we have 3 items!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_remove",
+      "title": "Remove Items",
+      "description": "Use remove to delete",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "To remove an item, use .remove() with the value to remove!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "inventory.remove(\"corn\")",
+          "description": "Type: inventory.remove(\"corn\")"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"After remove:\", inventory)",
+          "description": "Type: print(\"After remove:\", inventory)"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_run_remove",
+      "title": "See the Removal",
+      "description": "Run remove",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to see corn removed!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Corn is gone! Now it's just wheat and potato!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_7_change",
+      "title": "Change Items",
+      "description": "Modify existing items",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "To change an item, use its index and assign a new value!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "inventory[0] = \"carrot\"",
+          "description": "Type: inventory[0] = \"carrot\""
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"After change:\", inventory)",
+          "description": "Type: print(\"After change:\", inventory)"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_8_run_change",
+      "title": "See the Change",
+      "description": "Run the modification",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to see wheat become carrot!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Wheat changed to carrot! I can modify any item!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect! append, remove, and index assignment - you've got it!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "list_iteration",
+      "description": "Unlock 'Looping Through Lists' quest"
+    }
+  ]
+}

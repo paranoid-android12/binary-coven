@@ -1,0 +1,233 @@
+{
+  "id": "return_values",
+  "title": "Return Values",
+  "description": "Functions can give back results! Learn to use return to get values from functions.",
+  "difficulty": "intermediate",
+  "category": "Functions",
+  "estimatedTime": 12,
+  "concepts": ["return_statement", "function_output", "using_results"],
+  "prerequisites": ["function_parameters"],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "Getting Results Back",
+      "description": "Learn about return values",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Functions can do more than just print! They can GIVE BACK results!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Give back? Like returning something?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! We use 'return' to send a value back from a function!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_add_function",
+      "title": "An Adding Function",
+      "description": "Create a function that returns",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's make a function that adds two numbers and returns the result!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "def add(a, b):",
+          "description": "Type: def add(a, b):"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Two parameters: 'a' and 'b' - the numbers to add!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_return",
+      "title": "The Return Statement",
+      "description": "Add the return statement",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now use 'return' to send back the sum!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "return a + b",
+          "description": "Type: return a + b (with indent)"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "'return a + b' calculates the sum and sends it back to whoever called!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_use_return",
+      "title": "Capture the Result",
+      "description": "Store the returned value",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "When you call the function, you can save the result in a variable!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "result = add(5, 3)",
+          "description": "Type: result = add(5, 3)"
+        },
+        {
+          "type": "code_content",
+          "content": "print(result)",
+          "description": "Type: print(result)"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_run_return",
+      "title": "See the Result",
+      "description": "Run and see the return",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to see 5 + 3!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "It printed 8! The function calculated and returned the answer!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_farm_function",
+      "title": "Farm Calculator",
+      "description": "Create a practical function",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's make a function to calculate crop value!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "def crop_value(amount, price):",
+          "description": "Type: def crop_value(amount, price):"
+        },
+        {
+          "type": "code_content",
+          "content": "return amount * price",
+          "description": "Type: return amount * price"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_7_use_farm",
+      "title": "Calculate Value",
+      "description": "Use the crop value function",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's calculate how much our wheat is worth!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "wheat_total = crop_value(10, 5)",
+          "description": "Type: wheat_total = crop_value(10, 5)"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Wheat value:\", wheat_total)",
+          "description": "Type: print(\"Wheat value:\", wheat_total)"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_8_run_farm",
+      "title": "Final Calculation",
+      "description": "Run the farm calculator",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to calculate your crop value!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "10 wheat at 5 gold each = 50 gold! Functions are so useful!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Return values let functions give you results to use! Amazing progress!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "functions_challenge",
+      "description": "Unlock 'Functions Challenge' quest"
+    }
+  ]
+}

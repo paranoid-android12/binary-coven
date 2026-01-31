@@ -1,0 +1,191 @@
+{
+  "id": "variables_intro",
+  "title": "The Memory Stone",
+  "description": "Learn how to store and use data with variables - the foundation of all programming.",
+  "difficulty": "beginner",
+  "category": "Variables",
+  "estimatedTime": 10,
+  "concepts": ["variables", "assignment", "storing_values"],
+  "prerequisites": [],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "What Are Variables?",
+      "description": "Learn what variables are and why they're important",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Hey Qubit! Today I'm going to teach you something really important - variables!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Variables? What's that?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Think of a variable like a labeled box where you can store things. You give it a name, and put a value inside it!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "For example, if you want to remember how many crops you've harvested, you can store that number in a variable.",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_create_variable",
+      "title": "Creating Your First Variable",
+      "description": "Learn how to create a variable",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "To create a variable, you use the equals sign (=). Try typing: crop_count = 0",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "This creates a variable named 'crop_count' and stores the number 0 in it.",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "crop_count = 0",
+          "description": "Type: crop_count = 0"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! You just created your first variable! The name is 'crop_count' and it holds the value 0.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_update_variable",
+      "title": "Updating a Variable",
+      "description": "Learn how to change a variable's value",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now here's the cool part - you can change what's inside a variable!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Try typing: crop_count = crop_count + 1",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "This takes the current value (0), adds 1 to it, and stores the result (1) back in crop_count.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "crop_count = crop_count + 1",
+          "description": "Type: crop_count = crop_count + 1"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "So now crop_count is 1 instead of 0?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! You've updated the variable!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_use_variable",
+      "title": "Using Variables",
+      "description": "Learn how to use variables in your code",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "You can use variables anywhere you'd use a value. Let's print our crop count!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Type: print(crop_count)",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(crop_count)",
+          "description": "Type: print(crop_count)"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Great! When you run this, it will show the value stored in crop_count!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_execute",
+      "title": "Run Your Code",
+      "description": "Execute your code to see variables in action",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now click the play button to run your code and see your variable in action!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click the play button to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Awesome! You've learned how to create, update, and use variables!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "This is actually pretty useful. I can keep track of things now!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Variables are the memory of your program. Let's learn more about different types of variables!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "number_variables",
+      "description": "Unlock 'Counting Crops' quest"
+    }
+  ]
+}

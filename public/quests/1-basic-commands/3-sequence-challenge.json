@@ -1,0 +1,215 @@
+{
+  "id": "sequence_challenge",
+  "title": "Sequence Challenge",
+  "description": "Master basic commands by planning and executing a complete farming sequence!",
+  "difficulty": "beginner",
+  "category": "Basic Commands",
+  "estimatedTime": 10,
+  "concepts": ["sequencing", "command_order", "planning"],
+  "prerequisites": ["farming_scripts"],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "The Master Plan",
+      "description": "Plan a complete farming sequence",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Time to prove your basic command mastery! Let's plan a full farming day!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "A whole day of farming? What do I need to do?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "We'll wake up, check the farm, water crops, harvest, and rest!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_morning",
+      "title": "Start the Day",
+      "description": "Morning routine",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Every good day starts with a greeting! Print your morning message!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"Good morning, farm!\")",
+          "description": "Type: print(\"Good morning, farm!\")"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Time to start work!\")",
+          "description": "Type: print(\"Time to start work!\")"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_check",
+      "title": "Check the Farm",
+      "description": "Inspect the crops",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now check on your crops!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"Checking crops...\")",
+          "description": "Type: print(\"Checking crops...\")"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Wheat: Growing well!\")",
+          "description": "Type: print(\"Wheat: Growing well!\")"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Corn: Ready to harvest!\")",
+          "description": "Type: print(\"Corn: Ready to harvest!\")"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_water",
+      "title": "Water the Crops",
+      "description": "Keep crops healthy",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "The wheat needs water! Add watering commands!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"Watering wheat...\")",
+          "description": "Type: print(\"Watering wheat...\")"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Splash! Splash!\")",
+          "description": "Type: print(\"Splash! Splash!\")"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_harvest",
+      "title": "Harvest Time",
+      "description": "Collect ready crops",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "The corn is ready! Harvest it!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"Harvesting corn...\")",
+          "description": "Type: print(\"Harvesting corn...\")"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Got 5 corn!\")",
+          "description": "Type: print(\"Got 5 corn!\")"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_rest",
+      "title": "End the Day",
+      "description": "Time to rest",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "A good farmer knows when to rest! End your day!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "print(\"What a productive day!\")",
+          "description": "Type: print(\"What a productive day!\")"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Time to rest. Good night!\")",
+          "description": "Type: print(\"Time to rest. Good night!\")"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_7_run",
+      "title": "Run Your Day",
+      "description": "Execute the full sequence",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play to run your entire farming day!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "I did a whole day of farming with just print commands!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "PERFECT! You've mastered basic commands and sequencing!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "The ORDER of commands matters - that's sequencing! Ready for variables?",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "variables_intro",
+      "description": "Unlock 'Variable Introduction' quest (Variables Track)"
+    }
+  ]
+}

@@ -1,0 +1,222 @@
+{
+  "id": "elif_chains",
+  "title": "Multiple Paths",
+  "description": "Learn to check multiple conditions with elif chains.",
+  "difficulty": "beginner",
+  "category": "Conditionals",
+  "estimatedTime": 12,
+  "concepts": ["elif", "multiple_conditions", "chains"],
+  "prerequisites": ["if_else"],
+  "phases": [
+    {
+      "id": "phase_1_intro",
+      "title": "More Than Two Options",
+      "description": "Learn about elif",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "What if you have more than two options? Like choosing what to plant based on the season?",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So... spring, summer, fall, winter - that's 4 options!",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! That's where 'elif' comes in - it means 'else if'. You can chain multiple conditions!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_setup",
+      "title": "Setting Up",
+      "description": "Create a season variable",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's decide what crop to plant based on the season. Type: season = \"summer\"",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "season = \"summer\"",
+          "description": "Type: season = \"summer\""
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_first_if",
+      "title": "First Condition",
+      "description": "Check for spring",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's start with spring. Type: if season == \"spring\":",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Notice the == for comparison! One = is for assignment, == is for checking equality.",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "if season == \"spring\":",
+          "description": "Type: if season == \"spring\":"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Plant flowers!\")",
+          "description": "Type: print(\"Plant flowers!\") (indented)"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_elif",
+      "title": "Add Elif",
+      "description": "Check for summer",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now add elif for summer. Type: elif season == \"summer\":",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "elif season == \"summer\":",
+          "description": "Type: elif season == \"summer\":"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Plant wheat!\")",
+          "description": "Type: print(\"Plant wheat!\") (indented)"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Great! Python checks this only if the first condition was false.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_more_elif",
+      "title": "Add More Elif",
+      "description": "Check for fall",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's add fall too! Type: elif season == \"fall\":",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "elif season == \"fall\":",
+          "description": "Type: elif season == \"fall\":"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Plant pumpkins!\")",
+          "description": "Type: print(\"Plant pumpkins!\") (indented)"
+        }
+      ],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_6_else",
+      "title": "Default Option",
+      "description": "Add else for winter",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Finally, add else for anything else (like winter). Type: else:",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "content": "else:",
+          "description": "Type: else:"
+        },
+        {
+          "type": "code_content",
+          "content": "print(\"Rest for winter!\")",
+          "description": "Type: print(\"Rest for winter!\") (indented)"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! Now you have all 4 seasons covered!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_7_execute",
+      "title": "Run Your Code",
+      "description": "See the chain in action",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Click play! Since season is 'summer', you should see 'Plant wheat!'",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Click play to run your code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "It works! Your code checked spring (no match), then summer (match!) and stopped there.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So it only runs ONE of the branches?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Once a condition is true, the others are skipped. Very efficient!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "complex_conditions",
+      "description": "Unlock 'Complex Decisions' quest"
+    }
+  ]
+}
