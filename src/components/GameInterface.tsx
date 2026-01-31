@@ -17,6 +17,7 @@ import DialogueManager from '../game/systems/DialogueManager';
 import { useUser, isStudentUser } from '../contexts/UserContext';
 import LoginModal from './LoginModal';
 import ToastContainer from './ToastContainer';
+import { StudentProgressModal } from './StudentProgressModal';
 
 // Custom hook for draggable functionality
 const useDraggable = (initialPosition: { x: number; y: number }) => {
@@ -193,6 +194,11 @@ export const GameInterface: React.FC = () => {
   });
   const gameMenuModalRef = useRef<HTMLDivElement>(null);
 
+  // Progress modal state
+  const [progressModalState, setProgressModalState] = useState({
+    isOpen: false
+  });
+
   // Drone state
   const [activeDroneId, setActiveDroneId] = useState<string | undefined>(undefined);
   const [droneExecutionStates, setDroneExecutionStates] = useState<Map<string, boolean>>(new Map());
@@ -259,6 +265,7 @@ export const GameInterface: React.FC = () => {
   const glossaryButtonPosition = { x: 220, y: 40 };
   const quickProgramButtonPosition = { x: 320, y: 40 };
   const questButtonPosition = { x: 270, y: 40 }; // Centered between glossary and programming terminal
+  const progressButtonPosition = { x: 170, y: 40 }; // Left of glossary button
 
   // Plant/Harvest button positions (lower-right corner)
   const plantButtonPosition = { x: window.innerWidth - 220, y: window.innerHeight - 140 };
@@ -1242,6 +1249,22 @@ export const GameInterface: React.FC = () => {
             }}
           />
 
+          {/* Progress Button */}
+          <SpriteButton
+            position={progressButtonPosition}
+            backgroundSprite="button.png"
+            upFrame={{ x: 336, y: 496, w: 16, h: 16 }}
+            downFrame={{ x: 336, y: 512, w: 16, h: 16 }}
+            scale={3}
+            tooltip="My Progress"
+            onClick={() => {
+              if (!shouldBlockModalInteractions()) {
+                setProgressModalState({ isOpen: true });
+                openModal('progress');
+              }
+            }}
+          />
+
           {/* Plant Button (lower-right corner) */}
           <SpriteButton
             position={plantButtonPosition}
@@ -2170,6 +2193,15 @@ export const GameInterface: React.FC = () => {
           }}
         />
       )}
+
+      {/* Student Progress Modal */}
+      <StudentProgressModal
+        isOpen={progressModalState.isOpen}
+        onClose={() => {
+          setProgressModalState({ isOpen: false });
+          closeModal('progress');
+        }}
+      />
 
       {/* Educational Error Display */}
       <ErrorDisplay />
