@@ -10,10 +10,21 @@ interface StudentProgressModalProps {
 }
 
 interface ClassStats {
+  studentId?: string;
   studentName: string;
+  fullName?: string;
   questsCompleted: number;
   totalTime: number;
   rank: number;
+  isCurrentUser?: boolean;
+}
+
+interface SessionInfo {
+  code: string;
+  createdAt: string;
+  validityEnd: string;
+  createdByAdmin: string | null;
+  studentCount: number;
 }
 
 interface QuestExecutionStats {
@@ -54,6 +65,33 @@ interface ProgressSummary {
   totalAttempts: number;
 }
 
+// Student detailed stats from API
+interface StudentDetailedStats {
+  student: {
+    id: string;
+    displayName: string;
+    joinedAt: string;
+  };
+  summary: {
+    completedQuests: number;
+    totalQuests: number;
+    totalTimeSpent: number;
+    totalAttempts: number;
+    avgTimePerQuest: number;
+  };
+  questProgress: Array<{
+    questId: string;
+    questTitle: string;
+    state: string;
+    currentPhaseIndex: number;
+    startedAt: string | null;
+    completedAt: string | null;
+    timeSpentSeconds: number;
+    attempts: number;
+    score: number | null;
+  }>;
+}
+
 type TabType = 'progress' | 'insights' | 'class';
 
 export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOpen, onClose }) => {
@@ -67,6 +105,10 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
   const [refreshTrigger, setRefreshTrigger] = useState(0); // Force re-render on quest completion
   const [classStatsError, setClassStatsError] = useState<string | null>(null); // Error message for class stats
   const [hasLoadedSave, setHasLoadedSave] = useState(false); // Track if user has loaded their save
+  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null); // Selected student for detailed view
+  const [selectedStudentStats, setSelectedStudentStats] = useState<StudentDetailedStats | null>(null); // Selected student's detailed stats
+  const [studentStatsLoading, setStudentStatsLoading] = useState(false); // Loading state for student stats
+  const [sessionInfo, setSessionInfo] = useState<SessionInfo | null>(null); // Session info for header
   
   // LocalStorage-sourced progress data (real-time updates)
   const [localQuestProgress, setLocalQuestProgress] = useState<DatabaseQuestProgress[]>([]);
@@ -188,7 +230,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
       if (masteredTopics.has(topic)) {
         const description = topicDescriptions[topic] || '';
         insights.push({
-          message: `✓ ${topic}: ${description}`,
+          message: `${topic}: ${description}`,
           type: 'success'
         });
       }
@@ -208,12 +250,12 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
     if (unlearnedTopics.length > 0 && compQuests.length > 0) {
       const nextTopic = unlearnedTopics[0];
       insights.push({
-        message: `📚 Next: Continue learning to discover ${nextTopic}!`,
+        message: `Next: Continue learning to discover ${nextTopic}!`,
         type: 'next'
       });
     } else if (compQuests.length === 0) {
       insights.push({
-        message: `📚 Start your coding journey! Complete quests to learn programming fundamentals.`,
+        message: `Start your coding journey! Complete quests to learn programming fundamentals.`,
         type: 'next'
       });
     }
@@ -221,7 +263,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
     // If fully complete
     if (compQuests.length > 0 && compQuests.length >= avQuests.length && avQuests.length > 0) {
       insights.push({
-        message: `🎉 Amazing! You've mastered all available programming concepts!`,
+        message: `Amazing! You've mastered all available programming concepts!`,
         type: 'success'
       });
     }
@@ -229,31 +271,53 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
     return insights;
   };
 
-  // Fetch class statistics
+  // Fetch class statistics - always show full names
   const fetchClassStats = async (completedCount: number) => {
     setLoading(true);
     setClassStatsError(null);
     
     try {
-      const response = await fetch('/api/analytics/class-stats');
+      const response = await fetch('/api/analytics/class-stats?showFullNames=true');
       const data = await response.json();
       
       if (response.ok && data.success) {
-        // If no students returned, show only "You"
+        // Store session info if available
+        if (data.sessionInfo) {
+          setSessionInfo(data.sessionInfo);
+        }
+        
         const students = data.students || [];
+        const currentStudentId = data.currentStudentId;
         
-        // Filter out any existing "You" entry to prevent duplicates
-        const filteredStudents = students.filter((s: ClassStats) => s.studentName !== 'You');
+        // Mark current user's entry as "You" instead of adding a duplicate
+        const allStudents = students.map((student: ClassStats) => {
+          if (currentStudentId && student.studentId === currentStudentId) {
+            return {
+              ...student,
+              studentName: 'You',
+              isCurrentUser: true
+            };
+          }
+          return student;
+        });
         
-        // Add "You" with current progress
-        const allStudents = [
-          ...filteredStudents,
-          { studentName: 'You', questsCompleted: completedCount, totalTime: 1440, rank: 0 }
-        ];
+        // If current user not found in list (no data yet), add them
+        const hasCurrentUser = allStudents.some((s: ClassStats & { isCurrentUser?: boolean }) => s.isCurrentUser);
+        if (!hasCurrentUser && currentStudentId) {
+          allStudents.push({ 
+            studentId: currentStudentId,
+            studentName: 'You', 
+            fullName: 'You', 
+            questsCompleted: completedCount, 
+            totalTime: 0, 
+            rank: 0,
+            isCurrentUser: true
+          });
+        }
         
         // Re-sort by quests completed (descending) and assign ranks
-        allStudents.sort((a, b) => b.questsCompleted - a.questsCompleted);
-        allStudents.forEach((student, index) => {
+        allStudents.sort((a: ClassStats, b: ClassStats) => b.questsCompleted - a.questsCompleted);
+        allStudents.forEach((student: ClassStats, index: number) => {
           student.rank = index + 1;
         });
         
@@ -271,6 +335,26 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
     }
     
     setLoading(false);
+  };
+
+  // Fetch detailed stats for a specific student
+  const fetchStudentStats = async (studentId: string) => {
+    setStudentStatsLoading(true);
+    try {
+      const response = await fetch(`/api/analytics/student-stats/${studentId}`);
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        setSelectedStudentStats(data);
+      } else {
+        console.error('Failed to fetch student stats:', data.message);
+        setSelectedStudentStats(null);
+      }
+    } catch (error) {
+      console.error('Error fetching student stats:', error);
+      setSelectedStudentStats(null);
+    }
+    setStudentStatsLoading(false);
   };
 
   // Fetch quest execution statistics - only if save has been loaded
@@ -1498,6 +1582,47 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
             {/* Class Statistics Tab */}
             {activeTab === 'class' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {/* Session Info Header */}
+                {sessionInfo && (
+                  <div style={{
+                    backgroundColor: '#252526',
+                    borderRadius: '8px',
+                    border: '1px solid #3c3c3c',
+                    padding: '16px 20px',
+                  }}>
+                    <div style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                      gap: '16px',
+                    }}>
+                      <div style={{ display: 'flex', gap: '32px', flexWrap: 'wrap' }}>
+                        <div>
+                          <span style={{ color: '#888888', fontSize: '13px', fontFamily: 'BoldPixels, monospace' }}>SESSION CODE</span>
+                          <div style={{ color: '#00c9ff', fontSize: '18px', fontFamily: 'BoldPixels, monospace', fontWeight: 'bold' }}>{sessionInfo.code}</div>
+                        </div>
+                        {sessionInfo.createdByAdmin && (
+                          <div>
+                            <span style={{ color: '#888888', fontSize: '13px', fontFamily: 'BoldPixels, monospace' }}>CREATED BY</span>
+                            <div style={{ color: '#cccccc', fontSize: '18px', fontFamily: 'BoldPixels, monospace' }}>{sessionInfo.createdByAdmin}</div>
+                          </div>
+                        )}
+                        <div>
+                          <span style={{ color: '#888888', fontSize: '13px', fontFamily: 'BoldPixels, monospace' }}>STUDENTS</span>
+                          <div style={{ color: '#cccccc', fontSize: '18px', fontFamily: 'BoldPixels, monospace' }}>{classStats.length}</div>
+                        </div>
+                        <div>
+                          <span style={{ color: '#888888', fontSize: '13px', fontFamily: 'BoldPixels, monospace' }}>EXPIRES</span>
+                          <div style={{ color: '#cccccc', fontSize: '16px', fontFamily: 'BoldPixels, monospace' }}>
+                            {new Date(sessionInfo.validityEnd).toLocaleDateString()} {new Date(sessionInfo.validityEnd).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
                 {/* Refresh Button - Only show when there's an error */}
                 {classStatsError && !loading && (
                   <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -1580,7 +1705,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                   <>
                     {/* Your Percentile Card */}
                     {(() => {
-                      const yourRank = classStats.find(s => s.studentName === 'You')?.rank || classStats.length;
+                      const yourRank = classStats.find(s => s.isCurrentUser)?.rank || classStats.length;
                       const totalStudents = classStats.length;
                       // Calculate what percentage of students you're ahead of
                       // Rank 1 of 9 = beat 8/9 = 89% → Top 11%
@@ -1686,50 +1811,135 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                         }}>Time</span>
                       </div>
                       {/* Table Rows */}
-                      {classStats.map((student, index) => (
-                        <div 
-                          key={index}
-                          style={{
-                            display: 'grid',
-                            gridTemplateColumns: '80px 1fr 100px 100px',
-                            gap: '16px',
-                            padding: '12px 16px',
-                            borderBottom: index < classStats.length - 1 ? '1px solid #3c3c3c' : 'none',
-                            backgroundColor: student.studentName === 'You' ? 'rgba(0, 122, 204, 0.2)' : 'transparent',
-                          }}
-                        >
-                          <span style={{ 
-                            fontWeight: 'bold', 
-                            color: student.rank === 1 ? '#f5a623' : student.rank === 2 ? '#c0c0c0' : student.rank === 3 ? '#cd7f32' : 'white',
-                            fontFamily: 'BoldPixels, monospace',
-                            fontSize: '16px',
-                          }}>
-                            #{student.rank}
-                          </span>
-                          <span style={{
-                            color: student.studentName === 'You' ? '#007acc' : 'white',
-                            fontWeight: student.studentName === 'You' ? 'bold' : 'normal',
-                            fontFamily: 'BoldPixels, monospace',
-                            fontSize: '16px',
-                          }}>
-                            {student.studentName}
-                          </span>
-                          <span style={{ 
-                            color: '#cccccc',
-                            fontFamily: 'BoldPixels, monospace',
-                            fontSize: '16px',
-                          }}>
-                            {student.questsCompleted}
-                          </span>
-                          <span style={{ 
-                            color: '#cccccc',
-                            fontFamily: 'BoldPixels, monospace',
-                            fontSize: '16px',
-                          }}>
-                            {formatTime(student.totalTime)}
-                          </span>
-                        </div>
-                      ))}
+                      {classStats.map((student, index) => {
+                        const isYou = student.isCurrentUser === true;
+                        const isClickable = !isYou && student.studentId;
+                        const isExpanded = selectedStudentId === student.studentId;
+                        
+                        return (
+                          <React.Fragment key={index}>
+                            <div 
+                              onClick={() => {
+                                if (isClickable && student.studentId) {
+                                  if (isExpanded) {
+                                    setSelectedStudentId(null);
+                                    setSelectedStudentStats(null);
+                                  } else {
+                                    setSelectedStudentId(student.studentId);
+                                    fetchStudentStats(student.studentId);
+                                  }
+                                }
+                              }}
+                            style={{
+                              display: 'grid',
+                              gridTemplateColumns: '80px 1fr 100px 100px',
+                              gap: '16px',
+                              padding: '12px 16px',
+                              borderBottom: index < classStats.length - 1 ? '1px solid #3c3c3c' : 'none',
+                              backgroundColor: isYou ? 'rgba(0, 122, 204, 0.2)' : 
+                                             selectedStudentId === student.studentId ? 'rgba(245, 166, 35, 0.2)' : 'transparent',
+                              cursor: isClickable ? 'pointer' : 'default',
+                              transition: 'background-color 0.2s',
+                            }}
+                            onMouseEnter={(e) => {
+                              if (isClickable && selectedStudentId !== student.studentId) {
+                                e.currentTarget.style.backgroundColor = 'rgba(60, 60, 60, 0.5)';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (isClickable && selectedStudentId !== student.studentId) {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                              }
+                            }}
+                          >
+                            <span style={{ 
+                              fontWeight: 'bold', 
+                              color: student.rank === 1 ? '#f5a623' : student.rank === 2 ? '#c0c0c0' : student.rank === 3 ? '#cd7f32' : 'white',
+                              fontFamily: 'BoldPixels, monospace',
+                              fontSize: '16px',
+                            }}>
+                              #{student.rank}
+                            </span>
+                            <span style={{
+                              color: isYou ? '#007acc' : 'white',
+                              fontWeight: isYou ? 'bold' : 'normal',
+                              fontFamily: 'BoldPixels, monospace',
+                              fontSize: '16px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                            }}>
+                              {student.studentName}
+                              {isClickable && (
+                                <span style={{ color: '#666666', fontSize: '12px' }}>
+                                  {isExpanded ? '▼' : '▶'}
+                                </span>
+                              )}
+                            </span>
+                            <span style={{ 
+                              color: '#cccccc',
+                              fontFamily: 'BoldPixels, monospace',
+                              fontSize: '16px',
+                            }}>
+                              {student.questsCompleted}
+                            </span>
+                            <span style={{ 
+                              color: '#cccccc',
+                              fontFamily: 'BoldPixels, monospace',
+                              fontSize: '16px',
+                            }}>
+                              {formatTime(student.totalTime)}
+                            </span>
+                          </div>
+                          
+                          {/* Expanded Student Stats Dropdown */}
+                          {isExpanded && (
+                            <div style={{
+                              backgroundColor: '#1a1a1a',
+                              borderBottom: index < classStats.length - 1 ? '1px solid #3c3c3c' : 'none',
+                              padding: '12px 16px',
+                            }}>
+                              {studentStatsLoading ? (
+                                <div style={{ textAlign: 'center', padding: '12px', color: '#888888', fontFamily: 'BoldPixels, monospace' }}>
+                                  Loading...
+                                </div>
+                              ) : selectedStudentStats ? (
+                                <div style={{ display: 'flex', gap: '32px', flexWrap: 'wrap' }}>
+                                  <div>
+                                    <span style={{ color: '#888888', fontSize: '12px', fontFamily: 'BoldPixels, monospace' }}>JOINED</span>
+                                    <div style={{ color: '#cccccc', fontSize: '15px', fontFamily: 'BoldPixels, monospace' }}>
+                                      {new Date(selectedStudentStats.student.joinedAt).toLocaleDateString()}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <span style={{ color: '#888888', fontSize: '12px', fontFamily: 'BoldPixels, monospace' }}>COMPLETED</span>
+                                    <div style={{ color: '#7ed321', fontSize: '15px', fontFamily: 'BoldPixels, monospace' }}>
+                                      {selectedStudentStats.summary.completedQuests}/{selectedStudentStats.summary.totalQuests} quests
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <span style={{ color: '#888888', fontSize: '12px', fontFamily: 'BoldPixels, monospace' }}>TOTAL TIME</span>
+                                    <div style={{ color: '#cccccc', fontSize: '15px', fontFamily: 'BoldPixels, monospace' }}>
+                                      {formatTime(selectedStudentStats.summary.totalTimeSpent)}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <span style={{ color: '#888888', fontSize: '12px', fontFamily: 'BoldPixels, monospace' }}>ATTEMPTS</span>
+                                    <div style={{ color: '#cccccc', fontSize: '15px', fontFamily: 'BoldPixels, monospace' }}>
+                                      {selectedStudentStats.summary.totalAttempts}
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div style={{ textAlign: 'center', padding: '12px', color: '#888888', fontFamily: 'BoldPixels, monospace' }}>
+                                  Unable to load stats
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
                     </div>
                     <p style={{
                       color: '#666666',
