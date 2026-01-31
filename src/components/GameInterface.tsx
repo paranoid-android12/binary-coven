@@ -613,13 +613,49 @@ export const GameInterface: React.FC = () => {
 
     const initializeQuests = async () => {
       try {
-        // Load all quest files
+        // Load all quest files - Complete 6×5 Curriculum (Organized by Topic)
         await store.loadQuests([
-          'quests/game_intro.json',
-          'quests/first_harvest.json',
-          'quests/auto_movement.json',
-          'quests/farming_scripts.json',
-          'quests/full_automation.json',
+          // Topic 1: Basic Commands & Sequences (3 quests)
+          'quests/1-basic-commands/1-tutorial-basics.json',
+          'quests/1-basic-commands/2-full-automation.json',
+          'quests/1-basic-commands/3-sequence-challenge.json',
+          
+          // Topic 2: Variables & Data Types (5 quests)
+          'quests/2-variables/1-variables-intro.json',
+          'quests/2-variables/2-number-variables.json',
+          'quests/2-variables/3-string-variables.json',
+          'quests/2-variables/4-boolean-variables.json',
+          'quests/2-variables/5-variables-challenge.json',
+          
+          // Topic 3: Conditionals (5 quests)
+          'quests/3-conditionals/1-conditionals-intro.json',
+          'quests/3-conditionals/2-if-else.json',
+          'quests/3-conditionals/3-elif-chains.json',
+          'quests/3-conditionals/4-complex-conditions.json',
+          'quests/3-conditionals/5-conditionals-challenge.json',
+          
+          // Topic 4: Loops (5 quests)
+          'quests/4-loops/1-loop-movement.json',
+          'quests/4-loops/2-loop-actions.json',
+          'quests/4-loops/3-while-loops.json',
+          'quests/4-loops/4-loops-challenge.json',
+          'quests/4-loops/5-farming-loops.json',
+          
+          // Topic 5: Functions (5 quests)
+          'quests/5-functions/1-functions-intro.json',
+          'quests/5-functions/2-helper-functions.json',
+          'quests/5-functions/3-function-parameters.json',
+          'quests/5-functions/4-return-values.json',
+          'quests/5-functions/5-functions-challenge.json',
+          
+          // Topic 6: Lists (5 quests)
+          'quests/6-lists/1-lists-intro.json',
+          'quests/6-lists/2-list-indexing.json',
+          'quests/6-lists/3-list-modification.json',
+          'quests/6-lists/4-list-iteration.json',
+          'quests/6-lists/5-lists-challenge.json',
+          
+          // Bonus/Extra quests
           'quests/alpha_drone_intro.json',
           'quests/drone_farming_quest.json'
         ]);
@@ -640,7 +676,7 @@ export const GameInterface: React.FC = () => {
 
           // Small delay to ensure game is fully initialized
           setTimeout(() => {
-            const success = store.startQuest('game_intro');
+            const success = store.startQuest('tutorial_basics');
 
             if (success) {
               // Set flag to prevent auto-start on subsequent loads
