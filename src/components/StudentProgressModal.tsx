@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useGameStore } from '../stores/gameStore';
 import { EventBus } from '../game/EventBus';
-import { Quest } from '../types/quest';
+import { Quest, QuestDifficulty } from '../types/quest';
 
 interface StudentProgressModalProps {
   isOpen: boolean;
@@ -31,6 +31,28 @@ interface ObjectiveStats {
   avgTimePerObjective: number;
 }
 
+// Database-sourced quest progress item
+interface DatabaseQuestProgress {
+  questId: string;
+  questTitle: string;
+  state: 'locked' | 'available' | 'active' | 'completed' | 'failed';
+  currentPhaseIndex: number;
+  startedAt: string | null;
+  completedAt: string | null;
+  timeSpentSeconds: number;
+  attempts: number;
+  score: number | null;
+}
+
+// Database progress summary
+interface ProgressSummary {
+  totalQuests: number;
+  completedQuests: number;
+  inProgressQuests: number;
+  totalTimeSpentSeconds: number;
+  totalAttempts: number;
+}
+
 type TabType = 'progress' | 'insights' | 'class';
 
 export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOpen, onClose }) => {
@@ -43,6 +65,11 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
   const [loading, setLoading] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0); // Force re-render on quest completion
   const [classStatsError, setClassStatsError] = useState<string | null>(null); // Error message for class stats
+  
+  // Database-sourced progress data (source of truth)
+  const [dbQuestProgress, setDbQuestProgress] = useState<DatabaseQuestProgress[]>([]);
+  const [dbProgressSummary, setDbProgressSummary] = useState<ProgressSummary | null>(null);
+  const [progressLoading, setProgressLoading] = useState(false);
   
   // Store queries will be done fresh during render for dynamic updates
 
@@ -186,10 +213,29 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
     }
   };
 
+  // Fetch quest progress from database (source of truth)
+  const fetchDatabaseProgress = async () => {
+    setProgressLoading(true);
+    try {
+      const response = await fetch('/api/analytics/student-progress');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setDbQuestProgress(data.questProgress || []);
+          setDbProgressSummary(data.summary || null);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch database progress:', error);
+    }
+    setProgressLoading(false);
+  };
+
   useEffect(() => {
     if (isOpen) {
       fetchQuestStats();
       fetchObjectiveStats();
+      fetchDatabaseProgress(); // Fetch database progress on open
     }
   }, [isOpen, refreshTrigger]);
 
@@ -208,30 +254,59 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
 
   // Call store selectors to get fresh data (ensures dynamic updates on each render)
   // IMPORTANT: These hooks MUST be called before any conditional returns!
-  const allLoadedQuests = useGameStore((state) => state.getAllLoadedQuests()); // All quests, including completed
-  const allCompletedQuests = useGameStore((state) => state.getCompletedQuests());
+  const allLoadedQuests = useGameStore((state) => state.getAllLoadedQuests()); // All quests for display
   const currentActiveQuest = useGameStore((state) => state.getActiveQuest());
-  const getQuestProgress = useGameStore((state) => state.getQuestProgress);
+
+  // Create a set of completed quest IDs from database for fast lookup
+  const completedQuestIds = new Set(
+    dbQuestProgress
+      .filter(q => q.state === 'completed')
+      .map(q => q.questId)
+  );
+
+  // Create mock Quest objects for completed quests from database
+  // This allows existing functions like getOrganizedQuests to work
+  const dbCompletedQuests: Quest[] = dbQuestProgress
+    .filter(q => q.state === 'completed')
+    .map(qp => {
+      // Find matching quest from loaded quests, or create minimal object
+      const loadedQuest = allLoadedQuests.find(q => q.id === qp.questId);
+      if (loadedQuest) return loadedQuest;
+      // Create minimal Quest object for display purposes (when quest JSON not loaded)
+      return {
+        id: qp.questId,
+        title: qp.questTitle,
+        description: '',
+        category: 'Other',
+        difficulty: 'beginner' as QuestDifficulty,
+        phases: [],
+        rewards: []
+      } as Quest;
+    });
 
   // Fetch class stats when tab is active - needs to be after store hooks so we have completed count
   // Only fetch when we have loaded quests (to ensure data is ready)
+  // Use database completed count instead of localStorage
   useEffect(() => {
     if (isOpen && activeTab === 'class' && allLoadedQuests.length > 0) {
-      fetchClassStats(allCompletedQuests.length);
+      const dbCompletedCount = dbProgressSummary?.completedQuests || 0;
+      fetchClassStats(dbCompletedCount);
     }
-  }, [isOpen, activeTab, allCompletedQuests.length, allLoadedQuests.length]);
+  }, [isOpen, activeTab, dbProgressSummary?.completedQuests, allLoadedQuests.length]);
 
   if (!isOpen) return null;
 
-  const insights = getLearningInsights(allLoadedQuests, allCompletedQuests);
-  const totalCompleted = allCompletedQuests.length;
+  // Use database completed quests instead of localStorage ones
+  const insights = getLearningInsights(allLoadedQuests, dbCompletedQuests);
+  const totalCompleted = dbProgressSummary?.completedQuests || 0;
   const totalQuests = allLoadedQuests.length;
   const overallProgress = totalQuests > 0 ? Math.round((totalCompleted / totalQuests) * 100) : 0;
 
-  // Helper to format timestamps
-  const formatDateTime = (timestamp?: number) => {
+  // Helper to format timestamps (accepts string ISO date or number timestamp)
+  const formatDateTime = (timestamp?: string | number | null) => {
     if (!timestamp) return '-';
     const date = new Date(timestamp);
+    if (isNaN(date.getTime())) return '-';
     return date.toLocaleDateString('en-US', { 
       month: 'short', 
       day: 'numeric',
@@ -240,11 +315,23 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
     });
   };
 
-  // Helper to calculate time spent
-  const formatTimeSpent = (startedAt?: number, completedAt?: number) => {
+  // Helper to calculate time spent (from database seconds or from timestamps)
+  const formatTimeSpentFromDb = (timeSpentSeconds?: number) => {
+    if (!timeSpentSeconds || timeSpentSeconds <= 0) return '-';
+    const minutes = Math.floor(timeSpentSeconds / 60);
+    if (minutes < 60) return `${minutes}m`;
+    const hours = Math.floor(minutes / 60);
+    const remainingMins = minutes % 60;
+    return `${hours}h ${remainingMins}m`;
+  };
+
+  // Helper to calculate time spent from ISO timestamps (legacy support)
+  const formatTimeSpent = (startedAt?: string | number | null, completedAt?: string | number | null) => {
     if (!startedAt) return '-';
-    const endTime = completedAt || Date.now();
-    const minutes = Math.floor((endTime - startedAt) / 60000);
+    const startTime = new Date(startedAt).getTime();
+    if (isNaN(startTime)) return '-';
+    const endTime = completedAt ? new Date(completedAt).getTime() : Date.now();
+    const minutes = Math.floor((endTime - startTime) / 60000);
     if (minutes < 60) return `${minutes}m`;
     const hours = Math.floor(minutes / 60);
     const remainingMins = minutes % 60;
@@ -644,13 +731,13 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                     Quests
                   </h3>
                   {(() => {
-                    const organized = getOrganizedQuests(allLoadedQuests, allCompletedQuests);
+                    const organized = getOrganizedQuests(allLoadedQuests, dbCompletedQuests);
                     const categories = Object.keys(organized).filter(cat => organized[cat].length > 0);
                     
                     return categories.length > 0 ? (
                       categories.map((category, catIndex) => {
                         const quests = organized[category];
-                        const completedInCategory = quests.filter(q => allCompletedQuests.some(cq => cq.id === q.id)).length;
+                        const completedInCategory = quests.filter(q => completedQuestIds.has(q.id)).length;
                         const categoryKey = `category-${category}`;
 
                         return (
@@ -757,10 +844,11 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                               }}>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                                   {quests.map((quest, questIndex) => {
-                                    const isCompleted = allCompletedQuests.some(q => q.id === quest.id);
+                                    const isCompleted = completedQuestIds.has(quest.id);
                                     const isActive = currentActiveQuest?.id === quest.id;
                                     const questStat = questStats.find(s => s.questId === quest.id);
-                                    const questProgress = getQuestProgress(quest.id);
+                                    // Get quest progress from database
+                                    const dbProgress = dbQuestProgress.find(p => p.questId === quest.id);
 
                                     let statusColor = '#00c9ff';
                                     let statusLabel = 'AVAILABLE';
@@ -774,7 +862,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                                     }
 
                                     // Determine if card should be expandable (has stats OR has progress)
-                                    const hasExpandableContent = (questStat && questStat.totalAttempts > 0) || questProgress;
+                                    const hasExpandableContent = (questStat && questStat.totalAttempts > 0) || dbProgress;
 
                                     return (
                                       <div 
@@ -868,23 +956,23 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px', marginBottom: questStat && questStat.totalAttempts > 0 ? '12px' : '0' }}>
                                               <div>
                                                 <div style={{ color: '#666666', marginBottom: '1px' }}>STARTED</div>
-                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>{formatDateTime(questProgress?.startedAt)}</div>
+                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>{formatDateTime(dbProgress?.startedAt)}</div>
                                               </div>
                                               <div>
                                                 <div style={{ color: '#666666', marginBottom: '1px' }}>COMPLETED</div>
-                                                <div style={{ color: isCompleted ? '#7ed321' : '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>{formatDateTime(questProgress?.completedAt)}</div>
+                                                <div style={{ color: isCompleted ? '#7ed321' : '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>{formatDateTime(dbProgress?.completedAt)}</div>
                                               </div>
                                               <div>
                                                 <div style={{ color: '#666666', marginBottom: '1px' }}>TIME SPENT</div>
-                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>{formatTimeSpent(questProgress?.startedAt, questProgress?.completedAt)}</div>
+                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>{formatTimeSpentFromDb(dbProgress?.timeSpentSeconds)}</div>
                                               </div>
                                               <div>
                                                 <div style={{ color: '#666666', marginBottom: '1px' }}>ATTEMPTS</div>
-                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>{questProgress?.attempts || 0}</div>
+                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>{dbProgress?.attempts || 0}</div>
                                               </div>
                                               <div>
                                                 <div style={{ color: '#666666', marginBottom: '1px' }}>CURRENT PHASE</div>
-                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>Phase {(questProgress?.currentPhaseIndex || 0) + 1}</div>
+                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>Phase {(dbProgress?.currentPhaseIndex || 0) + 1}</div>
                                               </div>
                                             </div>
                                             
@@ -1204,7 +1292,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                     ))}
 
                     {/* Concepts Learned Section - Dynamic based on completed quests */}
-                    {allCompletedQuests.length > 0 && (
+                    {dbCompletedQuests.length > 0 && (
                       <div style={{ marginTop: '16px' }}>
                         <h3 style={{
                           fontSize: '18px',
@@ -1219,7 +1307,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                           {(() => {
                             // Collect all unique concepts from completed quests
                             const allConcepts = new Set<string>();
-                            allCompletedQuests.forEach(quest => {
+                            dbCompletedQuests.forEach(quest => {
                               if (quest.concepts && Array.isArray(quest.concepts)) {
                                 quest.concepts.forEach((concept: string) => {
                                   allConcepts.add(concept);
@@ -1283,7 +1371,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                 {classStatsError && !loading && (
                   <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <button
-                      onClick={() => fetchClassStats(allCompletedQuests.length)}
+                      onClick={() => fetchClassStats(dbProgressSummary?.completedQuests || 0)}
                       disabled={loading}
                       style={{
                         padding: '8px 16px',
