@@ -16,6 +16,12 @@ export const LOCAL_STORAGE_KEYS = {
 
   // Quest progress (QuestManager)
   QUEST_PROGRESS: 'quest_progress',
+
+  // Analytics (analyticsService) - localStorage-first pattern
+  ANALYTICS_QUEST_PROGRESS: 'analytics_quest_progress',
+  ANALYTICS_OBJECTIVE_PROGRESS: 'analytics_objective_progress',
+  ANALYTICS_CODE_EXECUTIONS: 'analytics_code_executions',
+  ANALYTICS_LAST_SYNC: 'analytics_last_sync',
 } as const;
 
 /**
