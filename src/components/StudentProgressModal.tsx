@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useGameStore } from '../stores/gameStore';
 import { EventBus } from '../game/EventBus';
 import { Quest, QuestDifficulty } from '../types/quest';
+import analyticsService from '../services/analyticsService';
 
 interface StudentProgressModalProps {
   isOpen: boolean;
@@ -65,10 +66,11 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
   const [loading, setLoading] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0); // Force re-render on quest completion
   const [classStatsError, setClassStatsError] = useState<string | null>(null); // Error message for class stats
+  const [hasLoadedSave, setHasLoadedSave] = useState(false); // Track if user has loaded their save
   
-  // Database-sourced progress data (source of truth)
-  const [dbQuestProgress, setDbQuestProgress] = useState<DatabaseQuestProgress[]>([]);
-  const [dbProgressSummary, setDbProgressSummary] = useState<ProgressSummary | null>(null);
+  // LocalStorage-sourced progress data (real-time updates)
+  const [localQuestProgress, setLocalQuestProgress] = useState<DatabaseQuestProgress[]>([]);
+  const [localProgressSummary, setLocalProgressSummary] = useState<ProgressSummary | null>(null);
   const [progressLoading, setProgressLoading] = useState(false);
   
   // Store queries will be done fresh during render for dynamic updates
@@ -100,39 +102,127 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
     return organized;
   };
 
-  // Get learning insights based on completed quests
+  // Get learning insights based on completed quests - focused on programming concepts
   const getLearningInsights = (avQuests: Quest[], compQuests: Quest[]) => {
-    const organized = getOrganizedQuests(avQuests, compQuests);
     const insights: { message: string; type: 'success' | 'suggestion' | 'next' }[] = [];
 
-    Object.keys(organized).forEach((category) => {
-      const quests = organized[category];
-      const completedCount = quests.filter(q => compQuests.some(cq => cq.id === q.id)).length;
+    // Collect all programming concepts from completed quests
+    const masteredConcepts = new Set<string>();
+
+    // Map concepts to broader programming topic groups
+    // Note: Keys use underscores to match normalized concept strings
+    const conceptToTopic: { [key: string]: string } = {
+      // Control Flow & Iteration
+      'loops': 'Control Flow',
+      'iteration': 'Control Flow',
+      'for': 'Control Flow',
+      'range': 'Control Flow',
+      'conditionals': 'Control Flow',
       
-      if (completedCount === quests.length && quests.length > 0) {
-        insights.push({
-          message: `You've mastered ${category}! Great progress on all ${quests.length} quests.`,
-          type: 'success'
-        });
-      } else if (completedCount > 0) {
-        insights.push({
-          message: `Keep going with ${category}! You've completed ${completedCount}/${quests.length} quests.`,
-          type: 'suggestion'
+      // Functions & Code Organization
+      'functions': 'Functions',
+      'def': 'Functions',
+      'parameters': 'Functions',
+      'return': 'Functions',
+      'code_organization': 'Functions', // Changed from 'code-organization' to match normalization
+      'harvest_function': 'Functions',
+      'plant_function': 'Functions',
+      'sleep_function': 'Functions',
+      
+      // Automation & Advanced Programming
+      'automation': 'Automation',
+      'full_automation': 'Automation',
+      'programming': 'Automation',
+      'drones': 'Automation',
+      
+      // Basic Programming Fundamentals
+      'code_terminal': 'Basic Programming',
+      'movement_commands': 'Basic Programming',
+      'movement': 'Basic Programming',
+      'manual_controls': 'Basic Programming',
+      'manual_buttons': 'Basic Programming',
+      'interaction': 'Basic Programming',
+      
+      // Domain Concepts (game-related but still programming)
+      'planting': 'Applied Programming',
+      'harvesting': 'Applied Programming',
+      'wheat': 'Applied Programming',
+      'farming': 'Applied Programming',
+    };
+
+    // Programming topic descriptions
+    const topicDescriptions: { [key: string]: string } = {
+      'Control Flow': 'Control Flow helps you repeat actions and make decisions in your code.',
+      'Functions': 'Functions let you organize code into reusable blocks - a key programming skill!',
+      'Automation': 'Automation allows your programs to run tasks independently.',
+      'Basic Programming': 'These fundamentals are the building blocks of all programming!',
+      'Applied Programming': 'You\'re applying programming concepts to solve real problems!',
+    };
+
+    // Gather concepts from completed quests
+    compQuests.forEach(quest => {
+      if (quest.concepts && Array.isArray(quest.concepts)) {
+        quest.concepts.forEach((concept: string) => {
+          // Normalize: lowercase, replace spaces and hyphens with underscores
+          const normalizedConcept = concept.toLowerCase().replace(/[ -]/g, '_');
+          masteredConcepts.add(normalizedConcept);
         });
       }
     });
 
-    // Suggest next incomplete category
-    const nextIncomplete = Object.keys(organized).find(cat => {
-      const quests = organized[cat];
-      const completedCount = quests.filter(q => compQuests.some(cq => cq.id === q.id)).length;
-      return completedCount < quests.length;
+    // Group mastered concepts by programming topic
+    const masteredTopics = new Map<string, string[]>();
+    masteredConcepts.forEach(concept => {
+      const topic = conceptToTopic[concept] || 'Programming Concepts';
+      if (!masteredTopics.has(topic)) {
+        masteredTopics.set(topic, []);
+      }
+      masteredTopics.get(topic)!.push(concept);
     });
-    
-    if (nextIncomplete) {
+
+    // Define topic priority order (most important programming topics first)
+    const topicPriority = ['Basic Programming', 'Functions', 'Control Flow', 'Automation', 'Applied Programming'];
+
+    // Generate insights based on programming topics mastered (in priority order)
+    topicPriority.forEach(topic => {
+      if (masteredTopics.has(topic)) {
+        const description = topicDescriptions[topic] || '';
+        insights.push({
+          message: `✓ ${topic}: ${description}`,
+          type: 'success'
+        });
+      }
+    });
+
+    // If no insights yet but has completed quests, add general programming message
+    if (insights.length === 0 && compQuests.length > 0) {
       insights.push({
-        message: `Suggested next: Continue with "${nextIncomplete}" to keep learning!`,
+        message: `You're making progress! Keep completing quests to learn more programming concepts.`,
+        type: 'suggestion'
+      });
+    }
+
+    // Find topics not yet learned to suggest next steps
+    const unlearnedTopics = topicPriority.filter(topic => !masteredTopics.has(topic));
+    
+    if (unlearnedTopics.length > 0 && compQuests.length > 0) {
+      const nextTopic = unlearnedTopics[0];
+      insights.push({
+        message: `📚 Next: Continue learning to discover ${nextTopic}!`,
         type: 'next'
+      });
+    } else if (compQuests.length === 0) {
+      insights.push({
+        message: `📚 Start your coding journey! Complete quests to learn programming fundamentals.`,
+        type: 'next'
+      });
+    }
+
+    // If fully complete
+    if (compQuests.length > 0 && compQuests.length >= avQuests.length && avQuests.length > 0) {
+      insights.push({
+        message: `🎉 Amazing! You've mastered all available programming concepts!`,
+        type: 'success'
       });
     }
 
@@ -183,8 +273,13 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
     setLoading(false);
   };
 
-  // Fetch quest execution statistics
+  // Fetch quest execution statistics - only if save has been loaded
   const fetchQuestStats = async () => {
+    // Only fetch from database if user has loaded their save
+    if (!hasLoadedSave) {
+      setQuestStats([]);
+      return;
+    }
     try {
       const response = await fetch('/api/analytics/student-quest-stats');
       if (response.ok) {
@@ -198,8 +293,13 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
     }
   };
 
-  // Fetch objective completion statistics
+  // Fetch objective completion statistics - only if save has been loaded
   const fetchObjectiveStats = async () => {
+    // Only fetch from database if user has loaded their save
+    if (!hasLoadedSave) {
+      setObjectiveStats(null);
+      return;
+    }
     try {
       const response = await fetch('/api/analytics/student-objective-stats');
       if (response.ok) {
@@ -213,20 +313,39 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
     }
   };
 
-  // Fetch quest progress from database (source of truth)
-  const fetchDatabaseProgress = async () => {
+  // Get quest progress from localStorage (real-time updates)
+  // Data only appears after user explicitly loads their save
+  const loadLocalProgress = () => {
     setProgressLoading(true);
     try {
-      const response = await fetch('/api/analytics/student-progress');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setDbQuestProgress(data.questProgress || []);
-          setDbProgressSummary(data.summary || null);
-        }
-      }
+      // Get quest progress from localStorage via analyticsService
+      // This will be empty until user loads their save, which syncs database → localStorage
+      const localProgress = analyticsService.getQuestProgressData();
+      const localSummary = analyticsService.getProgressSummary();
+      
+      // Transform to DatabaseQuestProgress format for compatibility
+      const transformedProgress: DatabaseQuestProgress[] = localProgress.map(p => ({
+        questId: p.questId,
+        questTitle: p.questTitle,
+        state: p.state,
+        currentPhaseIndex: p.currentPhaseIndex || 0,
+        startedAt: p.startedAt || null,
+        completedAt: p.completedAt || null,
+        timeSpentSeconds: p.timeSpentSeconds || 0,
+        attempts: p.attempts || 0,
+        score: p.score || null,
+      }));
+      
+      setLocalQuestProgress(transformedProgress);
+      setLocalProgressSummary({
+        totalQuests: localSummary.totalQuests,
+        completedQuests: localSummary.completed,
+        inProgressQuests: localSummary.inProgress,
+        totalTimeSpentSeconds: localSummary.totalTimeSpentSeconds,
+        totalAttempts: localSummary.totalAttempts,
+      });
     } catch (error) {
-      console.error('Failed to fetch database progress:', error);
+      console.error('Failed to load local progress:', error);
     }
     setProgressLoading(false);
   };
@@ -235,20 +354,32 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
     if (isOpen) {
       fetchQuestStats();
       fetchObjectiveStats();
-      fetchDatabaseProgress(); // Fetch database progress on open
+      loadLocalProgress(); // Load from localStorage for real-time updates
     }
   }, [isOpen, refreshTrigger]);
 
   // Subscribe to quest completion events to refresh data
   useEffect(() => {
-    const handleQuestComplete = () => {
+    const handleQuestUpdate = () => {
       setRefreshTrigger(prev => prev + 1);
     };
 
-    EventBus.on('quest-completed', handleQuestComplete);
+    const handleProgressSynced = () => {
+      setHasLoadedSave(true); // Mark that save has been loaded
+      setRefreshTrigger(prev => prev + 1);
+    };
+
+    // Listen for various quest events to update UI immediately
+    EventBus.on('quest-completed', handleQuestUpdate);
+    EventBus.on('quest-started', handleQuestUpdate);
+    EventBus.on('phase-completed', handleQuestUpdate);
+    EventBus.on('quest-progress-synced', handleProgressSynced);
 
     return () => {
-      EventBus.off('quest-completed', handleQuestComplete);
+      EventBus.off('quest-completed', handleQuestUpdate);
+      EventBus.off('quest-started', handleQuestUpdate);
+      EventBus.off('phase-completed', handleQuestUpdate);
+      EventBus.off('quest-progress-synced', handleProgressSynced);
     };
   }, []);
 
@@ -257,16 +388,16 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
   const allLoadedQuests = useGameStore((state) => state.getAllLoadedQuests()); // All quests for display
   const currentActiveQuest = useGameStore((state) => state.getActiveQuest());
 
-  // Create a set of completed quest IDs from database for fast lookup
+  // Create a set of completed quest IDs from localStorage for fast lookup
   const completedQuestIds = new Set(
-    dbQuestProgress
+    localQuestProgress
       .filter(q => q.state === 'completed')
       .map(q => q.questId)
   );
 
-  // Create mock Quest objects for completed quests from database
+  // Create mock Quest objects for completed quests from localStorage
   // This allows existing functions like getOrganizedQuests to work
-  const dbCompletedQuests: Quest[] = dbQuestProgress
+  const localCompletedQuests: Quest[] = localQuestProgress
     .filter(q => q.state === 'completed')
     .map(qp => {
       // Find matching quest from loaded quests, or create minimal object
@@ -286,19 +417,19 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
 
   // Fetch class stats when tab is active - needs to be after store hooks so we have completed count
   // Only fetch when we have loaded quests (to ensure data is ready)
-  // Use database completed count instead of localStorage
+  // Use localStorage completed count
   useEffect(() => {
     if (isOpen && activeTab === 'class' && allLoadedQuests.length > 0) {
-      const dbCompletedCount = dbProgressSummary?.completedQuests || 0;
-      fetchClassStats(dbCompletedCount);
+      const completedCount = localProgressSummary?.completedQuests || 0;
+      fetchClassStats(completedCount);
     }
-  }, [isOpen, activeTab, dbProgressSummary?.completedQuests, allLoadedQuests.length]);
+  }, [isOpen, activeTab, localProgressSummary?.completedQuests, allLoadedQuests.length]);
 
   if (!isOpen) return null;
 
-  // Use database completed quests instead of localStorage ones
-  const insights = getLearningInsights(allLoadedQuests, dbCompletedQuests);
-  const totalCompleted = dbProgressSummary?.completedQuests || 0;
+  // Use localStorage completed quests for insights
+  const insights = getLearningInsights(allLoadedQuests, localCompletedQuests);
+  const totalCompleted = localProgressSummary?.completedQuests || 0;
   const totalQuests = allLoadedQuests.length;
   const overallProgress = totalQuests > 0 ? Math.round((totalCompleted / totalQuests) * 100) : 0;
 
@@ -731,7 +862,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                     Quests
                   </h3>
                   {(() => {
-                    const organized = getOrganizedQuests(allLoadedQuests, dbCompletedQuests);
+                    const organized = getOrganizedQuests(allLoadedQuests, localCompletedQuests);
                     const categories = Object.keys(organized).filter(cat => organized[cat].length > 0);
                     
                     return categories.length > 0 ? (
@@ -847,8 +978,8 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                                     const isCompleted = completedQuestIds.has(quest.id);
                                     const isActive = currentActiveQuest?.id === quest.id;
                                     const questStat = questStats.find(s => s.questId === quest.id);
-                                    // Get quest progress from database
-                                    const dbProgress = dbQuestProgress.find(p => p.questId === quest.id);
+                                    // Get quest progress from localStorage
+                                    const questProgress = localQuestProgress.find(p => p.questId === quest.id);
 
                                     let statusColor = '#00c9ff';
                                     let statusLabel = 'AVAILABLE';
@@ -862,7 +993,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                                     }
 
                                     // Determine if card should be expandable (has stats OR has progress)
-                                    const hasExpandableContent = (questStat && questStat.totalAttempts > 0) || dbProgress;
+                                    const hasExpandableContent = (questStat && questStat.totalAttempts > 0) || questProgress;
 
                                     return (
                                       <div 
@@ -956,23 +1087,23 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px', marginBottom: questStat && questStat.totalAttempts > 0 ? '12px' : '0' }}>
                                               <div>
                                                 <div style={{ color: '#666666', marginBottom: '1px' }}>STARTED</div>
-                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>{formatDateTime(dbProgress?.startedAt)}</div>
+                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>{formatDateTime(questProgress?.startedAt)}</div>
                                               </div>
                                               <div>
                                                 <div style={{ color: '#666666', marginBottom: '1px' }}>COMPLETED</div>
-                                                <div style={{ color: isCompleted ? '#7ed321' : '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>{formatDateTime(dbProgress?.completedAt)}</div>
+                                                <div style={{ color: isCompleted ? '#7ed321' : '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>{formatDateTime(questProgress?.completedAt)}</div>
                                               </div>
                                               <div>
                                                 <div style={{ color: '#666666', marginBottom: '1px' }}>TIME SPENT</div>
-                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>{formatTimeSpentFromDb(dbProgress?.timeSpentSeconds)}</div>
+                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>{formatTimeSpentFromDb(questProgress?.timeSpentSeconds)}</div>
                                               </div>
                                               <div>
                                                 <div style={{ color: '#666666', marginBottom: '1px' }}>ATTEMPTS</div>
-                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>{dbProgress?.attempts || 0}</div>
+                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>{questProgress?.attempts || 0}</div>
                                               </div>
                                               <div>
                                                 <div style={{ color: '#666666', marginBottom: '1px' }}>CURRENT PHASE</div>
-                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>Phase {(dbProgress?.currentPhaseIndex || 0) + 1}</div>
+                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>Phase {(questProgress?.currentPhaseIndex || 0) + 1}</div>
                                               </div>
                                             </div>
                                             
@@ -1292,7 +1423,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                     ))}
 
                     {/* Concepts Learned Section - Dynamic based on completed quests */}
-                    {dbCompletedQuests.length > 0 && (
+                    {localCompletedQuests.length > 0 && (
                       <div style={{ marginTop: '16px' }}>
                         <h3 style={{
                           fontSize: '18px',
@@ -1307,7 +1438,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                           {(() => {
                             // Collect all unique concepts from completed quests
                             const allConcepts = new Set<string>();
-                            dbCompletedQuests.forEach(quest => {
+                            localCompletedQuests.forEach(quest => {
                               if (quest.concepts && Array.isArray(quest.concepts)) {
                                 quest.concepts.forEach((concept: string) => {
                                   allConcepts.add(concept);
@@ -1371,7 +1502,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                 {classStatsError && !loading && (
                   <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <button
-                      onClick={() => fetchClassStats(dbProgressSummary?.completedQuests || 0)}
+                      onClick={() => fetchClassStats(localProgressSummary?.completedQuests || 0)}
                       disabled={loading}
                       style={{
                         padding: '8px 16px',
