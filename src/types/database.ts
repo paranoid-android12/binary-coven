@@ -306,6 +306,29 @@ export interface Database {
           created_at?: string
         }
       }
+      session_quests: {
+        Row: {
+          id: string
+          session_code_id: string
+          quest_id: string
+          quest_order: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          session_code_id: string
+          quest_id: string
+          quest_order?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          session_code_id?: string
+          quest_id?: string
+          quest_order?: number
+          created_at?: string
+        }
+      }
     }
     Views: {
       session_code_stats: {
@@ -360,5 +383,6 @@ export type QuestProgress = Database['public']['Tables']['quest_progress']['Row'
 export type ObjectiveProgress = Database['public']['Tables']['objective_progress']['Row']
 export type CodeExecution = Database['public']['Tables']['code_executions']['Row']
 export type LearningEvent = Database['public']['Tables']['learning_events']['Row']
+export type SessionQuest = Database['public']['Tables']['session_quests']['Row']
 export type SessionCodeStats = Database['public']['Views']['session_code_stats']['Row']
 export type StudentProgressSummary = Database['public']['Views']['student_progress_summary']['Row']

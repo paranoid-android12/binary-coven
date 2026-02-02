@@ -14,6 +14,7 @@ interface SessionCodeCardProps {
     activeStudents24h: number;
     status: 'active' | 'expired' | 'scheduled';
     maxStudents?: number;
+    questCount?: number;
   };
   onRefresh?: () => void;
 }
@@ -183,7 +184,7 @@ export default function SessionCodeCard({ sessionCode, onRefresh }: SessionCodeC
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-4 mb-5 max-tablet:grid-cols-1">
+      <div className="grid grid-cols-3 gap-4 mb-5 max-tablet:grid-cols-1">
         <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
           <div className="flex flex-col gap-0.5">
             <span className="text-lg font-bold text-admin-primary">
@@ -198,6 +199,15 @@ export default function SessionCodeCard({ sessionCode, onRefresh }: SessionCodeC
           <div className="flex flex-col gap-0.5">
             <span className="text-lg font-bold text-admin-primary">{sessionCode.activeStudents24h}</span>
             <span className="text-xs text-gray-500 font-medium">Active (24h)</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-lg font-bold text-admin-primary">
+              {sessionCode.questCount === 0 || sessionCode.questCount === undefined ? 'All' : sessionCode.questCount}
+            </span>
+            <span className="text-xs text-gray-500 font-medium">Quests</span>
           </div>
         </div>
       </div>

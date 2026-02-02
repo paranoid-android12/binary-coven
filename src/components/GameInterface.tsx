@@ -607,14 +607,17 @@ export const GameInterface: React.FC = () => {
     }
   }, []); // Empty dependency array means this runs once on mount
 
+  // Store sessionCodeId in a ref to avoid re-running effect on user object identity changes
+  const sessionCodeId = user && isStudentUser(user) ? user.sessionCodeId : null;
+
   // Initialize quest system (runs when scene is ready)
   useEffect(() => {
     const store = useGameStore.getState();
 
     const initializeQuests = async () => {
       try {
-        // Load all quest files from public/quests directory
-        await store.loadQuests([
+        // Default quest files (all available quests)
+        const allQuestFiles = [
           'quests/tutorial_basics.json',
           'quests/game_intro.json',
           'quests/full_automation.json',
@@ -625,8 +628,61 @@ export const GameInterface: React.FC = () => {
           'quests/functions_intro.json',
           'quests/alpha_drone_intro.json',
           'quests/drone_farming_quest.json'
-        ]);
-        console.log('[Quest System] Quests loaded');
+        ];
+
+        let questFilesToLoad = allQuestFiles;
+        let isSessionSpecificQuests = false; // Track if we're loading session-specific quests
+
+        // Check if user is a student with a session code
+        if (sessionCodeId) {
+          try {
+            // Fetch session-specific quests with proper URL encoding
+            const response = await fetch(`/api/session-codes/quests?sessionCodeId=${encodeURIComponent(sessionCodeId)}`);
+            
+            // Check response status before parsing
+            if (!response.ok) {
+              console.warn('[Quest System] Failed to fetch session quests, status:', response.status);
+            } else {
+              const data = await response.json();
+
+              if (data.success && data.hasCustomQuests && data.quests && data.quests.length > 0) {
+                // Validate and sanitize file paths - only allow quests/ prefix
+                const validQuests = data.quests.filter((q: { filePath: string }) => 
+                  q.filePath && 
+                  typeof q.filePath === 'string' && 
+                  q.filePath.startsWith('quests/') &&
+                  q.filePath.endsWith('.json')
+                );
+                
+                if (validQuests.length > 0) {
+                  questFilesToLoad = validQuests.map((q: { filePath: string }) => q.filePath);
+                  isSessionSpecificQuests = true; // Mark that we have session-specific quests
+                  console.log('[Quest System] Loading session-specific quests:', questFilesToLoad.length);
+                } else {
+                  console.warn('[Quest System] No valid quest paths in session, using all quests');
+                }
+              } else {
+                console.log('[Quest System] No custom quests for session, loading all quests');
+              }
+            }
+          } catch (err) {
+            console.error('[Quest System] Error fetching session quests, using all quests:', err);
+          }
+        }
+
+        // Always include game_intro for new players (it's the mandatory tutorial)
+        // This ensures the intro tutorial runs even if admin didn't select it
+        const hasSeenTutorial = localStorage.getItem('hasSeenTutorial');
+        if (!hasSeenTutorial && isSessionSpecificQuests && !questFilesToLoad.includes('quests/game_intro.json')) {
+          questFilesToLoad = ['quests/game_intro.json', ...questFilesToLoad];
+          console.log('[Quest System] Added game_intro for new player');
+        }
+
+        // Load the quests
+        // For session-specific quests, force-unlock them regardless of prerequisites
+        // This allows teachers to assign quests out of order
+        await store.loadQuests(questFilesToLoad, isSessionSpecificQuests);
+        console.log('[Quest System] Quests loaded:', questFilesToLoad.length, isSessionSpecificQuests ? '(session-specific, force-unlocked)' : '');
 
         // Only auto-start tutorial if we're on the ProgrammingGame scene
         if (currentScene !== 'ProgrammingGame') {
@@ -634,16 +690,29 @@ export const GameInterface: React.FC = () => {
           return;
         }
 
-        // Check if player has seen tutorial
-        const hasSeenTutorial = localStorage.getItem('hasSeenTutorial');
-
+        // Check if player has seen tutorial (re-check since we may have added game_intro)
         if (!hasSeenTutorial) {
           // Auto-start tutorial for new players
           console.log('[Quest System] New player detected - auto-starting tutorial');
 
           // Small delay to ensure game is fully initialized
           setTimeout(() => {
-            const success = store.startQuest('game_intro');
+            // Try to start game_intro first, fall back to first available quest
+            let success = store.startQuest('game_intro');
+
+            if (!success) {
+              // game_intro might not be in the session's quest list
+              // Try to start the first available quest
+              const getAvailableQuests = store.getAvailableQuests;
+              if (typeof getAvailableQuests === 'function') {
+                const availableQuests = getAvailableQuests();
+                if (availableQuests.length > 0) {
+                  success = store.startQuest(availableQuests[0].id);
+                }
+              } else {
+                console.warn('[Quest System] getAvailableQuests not available');
+              }
+            }
 
             if (success) {
               // Set flag to prevent auto-start on subsequent loads
@@ -665,7 +734,7 @@ export const GameInterface: React.FC = () => {
     if (currentScene === 'ProgrammingGame') {
       initializeQuests();
     }
-  }, [currentScene]); // Depends on currentScene
+  }, [currentScene, sessionCodeId]); // Depends on currentScene and sessionCodeId (not full user object)
 
   const handleCloseModal = () => {
     setModalState(prev => ({ ...prev, isOpen: false }));

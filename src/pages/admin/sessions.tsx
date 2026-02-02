@@ -14,6 +14,7 @@ interface SessionCode {
   activeStudents24h: number;
   status: 'active' | 'expired' | 'scheduled';
   maxStudents?: number;
+  questCount?: number;
 }
 
 export default function SessionsPage() {

@@ -13,6 +13,7 @@ type SessionCodeItem = {
   studentCount: number
   activeStudents24h: number
   status: 'active' | 'expired' | 'scheduled'
+  questCount: number // Number of assigned quests (0 = all quests available)
 }
 
 type ListSessionCodesResponse = {
@@ -63,6 +64,27 @@ export default async function handler(
       })
     }
 
+    // Fetch quest counts for all sessions (only if there are sessions)
+    const sessionIds = sessionCodes.map(code => code.id)
+    const questCountMap: Record<string, number> = {}
+    
+    if (sessionIds.length > 0) {
+      const { data: questCounts, error: questError } = await supabase
+        .from('session_quests')
+        .select('session_code_id')
+        .in('session_code_id', sessionIds)
+
+      if (questError) {
+        // Log error but don't fail - just show "All" for all sessions
+        console.error('Error fetching quest counts:', questError)
+      } else if (questCounts) {
+        // Create a map of session_code_id to quest count
+        for (const quest of questCounts) {
+          questCountMap[quest.session_code_id] = (questCountMap[quest.session_code_id] || 0) + 1
+        }
+      }
+    }
+
     const formattedCodes: SessionCodeItem[] = sessionCodes.map((code) => ({
       id: code.id,
       code: code.code,
@@ -73,6 +95,7 @@ export default async function handler(
       studentCount: code.student_count || 0,
       activeStudents24h: code.active_students_24h || 0,
       status: code.status as 'active' | 'expired' | 'scheduled',
+      questCount: questCountMap[code.id] || 0, // 0 means all quests available
     }))
 
     return res.status(200).json({

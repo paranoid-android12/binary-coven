@@ -9,6 +9,7 @@ type CreateSessionRequest = {
   validityDays?: number // Days from now
   validityEnd?: string // Specific end date ISO string
   maxStudents?: number // Max students allowed (null = unlimited)
+  selectedQuests?: string[] // Optional - quest IDs to include in session (empty = all quests)
 }
 
 type CreateSessionResponse = {
@@ -20,6 +21,7 @@ type CreateSessionResponse = {
     validityStart: string
     validityEnd: string
     isActive: boolean
+    questCount: number
   }
 }
 
@@ -59,6 +61,7 @@ export default async function handler(
       validityDays,
       validityEnd,
       maxStudents,
+      selectedQuests,
     }: CreateSessionRequest = req.body
 
     // Generate or use provided code
@@ -118,15 +121,50 @@ export default async function handler(
       })
     }
 
+    // If selected quests are provided, insert them into session_quests table
+    let questCount = 0
+    let questsAssigned = false
+    
+    if (selectedQuests && Array.isArray(selectedQuests) && selectedQuests.length > 0) {
+      // Validate quest IDs - must be non-empty strings, max 100 chars each, max 50 quests
+      const validQuests = selectedQuests
+        .filter((id): id is string => typeof id === 'string' && id.trim().length > 0 && id.length <= 100)
+        .slice(0, 50); // Limit to 50 quests max
+      
+      if (validQuests.length > 0) {
+        const questInserts = validQuests.map((questId, index) => ({
+          session_code_id: newSessionCode.id,
+          quest_id: questId.trim(),
+          quest_order: index + 1,
+        }))
+
+        const { error: questError } = await supabase
+          .from('session_quests')
+          .insert(questInserts)
+
+        if (questError) {
+          console.error('Error inserting session quests:', questError)
+          // Don't fail the whole request, but log the error
+          // The session code was created, quests just weren't assigned
+        } else {
+          questCount = validQuests.length
+          questsAssigned = true
+        }
+      }
+    }
+
     return res.status(200).json({
       success: true,
-      message: 'Session code created successfully',
+      message: questsAssigned 
+        ? `Session code created with ${questCount} quest(s) assigned`
+        : 'Session code created with all quests available',
       sessionCode: {
         id: newSessionCode.id,
         code: newSessionCode.code,
         validityStart: newSessionCode.validity_start,
         validityEnd: newSessionCode.validity_end,
         isActive: newSessionCode.is_active,
+        questCount,
       },
     })
   } catch (error) {

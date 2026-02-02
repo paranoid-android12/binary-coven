@@ -91,8 +91,10 @@ export class QuestManager {
 
   /**
    * Load a quest from a JSON file
+   * @param questFilePath - Path to the quest JSON file
+   * @param forceUnlock - If true, unlock the quest regardless of prerequisites (for session-specific quests)
    */
-  public async loadQuest(questFilePath: string): Promise<Quest | null> {
+  public async loadQuest(questFilePath: string, forceUnlock: boolean = false): Promise<Quest | null> {
     try {
       console.log(`[QuestManager] Loading quest from: ${questFilePath}`);
 
@@ -112,7 +114,11 @@ export class QuestManager {
       this.quests.set(questData.id, questData);
 
       // Check if quest should be unlocked
-      if (!questData.prerequisites || questData.prerequisites.length === 0) {
+      // If forceUnlock is true (session-specific quests), always unlock
+      if (forceUnlock) {
+        this.unlockedQuests.add(questData.id);
+        console.log(`[QuestManager] Force-unlocked session quest: ${questData.id}`);
+      } else if (!questData.prerequisites || questData.prerequisites.length === 0) {
         this.unlockedQuests.add(questData.id);
       } else if (this.checkPrerequisites(questData.prerequisites)) {
         this.unlockedQuests.add(questData.id);
@@ -129,12 +135,14 @@ export class QuestManager {
   }
 
   /**
-   * Load multiple quests from a directory (convenience method)
+   * Load multiple quests from file paths
+   * @param questFilePaths - Array of paths to quest JSON files
+   * @param forceUnlock - If true, unlock all quests regardless of prerequisites (for session-specific quests)
    */
-  public async loadQuests(questFilePaths: string[]): Promise<void> {
-    console.log(`[QuestManager] Loading ${questFilePaths.length} quests...`);
+  public async loadQuests(questFilePaths: string[], forceUnlock: boolean = false): Promise<void> {
+    console.log(`[QuestManager] Loading ${questFilePaths.length} quests...${forceUnlock ? ' (force-unlock enabled)' : ''}`);
 
-    const loadPromises = questFilePaths.map(path => this.loadQuest(path));
+    const loadPromises = questFilePaths.map(path => this.loadQuest(path, forceUnlock));
     await Promise.all(loadPromises);
 
     console.log(`[QuestManager] Loaded ${this.quests.size} quests`);

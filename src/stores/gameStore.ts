@@ -142,7 +142,7 @@ export interface GameStore extends GameState {
   // =====================================================================
   // QUEST MANAGEMENT
   // =====================================================================
-  loadQuests: (questFilePaths: string[]) => Promise<void>;
+  loadQuests: (questFilePaths: string[], forceUnlock?: boolean) => Promise<void>;
   startQuest: (questId: string) => boolean;
   cancelQuest: () => boolean;
   restartQuest: () => boolean;
@@ -929,9 +929,9 @@ export const useGameStore = create<GameStore>()(
     // =====================================================================
     // QUEST MANAGEMENT
     // =====================================================================
-    loadQuests: async (questFilePaths: string[]) => {
+    loadQuests: async (questFilePaths: string[], forceUnlock: boolean = false) => {
       const questManager = QuestManager.getInstance();
-      await questManager.loadQuests(questFilePaths);
+      await questManager.loadQuests(questFilePaths, forceUnlock);
 
       // Update local state
       const availableQuests = questManager.getAvailableQuests();

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useGameStore } from '../stores/gameStore';
 import { EventBus } from '../game/EventBus';
 import { Quest, QuestDifficulty } from '../types/quest';
@@ -399,7 +399,8 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
 
   // Get quest progress from localStorage (real-time updates)
   // Data only appears after user explicitly loads their save
-  const loadLocalProgress = () => {
+  // Using useCallback to get a stable reference for event handlers
+  const loadLocalProgress = useCallback(() => {
     setProgressLoading(true);
     try {
       // Get quest progress from localStorage via analyticsService
@@ -432,7 +433,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
       console.error('Failed to load local progress:', error);
     }
     setProgressLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -445,12 +446,20 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
   // Subscribe to quest completion events to refresh data
   useEffect(() => {
     const handleQuestUpdate = () => {
+      // Refresh zustand store state (this updates currentActiveQuest, availableQuests, etc.)
+      useGameStore.getState().refreshQuestState();
+      // Increment trigger to force re-render and re-fetch
       setRefreshTrigger(prev => prev + 1);
+      // Also immediately reload localStorage data if modal is open
+      // This ensures we get the latest state right after quest events
+      loadLocalProgress();
     };
 
     const handleProgressSynced = () => {
       setHasLoadedSave(true); // Mark that save has been loaded
+      useGameStore.getState().refreshQuestState();
       setRefreshTrigger(prev => prev + 1);
+      loadLocalProgress();
     };
 
     // Listen for various quest events to update UI immediately
@@ -465,7 +474,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
       EventBus.off('phase-completed', handleQuestUpdate);
       EventBus.off('quest-progress-synced', handleProgressSynced);
     };
-  }, []);
+  }, [loadLocalProgress]);
 
   // Call store selectors to get fresh data (ensures dynamic updates on each render)
   // IMPORTANT: These hooks MUST be called before any conditional returns!
