@@ -23,6 +23,13 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame
         {
             game.current = StartGame("game-container");
 
+            // Remove tabIndex from the canvas to prevent browser text caret
+            const canvas = document.querySelector('#game-container canvas') as HTMLCanvasElement;
+            if (canvas) {
+                canvas.removeAttribute('tabindex');
+                canvas.style.outline = 'none';
+            }
+
             if (typeof ref === 'function')
             {
                 ref({ game: game.current, scene: null });

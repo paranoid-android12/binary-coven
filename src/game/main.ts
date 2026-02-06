@@ -16,6 +16,13 @@ const config: Types.Core.GameConfig = {
     parent: 'game-container',
     pixelArt: true,
     backgroundColor: '#028af8',
+    // Use window as keyboard target so the canvas doesn't need focus/tabIndex,
+    // which prevents the browser from showing a blinking text caret on the canvas.
+    input: {
+        keyboard: {
+            target: window
+        }
+    },
     scene: [
         Boot,
         Preloader,
