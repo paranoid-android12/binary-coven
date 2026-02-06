@@ -864,36 +864,10 @@ export class ProgrammingGame extends Scene {
   }
 
   private createUI() {
-    // Create basic UI elements
-    const uiContainer = this.add.container(10, 10);
-    
-    // Resource display
-    const resourceText = this.add.text(0, 0, '', {
-      fontSize: '14px',
-      color: '#ffffff',
-      backgroundColor: '#000000',
-      padding: { x: 10, y: 5 }
-    });
-    
-    uiContainer.add(resourceText);
-    
-    // Update resource display
-    this.time.addEvent({
-      delay: 500,
-      callback: () => {
-        const gameState = useGameStore.getState();
-        const activeEntity = gameState.entities.get(gameState.activeEntityId);
-        
-        if (activeEntity) {
-          resourceText.setText(
-            `Energy: ${activeEntity.stats.energy}/${activeEntity.stats.maxEnergy}\n` +
-            `Wheat: ${gameState.globalResources.wheat || 0}\n` +
-            `Position: (${activeEntity.position.x}, ${activeEntity.position.y})`
-          );
-        }
-      },
-      loop: true
-    });
+    // Note: Resource display (energy, wheat, position) is now handled by React overlay components
+    // (ImageSpriteEnergyDisplay, etc.) so no Phaser-side HUD is needed.
+    // The old uiContainer/resourceText at world pos (10,10) was removed to prevent
+    // a stray visual artifact (thin caret-like line) in the top-left of the game world.
   }
 
   private updateVisuals() {

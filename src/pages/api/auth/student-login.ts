@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getSupabaseApiClient, getSupabaseAdminClient } from '@/lib/supabase/server'
 import type { SessionCode, StudentProfile } from '@/types/database'
-// import bcrypt from 'bcryptjs'
+import bcrypt from 'bcryptjs'
 
 type LoginRequest = {
   username: string
@@ -13,6 +13,7 @@ type LoginRequest = {
 type LoginResponse = {
   success: boolean
   message?: string
+  needsOtp?: boolean
   student?: {
     id: string
     username: string
@@ -107,66 +108,35 @@ export default async function handler(
       .maybeSingle() as { data: StudentProfile | null, error: any }
 
     if (studentError || !studentData) {
-      // Student doesn't exist - create new student account
-      // Store password unhashed for now
-      const passwordHash = password
-
-      const { data: newStudent, error: createError } = await supabase
-        .from('student_profiles')
-        .insert({
-          username,
-          password_hash: passwordHash,
-          session_code_id: sessionCodeData.id,
-          display_name: username,
-          last_login: new Date().toISOString(),
-        })
-        .select()
-        .maybeSingle() as { data: StudentProfile | null, error: any }
-
-      if (createError || !newStudent) {
-        console.error('Error creating student:', createError)
-        return res.status(500).json({
-          success: false,
-          message: 'Failed to create student account',
-        })
-      }
-
-      // Create initial game save for new student
-      const { error: saveError } = await supabase
-        .from('game_saves')
-        .insert({
-          student_profile_id: newStudent.id,
-          game_state: {
-            grids: [],
-            entities: [],
-            globalResources: { wheat: 0, energy: 100 },
-            codeWindows: [],
-            questProgress: {},
-          },
-          save_name: 'autosave',
-        })
-
-      if (saveError) {
-        console.error('Error creating initial save:', saveError)
-      }
-
-      // Set session cookie
-      res.setHeader('Set-Cookie', `student_session_id=${newStudent.id}; Path=/; HttpOnly; SameSite=Strict; Max-Age=2592000`)
-
+      // Student doesn't exist - new account needs OTP verification
       return res.status(200).json({
-        success: true,
-        message: 'Account created and logged in successfully',
-        student: {
-          id: newStudent.id,
-          username: newStudent.username,
-          displayName: newStudent.display_name,
-          sessionCodeId: newStudent.session_code_id,
-        },
+        success: false,
+        needsOtp: true,
+        message: 'New account detected. Email verification required.',
       })
     }
 
-    // Student exists - verify password (unhashed comparison for now)
-    const passwordMatch = password === studentData.password_hash
+    // Student exists - verify password
+    // Support both bcrypt hashes (new) and legacy plaintext (old) with auto-upgrade
+    let passwordMatch = false
+    const storedHash = studentData.password_hash
+
+    if (storedHash.startsWith('$2a$') || storedHash.startsWith('$2b$')) {
+      // Already a bcrypt hash
+      passwordMatch = await bcrypt.compare(password, storedHash)
+    } else {
+      // Legacy plaintext comparison
+      passwordMatch = password === storedHash
+
+      // Auto-upgrade to bcrypt on successful login
+      if (passwordMatch) {
+        const newHash = await bcrypt.hash(password, 10)
+        await supabase
+          .from('student_profiles')
+          .update({ password_hash: newHash })
+          .eq('id', studentData.id)
+      }
+    }
 
     if (!passwordMatch) {
       return res.status(401).json({
@@ -182,7 +152,8 @@ export default async function handler(
       .eq('id', studentData.id)
 
     // Set session cookie
-    res.setHeader('Set-Cookie', `student_session_id=${studentData.id}; Path=/; HttpOnly; SameSite=Strict; Max-Age=2592000`)
+    const securePart = process.env.NODE_ENV === 'production' ? ' Secure;' : ''
+    res.setHeader('Set-Cookie', `student_session_id=${studentData.id}; Path=/; HttpOnly;${securePart} SameSite=Strict; Max-Age=2592000`)
 
     return res.status(200).json({
       success: true,

@@ -47,6 +47,16 @@ body {
     align-items: center;
 }
 
+/* Suppress blinking text caret on Phaser game canvas and its container */
+#game-container,
+#game-container canvas,
+#game-container *:focus {
+    outline: none !important;
+    caret-color: transparent !important;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
 .spritePosition {
     margin: 10px 0 0 10px;
     font-size: 0.8em;

@@ -99,6 +99,32 @@ export interface Database {
           created_by_admin_id?: string | null
         }
       }
+      otp_codes: {
+        Row: {
+          id: string
+          email: string
+          code: string
+          created_at: string
+          expires_at: string
+          used: boolean
+        }
+        Insert: {
+          id?: string
+          email: string
+          code: string
+          created_at?: string
+          expires_at: string
+          used?: boolean
+        }
+        Update: {
+          id?: string
+          email?: string
+          code?: string
+          created_at?: string
+          expires_at?: string
+          used?: boolean
+        }
+      }
       student_profiles: {
         Row: {
           id: string
@@ -106,6 +132,7 @@ export interface Database {
           password_hash: string
           session_code_id: string
           display_name: string | null
+          email: string | null
           created_at: string
           last_login: string | null
           is_active: boolean
@@ -116,6 +143,7 @@ export interface Database {
           password_hash: string
           session_code_id: string
           display_name?: string | null
+          email?: string | null
           created_at?: string
           last_login?: string | null
           is_active?: boolean
@@ -126,6 +154,7 @@ export interface Database {
           password_hash?: string
           session_code_id?: string
           display_name?: string | null
+          email?: string | null
           created_at?: string
           last_login?: string | null
           is_active?: boolean
