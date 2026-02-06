@@ -11,8 +11,6 @@ import { NPCManager } from '../systems/NPCManager';
 import { GridHoverAnimation } from '../systems/GridHoverAnimation';
 import { DroneManager } from '../systems/DroneManager';
 import { GameStateService } from '../../services/gameStateService';
-import QuestManager from '../systems/QuestManager';
-import analyticsService from '../../services/analyticsService';
 
 // Movement Manager for smooth entity transitions
 export class MovementManager {
@@ -325,9 +323,6 @@ export class ProgrammingGame extends Scene {
 
     // Emit event so React component can get scene reference
     EventBus.emit('current-scene-ready', this);
-
-    // Note: Auto-sync removed - quest progress only loads when user clicks "Load"
-    // This prevents showing progress before user explicitly loads their save
 
     // Note: Auto-load removed to prevent race condition with React initialization
     // Users can manually load their save via the menu if needed
@@ -2079,15 +2074,6 @@ export class ProgrammingGame extends Scene {
         (message, color) => this.showNotification(message, color)
       );
 
-      // Sync analytics data to database (quest progress, code executions, objectives)
-      // This pushes locally-stored analytics to the database
-      try {
-        const analyticsResult = await analyticsService.syncToDatabase();
-        console.log(`[SAVE] Analytics sync: ${analyticsResult.message}`);
-      } catch (analyticsError) {
-        console.warn('[SAVE] Analytics sync failed (non-critical):', analyticsError);
-      }
-
       console.log('[SAVE] Game state saved successfully');
       console.log("Finalized save", gameState);
     } catch (error) {
@@ -2274,20 +2260,6 @@ export class ProgrammingGame extends Scene {
       console.log('[LOAD] Active entity ID:', saveData.activeEntityId);
       console.log('[LOAD] Entities loaded:', newEntities.size);
       console.log('[LOAD] Grids loaded:', newGrids.size);
-
-      // Load quest progress from database (source of truth for logged-in students)
-      // This ensures quest progress is synced from the database, not just localStorage
-      try {
-        const questManager = QuestManager.getInstance();
-        const dbLoaded = await questManager.loadProgressFromDatabase();
-        if (dbLoaded) {
-          console.log('[LOAD] Quest progress synced from database');
-        } else {
-          console.log('[LOAD] Using localStorage quest progress (database sync failed or no session)');
-        }
-      } catch (questError) {
-        console.warn('[LOAD] Quest progress database sync failed:', questError);
-      }
 
       // Note: Notification already shown by GameStateService
       console.log("Finalized load", gameState)

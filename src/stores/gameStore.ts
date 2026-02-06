@@ -148,7 +148,6 @@ export interface GameStore extends GameState {
   restartQuest: () => boolean;
   getActiveQuest: () => Quest | null;
   getAvailableQuests: () => Quest[];
-  getAllLoadedQuests: () => Quest[];
   getCompletedQuests: () => Quest[];
   getQuestProgress: (questId: string) => QuestProgress | undefined;
   isQuestUnlocked: (questId: string) => boolean;
@@ -1012,11 +1011,6 @@ export const useGameStore = create<GameStore>()(
     getAvailableQuests: () => {
       const questManager = QuestManager.getInstance();
       return questManager.getAvailableQuests();
-    },
-
-    getAllLoadedQuests: () => {
-      const questManager = QuestManager.getInstance();
-      return questManager.getAllQuests();
     },
 
     getCompletedQuests: () => {

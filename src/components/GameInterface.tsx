@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { PhaserGame, IRefPhaserGame } from '../PhaserGame';
 import StatusModal from './StatusModal';
-import { StudentProgressModal } from './StudentProgressModal';
 import { useGameStore } from '../stores/gameStore';
 import { ProgrammingGame } from '../game/scenes/ProgrammingGame';
 import { BuiltInFunctionRegistry } from '../game/systems/BuiltInFunctions';
@@ -178,11 +177,6 @@ export const GameInterface: React.FC = () => {
     isOpen: false
   });
 
-  // Progress modal state
-  const [progressModalState, setProgressModalState] = useState({
-    isOpen: false
-  });
-
   // Reset confirmation modal state
   const [resetConfirmModalState, setResetConfirmModalState] = useState({
     isOpen: false
@@ -265,7 +259,6 @@ export const GameInterface: React.FC = () => {
   const glossaryButtonPosition = { x: 220, y: 40 };
   const quickProgramButtonPosition = { x: 320, y: 40 };
   const questButtonPosition = { x: 270, y: 40 }; // Centered between glossary and programming terminal
-  const progressButtonPosition = { x: 420, y: 40 }; // Progress button next to menu button
 
   // Plant/Harvest button positions (lower-right corner)
   const plantButtonPosition = { x: window.innerWidth - 220, y: window.innerHeight - 140 };
@@ -613,16 +606,13 @@ export const GameInterface: React.FC = () => {
 
     const initializeQuests = async () => {
       try {
-        // Load all quest files from public/quests directory
+        // Load all quest files
         await store.loadQuests([
-          'quests/tutorial_basics.json',
           'quests/game_intro.json',
-          'quests/full_automation.json',
           'quests/first_harvest.json',
           'quests/auto_movement.json',
-          'quests/farming_loops.json',
           'quests/farming_scripts.json',
-          'quests/functions_intro.json',
+          'quests/full_automation.json',
           'quests/alpha_drone_intro.json',
           'quests/drone_farming_quest.json'
         ]);
@@ -1248,22 +1238,6 @@ export const GameInterface: React.FC = () => {
               if (!shouldBlockModalInteractions()) {
                 setQuestModalState({ isOpen: true });
                 openModal('quest');
-              }
-            }}
-          />
-
-          {/* Progress Button */}
-          <SpriteButton
-            position={progressButtonPosition}
-            backgroundSprite="button.png"
-            upFrame={{ x: 336, y: 496, w: 16, h: 16 }}
-            downFrame={{ x: 336, y: 512, w: 16, h: 16 }}
-            scale={3}
-            tooltip="My Progress"
-            onClick={() => {
-              if (!shouldBlockModalInteractions()) {
-                setProgressModalState({ isOpen: true });
-                openModal('progress');
               }
             }}
           />
@@ -2196,15 +2170,6 @@ export const GameInterface: React.FC = () => {
           }}
         />
       )}
-
-      {/* Progress Modal */}
-      <StudentProgressModal
-        isOpen={progressModalState.isOpen}
-        onClose={() => {
-          setProgressModalState({ isOpen: false });
-          closeModal('progress');
-        }}
-      />
 
       {/* Educational Error Display */}
       <ErrorDisplay />

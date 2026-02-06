@@ -297,10 +297,8 @@ export class QuestManager {
     progress.state = QuestState.COMPLETED;
     progress.completedAt = Date.now();
 
-    // Calculate time spent (default to 0 if startedAt is not set)
-    const timeSpentSeconds = progress.startedAt 
-      ? Math.floor((progress.completedAt - progress.startedAt) / 1000)
-      : 0;
+    // Calculate time spent
+    const timeSpentSeconds = Math.floor((progress.completedAt - progress.startedAt) / 1000);
 
     // Track quest completion in analytics
     analyticsService.trackQuestComplete(
@@ -933,120 +931,6 @@ export class QuestManager {
       this.unlockedQuests = new Set();
       this.activeQuestId = undefined;
       this.currentPhaseIndex = 0;
-    }
-  }
-
-  /**
-   * Load progress from database (source of truth for logged-in students)
-   * This should be called after login to sync progress from the database
-   */
-  public async loadProgressFromDatabase(): Promise<boolean> {
-    try {
-      console.log('[QuestManager] Loading progress from database...');
-      
-      const response = await fetch('/api/analytics/student-progress');
-      if (!response.ok) {
-        console.warn('[QuestManager] Failed to fetch from database, using localStorage');
-        return false;
-      }
-
-      const data = await response.json();
-      if (!data.success || !data.questProgress) {
-        console.warn('[QuestManager] No database progress found, using localStorage');
-        return false;
-      }
-
-      // Convert database format to QuestManager format
-      const dbProgress = data.questProgress as Array<{
-        questId: string;
-        questTitle: string;
-        state: string;
-        currentPhaseIndex: number;
-        startedAt: string | null;
-        completedAt: string | null;
-        timeSpentSeconds: number;
-        attempts: number;
-        score: number | null;
-      }>;
-
-      // Update quest progress from database
-      dbProgress.forEach(item => {
-        const existingProgress = this.questProgress.get(item.questId);
-        
-        // Convert database state to QuestState enum
-        let state: QuestState;
-        switch (item.state) {
-          case 'completed': state = QuestState.COMPLETED; break;
-          case 'active': state = QuestState.ACTIVE; break;
-          case 'failed': state = QuestState.FAILED; break;
-          case 'available': state = QuestState.AVAILABLE; break;
-          default: state = QuestState.LOCKED;
-        }
-
-        // Create or update progress entry
-        const progressEntry: QuestProgress = {
-          questId: item.questId,
-          state,
-          startedAt: item.startedAt ? new Date(item.startedAt).getTime() : undefined,
-          completedAt: item.completedAt ? new Date(item.completedAt).getTime() : undefined,
-          currentPhaseIndex: item.currentPhaseIndex || 0,
-          attempts: item.attempts || 0,
-          phaseProgress: existingProgress?.phaseProgress || new Map(),
-        };
-
-        this.questProgress.set(item.questId, progressEntry);
-
-        // Add to unlocked quests if active or completed
-        if (state === QuestState.ACTIVE || state === QuestState.COMPLETED || state === QuestState.AVAILABLE) {
-          this.unlockedQuests.add(item.questId);
-        }
-      });
-
-      // Find active quest from database
-      const activeQuest = dbProgress.find(item => item.state === 'active');
-      if (activeQuest) {
-        this.activeQuestId = activeQuest.questId;
-        this.currentPhaseIndex = activeQuest.currentPhaseIndex || 0;
-      }
-
-      // Save merged state to localStorage as backup
-      this.saveProgressToStorage();
-
-      // Also sync to analyticsService localStorage for StudentProgressModal
-      // This ensures My Progress modal shows correct data immediately
-      dbProgress.forEach(item => {
-        const state = item.state as 'locked' | 'available' | 'active' | 'completed' | 'failed';
-        if (state === 'completed') {
-          analyticsService.trackQuestComplete(
-            item.questId,
-            item.questTitle,
-            item.timeSpentSeconds || 0,
-            item.attempts || 1,
-            item.score || undefined,
-            item.completedAt || undefined // Preserve original completion timestamp from database
-          );
-        } else if (state === 'active' || state === 'available') {
-          analyticsService.updateQuestProgress(
-            item.questId,
-            item.questTitle,
-            state,
-            item.currentPhaseIndex || 0,
-            undefined, // phaseProgress
-            item.startedAt || undefined // Preserve original start timestamp from database
-          );
-        }
-      });
-
-      console.log(`[QuestManager] Loaded ${dbProgress.length} quest progress entries from database`);
-      console.log(`[QuestManager] Completed: ${dbProgress.filter(q => q.state === 'completed').length}`);
-      
-      // Emit event so UI can update
-      EventBus.emit('quest-progress-synced');
-      
-      return true;
-    } catch (error) {
-      console.error('[QuestManager] Error loading from database:', error);
-      return false;
     }
   }
 
