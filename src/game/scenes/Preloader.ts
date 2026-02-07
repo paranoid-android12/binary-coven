@@ -56,6 +56,9 @@ export class Preloader extends Scene
         // Using setPath() with base URL to ensure correct loading
         this.load.setPath('/');
 
+        // Load background music
+        this.load.audio('bgm', 'bgm.mp3');
+
         this.load.spritesheet('manu_idle', 'Manu_Idle.png', {
             frameWidth: 32,
             frameHeight: 32

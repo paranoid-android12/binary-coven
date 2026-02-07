@@ -115,6 +115,24 @@ export class MainMenu extends Scene
         this.mainButton.setDepth(101);
         this.startText.setDepth(102);
 
+        // Start background music (persists across scenes via global SoundManager)
+        const existingBgm = this.sound.getAll('bgm');
+        if (existingBgm.length === 0) {
+            const bgm = this.sound.add('bgm', { loop: true, volume: 0.3 });
+            const isMuted = typeof window !== 'undefined' && localStorage.getItem('bgm-muted') === 'true';
+            bgm.mute = isMuted;
+            if (this.sound.locked) {
+                this.sound.once('unlocked', () => {
+                    bgm.play();
+                });
+            } else {
+                bgm.play();
+            }
+        } else {
+            // Returning to menu — restore full volume
+            existingBgm.forEach(s => { (s as any).volume = 0.15; });
+        }
+
         EventBus.emit('current-scene-ready', this);
     }
     

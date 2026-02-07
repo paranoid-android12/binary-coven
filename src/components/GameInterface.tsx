@@ -207,6 +207,14 @@ export const GameInterface: React.FC = () => {
   const [isOnChallengeGrid, setIsOnChallengeGrid] = useState(false);
   const [showChallengeBlockedMessage, setShowChallengeBlockedMessage] = useState(false);
 
+  // BGM mute state (persisted in localStorage)
+  const [bgmMuted, setBgmMuted] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('bgm-muted') === 'true';
+    }
+    return false;
+  });
+
   // Global modal state management - tracks if ANY modal is open
   const [globalModalState, setGlobalModalState] = useState({
     isAnyModalOpen: false,
@@ -299,6 +307,18 @@ export const GameInterface: React.FC = () => {
       };
     });
   }, []);
+
+  // BGM toggle handler - accesses global Phaser SoundManager
+  const handleToggleBGM = useCallback(() => {
+    const game = phaserRef.current?.game;
+    if (game && game.sound) {
+      const newMuted = !bgmMuted;
+      const sounds = game.sound.getAll('bgm');
+      sounds.forEach(s => { (s as any).mute = newMuted; });
+      setBgmMuted(newMuted);
+      localStorage.setItem('bgm-muted', String(newMuted));
+    }
+  }, [bgmMuted]);
 
   // Handle click outside game menu modal to close
   useEffect(() => {
@@ -2530,6 +2550,12 @@ export const GameInterface: React.FC = () => {
                   setGameMenuModalState({ isOpen: false });
                   closeModal('game-menu');
                 }}
+              />
+
+              {/* Music Toggle Button */}
+              <MenuButton
+                text={`MUSIC: ${bgmMuted ? 'OFF' : 'ON'}`}
+                onClick={handleToggleBGM}
               />
 
               {/* Logout Button */}
