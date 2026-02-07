@@ -50,9 +50,9 @@ export default async function handler(
     // Verify student exists
     const { data: student, error: studentError } = await supabase
       .from('student_profiles')
-      .select('id')
+      .select('id, session_code_id')
       .eq('id', studentSessionId)
-      .single()
+      .single() as { data: { id: string; session_code_id: string | null } | null; error: any }
 
     if (studentError || !student) {
       return res.status(401).json({
@@ -61,21 +61,34 @@ export default async function handler(
       })
     }
 
+    // Get active session_code_id from student_sessions (fall back to legacy field)
+    let activeSessionCodeId = student.session_code_id
+    const { data: activeSession } = await (supabase
+      .from('student_sessions') as any)
+      .select('session_code_id')
+      .eq('student_profile_id', studentSessionId)
+      .eq('is_active', true)
+      .order('joined_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+    if (activeSession) activeSessionCodeId = activeSession.session_code_id
+
     const now = new Date().toISOString()
 
-    // Upsert game save (insert or update if exists)
+    // Upsert game save (insert or update if exists) — scoped to session
     const { error: saveError } = await supabase
       .from('game_saves')
       .upsert(
         {
           student_profile_id: studentSessionId,
+          session_code_id: activeSessionCodeId,
           game_state: gameState,
           save_name: saveName,
           last_saved: now,
           save_version: 1,
-        },
+        } as any,
         {
-          onConflict: 'student_profile_id,save_name',
+          onConflict: 'student_profile_id,session_code_id,save_name',
         }
       )
 

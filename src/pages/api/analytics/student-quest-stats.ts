@@ -44,9 +44,9 @@ export default async function handler(
     // Verify student exists
     const { data: student, error: studentError } = await supabase
       .from('student_profiles')
-      .select('id')
+      .select('id, session_code_id')
       .eq('id', studentSessionId)
-      .single()
+      .single() as { data: { id: string; session_code_id: string | null } | null; error: any }
 
     if (studentError || !student) {
       return res.status(401).json({
@@ -55,12 +55,29 @@ export default async function handler(
       })
     }
 
-    // Fetch all code executions for this student
-    const { data: executions, error: executionsError } = await supabase
+    // Get active session_code_id from student_sessions (fall back to legacy field)
+    let activeSessionCodeId = student.session_code_id
+    const { data: activeSession } = await (supabase.from('student_sessions') as any)
+      .select('session_code_id')
+      .eq('student_profile_id', studentSessionId)
+      .eq('is_active', true)
+      .order('joined_at', { ascending: false })
+      .limit(1)
+      .single()
+    if (activeSession) activeSessionCodeId = activeSession.session_code_id
+
+    // Fetch code executions for this student in the active session
+    let executionsQuery = supabase
       .from('code_executions')
       .select('quest_id, execution_result, execution_duration_ms')
       .eq('student_profile_id', studentSessionId)
       .not('quest_id', 'is', null)
+    
+    if (activeSessionCodeId) {
+      executionsQuery = executionsQuery.eq('session_code_id', activeSessionCodeId)
+    }
+
+    const { data: executions, error: executionsError } = await executionsQuery
 
     if (executionsError) {
       console.error('Error fetching code executions:', executionsError)

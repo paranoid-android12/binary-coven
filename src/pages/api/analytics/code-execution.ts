@@ -59,9 +59,9 @@ export default async function handler(
     // Verify student exists
     const { data: student, error: studentError } = await supabase
       .from('student_profiles')
-      .select('id')
+      .select('id, session_code_id')
       .eq('id', studentSessionId)
-      .single()
+      .single() as { data: { id: string; session_code_id: string | null } | null; error: any }
 
     if (studentError || !student) {
       return res.status(401).json({
@@ -70,11 +70,24 @@ export default async function handler(
       })
     }
 
+    // Get active session_code_id from student_sessions (fall back to legacy field)
+    let activeSessionCodeId = student.session_code_id
+    const { data: activeSession } = await (supabase
+      .from('student_sessions') as any)
+      .select('session_code_id')
+      .eq('student_profile_id', studentSessionId)
+      .eq('is_active', true)
+      .order('joined_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+    if (activeSession) activeSessionCodeId = activeSession.session_code_id
+
     // Insert code execution log
     const { error: insertError } = await supabase
       .from('code_executions')
       .insert({
         student_profile_id: studentSessionId,
+        session_code_id: activeSessionCodeId,
         quest_id: executionLog.questId,
         phase_id: executionLog.phaseId,
         code_window_id: executionLog.codeWindowId,
@@ -82,7 +95,7 @@ export default async function handler(
         execution_result: executionLog.executionResult,
         entity_id: executionLog.entityId,
         execution_duration_ms: executionLog.executionDurationMs,
-      })
+      } as any)
 
     if (insertError) {
       console.error('Error logging code execution:', insertError)

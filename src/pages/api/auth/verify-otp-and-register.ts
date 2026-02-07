@@ -1,4 +1,5 @@
-// API route: Verify OTP and register a new student account
+// API route: Verify OTP and register a new global student account
+// Creates student_profiles row (global) + student_sessions row (session link)
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getSupabaseApiClient, getSupabaseAdminClient } from '@/lib/supabase/server'
 import { verifyOtp } from '@/lib/otpStore'
@@ -78,22 +79,35 @@ export default async function handler(
 
     const supabase = getSupabaseApiClient(req, res)
 
-    // Check that the username is still available
-    const { data: existingStudent } = await supabase
+    // Check that the username is globally available
+    const { data: existingByUsername } = await supabase
       .from('student_profiles')
       .select('id')
       .eq('username', username)
-      .eq('session_code_id', sessionCodeData.id)
       .maybeSingle()
 
-    if (existingStudent) {
+    if (existingByUsername) {
       return res.status(400).json({
         success: false,
         message: 'This username has already been taken. Please try a different one.',
       })
     }
 
-    // Create the student account
+    // Check that the email is not already registered
+    const { data: existingByEmail } = await supabase
+      .from('student_profiles')
+      .select('id')
+      .eq('email', email.toLowerCase().trim())
+      .maybeSingle()
+
+    if (existingByEmail) {
+      return res.status(400).json({
+        success: false,
+        message: 'This email is already registered with a different account.',
+      })
+    }
+
+    // Create the global student account (no session_code_id on the profile)
     const passwordHash = await bcrypt.hash(password, 10)
 
     const { data: newStudent, error: createError } = await supabase
@@ -101,7 +115,7 @@ export default async function handler(
       .insert({
         username,
         password_hash: passwordHash,
-        session_code_id: sessionCodeData.id,
+        session_code_id: sessionCodeData.id, // Keep for backward compat during transition
         display_name: username,
         email: email.toLowerCase().trim(),
         last_login: new Date().toISOString(),
@@ -117,11 +131,25 @@ export default async function handler(
       })
     }
 
-    // Create initial game save for new student
+    // Create student_sessions link
+    const { error: linkError } = await (supabase
+      .from('student_sessions') as any)
+      .insert({
+        student_profile_id: newStudent.id,
+        session_code_id: sessionCodeData.id,
+      })
+
+    if (linkError) {
+      console.error('Error creating session link:', linkError)
+      // Non-fatal — account was created, just session link failed
+    }
+
+    // Create initial game save for new student (with session_code_id)
     const { error: saveError } = await supabase
       .from('game_saves')
       .insert({
         student_profile_id: newStudent.id,
+        session_code_id: sessionCodeData.id,
         game_state: {
           grids: [],
           entities: [],
@@ -140,7 +168,7 @@ export default async function handler(
     const securePart = process.env.NODE_ENV === 'production' ? ' Secure;' : ''
     res.setHeader('Set-Cookie', `student_session_id=${newStudent.id}; Path=/; HttpOnly;${securePart} SameSite=Strict; Max-Age=2592000`)
 
-    console.log(`[OTP] Account created for ${username} (verified via ${email})`)
+    console.log(`[OTP] Global account created for ${username} (verified via ${email}), linked to session ${sessionCode}`)
 
     return res.status(200).json({
       success: true,
@@ -149,7 +177,7 @@ export default async function handler(
         id: newStudent.id,
         username: newStudent.username,
         displayName: newStudent.display_name,
-        sessionCodeId: newStudent.session_code_id,
+        sessionCodeId: sessionCodeData.id,
       },
     })
   } catch (error) {

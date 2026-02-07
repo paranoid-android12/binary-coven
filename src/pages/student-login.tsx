@@ -9,6 +9,7 @@ interface StudentLoginResponse {
   success: boolean;
   message: string;
   needsOtp?: boolean;
+  linkedNewSession?: boolean;
   student?: {
     id: string;
     username: string;
@@ -333,6 +334,7 @@ export default function StudentLogin() {
           username: formData.username.trim(),
           password: formData.password,
           sessionCode: formData.sessionCode.trim(),
+          email: formData.email.trim().toLowerCase(),
         }),
       });
 
@@ -347,6 +349,9 @@ export default function StudentLogin() {
         setTimeout(() => handleSendOtp(), 100);
         return;
       } else if (data.success && data.student) {
+        if (data.linkedNewSession) {
+          console.log('[StudentLogin] Welcome back — account linked to new session');
+        }
         // Update user context
         login(data.student, 'student');
         // Redirect to game
@@ -381,25 +386,25 @@ export default function StudentLogin() {
           backgroundColor: '#d8a888',
           border: '4px solid #210714',
           borderRadius: '12px',
-          padding: '40px 50px',
-          maxWidth: '450px',
+          padding: '25px 35px',
+          maxWidth: '420px',
           width: '100%',
           boxShadow: '0 8px 0 #210714, 0 12px 20px rgba(0, 0, 0, 0.5)',
         }}>
           <h1 style={{
             fontFamily: 'BoldPixels',
-            fontSize: '2.5em',
+            fontSize: '2em',
             color: '#210714',
             textAlign: 'center',
-            margin: '0 0 10px 0',
+            margin: '0 0 4px 0',
             textShadow: '2px 2px 0px rgba(255, 255, 255, 0.3)',
           }}>Binary Coven</h1>
           <p style={{
             fontFamily: 'BoldPixels',
-            fontSize: '1.2em',
+            fontSize: '1em',
             color: '#210714',
             textAlign: 'center',
-            margin: '0 0 30px 0',
+            margin: '0 0 16px 0',
             opacity: 0.8,
           }}>Student Portal</p>
 
@@ -408,7 +413,7 @@ export default function StudentLogin() {
               <form onSubmit={handleSubmit} style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '20px',
+                gap: '12px',
                 width: '100%',
                 maxWidth: '360px',
               }}>
@@ -440,10 +445,10 @@ export default function StudentLogin() {
                   </div>
                 )}
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <label htmlFor="sessionCode" style={{
                     fontFamily: 'Arial, Helvetica, sans-serif',
-                    fontSize: '0.9em',
+                    fontSize: '0.8em',
                     color: '#210714',
                     textTransform: 'uppercase',
                     letterSpacing: '1px',
@@ -456,7 +461,7 @@ export default function StudentLogin() {
                     style={{
                       fontFamily: 'Arial, Helvetica, sans-serif',
                       fontSize: '1em',
-                      padding: '12px 15px',
+                      padding: '8px 12px',
                       backgroundColor: '#ffffff',
                       color: '#210714',
                       border: '2px solid #210714',
@@ -484,10 +489,10 @@ export default function StudentLogin() {
                   )}
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <label htmlFor="email" style={{
                     fontFamily: 'Arial, Helvetica, sans-serif',
-                    fontSize: '0.9em',
+                    fontSize: '0.8em',
                     color: '#210714',
                     textTransform: 'uppercase',
                     letterSpacing: '1px',
@@ -500,7 +505,7 @@ export default function StudentLogin() {
                     style={{
                       fontFamily: 'Arial, Helvetica, sans-serif',
                       fontSize: '1em',
-                      padding: '12px 15px',
+                      padding: '8px 12px',
                       backgroundColor: '#ffffff',
                       color: '#210714',
                       border: '2px solid #210714',
@@ -514,10 +519,10 @@ export default function StudentLogin() {
                   />
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <label htmlFor="username" style={{
                     fontFamily: 'Arial, Helvetica, sans-serif',
-                    fontSize: '0.9em',
+                    fontSize: '0.8em',
                     color: '#210714',
                     textTransform: 'uppercase',
                     letterSpacing: '1px',
@@ -530,7 +535,7 @@ export default function StudentLogin() {
                     style={{
                       fontFamily: 'Arial, Helvetica, sans-serif',
                       fontSize: '1em',
-                      padding: '12px 15px',
+                      padding: '8px 12px',
                       backgroundColor: '#ffffff',
                       color: '#210714',
                       border: '2px solid #210714',
@@ -544,11 +549,11 @@ export default function StudentLogin() {
                   />
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <label htmlFor="password" style={{
                       fontFamily: 'Arial, Helvetica, sans-serif',
-                      fontSize: '0.9em',
+                      fontSize: '0.8em',
                       color: '#210714',
                       textTransform: 'uppercase',
                       letterSpacing: '1px',
@@ -587,7 +592,7 @@ export default function StudentLogin() {
                       style={{
                         fontFamily: 'Arial, Helvetica, sans-serif',
                         fontSize: '1em',
-                        padding: '12px 15px',
+                        padding: '8px 12px',
                         paddingRight: '45px',
                         backgroundColor: '#ffffff',
                         color: '#210714',
@@ -637,13 +642,13 @@ export default function StudentLogin() {
                     const requirements = checkPasswordRequirements(formData.password);
                     return (
                       <div style={{
-                        fontSize: '0.75em',
-                        padding: '8px 10px',
+                        fontSize: '0.7em',
+                        padding: '4px 8px',
                         backgroundColor: 'rgba(33, 7, 20, 0.1)',
                         borderRadius: '4px',
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '4px',
+                        gap: '2px',
                       }}>
                         <div style={{
                           color: requirements.hasUpperCase ? '#0b7607' : '#b10000',
@@ -675,8 +680,8 @@ export default function StudentLogin() {
               </form>
 
               <div style={{
-                marginTop: '30px',
-                paddingTop: '20px',
+                marginTop: '16px',
+                paddingTop: '12px',
                 borderTop: '2px solid rgba(33, 7, 20, 0.2)',
               }}>
                 <p style={{
@@ -1318,7 +1323,7 @@ const StudentLoginButton: React.FC<StudentLoginButtonProps> = ({ text, disabled 
       }}
       style={{
         width: '100%',
-        padding: '15px 20px',
+        padding: '10px 20px',
         backgroundColor: isHovered && !disabled ? '#210714' : 'transparent',
         color: isHovered && !disabled ? '#d8a888' : '#210714',
         border: '3px solid #210714',
