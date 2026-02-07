@@ -280,6 +280,10 @@ export class ProgrammingGame extends Scene {
   }
 
   create() {
+    // Lower BGM volume during gameplay (menu plays at 0.3)
+    const bgmSounds = this.sound.getAll('bgm');
+    bgmSounds.forEach(s => { (s as any).volume = 0.15; });
+
     // Configure pixel-perfect rendering for the entire scene
     this.cameras.main.setRoundPixels(true);
 
