@@ -44,16 +44,31 @@ export default async function handler(
       studentCount: number;
     } | null = null;
 
-    // Get current student's session code ID
+    // Get current student's active session code ID via student_sessions
     if (studentSessionId) {
-      const { data: studentData } = await supabase
-        .from('student_profiles')
+      // First try junction table
+      const { data: sessionLink } = await supabase
+        .from('student_sessions')
         .select('session_code_id')
-        .eq('id', studentSessionId)
-        .single();
-      
-      if (studentData) {
-        sessionCodeId = studentData.session_code_id;
+        .eq('student_profile_id', studentSessionId)
+        .eq('is_active', true)
+        .order('joined_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (sessionLink) {
+        sessionCodeId = sessionLink.session_code_id;
+      } else {
+        // Fallback to legacy field on student_profiles
+        const { data: studentData } = await supabase
+          .from('student_profiles')
+          .select('session_code_id')
+          .eq('id', studentSessionId)
+          .single();
+
+        if (studentData) {
+          sessionCodeId = studentData.session_code_id;
+        }
       }
     }
 
@@ -85,9 +100,9 @@ export default async function handler(
           }
         }
 
-        // Count students in this session
+        // Count students in this session (via junction table)
         const { count } = await supabase
-          .from('student_profiles')
+          .from('student_sessions')
           .select('id', { count: 'exact', head: true })
           .eq('session_code_id', sessionCodeId)
           .eq('is_active', true);
@@ -113,7 +128,25 @@ export default async function handler(
       });
     }
 
-    // Build query - only fetch students from the same session
+    // Build query - fetch students linked to this session via student_sessions
+    // First get student IDs from the junction table
+    const { data: sessionStudents, error: sessionStudentsError } = await supabase
+      .from('student_sessions')
+      .select('student_profile_id')
+      .eq('session_code_id', sessionCodeId)
+      .eq('is_active', true);
+
+    if (sessionStudentsError || !sessionStudents || sessionStudents.length === 0) {
+      return res.status(200).json({
+        success: true,
+        students: [],
+        sessionInfo,
+        message: 'No students found in this session'
+      });
+    }
+
+    const studentIds = sessionStudents.map((s: any) => s.student_profile_id);
+
     let query = supabase
       .from('student_profiles')
       .select(`
@@ -126,7 +159,7 @@ export default async function handler(
         )
       `)
       .eq('is_active', true)
-      .eq('session_code_id', sessionCodeId) // Always filter by session
+      .in('id', studentIds)
       .order('created_at', { ascending: false });
 
     const { data: studentsWithProgress, error: studentsError } = await query;

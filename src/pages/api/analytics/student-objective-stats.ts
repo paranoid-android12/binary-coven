@@ -44,9 +44,9 @@ export default async function handler(
     // Verify student exists
     const { data: student, error: studentError } = await supabase
       .from('student_profiles')
-      .select('id')
+      .select('id, session_code_id')
       .eq('id', studentSessionId)
-      .single()
+      .single() as { data: { id: string; session_code_id: string | null } | null; error: any }
 
     if (studentError || !student) {
       return res.status(401).json({
@@ -55,12 +55,29 @@ export default async function handler(
       })
     }
 
-    // Fetch all completed objectives for this student
-    const { data: objectives, error: objectivesError } = await supabase
+    // Get active session_code_id from student_sessions (fall back to legacy field)
+    let activeSessionCodeId = student.session_code_id
+    const { data: activeSession } = await (supabase.from('student_sessions') as any)
+      .select('session_code_id')
+      .eq('student_profile_id', studentSessionId)
+      .eq('is_active', true)
+      .order('joined_at', { ascending: false })
+      .limit(1)
+      .single()
+    if (activeSession) activeSessionCodeId = activeSession.session_code_id
+
+    // Fetch completed objectives for this student in the active session
+    let objectivesQuery = supabase
       .from('objective_progress')
       .select('attempts, time_spent_seconds, hints_used')
       .eq('student_profile_id', studentSessionId)
       .not('completed_at', 'is', null)
+    
+    if (activeSessionCodeId) {
+      objectivesQuery = objectivesQuery.eq('session_code_id', activeSessionCodeId)
+    }
+
+    const { data: objectives, error: objectivesError } = await objectivesQuery
 
     if (objectivesError) {
       console.error('Error fetching objectives:', objectivesError)

@@ -130,7 +130,7 @@ export interface Database {
           id: string
           username: string
           password_hash: string
-          session_code_id: string
+          session_code_id: string | null
           display_name: string | null
           email: string | null
           created_at: string
@@ -141,7 +141,7 @@ export interface Database {
           id?: string
           username: string
           password_hash: string
-          session_code_id: string
+          session_code_id?: string | null
           display_name?: string | null
           email?: string | null
           created_at?: string
@@ -152,7 +152,7 @@ export interface Database {
           id?: string
           username?: string
           password_hash?: string
-          session_code_id?: string
+          session_code_id?: string | null
           display_name?: string | null
           email?: string | null
           created_at?: string
@@ -160,10 +160,34 @@ export interface Database {
           is_active?: boolean
         }
       }
+      student_sessions: {
+        Row: {
+          id: string
+          student_profile_id: string
+          session_code_id: string
+          joined_at: string
+          is_active: boolean
+        }
+        Insert: {
+          id?: string
+          student_profile_id: string
+          session_code_id: string
+          joined_at?: string
+          is_active?: boolean
+        }
+        Update: {
+          id?: string
+          student_profile_id?: string
+          session_code_id?: string
+          joined_at?: string
+          is_active?: boolean
+        }
+      }
       game_saves: {
         Row: {
           id: string
           student_profile_id: string
+          session_code_id: string | null
           game_state: Json
           save_name: string
           last_saved: string
@@ -172,6 +196,7 @@ export interface Database {
         Insert: {
           id?: string
           student_profile_id: string
+          session_code_id?: string | null
           game_state: Json
           save_name?: string
           last_saved?: string
@@ -180,6 +205,7 @@ export interface Database {
         Update: {
           id?: string
           student_profile_id?: string
+          session_code_id?: string | null
           game_state?: Json
           save_name?: string
           last_saved?: string
@@ -190,6 +216,7 @@ export interface Database {
         Row: {
           id: string
           student_profile_id: string
+          session_code_id: string | null
           quest_id: string
           quest_title: string | null
           state: string
@@ -204,6 +231,7 @@ export interface Database {
         Insert: {
           id?: string
           student_profile_id: string
+          session_code_id?: string | null
           quest_id: string
           quest_title?: string | null
           state: string
@@ -218,6 +246,7 @@ export interface Database {
         Update: {
           id?: string
           student_profile_id?: string
+          session_code_id?: string | null
           quest_id?: string
           quest_title?: string | null
           state?: string
@@ -234,6 +263,7 @@ export interface Database {
         Row: {
           id: string
           student_profile_id: string
+          session_code_id: string | null
           quest_id: string
           phase_id: string
           objective_index: number
@@ -246,6 +276,7 @@ export interface Database {
         Insert: {
           id?: string
           student_profile_id: string
+          session_code_id?: string | null
           quest_id: string
           phase_id: string
           objective_index: number
@@ -258,6 +289,7 @@ export interface Database {
         Update: {
           id?: string
           student_profile_id?: string
+          session_code_id?: string | null
           quest_id?: string
           phase_id?: string
           objective_index?: number
@@ -272,6 +304,7 @@ export interface Database {
         Row: {
           id: string
           student_profile_id: string
+          session_code_id: string | null
           quest_id: string | null
           phase_id: string | null
           code_window_id: string | null
@@ -284,6 +317,7 @@ export interface Database {
         Insert: {
           id?: string
           student_profile_id: string
+          session_code_id?: string | null
           quest_id?: string | null
           phase_id?: string | null
           code_window_id?: string | null
@@ -296,6 +330,7 @@ export interface Database {
         Update: {
           id?: string
           student_profile_id?: string
+          session_code_id?: string | null
           quest_id?: string | null
           phase_id?: string | null
           code_window_id?: string | null
@@ -310,6 +345,7 @@ export interface Database {
         Row: {
           id: string
           student_profile_id: string
+          session_code_id: string | null
           event_type: string
           event_data: Json | null
           quest_id: string | null
@@ -319,6 +355,7 @@ export interface Database {
         Insert: {
           id?: string
           student_profile_id: string
+          session_code_id?: string | null
           event_type: string
           event_data?: Json | null
           quest_id?: string | null
@@ -328,6 +365,7 @@ export interface Database {
         Update: {
           id?: string
           student_profile_id?: string
+          session_code_id?: string | null
           event_type?: string
           event_data?: Json | null
           quest_id?: string | null
@@ -413,5 +451,6 @@ export type ObjectiveProgress = Database['public']['Tables']['objective_progress
 export type CodeExecution = Database['public']['Tables']['code_executions']['Row']
 export type LearningEvent = Database['public']['Tables']['learning_events']['Row']
 export type SessionQuest = Database['public']['Tables']['session_quests']['Row']
+export type StudentSession = Database['public']['Tables']['student_sessions']['Row']
 export type SessionCodeStats = Database['public']['Views']['session_code_stats']['Row']
 export type StudentProgressSummary = Database['public']['Views']['student_progress_summary']['Row']

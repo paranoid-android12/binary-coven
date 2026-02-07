@@ -35,9 +35,9 @@ export default async function handler(
     // Verify student exists
     const { data: student, error: studentError } = await supabase
       .from('student_profiles')
-      .select('id')
+      .select('id, session_code_id')
       .eq('id', studentSessionId)
-      .single()
+      .single() as { data: { id: string; session_code_id: string | null } | null; error: any }
 
     if (studentError || !student) {
       return res.status(401).json({
@@ -46,61 +46,77 @@ export default async function handler(
       })
     }
 
-    // Delete all game saves for this student
-    const { error: deleteSaveError } = await supabase
-      .from('game_saves')
-      .delete()
+    // Get active session_code_id from student_sessions (fall back to legacy field)
+    let activeSessionCodeId = student.session_code_id
+    const { data: activeSession } = await (supabase
+      .from('student_sessions') as any)
+      .select('session_code_id')
       .eq('student_profile_id', studentSessionId)
+      .eq('is_active', true)
+      .order('joined_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+    if (activeSession) activeSessionCodeId = activeSession.session_code_id
+
+    // Build session filter helper — scopes deletions to active session when possible
+    const withSessionScope = (query: any) => {
+      if (activeSessionCodeId) {
+        return query.eq('session_code_id', activeSessionCodeId)
+      }
+      return query
+    }
+
+    // Delete game saves for this student in this session
+    const { error: deleteSaveError } = await withSessionScope(
+      supabase.from('game_saves').delete().eq('student_profile_id', studentSessionId)
+    )
 
     if (deleteSaveError) {
       console.error('Error deleting game saves:', deleteSaveError)
     }
 
-    // Delete all quest progress
-    const { error: deleteQuestError } = await supabase
-      .from('quest_progress')
-      .delete()
-      .eq('student_profile_id', studentSessionId)
+    // Delete quest progress for this session
+    const { error: deleteQuestError } = await withSessionScope(
+      supabase.from('quest_progress').delete().eq('student_profile_id', studentSessionId)
+    )
 
     if (deleteQuestError) {
       console.error('Error deleting quest progress:', deleteQuestError)
     }
 
-    // Delete all objective progress
-    const { error: deleteObjectiveError } = await supabase
-      .from('objective_progress')
-      .delete()
-      .eq('student_profile_id', studentSessionId)
+    // Delete objective progress for this session
+    const { error: deleteObjectiveError } = await withSessionScope(
+      supabase.from('objective_progress').delete().eq('student_profile_id', studentSessionId)
+    )
 
     if (deleteObjectiveError) {
       console.error('Error deleting objective progress:', deleteObjectiveError)
     }
 
-    // Delete all code executions
-    const { error: deleteCodeError } = await supabase
-      .from('code_executions')
-      .delete()
-      .eq('student_profile_id', studentSessionId)
+    // Delete code executions for this session
+    const { error: deleteCodeError } = await withSessionScope(
+      supabase.from('code_executions').delete().eq('student_profile_id', studentSessionId)
+    )
 
     if (deleteCodeError) {
       console.error('Error deleting code executions:', deleteCodeError)
     }
 
-    // Delete all learning events
-    const { error: deleteEventsError } = await supabase
-      .from('learning_events')
-      .delete()
-      .eq('student_profile_id', studentSessionId)
+    // Delete learning events for this session
+    const { error: deleteEventsError } = await withSessionScope(
+      supabase.from('learning_events').delete().eq('student_profile_id', studentSessionId)
+    )
 
     if (deleteEventsError) {
       console.error('Error deleting learning events:', deleteEventsError)
     }
 
-    // Create a fresh initial game save
+    // Create a fresh initial game save for this session
     const { error: createSaveError } = await supabase
       .from('game_saves')
       .insert({
         student_profile_id: studentSessionId,
+        session_code_id: activeSessionCodeId,
         game_state: {
           grids: [],
           entities: [],
@@ -109,7 +125,7 @@ export default async function handler(
           questProgress: {},
         },
         save_name: 'autosave',
-      })
+      } as any)
 
     if (createSaveError) {
       console.error('Error creating initial save:', createSaveError)

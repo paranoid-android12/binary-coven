@@ -65,12 +65,29 @@ export default async function handler(
       .from('student_profiles')
       .select('id, username, display_name, session_code_id')
       .eq('id', studentSessionId)
-      .single()
+      .single() as { data: { id: string; username: string; display_name: string | null; session_code_id: string | null } | null; error: any }
 
     if (error || !studentData) {
       return res.status(200).json({
         authenticated: false,
       })
+    }
+
+    // Get the active session from student_sessions (most recently joined)
+    // Falls back to legacy session_code_id on the profile
+    let activeSessionCodeId = studentData.session_code_id
+
+    const { data: activeSession } = await (supabase
+      .from('student_sessions') as any)
+      .select('session_code_id')
+      .eq('student_profile_id', studentData.id)
+      .eq('is_active', true)
+      .order('joined_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (activeSession) {
+      activeSessionCodeId = activeSession.session_code_id
     }
 
     return res.status(200).json({
@@ -79,8 +96,8 @@ export default async function handler(
       user: {
         id: studentData.id,
         username: studentData.username,
-        displayName: studentData.display_name,
-        sessionCodeId: studentData.session_code_id,
+        displayName: studentData.display_name ?? undefined,
+        sessionCodeId: activeSessionCodeId ?? undefined,
       },
     })
   } catch (error) {

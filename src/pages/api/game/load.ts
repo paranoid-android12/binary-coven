@@ -40,9 +40,9 @@ export default async function handler(
     // Verify student exists
     const { data: student, error: studentError } = await supabase
       .from('student_profiles')
-      .select('id')
+      .select('id, session_code_id')
       .eq('id', studentSessionId)
-      .single()
+      .single() as { data: { id: string; session_code_id: string | null } | null; error: any }
 
     if (studentError || !student) {
       return res.status(401).json({
@@ -51,13 +51,45 @@ export default async function handler(
       })
     }
 
-    // Get game save
-    const { data: gameSave, error: loadError } = await supabase
-      .from('game_saves')
-      .select('game_state, last_saved')
+    // Get active session_code_id from student_sessions (fall back to legacy field)
+    let activeSessionCodeId = student.session_code_id
+    const { data: activeSession } = await (supabase
+      .from('student_sessions') as any)
+      .select('session_code_id')
       .eq('student_profile_id', studentSessionId)
-      .eq('save_name', saveName)
-      .single()
+      .eq('is_active', true)
+      .order('joined_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+    if (activeSession) activeSessionCodeId = activeSession.session_code_id
+
+    // Get game save — prefer session-specific save, fall back to any save for this student
+    let gameSave: { game_state: any, last_saved: string } | null = null
+    let loadError = null
+
+    if (activeSessionCodeId) {
+      const result = await supabase
+        .from('game_saves')
+        .select('game_state, last_saved')
+        .eq('student_profile_id', studentSessionId)
+        .eq('session_code_id', activeSessionCodeId)
+        .eq('save_name', saveName)
+        .single() as { data: { game_state: any, last_saved: string } | null, error: any }
+      gameSave = result.data
+      loadError = result.error
+    }
+
+    // Fallback: try loading without session_code_id filter (legacy saves)
+    if (!gameSave) {
+      const result = await supabase
+        .from('game_saves')
+        .select('game_state, last_saved')
+        .eq('student_profile_id', studentSessionId)
+        .eq('save_name', saveName)
+        .single() as { data: { game_state: any, last_saved: string } | null, error: any }
+      gameSave = result.data
+      loadError = result.error
+    }
 
     if (loadError || !gameSave) {
       // No save exists - return empty state

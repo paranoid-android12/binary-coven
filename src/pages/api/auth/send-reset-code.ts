@@ -51,41 +51,17 @@ export default async function handler(
 
     const adminSupabase = getSupabaseAdminClient()
 
-    // Look up the session code (including validity window and active status)
-    const { data: sessionCodeData, error: sessionCodeError } = await adminSupabase
-      .from('session_codes')
-      .select('id, validity_start, validity_end, is_active')
-      .eq('code', sessionCode.trim())
-      .maybeSingle() as { data: { id: string; validity_start: string; validity_end: string; is_active: boolean } | null, error: any }
-
-    if (sessionCodeError || !sessionCodeData) {
-      // Don't reveal whether session code exists — generic message
-      return res.status(400).json({
-        success: false,
-        message: 'No account found with this username and session code',
-      })
-    }
-
-    const now = new Date()
-    if (!sessionCodeData.is_active || now < new Date(sessionCodeData.validity_start) || now > new Date(sessionCodeData.validity_end)) {
-      return res.status(400).json({
-        success: false,
-        message: 'No account found with this username and session code',
-      })
-    }
-
-    // Look up the student profile
+    // Look up the student by username (global lookup)
     const { data: student, error: studentError } = await adminSupabase
       .from('student_profiles')
       .select('id, email')
       .eq('username', username.trim())
-      .eq('session_code_id', sessionCodeData.id)
       .maybeSingle() as { data: { id: string, email: string | null } | null, error: any }
 
     if (studentError || !student) {
       return res.status(400).json({
         success: false,
-        message: 'No account found with this username and session code',
+        message: 'No account found with this username',
       })
     }
 

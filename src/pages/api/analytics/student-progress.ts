@@ -56,9 +56,9 @@ export default async function handler(
     // Verify student exists
     const { data: student, error: studentError } = await supabase
       .from('student_profiles')
-      .select('id')
+      .select('id, session_code_id')
       .eq('id', studentSessionId)
-      .single()
+      .single() as { data: { id: string; session_code_id: string | null } | null; error: any }
 
     if (studentError || !student) {
       return res.status(401).json({
@@ -67,8 +67,19 @@ export default async function handler(
       })
     }
 
-    // Fetch all quest progress for this student
-    const { data: progressData, error: progressError } = await supabase
+    // Get active session_code_id from student_sessions (fall back to legacy field)
+    let activeSessionCodeId = student.session_code_id
+    const { data: activeSession } = await (supabase.from('student_sessions') as any)
+      .select('session_code_id')
+      .eq('student_profile_id', studentSessionId)
+      .eq('is_active', true)
+      .order('joined_at', { ascending: false })
+      .limit(1)
+      .single()
+    if (activeSession) activeSessionCodeId = activeSession.session_code_id
+
+    // Fetch quest progress for this student in the active session
+    let progressQuery = supabase
       .from('quest_progress')
       .select(`
         quest_id,
@@ -82,6 +93,12 @@ export default async function handler(
         score
       `)
       .eq('student_profile_id', studentSessionId)
+    
+    if (activeSessionCodeId) {
+      progressQuery = progressQuery.eq('session_code_id', activeSessionCodeId)
+    }
+
+    const { data: progressData, error: progressError } = await progressQuery
       .order('completed_at', { ascending: false, nullsFirst: false })
 
     if (progressError) {
