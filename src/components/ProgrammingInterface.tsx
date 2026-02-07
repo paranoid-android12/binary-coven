@@ -129,9 +129,25 @@ export const ProgrammingInterface: React.FC<ProgrammingInterfaceProps> = ({ enti
   const isDrone = entity.isDrone === true;
 
   // Get appropriate code windows (drone's own or player's)
-  const entityCodeWindows = isDrone && entity.codeWindows 
-    ? entity.codeWindows 
-    : codeWindows;
+  // Note: entity.codeWindows may be a plain object after JSON deserialization (save/load),
+  // so we need to ensure it's always a Map before using Map methods.
+  const entityCodeWindows = React.useMemo(() => {
+    if (isDrone && entity.codeWindows) {
+      if (entity.codeWindows instanceof Map) {
+        return entity.codeWindows;
+      }
+      // Convert plain object back to Map (happens after save/load cycle)
+      const map = new Map<string, CodeWindow>();
+      const obj = entity.codeWindows as any;
+      if (typeof obj === 'object' && obj !== null) {
+        Object.entries(obj).forEach(([key, value]) => {
+          map.set(key, value as CodeWindow);
+        });
+      }
+      return map;
+    }
+    return codeWindows;
+  }, [isDrone, entity.codeWindows, codeWindows]);
 
   // Get all code windows as an array
   const functions = Array.from(entityCodeWindows.values());

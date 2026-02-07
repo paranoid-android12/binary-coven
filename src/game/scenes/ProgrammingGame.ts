@@ -2009,6 +2009,10 @@ export class ProgrammingGame extends Scene {
           id,
           // Convert Phaser sprite reference to null for serialization
           sprite: null,
+          // Serialize drone codeWindows Map to array (Map becomes {} in JSON)
+          codeWindows: entity.codeWindows instanceof Map
+            ? Array.from(entity.codeWindows.entries()).map(([wId, w]) => ({ ...w, id: wId }))
+            : entity.codeWindows,
           // Reset movement state for clean loading
           movementState: {
             isMoving: false,
@@ -2108,10 +2112,21 @@ export class ProgrammingGame extends Scene {
       
       // Restore entities with their original IDs
       saveData.entities.forEach((entityData: any) => {
+        // Restore drone codeWindows from serialized array back to Map
+        let restoredCodeWindows = entityData.codeWindows;
+        if (entityData.isDrone && entityData.codeWindows && Array.isArray(entityData.codeWindows)) {
+          restoredCodeWindows = new Map<string, CodeWindow>();
+          entityData.codeWindows.forEach((windowData: any) => {
+            restoredCodeWindows.set(windowData.id, windowData);
+          });
+        }
+
         const entity = {
           ...entityData,
           // Ensure sprite reference is null for serialization safety
           sprite: null,
+          // Restore drone codeWindows as Map
+          codeWindows: restoredCodeWindows,
           // Reset movement state
           movementState: {
             isMoving: false,
@@ -2325,7 +2340,11 @@ export class ProgrammingGame extends Scene {
   }
 
   private showNotification(message: string, color: number): void {
-    const camera = this.cameras.main;
+    const camera = this.cameras?.main;
+    if (!camera) {
+      console.warn('[NOTIFICATION] Camera not available, skipping notification:', message);
+      return;
+    }
     const notification = this.add.text(camera.centerX, camera.centerY - 200, message, {
       fontSize: '20px',
       color: '#ffffff',
