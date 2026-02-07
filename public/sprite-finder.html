@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Button.png Sprite Finder</title>
+  <style>
+    body { margin: 20px; background: #1e1e1e; color: #fff; font-family: monospace; }
+    #info { position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.9); padding: 15px; border: 2px solid #0f0; border-radius: 8px; z-index: 100; font-size: 16px; min-width: 280px; }
+    #preview { image-rendering: pixelated; border: 2px solid #ff0; margin-top: 10px; }
+    #container { position: relative; display: inline-block; cursor: crosshair; }
+    #container img { image-rendering: pixelated; display: block; }
+    #highlight { position: absolute; border: 3px solid red; pointer-events: none; box-sizing: border-box; }
+    #selected { position: absolute; border: 3px solid #0f0; pointer-events: none; box-sizing: border-box; display: none; }
+    h2 { color: #0f0; }
+    .coord { color: #ff0; }
+  </style>
+</head>
+<body>
+  <h2>Button.png Sprite Finder — Hover over icons, click to select</h2>
+  <p>Each cell is 16×16 pixels. Click an icon to get its coordinates for SpriteButton.</p>
+  <div id="info">
+    <div>Hover: <span id="hover-coords" class="coord">—</span></div>
+    <div>Frame: <span id="frame-coords" class="coord">—</span></div>
+    <hr>
+    <div>Selected: <span id="selected-coords" class="coord">none</span></div>
+    <div style="margin-top:5px">upFrame: <code id="upframe-code">—</code></div>
+    <div>downFrame: <code id="downframe-code">—</code></div>
+    <canvas id="preview" width="128" height="128"></canvas>
+  </div>
+  <div id="container">
+    <img id="sprite" src="/button.png" style="transform: scale(3); transform-origin: top left;">
+    <div id="highlight" style="width:48px;height:48px;"></div>
+    <div id="selected" style="width:48px;height:48px;"></div>
+  </div>
+
+  <script>
+    const TILE = 16, SCALE = 3;
+    const img = document.getElementById('sprite');
+    const container = document.getElementById('container');
+    const highlight = document.getElementById('highlight');
+    const selectedEl = document.getElementById('selected');
+    const preview = document.getElementById('preview');
+    const ctx = preview.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+
+    container.addEventListener('mousemove', (e) => {
+      const rect = img.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / SCALE;
+      const py = (e.clientY - rect.top) / SCALE;
+      const gx = Math.floor(px / TILE) * TILE;
+      const gy = Math.floor(py / TILE) * TILE;
+
+      highlight.style.left = (gx * SCALE) + 'px';
+      highlight.style.top = (gy * SCALE) + 'px';
+
+      document.getElementById('hover-coords').textContent = `(${Math.floor(px)}, ${Math.floor(py)})`;
+      document.getElementById('frame-coords').textContent = `x: ${gx}, y: ${gy}`;
+    });
+
+    container.addEventListener('click', (e) => {
+      const rect = img.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / SCALE;
+      const py = (e.clientY - rect.top) / SCALE;
+      const gx = Math.floor(px / TILE) * TILE;
+      const gy = Math.floor(py / TILE) * TILE;
+
+      selectedEl.style.left = (gx * SCALE) + 'px';
+      selectedEl.style.top = (gy * SCALE) + 'px';
+      selectedEl.style.display = 'block';
+
+      document.getElementById('selected-coords').textContent = `(${gx}, ${gy})`;
+      document.getElementById('upframe-code').textContent = `{ x: ${gx}, y: ${gy}, w: 16, h: 16 }`;
+      document.getElementById('downframe-code').textContent = `{ x: ${gx}, y: ${gy + 16}, w: 16, h: 16 }`;
+
+      // Draw preview
+      ctx.clearRect(0, 0, 128, 128);
+      ctx.drawImage(img, gx, gy, 16, 16, 0, 0, 128, 128);
+    });
+  </script>
+</body>
+</html>

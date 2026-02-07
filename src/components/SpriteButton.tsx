@@ -17,6 +17,7 @@ interface SpriteButtonProps {
   onMouseDown?: () => void;
   onMouseUp?: () => void;
   tooltip?: string; // Tooltip text to display on hover
+  tooltipPosition?: 'top' | 'bottom'; // Where to show tooltip (default: 'bottom')
 }
 
 export const SpriteButton: React.FC<SpriteButtonProps> = ({
@@ -28,12 +29,14 @@ export const SpriteButton: React.FC<SpriteButtonProps> = ({
   onClick,
   onMouseDown,
   onMouseUp,
-  tooltip
+  tooltip,
+  tooltipPosition = 'bottom'
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [spriteImage, setSpriteImage] = useState<HTMLImageElement | null>(null);
   const [spriteLoaded, setSpriteLoaded] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Button dimensions (16x16 base size)
   const BUTTON_SIZE = 16;
@@ -110,11 +113,15 @@ export const SpriteButton: React.FC<SpriteButtonProps> = ({
 
   const handleMouseLeave = () => {
     setIsPressed(false);
+    setIsHovered(false);
+  };
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
   };
 
   return (
     <div
-      title={tooltip}
       style={{
         position: 'absolute',
         left: position.x,
@@ -129,6 +136,7 @@ export const SpriteButton: React.FC<SpriteButtonProps> = ({
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseLeave}
+      onMouseEnter={handleMouseEnter}
     >
       <canvas
         ref={canvasRef}
@@ -136,10 +144,49 @@ export const SpriteButton: React.FC<SpriteButtonProps> = ({
         height={SCALED_SIZE}
         style={{
           display: 'block',
-          imageRendering: 'pixelated', // For crisp pixel art style
+          imageRendering: 'pixelated',
           filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))'
         }}
       />
+
+      {/* Custom pixel-art styled tooltip */}
+      {tooltip && isHovered && (
+        <div style={{
+          position: 'absolute',
+          ...(tooltipPosition === 'top'
+            ? { bottom: SCALED_SIZE + 8 }
+            : { top: SCALED_SIZE + 8 }),
+          left: '50%',
+          transform: 'translateX(-50%)',
+          backgroundColor: '#210714',
+          color: '#d8a888',
+          padding: '6px 12px',
+          borderRadius: '4px',
+          fontSize: '13px',
+          fontFamily: 'BoldPixels',
+          whiteSpace: 'nowrap',
+          pointerEvents: 'none',
+          zIndex: 1100,
+          border: '2px solid #d8a888',
+          boxShadow: '0 3px 0 #210714, 0 4px 8px rgba(0,0,0,0.5)',
+          textShadow: '1px 1px 0 rgba(0,0,0,0.3)',
+        }}>
+          {tooltip}
+          {/* Arrow */}
+          <div style={{
+            position: 'absolute',
+            ...(tooltipPosition === 'top'
+              ? { bottom: -8, borderTop: '6px solid #d8a888', borderBottom: 'none' }
+              : { top: -8, borderBottom: '6px solid #d8a888', borderTop: 'none' }),
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 0,
+            height: 0,
+            borderLeft: '6px solid transparent',
+            borderRight: '6px solid transparent',
+          }} />
+        </div>
+      )}
       
       {!spriteLoaded && (
         <div style={{
