@@ -1,8 +1,20 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useGameStore } from '../stores/gameStore';
 import { EventBus } from '../game/EventBus';
 import { Quest, QuestDifficulty } from '../types/quest';
 import analyticsService from '../services/analyticsService';
+import { useUser, isStudentUser } from '../contexts/UserContext';
+import {
+  computeTopicMastery,
+  getActiveMasteryTags,
+  isFullyMastered,
+  formatConceptLabel,
+  MASTERY_COLORS,
+  TOPIC_DESCRIPTIONS,
+  TOPIC_PRIORITY,
+  type TopicMastery,
+  type QuestExecutionStatsInput,
+} from '../utils/masteryComputation';
 
 interface StudentProgressModalProps {
   isOpen: boolean;
@@ -92,10 +104,11 @@ interface StudentDetailedStats {
   }>;
 }
 
-type TabType = 'progress' | 'insights' | 'class';
+type TabType = 'profile' | 'progress' | 'insights' | 'class';
 
 export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOpen, onClose }) => {
-  const [activeTab, setActiveTab] = useState<TabType>('progress');
+  const [activeTab, setActiveTab] = useState<TabType>('profile');
+  const { user } = useUser();
   const [classStats, setClassStats] = useState<ClassStats[]>([]);
   const [questStats, setQuestStats] = useState<QuestExecutionStats[]>([]);
   const [objectiveStats, setObjectiveStats] = useState<ObjectiveStats | null>(null);
@@ -508,6 +521,18 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
       } as Quest;
     });
 
+  // Compute topic mastery (memoised for performance)
+  const topicMastery = useMemo(
+    () => computeTopicMastery(
+      allLoadedQuests,
+      localCompletedQuests,
+      questStats as QuestExecutionStatsInput[],
+    ),
+    [allLoadedQuests, localCompletedQuests, questStats],
+  );
+  const activeMasteryTags = useMemo(() => getActiveMasteryTags(topicMastery), [topicMastery]);
+  const fullyMastered = useMemo(() => isFullyMastered(topicMastery), [topicMastery]);
+
   // Fetch class stats when tab is active - needs to be after store hooks so we have completed count
   // Only fetch when we have loaded quests (to ensure data is ready)
   // Use localStorage completed count
@@ -593,6 +618,23 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
     return { totalRuns, successfulRuns, failedRuns, avgDuration };
   };
 
+  // Profile summary stats
+  const execStats = getOverallExecutionStats();
+  const profileStats = {
+    questsCompleted: totalCompleted,
+    totalQuests,
+    totalTimeSeconds: localProgressSummary?.totalTimeSpentSeconds || 0,
+    totalCodeRuns: execStats?.totalRuns || 0,
+    successRate: execStats && execStats.totalRuns > 0
+      ? Math.round((execStats.successfulRuns / execStats.totalRuns) * 100)
+      : 0,
+  };
+
+  // Student display info
+  const studentUsername = user && isStudentUser(user) ? user.username : 'Student';
+  const studentDisplayName = user && isStudentUser(user) ? user.displayName : '';
+  const studentInitial = studentUsername.charAt(0).toUpperCase();
+
   return (
     <>
       {/* Overlay */}
@@ -676,6 +718,28 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
             }}
           >
             <button
+              onClick={() => setActiveTab('profile')}
+              style={{
+                flex: 1,
+                padding: '12px 24px',
+                backgroundColor: activeTab === 'profile' ? '#007acc' : 'transparent',
+                color: activeTab === 'profile' ? 'white' : '#cccccc',
+                border: 'none',
+                cursor: 'pointer',
+                fontFamily: 'BoldPixels, monospace',
+                fontSize: '16px',
+                transition: 'background-color 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                if (activeTab !== 'profile') e.currentTarget.style.backgroundColor = '#3c3c3c';
+              }}
+              onMouseLeave={(e) => {
+                if (activeTab !== 'profile') e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+            >
+              Profile
+            </button>
+            <button
               onClick={() => setActiveTab('progress')}
               style={{
                 flex: 1,
@@ -745,6 +809,256 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
 
           {/* Content */}
           <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
+            {/* Profile Tab */}
+            {activeTab === 'profile' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {/* Avatar + Identity Card */}
+                <div style={{
+                  backgroundColor: '#1e1e1e',
+                  border: '2px solid #3c3c3c',
+                  borderRadius: '8px',
+                  padding: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '20px',
+                }}>
+                  {/* Avatar Circle */}
+                  <div style={{
+                    width: '72px',
+                    height: '72px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #007acc, #00c9ff)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    fontSize: '32px',
+                    fontWeight: 'bold',
+                    fontFamily: 'BoldPixels, monospace',
+                    flexShrink: 0,
+                  }}>
+                    {studentInitial}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h3 style={{
+                      margin: 0,
+                      fontSize: '22px',
+                      fontWeight: 'bold',
+                      color: 'white',
+                      fontFamily: 'BoldPixels, monospace',
+                    }}>
+                      {studentUsername}
+                    </h3>
+                    {studentDisplayName && studentDisplayName !== studentUsername && (
+                      <p style={{
+                        margin: '4px 0 0 0',
+                        fontSize: '14px',
+                        color: '#999999',
+                        fontFamily: 'BoldPixels, monospace',
+                      }}>
+                        {studentDisplayName}
+                      </p>
+                    )}
+                    <div style={{
+                      display: 'flex',
+                      gap: '16px',
+                      marginTop: '8px',
+                      flexWrap: 'wrap',
+                    }}>
+                      {sessionInfo && (
+                        <span style={{ fontSize: '16px', color: '#888888', fontFamily: 'BoldPixels, monospace' }}>
+                          Session: <span style={{ color: '#00c9ff' }}>{sessionInfo.code}</span>
+                        </span>
+                      )}
+                      <span style={{ fontSize: '16px', color: '#888888', fontFamily: 'BoldPixels, monospace' }}>
+                        {overallProgress}% Complete
+                      </span>
+                    </div>
+                  </div>
+                  {/* Mastery badge (compact) */}
+                  {fullyMastered && (
+                    <div style={{
+                      padding: '6px 14px',
+                      background: 'linear-gradient(135deg, #f5a623, #f7c948)',
+                      borderRadius: '20px',
+                      color: '#1e1e1e',
+                      fontSize: '15px',
+                      fontWeight: 'bold',
+                      fontFamily: 'BoldPixels, monospace',
+                      whiteSpace: 'nowrap',
+                    }}>
+                      ALL MASTERED
+                    </div>
+                  )}
+                </div>
+
+                {/* Summary Stats Cards */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(4, 1fr)',
+                  gap: '12px',
+                }}>
+                  {[
+                    { label: 'QUESTS DONE', value: `${profileStats.questsCompleted}/${profileStats.totalQuests}`, color: '#7ed321' },
+                    { label: 'TOTAL TIME', value: formatTime(profileStats.totalTimeSeconds), color: '#00c9ff' },
+                    { label: 'CODE RUNS', value: String(profileStats.totalCodeRuns), color: '#f5a623' },
+                    { label: 'SUCCESS RATE', value: profileStats.totalCodeRuns > 0 ? `${profileStats.successRate}%` : 'N/A', color: '#b19cd9' },
+                  ].map((stat) => (
+                    <div key={stat.label} style={{
+                      backgroundColor: '#252526',
+                      border: '1px solid #3c3c3c',
+                      borderRadius: '6px',
+                      padding: '16px',
+                      textAlign: 'center',
+                    }}>
+                      <div style={{
+                        fontSize: '28px',
+                        fontWeight: 'bold',
+                        color: stat.color,
+                        fontFamily: 'BoldPixels, monospace',
+                        marginBottom: '4px',
+                      }}>
+                        {stat.value}
+                      </div>
+                      <div style={{
+                        fontSize: '14px',
+                        color: '#999999',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                        fontFamily: 'BoldPixels, monospace',
+                      }}>
+                        {stat.label}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Mastery Tags */}
+                <div style={{
+                  backgroundColor: '#1e1e1e',
+                  border: '2px solid #3c3c3c',
+                  borderRadius: '8px',
+                  padding: '20px',
+                }}>
+                  <h3 style={{
+                    fontSize: '18px',
+                    fontWeight: 'bold',
+                    color: 'white',
+                    margin: '0 0 14px 0',
+                    fontFamily: 'BoldPixels, monospace',
+                  }}>
+                    Topic Mastery
+                  </h3>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    {topicMastery.map((tm) => {
+                      const colors = MASTERY_COLORS[tm.level];
+                      return (
+                        <span
+                          key={tm.topic}
+                          style={{
+                            padding: '6px 14px',
+                            backgroundColor: colors.bg,
+                            color: colors.text,
+                            border: `1px solid ${colors.border}`,
+                            borderRadius: '20px',
+                            fontSize: '15px',
+                            fontFamily: 'BoldPixels, monospace',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                          }}
+                        >
+                          {tm.level === 'mastered' ? '✓ ' : tm.level === 'in-progress' ? '◐ ' : '○ '}
+                          {tm.topic}
+                          {tm.totalQuests > 0 && (
+                            <span style={{ opacity: 0.7, fontSize: '14px' }}>
+                              ({tm.completedQuests}/{tm.totalQuests})
+                            </span>
+                          )}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Performance Bar Chart */}
+                <div style={{
+                  backgroundColor: '#1e1e1e',
+                  border: '2px solid #3c3c3c',
+                  borderRadius: '8px',
+                  padding: '20px',
+                }}>
+                  <h3 style={{
+                    fontSize: '18px',
+                    fontWeight: 'bold',
+                    color: 'white',
+                    margin: '0 0 16px 0',
+                    fontFamily: 'BoldPixels, monospace',
+                  }}>
+                    Proficiency by Topic
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {topicMastery.filter(tm => tm.totalQuests > 0).map((tm) => {
+                      const barColor = tm.level === 'mastered' ? '#7ed321'
+                        : tm.level === 'in-progress' ? '#f5a623'
+                        : '#555555';
+                      return (
+                        <div key={tm.topic}>
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            marginBottom: '4px',
+                          }}>
+                            <span style={{
+                              fontSize: '16px',
+                              color: '#cccccc',
+                              fontFamily: 'BoldPixels, monospace',
+                            }}>
+                              {tm.topic}
+                            </span>
+                            <span style={{
+                              fontSize: '16px',
+                              color: barColor,
+                              fontWeight: 'bold',
+                              fontFamily: 'BoldPixels, monospace',
+                            }}>
+                              {tm.proficiency}%
+                            </span>
+                          </div>
+                          <div style={{
+                            width: '100%',
+                            height: '10px',
+                            backgroundColor: '#3c3c3c',
+                            borderRadius: '5px',
+                            overflow: 'hidden',
+                          }}>
+                            <div style={{
+                              height: '100%',
+                              width: `${tm.proficiency}%`,
+                              backgroundColor: barColor,
+                              borderRadius: '5px',
+                              transition: 'width 0.5s ease',
+                            }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {topicMastery.filter(tm => tm.totalQuests > 0).length === 0 && (
+                      <p style={{
+                        color: '#666666',
+                        fontSize: '14px',
+                        textAlign: 'center',
+                        fontFamily: 'BoldPixels, monospace',
+                        margin: 0,
+                      }}>
+                        Complete quests to see your proficiency breakdown!
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Progress Tab */}
             {activeTab === 'progress' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -1539,14 +1853,6 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                               }
                             });
                             
-                            // Format concept names for display (e.g., "manual_controls" -> "Manual Controls")
-                            const formatConcept = (concept: string) => {
-                              return concept
-                                .split(/[-_]/)
-                                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                                .join(' ');
-                            };
-                            
                             // Convert to array and sort alphabetically
                             const conceptList = Array.from(allConcepts).sort();
                             
@@ -1569,17 +1875,149 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                                   padding: '6px 14px',
                                   backgroundColor: '#2d5016',
                                   color: '#7ed321',
-                                  fontSize: '13px',
+                                  fontSize: '16px',
                                   borderRadius: '20px',
                                   fontFamily: 'BoldPixels, monospace',
                                   textTransform: 'uppercase',
                                   border: '1px solid #7ed321',
                                 }}
                               >
-                                {formatConcept(concept)}
+                                {formatConceptLabel(concept)}
                               </span>
                             ));
                           })()}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Per-Topic Proficiency Breakdown */}
+                    {topicMastery.filter(tm => tm.totalQuests > 0).length > 0 && (
+                      <div style={{ marginTop: '20px' }}>
+                        <h3 style={{
+                          fontSize: '18px',
+                          fontWeight: 'bold',
+                          color: 'white',
+                          marginBottom: '14px',
+                          fontFamily: 'BoldPixels, monospace',
+                        }}>
+                          Topic Proficiency
+                        </h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                          {topicMastery.filter(tm => tm.totalQuests > 0).map((tm) => {
+                            const barColor = tm.level === 'mastered' ? '#7ed321'
+                              : tm.level === 'in-progress' ? '#f5a623'
+                              : '#555555';
+                            // Get per-topic execution stats
+                            const topicExecStats = questStats.filter(qs =>
+                              tm.concepts.some(c => qs.questId.toLowerCase().includes(c))
+                            );
+                            const topicTotalRuns = topicExecStats.reduce((s, e) => s + e.totalAttempts, 0);
+                            const topicSuccessRuns = topicExecStats.reduce((s, e) => s + e.successfulRuns, 0);
+                            const topicSuccessRate = topicTotalRuns > 0
+                              ? Math.round((topicSuccessRuns / topicTotalRuns) * 100) : 0;
+                            // Get average time per quest in this topic
+                            const topicQuestProgress = localQuestProgress.filter(qp =>
+                              allLoadedQuests.some(q =>
+                                q.id === qp.questId &&
+                                q.concepts?.some((c: string) => {
+                                  const norm = c.toLowerCase().replace(/[ -]/g, '_');
+                                  return tm.concepts.includes(norm);
+                                })
+                              )
+                            );
+                            const completedInTopic = topicQuestProgress.filter(qp => qp.state === 'completed');
+                            const avgTime = completedInTopic.length > 0
+                              ? Math.round(completedInTopic.reduce((s, q) => s + (q.timeSpentSeconds || 0), 0) / completedInTopic.length)
+                              : 0;
+
+                            return (
+                              <div key={tm.topic} style={{
+                                backgroundColor: '#252526',
+                                border: '1px solid #3c3c3c',
+                                borderRadius: '6px',
+                                padding: '14px',
+                              }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                  <span style={{
+                                    fontSize: '14px',
+                                    color: 'white',
+                                    fontFamily: 'BoldPixels, monospace',
+                                    fontWeight: 'bold',
+                                  }}>
+                                    {tm.topic}
+                                  </span>
+                                  <span style={{
+                                    fontSize: '16px',
+                                    color: barColor,
+                                    fontWeight: 'bold',
+                                    fontFamily: 'BoldPixels, monospace',
+                                  }}>
+                                    {tm.proficiency}%
+                                  </span>
+                                </div>
+                                {/* Proficiency bar */}
+                                <div style={{
+                                  width: '100%',
+                                  height: '8px',
+                                  backgroundColor: '#3c3c3c',
+                                  borderRadius: '4px',
+                                  overflow: 'hidden',
+                                  marginBottom: '10px',
+                                }}>
+                                  <div style={{
+                                    height: '100%',
+                                    width: `${tm.proficiency}%`,
+                                    backgroundColor: barColor,
+                                    borderRadius: '4px',
+                                    transition: 'width 0.5s ease',
+                                  }} />
+                                </div>
+                                {/* Per-topic stats row */}
+                                <div style={{
+                                  display: 'grid',
+                                  gridTemplateColumns: 'repeat(4, 1fr)',
+                                  gap: '8px',
+                                  fontSize: '14px',
+                                  fontFamily: 'BoldPixels, monospace',
+                                }}>
+                                  <div>
+                                    <div style={{ color: '#666666', marginBottom: '2px' }}>QUESTS</div>
+                                    <div style={{ color: '#cccccc', fontWeight: 'bold' }}>
+                                      {tm.completedQuests}/{tm.totalQuests}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <div style={{ color: '#666666', marginBottom: '2px' }}>SUCCESS RATE</div>
+                                    <div style={{ color: topicSuccessRate > 70 ? '#7ed321' : topicSuccessRate > 40 ? '#f5a623' : '#cccccc', fontWeight: 'bold' }}>
+                                      {topicTotalRuns > 0 ? `${topicSuccessRate}%` : '-'}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <div style={{ color: '#666666', marginBottom: '2px' }}>AVG TIME</div>
+                                    <div style={{ color: '#cccccc', fontWeight: 'bold' }}>
+                                      {avgTime > 0 ? formatTime(avgTime) : '-'}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <div style={{ color: '#666666', marginBottom: '2px' }}>CODE RUNS</div>
+                                    <div style={{ color: '#cccccc', fontWeight: 'bold' }}>
+                                      {topicTotalRuns > 0 ? topicTotalRuns : '-'}
+                                    </div>
+                                  </div>
+                                </div>
+                                {/* Description */}
+                                <p style={{
+                                  color: '#777777',
+                                  fontSize: '14px',
+                                  margin: '8px 0 0 0',
+                                  fontFamily: 'BoldPixels, monospace',
+                                  fontStyle: 'italic',
+                                }}>
+                                  {TOPIC_DESCRIPTIONS[tm.topic]}
+                                </p>
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
                     )}

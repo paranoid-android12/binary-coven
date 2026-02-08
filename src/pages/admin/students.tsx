@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import Link from 'next/link';
-import { Users, Target, Clock, Play, Zap } from 'lucide-react';
+import { Users, Target, Clock, Play, Zap, Award } from 'lucide-react';
 
 interface Student {
   id: string;
@@ -260,7 +260,7 @@ export default function StudentsPage() {
           <div className="flex-1">
             <input
               type="text"
-              placeholder="Search by username..."
+              placeholder="Search by username or display name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full p-[12px_16px] border border-[#d1d5db] rounded-lg text-sm text-[#374151] transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-admin-primary focus:border-transparent"
@@ -369,6 +369,18 @@ export default function StudentsPage() {
                                 <span className="text-[#10b981] text-xs font-semibold">+{student.questsActive}</span>
                               )}
                             </div>
+                            {/* Completion Progress Bar */}
+                            {(student.questsCompleted > 0 || student.questsActive > 0) && (
+                              <div className="w-full h-1.5 bg-[#e5e7eb] rounded-full mt-1.5 overflow-hidden max-w-[80px]">
+                                <div
+                                  className="h-full rounded-full transition-all duration-300"
+                                  style={{
+                                    width: `${Math.min(100, ((student.questsCompleted) / Math.max(1, student.questsCompleted + student.questsActive)) * 100)}%`,
+                                    backgroundColor: student.questsActive === 0 && student.questsCompleted > 0 ? '#22c55e' : '#0ec5c9',
+                                  }}
+                                />
+                              </div>
+                            )}
                           </td>
                           <td className="p-[15px_20px] text-sm text-[#374151] font-medium">{formatTime(student.totalTimeSpentSeconds)}</td>
                           <td className="p-[15px_20px] text-sm text-[#374151] font-medium">{student.totalCodeExecutions}</td>
