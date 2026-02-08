@@ -108,12 +108,26 @@ export default async function handler(
       })
     }
 
-    // Get summary from view
-    const { data: summary } = await supabase
+    // Get summary from view — aggregate across all sessions
+    // Student detail page shows overall journey (mastery, quest progress, etc. are all cross-session)
+    const { data: summaryRows } = await supabase
       .from('student_progress_summary')
       .select('*')
       .eq('student_profile_id', id)
-      .single()
+
+    const summary = (summaryRows && summaryRows.length > 0)
+      ? {
+          quests_completed: summaryRows.reduce((sum: number, r: any) => sum + (r.quests_completed || 0), 0),
+          quests_active: summaryRows.reduce((sum: number, r: any) => sum + (r.quests_active || 0), 0),
+          total_time_spent_seconds: summaryRows.reduce((sum: number, r: any) => sum + (r.total_time_spent_seconds || 0), 0),
+          total_code_executions: summaryRows.reduce((sum: number, r: any) => sum + (r.total_code_executions || 0), 0),
+          last_save_time: summaryRows.reduce((latest: string | null, r: any) => {
+            if (!r.last_save_time) return latest;
+            if (!latest) return r.last_save_time;
+            return new Date(r.last_save_time) > new Date(latest) ? r.last_save_time : latest;
+          }, null as string | null),
+        }
+      : null
 
     // Get detailed quest progress
     const { data: questProgress } = await supabase

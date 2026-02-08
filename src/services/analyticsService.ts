@@ -324,51 +324,53 @@ class AnalyticsService {
       codeExecutions: { success: true, count: 0 },
     };
 
-    // Sync quest progress
+    // Sync quest progress (batch — single request)
     try {
       const questProgress = this.getLocalQuestProgress();
       const questEntries = Object.values(questProgress);
       
-      for (const progress of questEntries) {
-        const response = await fetch('/api/analytics/quest-progress', {
+      if (questEntries.length > 0) {
+        const response = await fetch('/api/analytics/batch-quest-progress', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(progress),
+          body: JSON.stringify({ entries: questEntries }),
           credentials: 'include',
         });
-        
+
         if (response.ok) {
-          results.questProgress.count++;
+          const data = await response.json();
+          results.questProgress.count = data.count || questEntries.length;
         } else {
           results.questProgress.success = false;
         }
       }
-      console.log(`[Analytics] Synced ${results.questProgress.count} quest progress entries`);
+      console.log(`[Analytics] Synced ${results.questProgress.count} quest progress entries (batch)`);
     } catch (error) {
       console.error('[Analytics] Quest progress sync failed:', error);
       results.questProgress.success = false;
     }
 
-    // Sync objective progress
+    // Sync objective progress (batch — single request)
     try {
       const objectives = this.getLocalObjectiveProgress();
       const objectiveEntries = Object.values(objectives);
       
-      for (const objective of objectiveEntries) {
-        const response = await fetch('/api/analytics/objective-progress', {
+      if (objectiveEntries.length > 0) {
+        const response = await fetch('/api/analytics/batch-objective-progress', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(objective),
+          body: JSON.stringify({ entries: objectiveEntries }),
           credentials: 'include',
         });
-        
+
         if (response.ok) {
-          results.objectives.count++;
+          const data = await response.json();
+          results.objectives.count = data.count || objectiveEntries.length;
         } else {
           results.objectives.success = false;
         }
       }
-      console.log(`[Analytics] Synced ${results.objectives.count} objective entries`);
+      console.log(`[Analytics] Synced ${results.objectives.count} objective entries (batch)`);
     } catch (error) {
       console.error('[Analytics] Objective sync failed:', error);
       results.objectives.success = false;

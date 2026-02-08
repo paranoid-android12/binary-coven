@@ -68,8 +68,9 @@ export default function CodeExecutionViewer({ codeExecutions, compact = false }:
   const uniqueQuests = getUniqueQuests();
   const successCount = codeExecutions.filter((exec) => isSuccess(exec.executionResult)).length;
   const failedCount = codeExecutions.length - successCount;
-  const avgDuration = codeExecutions.length > 0
-    ? (codeExecutions.reduce((sum, exec) => sum + exec.executionDurationMs, 0) / codeExecutions.length).toFixed(0)
+  const execsWithDuration = codeExecutions.filter((exec) => exec.executionDurationMs != null && !isNaN(exec.executionDurationMs));
+  const avgDuration = execsWithDuration.length > 0
+    ? (execsWithDuration.reduce((sum, exec) => sum + exec.executionDurationMs, 0) / execsWithDuration.length).toFixed(0)
     : 0;
 
   if (codeExecutions.length === 0) {
@@ -173,7 +174,7 @@ export default function CodeExecutionViewer({ codeExecutions, compact = false }:
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-gray-500 text-[0.85rem]">{formatDate(exec.executedAt)}</span>
                       <span className="text-gray-300">•</span>
-                      <span className="text-gray-500 text-[0.85rem]">{exec.executionDurationMs}ms</span>
+                      <span className="text-gray-500 text-[0.85rem]">{exec.executionDurationMs != null ? `${exec.executionDurationMs}ms` : '—'}</span>
                       <span className="text-gray-300">•</span>
                       <span className="text-gray-500 text-[0.85rem]">{exec.entityId}</span>
                     </div>

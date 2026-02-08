@@ -833,15 +833,13 @@ export class ProgrammingGame extends Scene {
       this.resetGameState();
     });
 
-    // Auto-save on critical game events
+    // Quest events — save locally only (database sync happens on manual save or auto-save interval)
     EventBus.on('quest-completed', () => {
-      console.log('[AUTO-SAVE] Quest completed - auto-saving...');
-      this.saveGameState();
+      console.log('[QUEST] Quest completed — progress saved locally');
     });
 
     EventBus.on('quest-phase-completed', () => {
-      console.log('[AUTO-SAVE] Quest phase completed - auto-saving...');
-      this.saveGameState();
+      console.log('[QUEST] Quest phase completed — progress saved locally');
     });
 
     // Handle debug requests from map editor UI

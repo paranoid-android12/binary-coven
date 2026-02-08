@@ -1,12 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import AdminLayout from '../../../components/admin/AdminLayout';
 import Link from 'next/link';
-import { Target, FileText, Clock, Play, Save } from 'lucide-react';
+import { Target, FileText, Clock, Play, Save, Award } from 'lucide-react';
 import QuestProgressChart from '../../../components/admin/QuestProgressChart';
 import CodeExecutionViewer from '../../../components/admin/CodeExecutionViewer';
 import ObjectiveProgressList from '../../../components/admin/ObjectiveProgressList';
 import GameStateViewer from '../../../components/admin/GameStateViewer';
+import {
+  computeTopicMastery,
+  getActiveMasteryTags,
+  isFullyMastered,
+  MASTERY_ADMIN_CLASSES,
+  TOPIC_DESCRIPTIONS,
+  type TopicMastery,
+} from '../../../utils/masteryComputation';
+import type { Quest } from '../../../types/quest';
 
 interface StudentProfile {
   id: string;
@@ -75,13 +84,28 @@ export default function StudentDetailPage() {
   const [analytics, setAnalytics] = useState<StudentAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'overview' | 'quests' | 'objectives' | 'code' | 'gamestate'>('overview');
+  const [activeTab, setActiveTab] = useState<'profile' | 'overview' | 'quests' | 'objectives' | 'code' | 'gamestate'>('profile');
+  const [questDefinitions, setQuestDefinitions] = useState<Quest[]>([]);
 
   useEffect(() => {
     if (id) {
       fetchStudentAnalytics();
+      fetchQuestDefinitions();
     }
   }, [id]);
+
+  /** Fetch quest definitions dynamically from API (not hardcoded) */
+  const fetchQuestDefinitions = async () => {
+    try {
+      const res = await fetch('/api/quests/definitions');
+      const data = await res.json();
+      if (data.success) {
+        setQuestDefinitions(data.quests as Quest[]);
+      }
+    } catch {
+      // Silently skip — mastery section will show empty
+    }
+  };
 
   const fetchStudentAnalytics = async () => {
     try {
@@ -140,6 +164,31 @@ export default function StudentDetailPage() {
     return formatDate(dateString);
   };
 
+  // Compute mastery from quest definitions + student progress
+  const completedQuestDefs = useMemo(() => {
+    if (!analytics || questDefinitions.length === 0) return [];
+    const completedIds = new Set(
+      analytics.questProgress
+        .filter((qp) => qp.state === 'completed')
+        .map((qp) => qp.questId)
+    );
+    return questDefinitions.filter((q) => completedIds.has(q.id));
+  }, [analytics, questDefinitions]);
+
+  const topicMastery = useMemo(
+    () => computeTopicMastery(questDefinitions, completedQuestDefs),
+    [questDefinitions, completedQuestDefs]
+  );
+  const activeTags = useMemo(() => getActiveMasteryTags(topicMastery), [topicMastery]);
+  const allMastered = useMemo(() => isFullyMastered(topicMastery), [topicMastery]);
+
+  // Completion rate
+  const completionRate = analytics
+    ? analytics.questProgress.length > 0
+      ? Math.round((analytics.summary.questsCompleted / analytics.questProgress.length) * 100)
+      : 0
+    : 0;
+
   return (
     <AdminLayout title={analytics?.profile.username || 'Student Details'}>
       <div className="max-w-[1400px] mx-auto">
@@ -195,6 +244,24 @@ export default function StudentDetailPage() {
                       Last active: {getRelativeTime(analytics.profile.lastLogin)}
                     </span>
                   </div>
+                  {/* Mastery Tags */}
+                  {activeTags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {activeTags.map((tag) => (
+                        <span
+                          key={tag.topic}
+                          className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border ${MASTERY_ADMIN_CLASSES[tag.level]}`}
+                        >
+                          {tag.level === 'mastered' ? '✓' : '◐'} {tag.topic}
+                        </span>
+                      ))}
+                      {allMastered && (
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border bg-amber-100 text-amber-700 border-amber-300">
+                          <Award size={12} /> All Mastered
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -245,6 +312,16 @@ export default function StudentDetailPage() {
 
             {/* Tabs */}
             <div className="flex gap-[10px] mb-8 border-b-2 border-[#e5e7eb] overflow-x-auto max-tablet:gap-[5px]">
+              <button
+                className={`py-[12px] px-5 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-300 ease-in-out whitespace-nowrap ${
+                  activeTab === 'profile'
+                    ? 'text-admin-primary border-b-2 border-admin-primary mb-[-2px]'
+                    : 'text-[#6b7280] hover:text-admin-dark'
+                }`}
+                onClick={() => setActiveTab('profile')}
+              >
+                Profile
+              </button>
               <button
                 className={`py-[12px] px-5 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-300 ease-in-out whitespace-nowrap ${
                   activeTab === 'overview'
@@ -299,6 +376,96 @@ export default function StudentDetailPage() {
 
             {/* Tab Content */}
             <div>
+              {activeTab === 'profile' && (
+                <div className="space-y-6">
+                  {/* Profile Summary Cards */}
+                  <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-5">
+                    <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 text-center">
+                      <div className="text-3xl font-bold text-admin-primary mb-1">{completionRate}%</div>
+                      <div className="text-xs text-[#6b7280] font-medium">Completion Rate</div>
+                    </div>
+                    <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 text-center">
+                      <div className="text-3xl font-bold text-admin-primary mb-1">{analytics.summary.questsCompleted}</div>
+                      <div className="text-xs text-[#6b7280] font-medium">Quests Done</div>
+                    </div>
+                    <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 text-center">
+                      <div className="text-3xl font-bold text-admin-primary mb-1">{formatTime(analytics.summary.totalTimeSpentSeconds)}</div>
+                      <div className="text-xs text-[#6b7280] font-medium">Total Time</div>
+                    </div>
+                    <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 text-center">
+                      <div className="text-3xl font-bold text-admin-primary mb-1">{analytics.summary.totalCodeExecutions}</div>
+                      <div className="text-xs text-[#6b7280] font-medium">Code Runs</div>
+                    </div>
+                  </div>
+
+                  {/* Topic Mastery Section */}
+                  <div className="bg-white border border-[#e5e7eb] rounded-xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
+                    <h2 className="text-lg font-bold text-admin-dark m-0 mb-4">Topic Mastery</h2>
+                    <div className="space-y-4">
+                      {topicMastery.filter(tm => tm.totalQuests > 0).map((tm) => {
+                        const barColor = tm.level === 'mastered' ? '#22c55e'
+                          : tm.level === 'in-progress' ? '#eab308'
+                          : '#d1d5db';
+                        return (
+                          <div key={tm.topic}>
+                            <div className="flex justify-between items-center mb-1">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-semibold text-admin-dark">{tm.topic}</span>
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${MASTERY_ADMIN_CLASSES[tm.level]}`}>
+                                  {tm.level === 'mastered' ? 'MASTERED' : tm.level === 'in-progress' ? 'IN PROGRESS' : 'NOT STARTED'}
+                                </span>
+                              </div>
+                              <span className="text-sm font-bold" style={{ color: barColor }}>{tm.proficiency}%</span>
+                            </div>
+                            <div className="w-full h-2 bg-[#f3f4f6] rounded-full overflow-hidden">
+                              <div
+                                className="h-full rounded-full transition-all duration-500"
+                                style={{ width: `${tm.proficiency}%`, backgroundColor: barColor }}
+                              />
+                            </div>
+                            <div className="flex justify-between mt-1">
+                              <span className="text-[11px] text-[#9ca3af]">{tm.completedQuests}/{tm.totalQuests} quests</span>
+                              <span className="text-[11px] text-[#9ca3af] italic">{TOPIC_DESCRIPTIONS[tm.topic]}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                      {topicMastery.filter(tm => tm.totalQuests > 0).length === 0 && (
+                        <p className="text-sm text-[#6b7280] text-center py-4">No quest data available to compute mastery.</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Recent Activity */}
+                  <div className="bg-white border border-[#e5e7eb] rounded-xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
+                    <h2 className="text-lg font-bold text-admin-dark m-0 mb-4">Recent Quest Activity</h2>
+                    {analytics.questProgress.length > 0 ? (
+                      <div className="space-y-3">
+                        {analytics.questProgress.slice(0, 5).map((qp) => (
+                          <div key={qp.questId} className="flex items-center justify-between p-3 bg-[#f9fafb] rounded-lg">
+                            <div>
+                              <span className="text-sm font-semibold text-admin-dark">{qp.questTitle || qp.questId}</span>
+                              <div className="text-xs text-[#6b7280] mt-0.5">
+                                {qp.state === 'completed' ? `Completed ${formatDate(qp.completedAt)}` : `Started ${formatDate(qp.startedAt)}`}
+                              </div>
+                            </div>
+                            <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
+                              qp.state === 'completed' ? 'bg-green-100 text-green-700' :
+                              qp.state === 'active' ? 'bg-yellow-100 text-yellow-700' :
+                              'bg-gray-100 text-gray-600'
+                            }`}>
+                              {qp.state}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-[#6b7280] text-center py-4">No quest activity yet.</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {activeTab === 'overview' && (
                 <div>
                   <div className="mb-8">

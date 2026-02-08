@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect, useCallback } from "react";
 import { PhaserGame, IRefPhaserGame } from "../PhaserGame";
 import StatusModal from "./StatusModal";
 import { StudentProgressModal } from "./StudentProgressModal";
+import { ExploreModal } from "./ExploreModal";
 import { useGameStore } from "../stores/gameStore";
 import { ProgrammingGame } from "../game/scenes/ProgrammingGame";
 import { BuiltInFunctionRegistry } from "../game/systems/BuiltInFunctions";
@@ -199,6 +200,11 @@ export const GameInterface: React.FC = () => {
         isOpen: false,
     });
 
+    // Explore modal state
+    const [exploreModalState, setExploreModalState] = useState({
+        isOpen: false,
+    });
+
     // Reset confirmation modal state
     const [resetConfirmModalState, setResetConfirmModalState] = useState({
         isOpen: false,
@@ -292,11 +298,12 @@ export const GameInterface: React.FC = () => {
     const dronePlayButtonPosition = { x: window.innerWidth - 180, y: 90 };
 
     // Menu button position (beside quick programming button)
-    const menuButtonPosition = { x: 420, y: 40 };
-    const glossaryButtonPosition = { x: 220, y: 40 };
-    const quickProgramButtonPosition = { x: 320, y: 40 };
-    const questButtonPosition = { x: 270, y: 40 }; // Centered between glossary and programming terminal
-    const progressButtonPosition = { x: 370, y: 40 }; // Progress button next to menu button
+    const menuButtonPosition = { x: 470, y: 34 };
+    const glossaryButtonPosition = { x: 220, y: 34 };
+    const quickProgramButtonPosition = { x: 320, y: 34 };
+    const questButtonPosition = { x: 270, y: 34 }; 
+    const exploreButtonPosition = { x: 370, y: 34 }; 
+    const progressButtonPosition = { x: 420, y: 34 }; 
 
     // Plant/Harvest button positions (lower-right corner)
     const plantButtonPosition = {
@@ -1488,6 +1495,22 @@ export const GameInterface: React.FC = () => {
                             if (!shouldBlockModalInteractions()) {
                                 setQuestModalState({ isOpen: true });
                                 openModal("quest");
+                            }
+                        }}
+                    />
+
+                    {/* Explore Button */}
+                    <SpriteButton
+                        position={exploreButtonPosition}
+                        backgroundSprite="button.png"
+                        upFrame={{ x: 816, y: 496, w: 16, h: 16 }}
+                        downFrame={{ x: 816, y: 512, w: 16, h: 16 }}
+                        scale={3}
+                        tooltip="Explore"
+                        onClick={() => {
+                            if (!shouldBlockModalInteractions()) {
+                                setExploreModalState({ isOpen: true });
+                                openModal("explore");
                             }
                         }}
                     />
@@ -2885,6 +2908,15 @@ export const GameInterface: React.FC = () => {
                 onClose={() => {
                     setProgressModalState({ isOpen: false });
                     closeModal("progress");
+                }}
+            />
+
+            {/* Explore Modal */}
+            <ExploreModal
+                isOpen={exploreModalState.isOpen}
+                onClose={() => {
+                    setExploreModalState({ isOpen: false });
+                    closeModal("explore");
                 }}
             />
 
