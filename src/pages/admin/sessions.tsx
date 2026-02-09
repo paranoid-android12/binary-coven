@@ -99,7 +99,7 @@ export default function SessionsPage() {
             </p>
           </div>
           <button
-            className="flex items-center gap-2 py-3 px-6 bg-admin-primary-gradient text-white border-none rounded-lg text-[15px] font-bold font-[family-name:var(--font-family-pixel)] cursor-pointer transition-all duration-300 ease-in-out shadow-[0_2px_8px_rgba(14,195,201,0.3)] flex-shrink-0 hover:bg-admin-primary-gradient-hover hover:shadow-[0_4px_12px_rgba(14,195,201,0.4)] hover:-translate-y-[2px] active:translate-y-0 max-laptop:w-full max-laptop:justify-center"
+            className="flex items-center gap-2 py-3 px-6 bg-admin-primary-gradient text-white border-none rounded-lg text-[15px] font-bold font-[family-name:var(--font-family-admin)] cursor-pointer transition-all duration-300 ease-in-out shadow-[0_2px_8px_rgba(14,195,201,0.3)] flex-shrink-0 hover:bg-admin-primary-gradient-hover hover:shadow-[0_4px_12px_rgba(14,195,201,0.4)] hover:-translate-y-[2px] active:translate-y-0 max-laptop:w-full max-laptop:justify-center"
             onClick={() => setShowCreateModal(true)}
           >
             <span className="text-xl font-bold">+</span>
@@ -111,7 +111,7 @@ export default function SessionsPage() {
         <div className="flex items-center justify-between gap-5 mb-[30px] flex-wrap max-laptop:flex-col max-laptop:items-stretch">
           <div className="flex gap-[10px] flex-wrap max-tablet:w-full">
             <button
-              className={`py-[10px] px-[18px] bg-white border-2 rounded-lg text-sm font-semibold font-[family-name:var(--font-family-pixel)] text-[#374151] cursor-pointer transition-all duration-300 ease-in-out ${
+              className={`py-[10px] px-[18px] bg-white border-2 rounded-lg text-sm font-semibold font-[family-name:var(--font-family-admin)] text-[#374151] cursor-pointer transition-all duration-300 ease-in-out ${
                 statusFilter === 'all'
                   ? 'bg-admin-primary-gradient border-admin-primary text-white hover:bg-admin-primary-gradient-hover hover:border-admin-primary-dark'
                   : 'border-[#e5e7eb] hover:border-admin-primary hover:bg-[#f0feff] hover:text-admin-primary-dark'
@@ -121,7 +121,7 @@ export default function SessionsPage() {
               All ({counts.all})
             </button>
             <button
-              className={`py-[10px] px-[18px] bg-white border-2 rounded-lg text-sm font-semibold font-[family-name:var(--font-family-pixel)] text-[#374151] cursor-pointer transition-all duration-300 ease-in-out ${
+              className={`py-[10px] px-[18px] bg-white border-2 rounded-lg text-sm font-semibold font-[family-name:var(--font-family-admin)] text-[#374151] cursor-pointer transition-all duration-300 ease-in-out ${
                 statusFilter === 'active'
                   ? 'bg-admin-primary-gradient border-admin-primary text-white hover:bg-admin-primary-gradient-hover hover:border-admin-primary-dark'
                   : 'border-[#e5e7eb] hover:border-admin-primary hover:bg-[#f0feff] hover:text-admin-primary-dark'
@@ -131,7 +131,7 @@ export default function SessionsPage() {
               Active ({counts.active})
             </button>
             <button
-              className={`py-[10px] px-[18px] bg-white border-2 rounded-lg text-sm font-semibold font-[family-name:var(--font-family-pixel)] text-[#374151] cursor-pointer transition-all duration-300 ease-in-out ${
+              className={`py-[10px] px-[18px] bg-white border-2 rounded-lg text-sm font-semibold font-[family-name:var(--font-family-admin)] text-[#374151] cursor-pointer transition-all duration-300 ease-in-out ${
                 statusFilter === 'expired'
                   ? 'bg-admin-primary-gradient border-admin-primary text-white hover:bg-admin-primary-gradient-hover hover:border-admin-primary-dark'
                   : 'border-[#e5e7eb] hover:border-admin-primary hover:bg-[#f0feff] hover:text-admin-primary-dark'
@@ -141,7 +141,7 @@ export default function SessionsPage() {
               Expired ({counts.expired})
             </button>
             <button
-              className={`py-[10px] px-[18px] bg-white border-2 rounded-lg text-sm font-semibold font-[family-name:var(--font-family-pixel)] text-[#374151] cursor-pointer transition-all duration-300 ease-in-out ${
+              className={`py-[10px] px-[18px] bg-white border-2 rounded-lg text-sm font-semibold font-[family-name:var(--font-family-admin)] text-[#374151] cursor-pointer transition-all duration-300 ease-in-out ${
                 statusFilter === 'scheduled'
                   ? 'bg-admin-primary-gradient border-admin-primary text-white hover:bg-admin-primary-gradient-hover hover:border-admin-primary-dark'
                   : 'border-[#e5e7eb] hover:border-admin-primary hover:bg-[#f0feff] hover:text-admin-primary-dark'
@@ -158,7 +158,7 @@ export default function SessionsPage() {
               placeholder="Search by code..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full py-3 pr-10 pl-4 border-2 border-[#e5e7eb] rounded-lg text-sm font-[family-name:var(--font-family-pixel)] text-admin-dark transition-all duration-300 ease-in-out box-border focus:outline-none focus:border-admin-primary focus:shadow-[0_0_0_3px_rgba(14,195,201,0.1)] placeholder:text-[#9ca3af]"
+              className="w-full py-3 pr-10 pl-4 border-2 border-[#e5e7eb] rounded-lg text-sm font-[family-name:var(--font-family-admin)] text-admin-dark transition-all duration-300 ease-in-out box-border focus:outline-none focus:border-admin-primary focus:shadow-[0_0_0_3px_rgba(14,195,201,0.1)] placeholder:text-[#9ca3af]"
             />
             {searchQuery && (
               <button
@@ -182,7 +182,7 @@ export default function SessionsPage() {
             <p className="m-0 mb-[15px] text-base">{error}</p>
             <button
               onClick={fetchSessionCodes}
-              className="bg-[#dc2626] text-white border-none py-[10px] px-5 rounded-lg text-sm font-[family-name:var(--font-family-pixel)] cursor-pointer transition-colors duration-300 ease-in-out hover:bg-[#b91c1c]"
+              className="bg-[#dc2626] text-white border-none py-[10px] px-5 rounded-lg text-sm font-[family-name:var(--font-family-admin)] cursor-pointer transition-colors duration-300 ease-in-out hover:bg-[#b91c1c]"
             >
               Retry
             </button>
@@ -197,7 +197,7 @@ export default function SessionsPage() {
                   Try adjusting your filters or search query
                 </p>
                 <button
-                  className="py-3 px-6 bg-[#f9fafb] border-2 border-[#e5e7eb] rounded-lg text-[15px] font-semibold font-[family-name:var(--font-family-pixel)] text-[#374151] cursor-pointer transition-all duration-300 ease-in-out hover:bg-[#f3f4f6] hover:border-[#d1d5db]"
+                  className="py-3 px-6 bg-[#f9fafb] border-2 border-[#e5e7eb] rounded-lg text-[15px] font-semibold font-[family-name:var(--font-family-admin)] text-[#374151] cursor-pointer transition-all duration-300 ease-in-out hover:bg-[#f3f4f6] hover:border-[#d1d5db]"
                   onClick={() => {
                     setSearchQuery('');
                     setStatusFilter('all');
@@ -213,7 +213,7 @@ export default function SessionsPage() {
                   Create your first session code to get started
                 </p>
                 <button
-                  className="flex items-center gap-2 py-3 px-6 bg-admin-primary-gradient text-white border-none rounded-lg text-[15px] font-bold font-[family-name:var(--font-family-pixel)] cursor-pointer transition-all duration-300 ease-in-out shadow-[0_2px_8px_rgba(14,195,201,0.3)] hover:bg-admin-primary-gradient-hover hover:shadow-[0_4px_12px_rgba(14,195,201,0.4)] hover:-translate-y-[2px] active:translate-y-0"
+                  className="flex items-center gap-2 py-3 px-6 bg-admin-primary-gradient text-white border-none rounded-lg text-[15px] font-bold font-[family-name:var(--font-family-admin)] cursor-pointer transition-all duration-300 ease-in-out shadow-[0_2px_8px_rgba(14,195,201,0.3)] hover:bg-admin-primary-gradient-hover hover:shadow-[0_4px_12px_rgba(14,195,201,0.4)] hover:-translate-y-[2px] active:translate-y-0"
                   onClick={() => setShowCreateModal(true)}
                 >
                   <span className="text-xl font-bold">+</span>
