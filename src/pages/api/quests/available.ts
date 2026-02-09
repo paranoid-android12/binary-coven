@@ -90,8 +90,8 @@ export default async function handler(
       }
     }
 
-    // Sort quests by a logical order (could be customized)
-    // For now, sort by category then by title
+    // Sort quests by category then by file prefix number (0_, 1_, 2_, ...)
+    // This preserves the prerequisite chain order within each category
     quests.sort((a, b) => {
       if (a.category !== b.category) {
         // Tutorials first
@@ -99,6 +99,10 @@ export default async function handler(
         if (b.category === 'Tutorial') return 1
         return a.category.localeCompare(b.category)
       }
+      // Extract numeric prefix from filename (e.g. "conditionals/0_conditionals_boolean.json" → 0)
+      const numA = parseInt(a.fileName.match(/(\d+)_/)?.[1] ?? '999', 10)
+      const numB = parseInt(b.fileName.match(/(\d+)_/)?.[1] ?? '999', 10)
+      if (numA !== numB) return numA - numB
       return a.title.localeCompare(b.title)
     })
 

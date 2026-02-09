@@ -6,7 +6,7 @@
   "category": "Lists",
   "estimatedTime": 10,
   "concepts": ["lists", "arrays", "list_creation", "indexing"],
-  "prerequisites": ["variables_strings"],
+  "prerequisites": [],
   "icon": "quest_lists.png",
   "thumbnail": "quest_lists_thumb.png",
   "phases": [

@@ -6,7 +6,7 @@
   "category": "Variables",
   "estimatedTime": 15,
   "concepts": ["variables", "energy_management", "get_energy", "data_storage"],
-  "prerequisites": ["foundations_upgrade_system", "variables_positions"],
+  "prerequisites": ["variables_positions"],
   "icon": "quest_programming.png",
   "thumbnail": "quest_programming_thumb.png",
   "phases": [

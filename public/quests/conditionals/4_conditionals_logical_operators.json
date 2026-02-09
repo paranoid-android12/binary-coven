@@ -6,7 +6,7 @@
   "category": "Conditionals",
   "estimatedTime": 20,
   "concepts": ["logical_operators", "and", "or", "not", "boolean_logic"],
-  "prerequisites": ["conditionals_boolean"],
+  "prerequisites": ["conditionals_weather"],
   "icon": "quest_programming.png",
   "thumbnail": "quest_programming_thumb.png",
   "phases": [

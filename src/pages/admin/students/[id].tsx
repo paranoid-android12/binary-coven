@@ -166,19 +166,28 @@ export default function StudentDetailPage() {
   };
 
   // Compute mastery from quest definitions + student progress
-  const completedQuestDefs = useMemo(() => {
+  // Only include quests in the student's progress (session-assigned quests)
+  const studentQuestDefs = useMemo(() => {
     if (!analytics || questDefinitions.length === 0) return [];
+    const studentQuestIds = new Set(
+      analytics.questProgress.map((qp) => qp.questId)
+    );
+    return questDefinitions.filter((q) => studentQuestIds.has(q.id));
+  }, [analytics, questDefinitions]);
+
+  const completedQuestDefs = useMemo(() => {
+    if (!analytics || studentQuestDefs.length === 0) return [];
     const completedIds = new Set(
       analytics.questProgress
         .filter((qp) => qp.state === 'completed')
         .map((qp) => qp.questId)
     );
-    return questDefinitions.filter((q) => completedIds.has(q.id));
-  }, [analytics, questDefinitions]);
+    return studentQuestDefs.filter((q) => completedIds.has(q.id));
+  }, [analytics, studentQuestDefs]);
 
   const topicMastery = useMemo(
-    () => computeTopicMastery(questDefinitions, completedQuestDefs),
-    [questDefinitions, completedQuestDefs]
+    () => computeTopicMastery(studentQuestDefs, completedQuestDefs),
+    [studentQuestDefs, completedQuestDefs]
   );
   const activeTags = useMemo(() => getActiveMasteryTags(topicMastery), [topicMastery]);
   const allMastered = useMemo(() => isFullyMastered(topicMastery), [topicMastery]);

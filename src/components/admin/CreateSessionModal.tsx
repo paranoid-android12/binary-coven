@@ -382,6 +382,19 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
                               )}
                             </div>
                           )}
+                          {quest.prerequisites && quest.prerequisites.length > 0 && (
+                            <div className="flex gap-1 mt-1 flex-wrap items-center">
+                              <span className="text-[9px] text-gray-400 font-medium">Requires:</span>
+                              {quest.prerequisites.map(prereq => {
+                                const prereqQuest = availableQuests.find(q => q.id === prereq);
+                                return (
+                                  <span key={prereq} className="text-[9px] px-1 py-0.5 bg-orange-50 text-orange-600 rounded">
+                                    {prereqQuest ? prereqQuest.title : prereq}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}

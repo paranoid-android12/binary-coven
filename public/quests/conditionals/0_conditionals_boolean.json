@@ -6,7 +6,7 @@
   "category": "Conditionals",
   "estimatedTime": 18,
   "concepts": ["boolean", "true_false", "comparisons", "logic"],
-  "prerequisites": ["variables_introduction"],
+  "prerequisites": [],
   "icon": "quest_programming.png",
   "thumbnail": "quest_programming_thumb.png",
   "phases": [
