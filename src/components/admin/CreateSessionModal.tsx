@@ -34,6 +34,7 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
   const [loadingQuests, setLoadingQuests] = useState(false);
   const [questsExpanded, setQuestsExpanded] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [enforcePrerequisites, setEnforcePrerequisites] = useState(false);
 
   // Get unique categories from quests
   const categories = ['all', ...Array.from(new Set(availableQuests.map(q => q.category))).sort()];
@@ -153,6 +154,9 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
       }
       // If all quests are selected, don't send selectedQuests (use all quests)
 
+      // Add enforce prerequisites setting
+      payload.enforcePrerequisites = enforcePrerequisites;
+
       const response = await adminFetch('/api/session-codes/create', {
         method: 'POST',
         headers: {
@@ -169,6 +173,7 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
         setDurationValue('7');
         setMaxStudents('');
         setSelectedQuests(new Set(availableQuests.map(q => q.id)));
+        setEnforcePrerequisites(false);
         onSuccess();
         onClose();
       } else {
@@ -382,6 +387,19 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
                               )}
                             </div>
                           )}
+                          {quest.prerequisites && quest.prerequisites.length > 0 && (
+                            <div className="flex gap-1 mt-1 flex-wrap items-center">
+                              <span className="text-[9px] text-gray-400 font-medium">Requires:</span>
+                              {quest.prerequisites.map(prereq => {
+                                const prereqQuest = availableQuests.find(q => q.id === prereq);
+                                return (
+                                  <span key={prereq} className="text-[9px] px-1 py-0.5 bg-orange-50 text-orange-600 rounded">
+                                    {prereqQuest ? prereqQuest.title : prereq}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -395,6 +413,36 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
                 </p>
               </>
             )}
+          </div>
+
+          {/* Enforce Prerequisites Toggle */}
+          <div className="mb-[25px]">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700">
+                  Enforce Quest Prerequisites
+                </label>
+                <p className="text-[13px] text-gray-500 mt-1 mb-0">
+                  {enforcePrerequisites 
+                    ? 'Students must complete prerequisites before starting dependent quests'
+                    : 'All selected quests are immediately available (recommended for custom sessions)'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEnforcePrerequisites(!enforcePrerequisites)}
+                disabled={loading}
+                className={`relative w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-admin-primary focus:ring-offset-2 ${
+                  enforcePrerequisites ? 'bg-admin-primary' : 'bg-gray-300'
+                } disabled:opacity-60 disabled:cursor-not-allowed`}
+              >
+                <span
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-200 ${
+                    enforcePrerequisites ? 'translate-x-6' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
           </div>
 
           {error && (

@@ -170,13 +170,18 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
   // Compute mastery for selected student
   const selectedMastery: TopicMastery[] = useMemo(() => {
     if (!detailStats || questDefinitions.length === 0) return [];
+    // Only include quests that are in the student's progress (session-assigned quests)
+    const studentQuestIds = new Set(
+      detailStats.questProgress.map((q) => q.questId),
+    );
+    const studentQuests = questDefinitions.filter((q) => studentQuestIds.has(q.id));
     const completedIds = new Set(
       detailStats.questProgress
         .filter((q) => q.state === 'completed')
         .map((q) => q.questId),
     );
-    const completedDefs = questDefinitions.filter((q) => completedIds.has(q.id));
-    return computeTopicMastery(questDefinitions, completedDefs);
+    const completedDefs = studentQuests.filter((q) => completedIds.has(q.id));
+    return computeTopicMastery(studentQuests, completedDefs);
   }, [detailStats, questDefinitions]);
 
   const selectedTags = useMemo(() => getActiveMasteryTags(selectedMastery), [selectedMastery]);

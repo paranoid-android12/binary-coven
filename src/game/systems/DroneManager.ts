@@ -343,12 +343,14 @@ def main():
       const QuestManager = require('./QuestManager').QuestManager;
       const questManager = QuestManager.getInstance();
 
-      // If the intro quest hasn't been completed yet, start it
-      if (!questManager.isQuestCompleted('alpha_drone_intro')) {
+      // Only enforce the intro quest if it's actually loaded in this session
+      const introQuest = questManager.getQuest('alpha_drone_intro');
+      if (introQuest && !questManager.isQuestCompleted('alpha_drone_intro')) {
         console.log('[DRONE-CLICK] Starting alpha drone introduction quest');
         questManager.startQuest('alpha_drone_intro');
         return; // Don't open programming interface on first click
       }
+      // If intro quest isn't loaded, skip the check and allow interaction
     }
 
     // Emit event to open drone programming interface

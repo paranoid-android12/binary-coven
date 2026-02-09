@@ -799,10 +799,15 @@ export const GameInterface: React.FC = () => {
                                     questFilesToLoad = validQuests.map(
                                         (q: { filePath: string }) => q.filePath,
                                     );
-                                    isSessionSpecificQuests = true; // Mark that we have session-specific quests
+                                    // If session has enforcePrerequisites enabled, don't force-unlock
+                                    // Otherwise, force-unlock all session quests (default for custom sessions)
+                                    isSessionSpecificQuests = !data.enforcePrerequisites;
                                     console.log(
                                         "[Quest System] Loading session-specific quests:",
                                         questFilesToLoad.length,
+                                        data.enforcePrerequisites
+                                            ? "(enforcing prerequisites)"
+                                            : "(force-unlocked)",
                                     );
                                 } else {
                                     console.warn(
@@ -841,8 +846,8 @@ export const GameInterface: React.FC = () => {
                 }
 
                 // Load the quests
-                // For session-specific quests, force-unlock them regardless of prerequisites
-                // This allows teachers to assign quests out of order
+                // When isSessionSpecificQuests is true, force-unlock them regardless of prerequisites
+                // When false (enforcing prerequisites or all quests), use normal prerequisite checking
                 await store.loadQuests(
                     questFilesToLoad,
                     isSessionSpecificQuests,
@@ -2181,10 +2186,10 @@ export const GameInterface: React.FC = () => {
                                     backgroundRepeat: "no-repeat",
                                     backgroundPosition: "center",
                                     width: "100%",
-                                    height: "200px",
+                                    height: "260px",
                                     display: "flex",
-                                    alignItems: "center",
-                                    padding: "20px",
+                                    alignItems: "flex-start",
+                                    padding: "20px 20px 35px 20px",
                                 }}
                             >
                                 {/* Speaker Sprite */}
@@ -2194,13 +2199,14 @@ export const GameInterface: React.FC = () => {
                                     <div
                                         style={{
                                             position: "absolute",
-                                            left: "40px",
-                                            top: "15px",
-                                            width: "220px",
-                                            height: "220px",
+                                            left: "0px",
+                                            bottom: "5px",
+                                            width: "240px",
+                                            height: "250px",
                                             backgroundImage: `url(/assets/${dialogueState.dialogues[dialogueState.currentIndex].sprite})`,
-                                            backgroundSize: "cover",
-                                            backgroundPosition: "center",
+                                            backgroundSize: "contain",
+                                            backgroundRepeat: "no-repeat",
+                                            backgroundPosition: "center bottom",
                                             imageRendering: "pixelated",
                                         }}
                                     />
@@ -2216,7 +2222,10 @@ export const GameInterface: React.FC = () => {
                                             color: "#ffffff",
                                             fontFamily: "BoldPixels",
                                             flex: 1,
-                                            paddingRight: "70px",
+                                            paddingRight: "30px",
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            height: "100%",
                                         }}
                                     >
                                         {/* Speaker Name */}
@@ -2242,7 +2251,7 @@ export const GameInterface: React.FC = () => {
                                                 fontSize: "20px",
                                                 lineHeight: "1.4",
                                                 color: "#1c0a18",
-                                                maxHeight: "120px",
+                                                flex: 1,
                                                 overflowY: "auto",
                                                 fontFamily: "BoldPixels",
                                             }}
@@ -2273,15 +2282,15 @@ export const GameInterface: React.FC = () => {
                                                 return (
                                                     <div
                                                         style={{
-                                                            marginTop: "8px",
-                                                            padding: "6px 10px",
+                                                            marginTop: "auto",
+                                                            padding: "4px 8px",
                                                             backgroundColor:
                                                                 isComplete
                                                                     ? "rgba(0, 150, 0, 0.2)"
                                                                     : "rgba(150, 150, 0, 0.2)",
                                                             border: `2px solid ${isComplete ? "#00AA00" : "#AAAA00"}`,
                                                             borderRadius: "6px",
-                                                            fontSize: "16px",
+                                                            fontSize: "14px",
                                                             fontFamily:
                                                                 "BoldPixels",
                                                             display: "flex",
@@ -2415,52 +2424,38 @@ export const GameInterface: React.FC = () => {
                                     {dialogueState.dialogues.length}
                                 </div>
 
-                                {/* Continue Indicator */}
-                                <div
-                                    style={{
-                                        position: "absolute",
-                                        bottom: "10px",
-                                        left: "50%",
-                                        transform: "translateX(-50%)",
-                                        fontSize: "14px",
-                                        color: "#1c0a18",
-                                        animation:
-                                            dialogueState.dialogues[
-                                                dialogueState.currentIndex
-                                            ]?.objectives &&
-                                            dialogueState.dialogues[
-                                                dialogueState.currentIndex
-                                            ].objectives!.length > 0 &&
-                                            !DialogueManager.isRequirementMet(
-                                                dialogueState.dialogues[
-                                                    dialogueState.currentIndex
-                                                ].objectives![0],
-                                            )
-                                                ? "none"
-                                                : "pulse 1.5s ease-in-out infinite",
-                                    }}
-                                >
-                                    {(() => {
-                                        const currentDialogue =
-                                            dialogueState.dialogues[
-                                                dialogueState.currentIndex
-                                            ];
-                                        if (
-                                            currentDialogue?.objectives &&
-                                            currentDialogue.objectives.length >
-                                                0 &&
-                                            !DialogueManager.isRequirementMet(
-                                                currentDialogue.objectives[0],
-                                            )
-                                        ) {
-                                            return `Complete task: ${currentDialogue.objectives[0].description}`;
-                                        }
-                                        return dialogueState.currentIndex <
+                                {/* Continue Indicator - hidden when objectives are active (shown in requirement indicator instead) */}
+                                {(() => {
+                                    const currentDialogue =
+                                        dialogueState.dialogues[
+                                            dialogueState.currentIndex
+                                        ];
+                                    const hasActiveObjective =
+                                        currentDialogue?.objectives &&
+                                        currentDialogue.objectives.length > 0 &&
+                                        !DialogueManager.isRequirementMet(
+                                            currentDialogue.objectives[0],
+                                        );
+                                    if (hasActiveObjective) return null;
+                                    return (
+                                        <div
+                                            style={{
+                                                position: "absolute",
+                                                bottom: "10px",
+                                                left: "50%",
+                                                transform: "translateX(-50%)",
+                                                fontSize: "14px",
+                                                color: "#1c0a18",
+                                                animation: "pulse 1.5s ease-in-out infinite",
+                                            }}
+                                        >
+                                            {dialogueState.currentIndex <
                                             dialogueState.dialogues.length - 1
-                                            ? "Click or press any key to continue..."
-                                            : "Click or press any key to close...";
-                                    })()}
-                                </div>
+                                                ? "Click or press any key to continue..."
+                                                : "Click or press any key to close..."}
+                                        </div>
+                                    );
+                                })()}
                             </div>
                         </div>
                     </div>

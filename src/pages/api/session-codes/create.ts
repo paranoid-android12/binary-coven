@@ -10,6 +10,7 @@ type CreateSessionRequest = {
   validityEnd?: string // Specific end date ISO string
   maxStudents?: number // Max students allowed (null = unlimited)
   selectedQuests?: string[] // Optional - quest IDs to include in session (empty = all quests)
+  enforcePrerequisites?: boolean // Whether to enforce quest prerequisites (default: false)
 }
 
 type CreateSessionResponse = {
@@ -62,6 +63,7 @@ export default async function handler(
       validityEnd,
       maxStudents,
       selectedQuests,
+      enforcePrerequisites,
     }: CreateSessionRequest = req.body
 
     // Generate or use provided code
@@ -109,6 +111,7 @@ export default async function handler(
         validity_end: endDate.toISOString(),
         max_students: maxStudents || null,
         created_by_admin_id: admin.id,
+        enforce_prerequisites: enforcePrerequisites ?? false,
       })
       .select()
       .single()

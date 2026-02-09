@@ -6,7 +6,7 @@
   "category": "Functions",
   "estimatedTime": 18,
   "concepts": ["functions", "def_keyword", "function_calls", "code_organization"],
-  "prerequisites": ["variables_energy_tracking"],
+  "prerequisites": [],
   "icon": "quest_programming.png",
   "thumbnail": "quest_programming_thumb.png",
   "phases": [
