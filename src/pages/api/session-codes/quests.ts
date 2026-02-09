@@ -20,6 +20,7 @@ type SessionQuestsResponse = {
     filePath: string
   }[]
   hasCustomQuests: boolean // true if session has specific quests, false if using all
+  enforcePrerequisites?: boolean // whether to enforce quest prerequisites
 }
 
 // Type for session quest from database
@@ -31,6 +32,7 @@ type SessionQuestRow = {
 // Type for session code lookup result
 type SessionCodeRow = {
   id: string
+  enforce_prerequisites: boolean
 }
 
 export default async function handler(
@@ -60,13 +62,32 @@ export default async function handler(
 
     const supabase = getSupabaseAdminClient()
 
-    // If we have session code string, look up the ID first
+    // Look up session code to get ID and enforce_prerequisites setting
     let codeId = sessionCodeId as string
+    let enforcePrerequisites = false
 
-    if (!codeId && sessionCode) {
+    // Always fetch the session code to get enforce_prerequisites
+    if (sessionCodeId) {
       const { data: codeData, error: codeError } = await supabase
         .from('session_codes')
-        .select('id')
+        .select('id, enforce_prerequisites')
+        .eq('id', sessionCodeId)
+        .single() as { data: SessionCodeRow | null, error: unknown }
+
+      if (codeError || !codeData) {
+        return res.status(404).json({
+          success: false,
+          message: 'Session code not found',
+          hasCustomQuests: false,
+        })
+      }
+
+      codeId = codeData.id
+      enforcePrerequisites = codeData.enforce_prerequisites ?? false
+    } else if (sessionCode) {
+      const { data: codeData, error: codeError } = await supabase
+        .from('session_codes')
+        .select('id, enforce_prerequisites')
         .eq('code', sessionCode)
         .single() as { data: SessionCodeRow | null, error: unknown }
 
@@ -79,6 +100,7 @@ export default async function handler(
       }
 
       codeId = codeData.id
+      enforcePrerequisites = codeData.enforce_prerequisites ?? false
     }
 
     // Fetch quests assigned to this session
@@ -103,6 +125,7 @@ export default async function handler(
         success: true,
         quests: [],
         hasCustomQuests: false,
+        enforcePrerequisites,
       })
     }
 
@@ -120,6 +143,7 @@ export default async function handler(
       success: true,
       quests,
       hasCustomQuests: true,
+      enforcePrerequisites,
     })
   } catch (error) {
     console.error('Error in session quests API:', error)

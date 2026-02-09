@@ -799,10 +799,15 @@ export const GameInterface: React.FC = () => {
                                     questFilesToLoad = validQuests.map(
                                         (q: { filePath: string }) => q.filePath,
                                     );
-                                    isSessionSpecificQuests = true; // Mark that we have session-specific quests
+                                    // If session has enforcePrerequisites enabled, don't force-unlock
+                                    // Otherwise, force-unlock all session quests (default for custom sessions)
+                                    isSessionSpecificQuests = !data.enforcePrerequisites;
                                     console.log(
                                         "[Quest System] Loading session-specific quests:",
                                         questFilesToLoad.length,
+                                        data.enforcePrerequisites
+                                            ? "(enforcing prerequisites)"
+                                            : "(force-unlocked)",
                                     );
                                 } else {
                                     console.warn(
@@ -841,8 +846,8 @@ export const GameInterface: React.FC = () => {
                 }
 
                 // Load the quests
-                // For session-specific quests, force-unlock them regardless of prerequisites
-                // This allows teachers to assign quests out of order
+                // When isSessionSpecificQuests is true, force-unlock them regardless of prerequisites
+                // When false (enforcing prerequisites or all quests), use normal prerequisite checking
                 await store.loadQuests(
                     questFilesToLoad,
                     isSessionSpecificQuests,
@@ -2184,7 +2189,7 @@ export const GameInterface: React.FC = () => {
                                     height: "260px",
                                     display: "flex",
                                     alignItems: "flex-start",
-                                    padding: "20px 20px 25px 20px",
+                                    padding: "20px 20px 35px 20px",
                                 }}
                             >
                                 {/* Speaker Sprite */}

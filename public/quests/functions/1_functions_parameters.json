@@ -71,8 +71,8 @@
       "objectives": [
         {
           "type": "code_content",
-          "description": "Use the parameter inside your function body",
-          "content": "move_to(plot_x, 11)"
+          "description": "Use the parameter inside your function body. Using move_right",
+          "content": "move_right(plot_x)"
         }
       ],
       "postDialogues": [
