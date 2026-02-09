@@ -825,8 +825,21 @@ export class ProgrammingGame extends Scene {
       this.saveGameState();
     });
 
-    EventBus.on('load-game-state', () => {
-      this.loadGameState();
+    EventBus.on('load-game-state', async () => {
+      // Pre-check: verify a save exists before attempting to load
+      // This prevents the bug where clearAllSprites runs but no valid data is restored
+      try {
+        const hasSave = await GameStateService.hasDatabaseSave('autosave');
+        if (!hasSave) {
+          this.showNotification('No Save Found', 0xff6600);
+          return;
+        }
+        // Save exists in database, proceed with full load
+        await this.loadGameState();
+      } catch (err) {
+        console.warn('[LOAD] Pre-check or load failed:', err);
+        this.showNotification('Load Failed', 0xff0000);
+      }
     });
 
     EventBus.on('reset-game-state', () => {
@@ -2088,10 +2101,20 @@ export class ProgrammingGame extends Scene {
         // No valid save data - return early WITHOUT clearing sprites
         // This prevents destroying existing sprites when there's nothing to load
         console.log('[LOAD] No valid save data, keeping current state');
+        this.showNotification('No Save Found', 0xff6600);
         return;
       }
 
       const saveData = result.gameState;
+
+      // Validate save data has required fields before proceeding
+      if (!saveData.entities || !Array.isArray(saveData.entities) || saveData.entities.length === 0 ||
+          !saveData.grids || !Array.isArray(saveData.grids)) {
+        console.warn('[LOAD] Save data is missing required fields (entities/grids), aborting load');
+        this.showNotification('Save Data Corrupted', 0xff0000);
+        return;
+      }
+
       const gameState = useGameStore.getState();
 
       console.log('[LOAD] Starting game state load...');
