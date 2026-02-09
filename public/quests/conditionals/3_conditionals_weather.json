@@ -1,0 +1,220 @@
+{
+  "id": "conditionals_weather",
+  "title": "Adapting to Weather",
+  "description": "Create an adaptive farming system that responds to changing conditions - master conditional programming.",
+  "difficulty": "advanced",
+  "category": "Conditionals",
+  "estimatedTime": 25,
+  "concepts": ["conditionals", "adaptive_systems", "complex_logic", "decision_making"],
+  "prerequisites": ["conditionals_else"],
+  "icon": "quest_automation.png",
+  "thumbnail": "quest_automation_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_weather_system",
+      "title": "Understanding Weather Variables",
+      "description": "Introduce environmental factors",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Real farms must adapt to weather! Let's simulate this. Create variables for: weather, soil_quality, and water_level.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So these variables represent environmental conditions?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Your code will read these variables and make smart decisions based on conditions.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create weather-related variables",
+          "content": "weather"
+        },
+        {
+          "type": "code_content",
+          "description": "Create soil_quality variable",
+          "content": "soil_quality"
+        },
+        {
+          "type": "code_content",
+          "description": "Create water_level variable",
+          "content": "water_level"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! Now you have environmental data to work with.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_weather_decisions",
+      "title": "Weather-Based Crop Selection",
+      "description": "Adapt crops to conditions",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Different weather suits different crops. Use if/elif/else to plant wheat in sunny weather, carrots in rainy weather, etc.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So my code checks the weather variable and decides which crop?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Adaptive farming based on environmental data!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create weather-based conditional crop selection",
+          "content": "if weather"
+        },
+        {
+          "type": "code_content",
+          "description": "Use elif for multiple weather conditions",
+          "content": "elif weather"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "My code adapts to the environment!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect! Now let's add resource management.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_resource_management",
+      "title": "Conditional Resource Use",
+      "description": "Decide when to use resources",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Resources like water and fertilizer shouldn't be wasted. Use conditionals to decide when to use them based on soil_quality and water_level!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So only fertilize if soil quality is low, and only water if water level is low?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect reasoning! Efficient resource management through conditionals!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create conditional resource management logic",
+          "content": "if soil_quality"
+        },
+        {
+          "type": "code_content",
+          "description": "Add water level conditionals",
+          "content": "if water_level"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Conditionals prevent waste and optimize resource use!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Now for the ultimate challenge!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_complete_adaptive",
+      "title": "Complete Adaptive System",
+      "description": "Comprehensive environmental response",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Final challenge! Create a complete adaptive farm that checks weather, manages resources, selects crops, and farms efficiently using conditionals!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "What do I need to accomplish?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Your goal: harvest 10 wheat crops with your adaptive system! Use conditionals to make smart decisions. Plant, grow, and harvest to complete the challenge!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "harvest_crop",
+          "description": "Harvest 10 wheat crops using adaptive conditional logic",
+          "cropType": "wheat",
+          "cropCount": 10
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "I built a complete adaptive farming system! It responds to everything!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Outstanding! You've mastered conditionals. But what if you need to repeat operations hundreds of times?",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Copy and paste the code?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "There's a better way—loops! He's the loop expert!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "loops_while_basics",
+      "description": "Unlocked quest: Repeating Until Done - While Loops"
+    },
+    {
+      "type": "resource",
+      "value": 100,
+      "description": "Gained 100 energy"
+    }
+  ]
+}

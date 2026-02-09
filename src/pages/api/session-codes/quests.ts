@@ -9,6 +9,7 @@
 // Returns hasCustomQuests: false if no specific quests assigned (use all quests)
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getSupabaseAdminClient } from '@/lib/supabase/server'
+import { resolveQuestFilePath } from '../../../utils/questFileDiscovery'
 
 type SessionQuestsResponse = {
   success: boolean
@@ -105,12 +106,15 @@ export default async function handler(
       })
     }
 
-    // Map quest IDs to file paths
-    const quests = sessionQuests.map((sq: SessionQuestRow) => ({
-      questId: sq.quest_id,
-      questOrder: sq.quest_order,
-      filePath: `quests/${sq.quest_id}.json`,
-    }))
+    // Map quest IDs to file paths (handles both top-level and subdirectory quests)
+    const quests = sessionQuests.map((sq: SessionQuestRow) => {
+      const resolvedPath = resolveQuestFilePath(sq.quest_id);
+      return {
+        questId: sq.quest_id,
+        questOrder: sq.quest_order,
+        filePath: resolvedPath ? `quests/${resolvedPath}` : `quests/${sq.quest_id}.json`,
+      };
+    })
 
     return res.status(200).json({
       success: true,

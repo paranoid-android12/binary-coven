@@ -1,0 +1,205 @@
+{
+  "id": "loops_patterns",
+  "title": "Loop Mastery - Common Patterns",
+  "description": "Learn essential loop patterns and techniques including accumulation, nested loops, and search patterns.",
+  "difficulty": "advanced",
+  "category": "Loops",
+  "estimatedTime": 25,
+  "concepts": ["loop_patterns", "accumulation", "search", "nested_loops"],
+  "prerequisites": ["loops_for_basics"],
+  "icon": "quest_programming.png",
+  "thumbnail": "quest_programming_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_accumulation",
+      "title": "The Accumulation Pattern",
+      "description": "Building up a total",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "One powerful pattern is accumulation—using a loop to build up a total. Initialize a variable to zero, then add to it each iteration!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Like counting total harvests? Start at 0 and add 1 each time?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Accumulation works for summing values, counting items, building lists—it's everywhere in programming!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create an accumulation loop with total variable (initialize variable, loop, accumulate)",
+          "content": "total"
+        },
+        {
+          "type": "code_content",
+          "description": "Accumulate values inside the loop via += or -= operators",
+          "content": "+="
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "The total grew with each iteration!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Accumulation is one of the most common loop patterns!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_nested_loops",
+      "title": "Nested Loops for Grids",
+      "description": "Loops within loops",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "To process a grid, use nested loops! Put one loop inside another. An outer loop for rows, inner loop for columns!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So the inner loop runs completely for each iteration of the outer loop?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! If the outer runs 3 times and the inner runs 3 times, you get 3 × 3 = 9 total iterations!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create a nested loop (loop inside a loop)",
+          "content": "for "
+        },
+        {
+          "type": "code_content",
+          "description": "Ensure proper indentation for nested loop",
+          "content": "    for "
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Nested loops let me process 2D grids systematically!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect for farm plots arranged in rows and columns!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_search_pattern",
+      "title": "Search Pattern with Break",
+      "description": "Finding items and stopping early",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Sometimes you want to stop a loop early when you find what you're looking for. Use 'break' to exit the loop immediately!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So if I'm searching for a specific crop, I can stop once I find it?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Use an if statement inside the loop, and when the condition matches, call break!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Use break to exit a loop early",
+          "content": "break"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Break stops the loop immediately! So efficient!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "The search pattern is fundamental to programming!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_pattern_challenge",
+      "title": "Multi-Pattern Challenge",
+      "description": "Combine multiple patterns",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Final pattern challenge! Create a farming script that combines multiple loop patterns!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "What's the goal?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Harvest 10 wheat crops using accumulation, nested loops, and search patterns! Show me your loop mastery!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "harvest_crop",
+          "description": "Harvest 10 wheat crops using multiple loop patterns",
+          "cropType": "wheat",
+          "cropCount": 10
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "I combined all the loop patterns into one sophisticated system!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Outstanding! Loops are algorithms—step-by-step solutions to problems. Now let's combine loops with conditionals for ultimate power!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "loops_with_conditionals",
+      "description": "Unlocked quest: Smart Loops - Combining Iteration and Logic"
+    },
+    {
+      "type": "resource",
+      "value": 100,
+      "description": "Gained 100 energy"
+    }
+  ]
+}

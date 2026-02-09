@@ -1,0 +1,198 @@
+{
+  "id": "functions_parameters",
+  "title": "Flexible Functions",
+  "description": "Make functions adaptable with parameters - learn to pass data into your functions.",
+  "difficulty": "intermediate",
+  "category": "Functions",
+  "estimatedTime": 18,
+  "concepts": ["parameters", "arguments", "function_flexibility"],
+  "prerequisites": ["functions_basics"],
+  "icon": "quest_programming.png",
+  "thumbnail": "quest_programming_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_parameter_basics",
+      "title": "Functions That Take Input",
+      "description": "Understanding parameters",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Functions become really powerful when they can accept input. That's what parameters are for!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Like how move() can accept coordinates to move to different plots?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Coordinates are arguments passed to move's parameters. Let's create a function with parameters for plot positions.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Define a function with a parameter: def move_to_plot(plot_x):",
+          "content": "def move_to_plot(plot_x):"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! plot_x is now a parameter—a variable that receives input when the function is called.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_using_parameters",
+      "title": "Using Parameters Inside Functions",
+      "description": "Access parameter values",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Inside the function, you can use the parameter like any variable. Use plot_x in a move command inside your function.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So whatever I pass to move_to_plot gets used when moving?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! The parameter acts as a placeholder for whatever value you provide.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Use the parameter inside your function body",
+          "content": "move_to(plot_x, 11)"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Great! Now your function can move to any plot position based on what you pass in.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_calling_with_arguments",
+      "title": "Passing Arguments",
+      "description": "Call functions with different inputs",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now call your function with different arguments. Try calling move_to_plot with different x coordinates!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So I can call the same function with different values?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! That's the flexibility of parameters. One function, infinite possibilities!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Call your function with coordinate 1",
+          "content": "move_to_plot(1)"
+        },
+        {
+          "type": "code_content",
+          "description": "Call your function with coordinate 3 too",
+          "content": "move_to_plot(3)"
+        },
+        {
+          "type": "play_button",
+          "description": "Execute to see your parameterized function work"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Amazing! One function moved to different plots!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "That's the beauty of parameters—reusable code that adapts to different inputs.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_multiple_parameters",
+      "title": "Multiple Parameters",
+      "description": "Functions with multiple inputs",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Functions can have multiple parameters! Create a function that takes both x and y coordinates to move to any plot position.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So I separate them with commas in the definition?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! And when calling, you provide values in the same order. Multiple parameters make functions very flexible!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create a function with multiple parameters (2 or more)",
+          "content": "def "
+        },
+        {
+          "type": "code_content",
+          "description": "Your function should have comma-separated parameters",
+          "content": ", "
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Multiple parameters make functions so much more powerful!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Absolutely! Now your functions can accept all the information they need to do complex tasks. Next, we'll learn how functions can send data back!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "functions_return",
+      "description": "Unlocked quest: Functions That Give Back"
+    },
+    {
+      "type": "resource",
+      "value": 80,
+      "description": "Gained 80 energy"
+    }
+  ]
+}

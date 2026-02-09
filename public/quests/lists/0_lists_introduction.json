@@ -1,0 +1,205 @@
+{
+  "id": "lists_introduction",
+  "title": "Your First List",
+  "description": "Learn what lists are and how to create them to organize your farming data.",
+  "difficulty": "beginner",
+  "category": "Lists",
+  "estimatedTime": 10,
+  "concepts": ["lists", "arrays", "list_creation", "indexing"],
+  "prerequisites": ["variables_strings"],
+  "icon": "quest_lists.png",
+  "thumbnail": "quest_lists_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_what_are_lists",
+      "title": "Collections of Items",
+      "description": "Understanding lists",
+      "preDialogues": [
+        {
+          "name": "Manu",
+          "content": "Welcome back, Qubit! Today we're learning about lists - one of the most powerful tools in programming.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Lists? What are those?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Manu",
+          "content": "A list is a collection that holds multiple values together. Instead of having separate variables for each wheat count, you can store them all in one list!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_creating_lists",
+      "title": "Making Your First List",
+      "description": "Create a list",
+      "preDialogues": [
+        {
+          "name": "Manu",
+          "content": "Let's create your first list! Use square brackets [] to create a list. For example: let crops = [1, 2, 3]",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So I can put multiple numbers inside the brackets?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Manu",
+          "content": "Exactly! Try creating a list called harvests with at least 3 numbers representing wheat counts.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create a list using []",
+          "content": "= ["
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Manu",
+          "content": "Perfect! You've created your first list. Now let's learn how to access individual items.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_accessing_elements",
+      "title": "Reading List Items",
+      "description": "Access items by index",
+      "preDialogues": [
+        {
+          "name": "Manu",
+          "content": "Each item in a list has an index (position). The first item is at index 0, second at index 1, and so on.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Wait, it starts at 0, not 1?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Manu",
+          "content": "Yes! In programming we count from 0. To access an item, use brackets: myList[0] gets the first item, myList[1] gets the second.",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Access a list item with [index]",
+          "content": "[0]"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Manu",
+          "content": "Great! You can now access any item in your list by its index.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_empty_lists",
+      "title": "Starting Empty",
+      "description": "Create empty lists",
+      "preDialogues": [
+        {
+          "name": "Manu",
+          "content": "You can also create an empty list and add items to it later. Just use empty brackets: myList = []",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So I can start with nothing and build it up as I farm?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Manu",
+          "content": "Exactly! This is perfect for tracking harvests as they happen. Create an empty list now.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create an empty list with []",
+          "content": "= []"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Manu",
+          "content": "Perfect! Now you know how to create both filled and empty lists. Let's test your knowledge with a farming task!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_first_harvest",
+      "title": "Lists in Action",
+      "description": "Use lists while farming",
+      "preDialogues": [
+        {
+          "name": "Manu",
+          "content": "Let's put theory into practice. Create a list with some initial harvest values, then harvest 2 wheat to see lists in action!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "I'll create a list and do some farming!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create a list in your code",
+          "content": "= ["
+        },
+        {
+          "type": "harvest_crop",
+          "description": "Harvest 2 wheat",
+          "cropType": "wheat",
+          "cropCount": 2
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Manu",
+          "content": "Excellent work! You've learned the basics of lists. Next, we'll learn how to add items to your lists!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "I can't wait to learn more!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "lists_append",
+      "description": "Unlocked quest: Adding to Lists"
+    },
+    {
+      "type": "resource",
+      "value": 100,
+      "description": "Gained 100 energy"
+    }
+  ]
+}

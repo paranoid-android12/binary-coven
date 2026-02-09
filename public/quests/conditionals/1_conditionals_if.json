@@ -1,0 +1,156 @@
+{
+  "id": "conditionals_if",
+  "title": "Making Decisions - If Statements",
+  "description": "Learn to make your code choose different paths based on conditions using if statements.",
+  "difficulty": "intermediate",
+  "category": "Conditionals",
+  "estimatedTime": 18,
+  "concepts": ["if_statements", "conditionals", "branching", "decision_making"],
+  "prerequisites": ["conditionals_boolean"],
+  "icon": "quest_programming.png",
+  "thumbnail": "quest_programming_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_if_syntax",
+      "title": "The If Statement",
+      "description": "Basic conditional execution",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now we use booleans to make decisions! The 'if' statement runs code only when a condition is True.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So the code inside only runs sometimes?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Write an if statement with a condition. The action below only happens if the condition is True. Don't forget the colon!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Write an if statement: if condition:",
+          "content": "if "
+        },
+        {
+          "type": "code_content",
+          "description": "Include a condition with a colon",
+          "content": ":"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Great! Remember: the colon after the condition and indentation for the code block are required!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_conditional_body",
+      "title": "Code That Runs Conditionally",
+      "description": "Adding the if block body",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "The code inside the if block (indented) only runs when the condition is True. Add an action under your if statement.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Indentation shows what's inside the if block, like with functions?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Python uses indentation to define code blocks.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Add indented code inside your if statement",
+          "content": "    "
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! Now your code makes decisions based on conditions.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_simple_decision",
+      "title": "Practical Conditional Logic",
+      "description": "Use if for farming decisions",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's apply this! Create an if statement: only harvest if the crop is grown. Use an appropriate condition.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So I can prevent harvesting unready crops?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Conditionals let your code adapt to different situations.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create an if statement controlling a farming action",
+          "content": "if "
+        },
+        {
+          "type": "play_button",
+          "description": "Execute your conditional code"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "My code now makes intelligent decisions!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect! Conditionals make programs dynamic and responsive.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "But what if you want an alternative action when the condition is False? That's where 'else' comes in!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "conditionals_else",
+      "description": "Unlocked quest: Alternative Paths - Else and Elif"
+    },
+    {
+      "type": "resource",
+      "value": 80,
+      "description": "Gained 80 energy"
+    }
+  ]
+}

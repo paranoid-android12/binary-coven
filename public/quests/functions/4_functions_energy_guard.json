@@ -1,0 +1,167 @@
+{
+  "id": "functions_energy_guard",
+  "title": "Energy Guard Functions",
+  "description": "Create reusable functions to abstract energy and battery management - write it once, use it everywhere!",
+  "difficulty": "intermediate",
+  "category": "Functions",
+  "estimatedTime": 20,
+  "concepts": ["functions", "abstraction", "energy_management", "code_reuse"],
+  "prerequisites": ["functions_library"],
+  "icon": "quest_programming.png",
+  "thumbnail": "quest_programming_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_energy_check_function",
+      "title": "The Energy Check Function",
+      "description": "Abstract energy checking",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Your function library is great, but there's a problem—your functions don't check if you have enough energy before acting!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Oh no! So if my energy runs out mid-farming, my functions will fail?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Let's create ensure_energy(threshold) - a function that checks energy, goes to the food station if needed, and returns when ready!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So I can add this to my other functions to make them safer?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Precisely! This is abstraction—hiding complexity behind a simple interface!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Define the ensure_energy function with a 'threshold' parameter",
+          "content": "def ensure_energy(threshold):"
+        },
+        {
+          "type": "code_content",
+          "description": "Check current energy in the function (get_energy()['energy'])",
+          "content": "get_energy()['energy']"
+        },
+        {
+          "type": "code_content",
+          "description": "Navigate to food station if needed",
+          "content": "move_to(10,8)"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! Now you can call ensure_energy(50) before any operation and never worry about running out!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_smart_farm_function",
+      "title": "Complete Farm Function",
+      "description": "Combine all mechanics into one function",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now create smart_farm(x, y) - it handles energy, movement, and farming!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "This function should: check energy, move to position, scan the plot, and farm appropriately.",
+          "sprite": "qubit-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Define smart_farm with parameters, x and y",
+          "content": "def smart_farm(x, y):"
+        },
+        {
+          "type": "code_content",
+          "description": "Use ensure_energy inside",
+          "content": "ensure_energy("
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Brilliant! Now farming any plot is just one function call. This is professional code organization!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_farm_library",
+      "title": "Complete Farm Library",
+      "description": "Build a comprehensive toolkit",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Final challenge: create a complete library of farming functions. Then use them to farm plots effortlessly!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Your library should have: ensure_energy(), ensure_battery(), smart_farm(), and batch_farm(positions)!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create batch_farm function for multiple positions",
+          "content": "def batch_farm(positions):"
+        },
+        {
+          "type": "code_content",
+          "description": "Use a loop inside batch_farm",
+          "content": "for"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Incredible! You've created a complete farming library. This code is reusable, maintainable, and elegant!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "And I can use these functions too! This makes human-robot coordination so much easier!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "You've mastered the game mechanics AND programming concepts. You're ready for the ultimate challenges!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "resource",
+      "value": 200,
+      "description": "Gained 200 energy"
+    },
+    {
+      "type": "achievement",
+      "value": "master_programmer",
+      "description": "Achievement: Master Programmer!"
+    }
+  ]
+}

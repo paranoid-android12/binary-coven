@@ -1,0 +1,146 @@
+{
+  "id": "lists_append",
+  "title": "Adding to Lists",
+  "description": "Learn to use append() to add items to your lists dynamically.",
+  "difficulty": "beginner",
+  "category": "Lists",
+  "estimatedTime": 12,
+  "concepts": ["lists", "append", "dynamic_data", "list_growth"],
+  "prerequisites": ["lists_introduction"],
+  "icon": "quest_lists.png",
+  "thumbnail": "quest_lists_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_append_intro",
+      "title": "Growing Your Lists",
+      "description": "Introduction to append",
+      "preDialogues": [
+        {
+          "name": "Manu",
+          "content": "Now that you know how to create lists, let's learn how to add items to them!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Can I add items after creating the list?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Manu",
+          "content": "Absolutely! The append() method adds an item to the end of your list. If you have [1, 2] and append 3, you get [1, 2, 3]!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_first_append",
+      "title": "Your First Append",
+      "description": "Use append() to add items",
+      "preDialogues": [
+        {
+          "name": "Manu",
+          "content": "Let's try it! Create an empty list, then use append() to add a number. The syntax is: append(myList, 5)",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So I can start with an empty list and fill it up as I go?",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Manu",
+          "content": "Exactly! This is perfect for tracking harvests as they happen. Try it now!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create an empty list",
+          "content": "= []"
+        },
+        {
+          "type": "code_content",
+          "description": "Use append() to add an item",
+          "content": "append("
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Manu",
+          "content": "Perfect! You've added your first item to a list dynamically!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "This is so useful! I can keep adding items as I farm!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Manu",
+          "content": "You can append as many items as you want! Each append() adds one more item to the end of your list.",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_harvest_tracking",
+      "title": "Tracking Your Harvests",
+      "description": "Append after each harvest",
+      "preDialogues": [
+        {
+          "name": "Manu",
+          "content": "Here's a real-world use case: harvest wheat 3 times, and after each harvest, append the amount to a list!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So I'll have a record of every harvest I make!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Manu",
+          "content": "Precisely! This is how professional programmers track data over time.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "harvest_crop",
+          "description": "Harvest 3 wheat",
+          "cropType": "wheat",
+          "cropCount": 3
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Manu",
+          "content": "Outstanding! You've mastered append(). Next, we'll learn how to remove items from lists!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "I'm ready for the next challenge!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "lists_pop_and_length",
+      "description": "Unlocked quest: Removing from Lists"
+    },
+    {
+      "type": "resource",
+      "value": 120,
+      "description": "Gained 120 energy"
+    }
+  ]
+}

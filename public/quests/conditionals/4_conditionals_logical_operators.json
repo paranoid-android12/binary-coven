@@ -1,0 +1,277 @@
+{
+  "id": "conditionals_logical_operators",
+  "title": "Combining Conditions",
+  "description": "Master logical operators to combine multiple conditions - make smarter decisions with AND, OR, and NOT.",
+  "difficulty": "intermediate",
+  "category": "Conditionals",
+  "estimatedTime": 20,
+  "concepts": ["logical_operators", "and", "or", "not", "boolean_logic"],
+  "prerequisites": ["conditionals_boolean"],
+  "icon": "quest_programming.png",
+  "thumbnail": "quest_programming_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_and_operator",
+      "title": "The AND Operator",
+      "description": "Learning to check multiple conditions at once",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "What if you need BOTH conditions to be true? That's where the 'and' operator comes in!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So... like checking if I have energy AND seeds at the same time?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! With 'and', both conditions must be True for the whole thing to be True. If either is False, the result is False.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "That's useful! No more nested ifs just to check two things!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Use 'and' operator to combine two conditions",
+          "content": " and "
+        },
+        {
+          "type": "code_content",
+          "description": "Create an if statement with 'and'",
+          "content": "if "
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! Remember: with 'and', ALL conditions must be True.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_or_operator",
+      "title": "The OR Operator",
+      "description": "When any condition being true is enough",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's learn 'or'! This operator returns True if AT LEAST ONE condition is True.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So if I want to plant when I have wheat seeds OR corn seeds, I can use 'or'?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect example! The condition is True if you have wheat seeds, corn seeds, or both!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "And it's only False if NONE of the conditions are True?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly right! All conditions must be False for 'or' to return False.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Use 'or' operator to combine conditions",
+          "content": " or "
+        },
+        {
+          "type": "code_content",
+          "description": "Create an if statement with 'or'",
+          "content": "if "
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "So 'and' needs ALL true, 'or' needs ANY true!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect summary! You've got it!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_not_operator",
+      "title": "The NOT Operator",
+      "description": "Inverting conditions",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "The 'not' operator flips a boolean value. True becomes False, and False becomes True!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So 'not True' equals False?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! And 'not False' equals True. It's super useful when you want to check if something is NOT the case.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Like checking if my inventory is NOT empty?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect! 'not' helps make your code more readable by expressing negative conditions clearly.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Use 'not' operator to invert a condition",
+          "content": "not "
+        },
+        {
+          "type": "code_content",
+          "description": "Create an if statement with 'not'",
+          "content": "if "
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Great! 'not' is simple but powerful. It makes negative checks much clearer!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_combining_operators",
+      "title": "Complex Logic",
+      "description": "Combining multiple operators",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now the fun part! You can combine 'and', 'or', and 'not' in the same condition!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Wait, like 'if energy > 10 and (has_seeds or has_water)'?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Use parentheses to group conditions, just like math. They control which operations happen first!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So I can create really complex decision-making!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Combine 'and' and 'or' in one condition",
+          "content": " and "
+        },
+        {
+          "type": "code_content",
+          "description": "Include 'or' in the same expression",
+          "content": " or "
+        },
+        {
+          "type": "code_content",
+          "description": "Use parentheses to group conditions",
+          "content": "("
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Excellent! Remember: 'and' and 'or' have different priorities, so use parentheses to be clear!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_smart_farming",
+      "title": "Intelligent Farm Logic",
+      "description": "Apply logical operators to farming",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Final challenge! Create a smart farming system using logical operators to make complex decisions.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "I'll check multiple conditions efficiently!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Your goal: harvest 5 wheat crops using logical operators to manage planting and harvesting. Use 'and', 'or', or 'not' to create smart conditions!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "harvest_crop",
+          "description": "Harvest 5 wheat crops using logical operators",
+          "cropType": "wheat",
+          "cropCount": 5
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "My code is so much cleaner with logical operators!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Fantastic! You've mastered logical operators. Now you can build truly intelligent systems! Ready for the next challenge?",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "conditionals_weather",
+      "description": "Unlocked quest: Adapting to Weather"
+    },
+    {
+      "type": "resource",
+      "value": 100,
+      "description": "Gained 100 energy"
+    }
+  ]
+}

@@ -1,0 +1,147 @@
+{
+  "id": "foundations_welcome",
+  "title": "Welcome to Binary Coven",
+  "description": "Learn the essential game functions and mechanics to survive and thrive on the farm.",
+  "difficulty": "beginner",
+  "category": "Game Mechanics",
+  "estimatedTime": 10,
+  "concepts": [],
+  "prerequisites": [],
+  "icon": "quest_tutorial.png",
+  "thumbnail": "quest_tutorial_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_introduction",
+      "title": "The Automated Farm",
+      "description": "Understanding the coding environment",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Welcome to Binary Coven! I see you're already familiar with coding. Perfect! Here, we use code to control everything on the farm.",
+          "sprite": "manu-pleased.png",
+          "camera": { "x": 10, "y": 5 }
+        },
+        {
+          "name": "Qubit",
+          "content": "Our farm uses a Python-like language. You'll write code to control your character and farm operations.",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Let me show you the available functions. Open your terminal by clicking yourself or pressing the code button.",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "open_terminal",
+          "description": "Open the code terminal"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Great! This is your code editor. The functions you'll need are: move_up(), move_down(), move_left(), move_right(), plant(), harvest(), and eat().",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_basic_functions",
+      "title": "Movement & Interaction API",
+      "description": "Learn the core functions",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Try the basic API. Use move_right() three times to reach that farmland, then use plant() to plant wheat.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Remember: each function call costs energy. You'll need to manage that carefully!",
+          "sprite": "qubit-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Write code using move functions",
+          "content": "move_right()"
+        },
+        {
+          "type": "code_content",
+          "description": "Plant wheat using the plant() function",
+          "content": "plant()"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Good! You understand the basic functions. Now let's talk about the game mechanics you'll need to master.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_coordinate_movement",
+      "title": "Efficient Movement",
+      "description": "Learn coordinate-based movement",
+      "preDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Moving step by step takes many function calls! Is there a faster way?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Yes! Use move_to(x, y) to go directly to any position. For example, move_to(10, 8) moves you to coordinates (10, 8) in one command!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So instead of chaining move_right() and move_down(), I can just specify the destination?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! The grid uses (x, y) coordinates. X increases as you go right, Y increases as you go down. You can check your position with get_position().",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Use move_to() to move to specific coordinates",
+          "content": "move_to("
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! Coordinate-based movement is much more efficient for long distances.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "This will save so much energy and time!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "foundations_energy_management",
+      "description": "Unlocked quest: Energy Management"
+    },
+    {
+      "type": "resource",
+      "value": 50,
+      "description": "Gained 50 energy"
+    }
+  ]
+}

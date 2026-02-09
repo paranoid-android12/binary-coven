@@ -1,0 +1,149 @@
+{
+  "id": "foundations_upgrade_system",
+  "title": "The Upgrade System",
+  "description": "Learn to use upgrades to increase your speed, efficiency, and capabilities.",
+  "difficulty": "beginner",
+  "category": "Game Mechanics",
+  "estimatedTime": 15,
+  "concepts": ["upgrades", "speed_multipliers", "efficiency", "optimization"],
+  "prerequisites": ["foundations_scanner_function"],
+  "icon": "quest_upgrade.png",
+  "thumbnail": "quest_upgrade_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_upgrade_intro",
+      "title": "Why Upgrades Matter",
+      "description": "Understanding the upgrade system",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Some farming challenges have strict time limits. You can't beat them with basic stats - you need upgrades!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Upgrades improve your stats: movement speed, planting speed, harvesting speed, and max energy!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Each upgrade costs resources. You'll need to farm wheat and use your earnings to improve your capabilities.",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_viewing_upgrades",
+      "title": "Available Upgrades",
+      "description": "Checking upgrade options",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Open the upgrades panel to see what's available. You'll see: Movement Speed, Planting Speed, Harvesting Speed, and Max Energy.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Each upgrade has levels. Higher levels cost more but give bigger bonuses!",
+          "sprite": "qubit-speaking.png"
+        }
+      ],
+      "objectives": [
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Good! You can see the costs and benefits. Let's earn some wheat and buy your first upgrade.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_first_upgrade",
+      "title": "Purchasing Upgrades",
+      "description": "Buy your first upgrade",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Farm enough wheat to afford Movement Speed Level 1. Then purchase it and feel the difference!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Movement speed makes you move faster between farmlands. This saves time and energy!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "harvest_crop",
+          "description": "Farm wheat to afford the upgrade",
+          "cropType": "wheat",
+          "cropCount": 15
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Whoa! You're moving faster now! See how upgrades change the game?",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Now you can complete tasks that were impossible before. Upgrades are essential for advanced challenges.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_speed_challenge",
+      "title": "Time-Based Challenge",
+      "description": "Use upgrades to beat the clock",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Here's the real test: plant and harvest 5 wheat plots in under 60 seconds. Without upgrades, this is nearly impossible!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "You'll need to upgrade planting speed and movement speed. Farm more wheat, buy upgrades, then take on the challenge!",
+          "sprite": "qubit-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "harvest_crop",
+          "description": "Plant and harvest 5 wheat in under 60 seconds",
+          "cropType": "wheat",
+          "cropCount": 5
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Incredible! You beat the timer! This is the power of combining code with upgrades.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Now you understand the foundations of Binary Coven - functions, energy, scanning, and upgrades!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "resource",
+      "value": 100,
+      "description": "Gained 100 energy"
+    }
+  ]
+}

@@ -1,0 +1,183 @@
+{
+  "id": "lists_sum_calculations",
+  "title": "List Calculations",
+  "description": "Learn to use sum() and perform calculations on your harvest data.",
+  "difficulty": "beginner",
+  "category": "Lists",
+  "estimatedTime": 15,
+  "concepts": ["lists", "sum", "calculations", "aggregation", "math_operations"],
+  "prerequisites": ["lists_pop_and_length"],
+  "icon": "quest_lists.png",
+  "thumbnail": "quest_lists_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_sum_intro",
+      "title": "Adding It All Up",
+      "description": "Introduction to sum",
+      "preDialogues": [
+        {
+          "name": "Manu",
+          "content": "Now for one of the most useful list functions: sum()! It adds all the numbers in your list together.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So instead of adding each number manually, sum() does it all at once?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Manu",
+          "content": "Exactly! If you have [3, 5, 2, 4], sum(myList) returns 14. It's perfect for calculating total harvests!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_first_sum",
+      "title": "Your First Sum",
+      "description": "Use sum() on a list",
+      "preDialogues": [
+        {
+          "name": "Manu",
+          "content": "Let's try it! Create a list with several numbers, then use sum() to calculate the total.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "This will save so much time compared to adding each number separately!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Manu",
+          "content": "That's the power of programming! Let the computer do the tedious work.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create a list with numbers",
+          "content": "= ["
+        },
+        {
+          "type": "code_content",
+          "description": "Use sum() to calculate total",
+          "content": "sum("
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Manu",
+          "content": "Perfect! You've calculated your first sum. Now let's use this with real farming data.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_harvest_totals",
+      "title": "Total Harvest Calculator",
+      "description": "Track and sum harvests",
+      "preDialogues": [
+        {
+          "name": "Manu",
+          "content": "Here's a real scenario: harvest wheat 3 times, append each to a list, then use sum() to get your total yield!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So I can see exactly how productive my farming was!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Manu",
+          "content": "Exactly! This is how farmers track their productivity. Let's do it!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "harvest_crop",
+          "description": "Harvest 3 wheat",
+          "cropType": "wheat",
+          "cropCount": 3
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Manu",
+          "content": "Excellent! You're tracking and analyzing your farming data like a professional!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_average_calculation",
+      "title": "Average Harvest",
+      "description": "Calculate averages with sum and length",
+      "preDialogues": [
+        {
+          "name": "Manu",
+          "content": "Want to know your average harvest per plot? Divide sum by length: sum(myList) / len(myList)",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Oh! So I can use sum() and length together to get the average?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Manu",
+          "content": "Exactly! This tells you how efficient each harvest is. Try it with some harvest data!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Use sum() in calculation",
+          "content": "sum("
+        },
+        {
+          "type": "code_content",
+          "description": "Use len() in calculation",
+          "content": "len("
+        },
+        {
+          "type": "code_content",
+          "description": "Use / in calculation",
+          "content": "/"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Manu",
+          "content": "Outstanding! You're analyzing data like a data scientist. One more quest to master lists completely!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "I'm ready for the ultimate list challenge!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "lists_advanced_management",
+      "description": "Unlocked quest: Advanced List Management"
+    },
+    {
+      "type": "resource",
+      "value": 150,
+      "description": "Gained 150 energy"
+    }
+  ]
+}

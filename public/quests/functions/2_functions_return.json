@@ -1,0 +1,191 @@
+{
+  "id": "functions_return",
+  "title": "Functions That Give Back",
+  "description": "Learn how functions can return data - enabling powerful data processing and calculations.",
+  "difficulty": "intermediate",
+  "category": "Functions",
+  "estimatedTime": 18,
+  "concepts": ["return_values", "function_output", "data_flow"],
+  "prerequisites": ["functions_parameters"],
+  "icon": "quest_programming.png",
+  "thumbnail": "quest_programming_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_return_concept",
+      "title": "Functions Produce Values",
+      "description": "Understanding return values",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "So far our functions have performed actions. But functions can also calculate and return values!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Return values? Like giving back an answer?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! A function can do calculations and 'return' the result so you can use it elsewhere in your code.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So functions can both DO things and CALCULATE things?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect understanding! Let's create a function that returns a value.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_simple_return",
+      "title": "Your First Return Statement",
+      "description": "Return a value from a function",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Use the 'return' keyword to send a value back. Try: def get_wheat_price(): return 10",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So this function returns the number 10?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! When you call get_wheat_price(), you get back the value 10.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create a function with a return statement",
+          "content": "return"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! Your function now produces a value instead of just performing actions.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_using_return",
+      "title": "Capturing Return Values",
+      "description": "Store returned data",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "To use a return value, store it in a variable: price = get_wheat_price(). The variable will hold the returned value!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So the function's return value gets assigned to the variable?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! The function runs, calculates its result, returns it, and that value goes into your variable.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Call a function and store its return value in a variable",
+          "content": "return"
+        },
+        {
+          "type": "play_button",
+          "description": "Execute your code to see return values in action"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "The variable now holds the value my function returned!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect! This is how functions pass data around in your program.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_calculate_return",
+      "title": "Calculating and Returning",
+      "description": "Return calculated values",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Functions can calculate before returning! Try: def calculate_value(wheat_count): return wheat_count * 10",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So it takes wheat_count as input, multiplies by 10, and returns the result?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Functions can process input and return output. They're like little calculation machines!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create a function that calculates and returns a value",
+          "content": "return "
+        },
+        {
+          "type": "code_content",
+          "description": "Use multiplication in your return statement",
+          "content": " * "
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Functions as calculation tools! This opens up so many possibilities!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Absolutely! Return values let functions communicate with each other and share data. Next, let's build a whole library of farming functions!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "functions_library",
+      "description": "Unlocked quest: Building Your Function Toolbox"
+    },
+    {
+      "type": "resource",
+      "value": 90,
+      "description": "Gained 90 energy"
+    }
+  ]
+}

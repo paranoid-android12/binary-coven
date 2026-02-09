@@ -1,12 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import fs from 'fs';
 import path from 'path';
+import { getAllQuestFilePaths } from '../../../utils/questFileDiscovery';
 
 /**
  * GET /api/quests/definitions
  *
  * Dynamically discovers and returns all quest definition JSON files
- * from the public/quests/ directory. No hardcoded list required.
+ * from the public/quests/ directory (including subdirectories).
+ * No hardcoded list required.
  */
 export default async function handler(
   req: NextApiRequest,
@@ -23,12 +25,13 @@ export default async function handler(
       return res.status(200).json({ success: true, quests: [] });
     }
 
-    const files = fs.readdirSync(questsDir).filter((f) => f.endsWith('.json'));
+    // Recursively discover all quest JSON files (top-level + subdirectories)
+    const files = getAllQuestFilePaths();
     const quests: any[] = [];
 
-    for (const file of files) {
+    for (const relPath of files) {
       try {
-        const filePath = path.join(questsDir, file);
+        const filePath = path.join(questsDir, relPath);
         const content = fs.readFileSync(filePath, 'utf-8');
         const quest = JSON.parse(content);
         quests.push(quest);

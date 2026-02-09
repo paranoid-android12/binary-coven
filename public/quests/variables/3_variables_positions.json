@@ -1,0 +1,177 @@
+{
+  "id": "variables_positions",
+  "title": "Coordinate Magic",
+  "description": "Use variables to store and work with positions on the farm - master coordinate-based navigation.",
+  "difficulty": "intermediate",
+  "category": "Variables",
+  "estimatedTime": 18,
+  "concepts": ["variables", "coordinates", "position_data"],
+  "prerequisites": ["variables_strings"],
+  "icon": "quest_programming.png",
+  "thumbnail": "quest_programming_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_coordinates",
+      "title": "Understanding Coordinates",
+      "description": "Learn the x, y coordinate system",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Every location on the farm has coordinates—an x position (left-right) and y position (up-down).",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Like a map grid? X for horizontal and Y for vertical?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Your current position might be x=10, y=5. We can store these in variables to remember important locations.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_storing_positions",
+      "title": "Storing Position Data",
+      "description": "Create position variables",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's store a target location. Create two variables: target_x = 10 and target_y = 5",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So I can remember where to go later by looking at these variables?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Instead of hardcoding positions everywhere, you store them once and reference them.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create position variables: target_x = 10",
+          "content": "target_x"
+        },
+        {
+          "type": "code_content",
+          "description": "Create the y position variable too",
+          "content": "target_y"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! Now you have a stored location you can use throughout your code.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_using_positions",
+      "title": "Navigating with Variables",
+      "description": "Move to stored positions",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now navigate to your stored position. Use your target_x and target_y variables to calculate how to move there.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So I need to figure out how many moves up/down and left/right based on the variables?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Yes! Though for now, you can just create the logic to reference those positions. Advanced movement using variables will come later!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Navigate to a position using position variables as reference",
+          "content": "move_to("
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "I made it to the position I stored!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Excellent! Position variables are powerful for managing waypoints and farm plots.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_multiple_positions",
+      "title": "Multiple Location Storage",
+      "description": "Store several positions",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "What if you have multiple farm plots? You could create plot1_x, plot1_y, plot2_x, plot2_y, etc.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "That would let me remember all my important farming locations!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Later you'll learn about lists and dictionaries which make this even easier. For now, create variables for 3 different plot positions.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create multiple position variables (at least 3 different locations, use position naming like plot1_x, plot1_y, etc.)",
+          "content": "plot"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Now I have variables storing all my farm plot locations!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect! Position variables are essential for managing complex farms. Next, we'll combine everything you've learned!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "variables_energy_tracking",
+      "description": "Unlocked quest: The Smart Farm Manager"
+    },
+    {
+      "type": "resource",
+      "value": 90,
+      "description": "Gained 90 energy"
+    }
+  ]
+}

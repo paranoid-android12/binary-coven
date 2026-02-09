@@ -1,0 +1,222 @@
+{
+  "id": "lists_advanced_management",
+  "title": "List Mastery",
+  "description": "Combine all list operations to build a complete harvest management system.",
+  "difficulty": "intermediate",
+  "category": "Lists",
+  "estimatedTime": 20,
+  "concepts": ["lists", "complete_workflow", "data_management", "farming_automation", "list_operations"],
+  "prerequisites": ["lists_sum_calculations"],
+  "icon": "quest_lists.png",
+  "thumbnail": "quest_lists_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_system_planning",
+      "title": "Building a System",
+      "description": "Planning your harvest manager",
+      "preDialogues": [
+        {
+          "name": "Manu",
+          "content": "You've learned all the list operations. Now let's combine them into a complete harvest management system!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "What will this system do?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Manu",
+          "content": "It will track every harvest, calculate totals, manage a processing queue, and provide analytics. Everything a smart farmer needs!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_harvest_queue",
+      "title": "Building the Queue",
+      "description": "Create a harvest processing system",
+      "preDialogues": [
+        {
+          "name": "Manu",
+          "content": "First, let's build a harvest queue. Create an empty list, harvest 3 wheat, and append each to the queue.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So each harvest goes into the queue to be processed later?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Manu",
+          "content": "Exactly! This is how real systems manage tasks. Build it!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "harvest_crop",
+          "description": "Harvest 3 wheat",
+          "cropType": "wheat",
+          "cropCount": 3
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Manu",
+          "content": "Perfect! Your queue is ready. Now let's process some items.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_queue_processing",
+      "title": "Processing the Queue",
+      "description": "Use pop to process items",
+      "preDialogues": [
+        {
+          "name": "Manu",
+          "content": "Now use pop() to process items from your queue. Check the length before and after to see the queue shrinking!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "I'll pop items one by one and track the queue size!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Check queue length",
+          "content": "len("
+        },
+        {
+          "type": "code_content",
+          "description": "Use pop() to process items",
+          "content": "pop("
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Manu",
+          "content": "Excellent! You're processing data from a queue. Now let's add analytics!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_complete_analytics",
+      "title": "Full Analytics Dashboard",
+      "description": "Calculate all statistics",
+      "preDialogues": [
+        {
+          "name": "Manu",
+          "content": "Create a complete analytics system: build a harvest list, calculate the total with sum(), and get the average!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "I'll create a full dashboard with all the farming stats!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Manu",
+          "content": "Harvest 4 wheat, track them, and give me total yield, count, and average per harvest!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "harvest_crop",
+          "description": "Harvest 4 wheat for analysis",
+          "cropType": "wheat",
+          "cropCount": 4
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Manu",
+          "content": "Impressive! Your analytics system is professional-grade. Ready for the ultimate challenge?",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Bring it on!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_master_challenge",
+      "title": "The List Master Challenge",
+      "description": "Ultimate list operations test",
+      "preDialogues": [
+        {
+          "name": "Manu",
+          "content": "Final challenge: Harvest 7 wheat, build a tracking list, pop the first 2 to process them, then calculate stats on the remaining 5!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "That combines everything: append, pop, sum, and length!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Manu",
+          "content": "Exactly! Show me you're a true list master. Track, process, and analyze - all in one workflow!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "harvest_crop",
+          "description": "Harvest 7 wheat",
+          "cropType": "wheat",
+          "cropCount": 7
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Manu",
+          "content": "OUTSTANDING! You've mastered lists completely! You can now manage data collections like a professional programmer!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "I feel so powerful! Lists make everything so much easier!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Manu",
+          "content": "You've unlocked one of programming's most fundamental concepts. With lists, you can build amazing automated systems!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "resource",
+      "value": 200,
+      "description": "Gained 200 energy"
+    },
+    {
+      "type": "achievement",
+      "value": "list_master",
+      "description": "Achievement unlocked: List Master"
+    },
+    {
+      "type": "achievement",
+      "value": "data_scientist",
+      "description": "Achievement unlocked: Data Scientist"
+    }
+  ]
+}
