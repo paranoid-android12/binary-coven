@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import AdminLayout from '../../../../components/admin/AdminLayout';
 import Link from 'next/link';
 import { Users, CheckCircle, Zap, Clock } from 'lucide-react';
+import { adminFetch } from '../../../../utils/adminFetch';
 
 interface Student {
   id: string;
@@ -40,7 +41,7 @@ export default function SessionStudentsPage() {
   const fetchStudents = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/session-codes/${code}/students`);
+      const response = await adminFetch(`/api/session-codes/${code}/students`);
       const data = await response.json();
 
       if (data.success) {

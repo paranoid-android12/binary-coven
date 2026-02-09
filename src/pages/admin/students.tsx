@@ -1,7 +1,8 @@
 import { useEffect, useState, useMemo } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import Link from 'next/link';
-import { Users, Target, Clock, Play, Zap, Award } from 'lucide-react';
+import { Users, Target, Clock, Play, Zap, Award, Search } from 'lucide-react';
+import { adminFetch } from '../../utils/adminFetch';
 
 interface Student {
   id: string;
@@ -48,7 +49,7 @@ export default function StudentsPage() {
       setError('');
 
       // First, fetch all session codes
-      const sessionResponse = await fetch('/api/session-codes/list');
+      const sessionResponse = await adminFetch('/api/session-codes/list');
       const sessionData = await sessionResponse.json();
 
       if (!sessionData.success) {
@@ -64,7 +65,7 @@ export default function StudentsPage() {
 
       for (const session of codes) {
         try {
-          const studentResponse = await fetch(`/api/session-codes/${session.code}/students`);
+          const studentResponse = await adminFetch(`/api/session-codes/${session.code}/students`);
           const studentData = await studentResponse.json();
 
           if (studentData.success && studentData.students) {
@@ -218,38 +219,38 @@ export default function StudentsPage() {
 
         {/* Summary Stats */}
         <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5 mb-8 max-laptop:grid-cols-3 max-tablet:grid-cols-2">
-          <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 flex items-center gap-[15px] transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
-            <Users className="text-admin-primary flex-shrink-0" size={17} />
+          <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 flex items-center gap-4 transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+            <Users className="text-admin-primary flex-shrink-0" size={18} />
             <div className="flex-1">
-              <div className="text-[24px] font-bold text-admin-primary m-0 mb-[5px]">{stats.totalStudents}</div>
+              <div className="text-[24px] font-bold text-[#1a1a2e] m-0 mb-[2px]">{stats.totalStudents}</div>
               <div className="text-xs text-[#6b7280] m-0 font-medium">Total Students</div>
             </div>
           </div>
-          <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 flex items-center gap-[15px] transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
-            <Target className="text-admin-primary flex-shrink-0" size={17} />
+          <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 flex items-center gap-4 transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+            <Target className="text-admin-primary flex-shrink-0" size={18} />
             <div className="flex-1">
-              <div className="text-[24px] font-bold text-admin-primary m-0 mb-[5px]">{stats.totalQuests}</div>
+              <div className="text-[24px] font-bold text-[#1a1a2e] m-0 mb-[2px]">{stats.totalQuests}</div>
               <div className="text-xs text-[#6b7280] m-0 font-medium">Quests Completed</div>
             </div>
           </div>
-          <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 flex items-center gap-[15px] transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
-            <Clock className="text-admin-primary flex-shrink-0" size={17} />
+          <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 flex items-center gap-4 transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+            <Clock className="text-admin-primary flex-shrink-0" size={18} />
             <div className="flex-1">
-              <div className="text-[24px] font-bold text-admin-primary m-0 mb-[5px]">{formatTime(stats.totalTime)}</div>
+              <div className="text-[24px] font-bold text-[#1a1a2e] m-0 mb-[2px]">{formatTime(stats.totalTime)}</div>
               <div className="text-xs text-[#6b7280] m-0 font-medium">Total Time</div>
             </div>
           </div>
-          <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 flex items-center gap-[15px] transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
-            <Play className="text-admin-primary flex-shrink-0" size={17} />
+          <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 flex items-center gap-4 transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+            <Play className="text-admin-primary flex-shrink-0" size={18} />
             <div className="flex-1">
-              <div className="text-[24px] font-bold text-admin-primary m-0 mb-[5px]">{stats.totalExecutions}</div>
+              <div className="text-[24px] font-bold text-[#1a1a2e] m-0 mb-[2px]">{stats.totalExecutions}</div>
               <div className="text-xs text-[#6b7280] m-0 font-medium">Code Executions</div>
             </div>
           </div>
-          <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 flex items-center gap-[15px] transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
-            <Zap className="text-admin-primary flex-shrink-0" size={17} />
+          <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 flex items-center gap-4 transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+            <Zap className="text-admin-primary flex-shrink-0" size={18} />
             <div className="flex-1">
-              <div className="text-[24px] font-bold text-admin-primary m-0 mb-[5px]">{stats.activeToday}</div>
+              <div className="text-[24px] font-bold text-[#1a1a2e] m-0 mb-[2px]">{stats.activeToday}</div>
               <div className="text-xs text-[#6b7280] m-0 font-medium">Active Today</div>
             </div>
           </div>
@@ -257,13 +258,14 @@ export default function StudentsPage() {
 
         {/* Filters */}
         <div className="flex gap-[15px] mb-8 max-tablet:flex-col">
-          <div className="flex-1">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9ca3af] pointer-events-none" size={16} />
             <input
               type="text"
               placeholder="Search by username or display name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full p-[12px_16px] border border-[#d1d5db] rounded-lg text-sm text-[#374151] transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-admin-primary focus:border-transparent"
+              className="w-full p-[12px_16px] pl-10 border border-[#d1d5db] rounded-lg text-sm text-[#374151] transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-admin-primary focus:border-transparent"
             />
           </div>
 
@@ -347,7 +349,7 @@ export default function StudentsPage() {
                     </thead>
                     <tbody>
                       {filteredStudents.map((student) => (
-                        <tr key={student.id} className="border-b border-[#e5e7eb] last:border-b-0 transition-colors duration-200 ease-in-out hover:bg-[#f9fafb]">
+                        <tr key={student.id} className="border-b border-[#e5e7eb] last:border-b-0 transition-colors duration-200 ease-in-out hover:bg-[#f0fdfa] group">
                           <td className="p-[15px_20px] text-sm text-[#374151]">
                             <div className="font-semibold text-admin-dark">{student.username}</div>
                             {student.displayName && student.displayName !== student.username && (

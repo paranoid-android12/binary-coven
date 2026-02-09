@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import Link from 'next/link';
-import { Users, Key, BookOpen, Zap } from 'lucide-react';
+import { Users, Key, BookOpen, Zap, ArrowRight, UserCog } from 'lucide-react';
+import { adminFetch } from '../../utils/adminFetch';
 
 interface SessionCode {
   id: string;
@@ -32,14 +33,24 @@ export default function AdminDashboard() {
   const [recentSessions, setRecentSessions] = useState<SessionCode[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [adminName, setAdminName] = useState('Admin');
 
   useEffect(() => {
     fetchDashboardData();
+    // Fetch admin name for greeting
+    fetch('/api/auth/session')
+      .then(res => res.json())
+      .then(data => {
+        if (data.authenticated && data.user?.username) {
+          setAdminName(data.user.username);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const fetchDashboardData = async () => {
     try {
-      const response = await fetch('/api/session-codes/list');
+      const response = await adminFetch('/api/session-codes/list');
       const data = await response.json();
 
       if (data.success) {
@@ -115,37 +126,58 @@ export default function AdminDashboard() {
           </div>
         ) : (
           <>
+            {/* Greeting */}
+            <div className="mb-8">
+              <h1 className="text-[28px] font-bold text-admin-dark m-0 mb-1">
+                {(() => {
+                  const hour = new Date().getHours();
+                  if (hour < 12) return 'Good morning';
+                  if (hour < 18) return 'Good afternoon';
+                  return 'Good evening';
+                })()}, {adminName}
+              </h1>
+              <p className="text-sm text-[#6b7280] m-0">Here&apos;s your overview for today.</p>
+            </div>
+
             {/* Stats Cards */}
             <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-5 mb-10 max-laptop:grid-cols-2 max-tablet:grid-cols-1">
-              <div className="bg-white border border-[#e5e7eb] rounded-xl p-[25px] flex items-center gap-5 transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] max-tablet:p-5">
-                <Users className="text-xl w-[45px] h-[45px] flex items-center justify-center bg-admin-primary rounded-lg p-[5px] text-white flex-shrink-0" size={17} />
-                <div className="flex-1">
-                  <h3 className="text-[32px] font-bold text-admin-primary m-0 mb-[5px] max-tablet:text-[26px]">{stats.totalStudents}</h3>
-                  <p className="text-sm text-[#6b7280] m-0 font-medium">Total Students</p>
+              <div className="bg-white border border-[#e5e7eb] rounded-xl overflow-hidden transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+                <div className="p-[25px] flex items-center gap-5 max-tablet:p-5">
+                  <Users className="text-admin-primary flex-shrink-0" size={22} />
+                  <div className="flex-1">
+                    <h3 className="text-[32px] font-bold text-[#1a1a2e] m-0 mb-[2px] max-tablet:text-[26px]">{stats.totalStudents}</h3>
+                    <p className="text-sm text-[#6b7280] m-0 font-medium">Total Students</p>
+                  </div>
                 </div>
               </div>
 
-              <div className="bg-white border border-[#e5e7eb] rounded-xl p-[25px] flex items-center gap-5 transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] max-tablet:p-5">
-                <Key className="text-xl w-[45px] h-[45px] flex items-center justify-center bg-admin-primary rounded-lg p-[5px] text-white flex-shrink-0" size={17} />
-                <div className="flex-1">
-                  <h3 className="text-[32px] font-bold text-admin-primary m-0 mb-[5px] max-tablet:text-[26px]">{stats.activeSessions}</h3>
-                  <p className="text-sm text-[#6b7280] m-0 font-medium">Active Sessions</p>
+              <div className="bg-white border border-[#e5e7eb] rounded-xl overflow-hidden transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+                <div className="p-[25px] flex items-center gap-5 max-tablet:p-5">
+                  <Key className="text-admin-primary flex-shrink-0" size={22} />
+                  <div className="flex-1">
+                    <h3 className="text-[32px] font-bold text-[#1a1a2e] m-0 mb-[2px] max-tablet:text-[26px]">{stats.activeSessions}</h3>
+                    <p className="text-sm text-[#6b7280] m-0 font-medium">Active Sessions</p>
+                  </div>
                 </div>
               </div>
 
-              <div className="bg-white border border-[#e5e7eb] rounded-xl p-[25px] flex items-center gap-5 transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] max-tablet:p-5">
-                <BookOpen className="text-xl w-[45px] h-[45px] flex items-center justify-center bg-admin-primary rounded-lg p-[5px] text-white flex-shrink-0" size={17} />
-                <div className="flex-1">
-                  <h3 className="text-[32px] font-bold text-admin-primary m-0 mb-[5px] max-tablet:text-[26px]">{stats.totalSessions}</h3>
-                  <p className="text-sm text-[#6b7280] m-0 font-medium">Total Sessions</p>
+              <div className="bg-white border border-[#e5e7eb] rounded-xl overflow-hidden transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+                <div className="p-[25px] flex items-center gap-5 max-tablet:p-5">
+                  <BookOpen className="text-admin-primary flex-shrink-0" size={22} />
+                  <div className="flex-1">
+                    <h3 className="text-[32px] font-bold text-[#1a1a2e] m-0 mb-[2px] max-tablet:text-[26px]">{stats.totalSessions}</h3>
+                    <p className="text-sm text-[#6b7280] m-0 font-medium">Total Sessions</p>
+                  </div>
                 </div>
               </div>
 
-              <div className="bg-white border border-[#e5e7eb] rounded-xl p-[25px] flex items-center gap-5 transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] max-tablet:p-5">
-                <Zap className="text-xl w-[45px] h-[45px] flex items-center justify-center bg-admin-primary rounded-lg p-[5px] text-white flex-shrink-0" size={17} />
-                <div className="flex-1">
-                  <h3 className="text-[32px] font-bold text-admin-primary m-0 mb-[5px] max-tablet:text-[26px]">{stats.recentActivity}</h3>
-                  <p className="text-sm text-[#6b7280] m-0 font-medium">Active (24h)</p>
+              <div className="bg-white border border-[#e5e7eb] rounded-xl overflow-hidden transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+                <div className="p-[25px] flex items-center gap-5 max-tablet:p-5">
+                  <Zap className="text-admin-primary flex-shrink-0" size={22} />
+                  <div className="flex-1">
+                    <h3 className="text-[32px] font-bold text-[#1a1a2e] m-0 mb-[2px] max-tablet:text-[26px]">{stats.recentActivity}</h3>
+                    <p className="text-sm text-[#6b7280] m-0 font-medium">Active (24h)</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -153,13 +185,16 @@ export default function AdminDashboard() {
             {/* Quick Actions */}
             <div className="mb-10">
               <h2 className="text-[22px] font-bold text-admin-dark m-0 mb-5">Quick Actions</h2>
-              <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-5 max-tablet:grid-cols-1">
+              <div className="grid grid-cols-3 gap-5 max-laptop:grid-cols-2 max-tablet:grid-cols-1">
                 <Link
                   href="/admin/sessions"
-                  className="bg-white border-2 border-[#e5e7eb] rounded-xl p-[30px] no-underline transition-all duration-300 ease-in-out block hover:border-admin-primary hover:shadow-[0_4px_12px_rgba(14,195,201,0.15)] hover:-translate-y-[3px]"
+                  className="group bg-white border-2 border-[#e5e7eb] rounded-xl p-6 no-underline transition-all duration-300 ease-in-out block hover:border-admin-primary hover:shadow-[0_4px_12px_rgba(14,195,201,0.15)] hover:-translate-y-[3px]"
                 >
-                  <Key className="text-[48px] mb-[15px]" size={32} />
-                  <h3 className="text-xl font-bold text-admin-dark m-0 mb-[10px]">Manage Sessions</h3>
+                  <div className="flex items-start justify-between mb-4">
+                    <Key className="text-admin-primary" size={24} />
+                    <ArrowRight className="text-[#d1d5db] transition-all duration-300 group-hover:text-admin-primary group-hover:translate-x-1" size={20} />
+                  </div>
+                  <h3 className="text-lg font-bold text-admin-dark m-0 mb-[6px]">Manage Sessions</h3>
                   <p className="text-sm text-[#6b7280] m-0 leading-[1.5]">
                     Create and manage session codes for students
                   </p>
@@ -167,12 +202,29 @@ export default function AdminDashboard() {
 
                 <Link
                   href="/admin/students"
-                  className="bg-white border-2 border-[#e5e7eb] rounded-xl p-[30px] no-underline transition-all duration-300 ease-in-out block hover:border-admin-primary hover:shadow-[0_4px_12px_rgba(14,195,201,0.15)] hover:-translate-y-[3px]"
+                  className="group bg-white border-2 border-[#e5e7eb] rounded-xl p-6 no-underline transition-all duration-300 ease-in-out block hover:border-admin-primary hover:shadow-[0_4px_12px_rgba(14,195,201,0.15)] hover:-translate-y-[3px]"
                 >
-                  <Users className="text-[48px] mb-[15px]" size={32} />
-                  <h3 className="text-xl font-bold text-admin-dark m-0 mb-[10px]">View Students</h3>
+                  <div className="flex items-start justify-between mb-4">
+                    <Users className="text-admin-primary" size={24} />
+                    <ArrowRight className="text-[#d1d5db] transition-all duration-300 group-hover:text-admin-primary group-hover:translate-x-1" size={20} />
+                  </div>
+                  <h3 className="text-lg font-bold text-admin-dark m-0 mb-[6px]">View Students</h3>
                   <p className="text-sm text-[#6b7280] m-0 leading-[1.5]">
                     Track student progress and analytics
+                  </p>
+                </Link>
+
+                <Link
+                  href="/admin/users"
+                  className="group bg-white border-2 border-[#e5e7eb] rounded-xl p-6 no-underline transition-all duration-300 ease-in-out block hover:border-admin-primary hover:shadow-[0_4px_12px_rgba(14,195,201,0.15)] hover:-translate-y-[3px]"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <UserCog className="text-admin-primary" size={24} />
+                    <ArrowRight className="text-[#d1d5db] transition-all duration-300 group-hover:text-admin-primary group-hover:translate-x-1" size={20} />
+                  </div>
+                  <h3 className="text-lg font-bold text-admin-dark m-0 mb-[6px]">Admin Users</h3>
+                  <p className="text-sm text-[#6b7280] m-0 leading-[1.5]">
+                    Manage admin accounts and permissions
                   </p>
                 </Link>
               </div>

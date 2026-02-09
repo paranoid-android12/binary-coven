@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { adminFetch } from '../../utils/adminFetch';
 
 // Quest metadata type from API
 interface QuestMetadata {
@@ -46,7 +47,7 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
   const loadAvailableQuests = useCallback(async () => {
     setLoadingQuests(true);
     try {
-      const response = await fetch('/api/quests/available');
+      const response = await adminFetch('/api/quests/available');
       if (!response.ok) {
         throw new Error('Failed to load quests');
       }
@@ -152,7 +153,7 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
       }
       // If all quests are selected, don't send selectedQuests (use all quests)
 
-      const response = await fetch('/api/session-codes/create', {
+      const response = await adminFetch('/api/session-codes/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
