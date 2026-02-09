@@ -108,7 +108,7 @@ export default function SessionStudentsPage() {
         ) : error ? (
           <div className="bg-[#fef2f2] border border-[#fecaca] rounded-xl p-[30px] text-center text-[#dc2626]">
             <p className="m-0 mb-[15px] text-base">{error}</p>
-            <button onClick={fetchStudents} className="bg-[#dc2626] text-white border-none py-[10px] px-5 rounded-lg text-sm font-[family-name:var(--font-family-pixel)] cursor-pointer transition-colors duration-300 ease-in-out hover:bg-[#b91c1c]">
+            <button onClick={fetchStudents} className="bg-[#dc2626] text-white border-none py-[10px] px-5 rounded-lg text-sm font-[family-name:var(--font-family-admin)] cursor-pointer transition-colors duration-300 ease-in-out hover:bg-[#b91c1c]">
               Retry
             </button>
           </div>

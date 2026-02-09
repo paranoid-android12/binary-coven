@@ -293,7 +293,7 @@ export default function StudentsPage() {
         {error && (
           <div className="bg-[#fef2f2] border border-[#fecaca] rounded-xl p-[30px] text-center text-[#dc2626]">
             <p className="m-0 mb-[15px] text-base">{error}</p>
-            <button onClick={fetchAllStudents} className="bg-[#dc2626] text-white border-none py-[10px] px-5 rounded-lg text-sm font-[family-name:var(--font-family-pixel)] cursor-pointer transition-colors duration-300 ease-in-out hover:bg-[#b91c1c]">
+            <button onClick={fetchAllStudents} className="bg-[#dc2626] text-white border-none py-[10px] px-5 rounded-lg text-sm font-[family-name:var(--font-family-admin)] cursor-pointer transition-colors duration-300 ease-in-out hover:bg-[#b91c1c]">
               Retry
             </button>
           </div>
@@ -357,7 +357,7 @@ export default function StudentsPage() {
                           <td className="p-[15px_20px] text-sm text-[#374151]">
                             <Link
                               href={`/admin/sessions/${student.sessionCode}/students`}
-                              className="text-admin-primary no-underline font-[family-name:var(--font-family-pixel)] text-[13px] font-bold transition-colors duration-300 ease-in-out hover:text-admin-primary-dark"
+                              className="text-admin-primary no-underline font-[family-name:var(--font-family-admin)] text-[13px] font-bold transition-colors duration-300 ease-in-out hover:text-admin-primary-dark"
                             >
                               {student.sessionCode}
                             </Link>

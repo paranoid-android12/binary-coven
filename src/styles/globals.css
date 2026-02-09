@@ -120,25 +120,40 @@ h1, h2, h3, h4, h5, h6 {
     font-family: "BoldPixels", Arial, Helvetica, sans-serif;
 }
 
+/* Admin pages: override heading fonts to inherit from parent (Poppins) */
+.admin-font h1,
+.admin-font h2,
+.admin-font h3,
+.admin-font h4,
+.admin-font h5,
+.admin-font h6,
+.admin-font p,
+.admin-font span,
+.admin-font button,
+.admin-font input,
+.admin-font label,
+.admin-font a,
+.admin-font code,
+.admin-font td,
+.admin-font th {
+    font-family: inherit;
+}
+
 /* Explicitly set font sizes for headers */
 h1 {
     font-size: 32px;
-    font-family: "BoldPixels", Arial, Helvetica, sans-serif;
 }
 
 h2 {
     font-size: 24px;
-    font-family: "BoldPixels", Arial, Helvetica, sans-serif;
 }
 
 h3 {
     font-size: 20px;
-    font-family: "BoldPixels", Arial, Helvetica, sans-serif;
 }
 
 h4, h5, h6 {
     font-size: 16px;
-    font-family: "BoldPixels", Arial, Helvetica, sans-serif;
 }
 
 /* Tailwind Custom Utilities */

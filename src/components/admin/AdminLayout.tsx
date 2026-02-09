@@ -57,7 +57,7 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-admin-gradient text-white font-[family-name:var(--font-family-pixel)]">
+      <div className="admin-font min-h-screen flex flex-col items-center justify-center bg-admin-gradient text-white font-[family-name:var(--font-family-admin)]">
         <div className="w-[50px] h-[50px] border-4 border-[rgba(14,195,201,0.2)] border-t-admin-primary rounded-full animate-spin-slow mb-5"></div>
         <p>Loading...</p>
       </div>
@@ -87,7 +87,7 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
         <title>{title} - Binary Coven Admin</title>
       </Head>
 
-      <div className="flex min-h-screen bg-[#f5f7fa] font-[family-name:var(--font-family-pixel)]">
+      <div className="admin-font flex min-h-screen bg-[#f5f7fa] font-[family-name:var(--font-family-admin)]">
         {/* Sidebar Navigation */}
         <aside className={`w-[260px] bg-admin-gradient-vertical text-white flex flex-col fixed h-screen left-0 top-0 z-[1000] shadow-[2px_0_10px_rgba(0,0,0,0.1)] transition-transform duration-300 ease-in-out ${
           mobileMenuOpen ? 'translate-x-0' : 'max-laptop:-translate-x-full'
@@ -121,7 +121,7 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
           <div className="p-5 border-t border-[rgba(14,195,201,0.2)]">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center py-[14px] px-5 bg-[rgba(255,82,82,0.1)] border border-[rgba(255,82,82,0.3)] rounded-lg text-[#ff8a8a] text-[15px] font-[family-name:var(--font-family-pixel)] cursor-pointer transition-all duration-300 ease-in-out hover:bg-[rgba(255,82,82,0.2)] hover:border-[rgba(255,82,82,0.5)]"
+              className="w-full flex items-center py-[14px] px-5 bg-[rgba(255,82,82,0.1)] border border-[rgba(255,82,82,0.3)] rounded-lg text-[#ff8a8a] text-[15px] font-[family-name:var(--font-family-admin)] cursor-pointer transition-all duration-300 ease-in-out hover:bg-[rgba(255,82,82,0.2)] hover:border-[rgba(255,82,82,0.5)]"
             >
               <LogOut className="text-xl mr-3 w-6 text-center" size={20} />
               <span className="text-[15px]">Logout</span>

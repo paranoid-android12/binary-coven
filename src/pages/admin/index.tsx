@@ -108,7 +108,7 @@ export default function AdminDashboard() {
             <p className="m-0 mb-[15px] text-base">{error}</p>
             <button
               onClick={fetchDashboardData}
-              className="bg-[#dc2626] text-white border-none py-[10px] px-5 rounded-lg text-sm font-[family-name:var(--font-family-pixel)] cursor-pointer transition-colors duration-300 ease-in-out hover:bg-[#b91c1c]"
+              className="bg-[#dc2626] text-white border-none py-[10px] px-5 rounded-lg text-sm font-[family-name:var(--font-family-admin)] cursor-pointer transition-colors duration-300 ease-in-out hover:bg-[#b91c1c]"
             >
               Retry
             </button>
@@ -207,7 +207,7 @@ export default function AdminDashboard() {
                       {recentSessions.map((session) => (
                         <tr key={session.id} className="border-b border-[#e5e7eb] last:border-b-0 transition-colors duration-200 ease-in-out hover:bg-[#f9fafb]">
                           <td className="p-[15px_20px] text-sm text-[#374151] font-medium">
-                            <code className="bg-[#f3f4f6] py-1 px-[10px] rounded-md font-[family-name:var(--font-family-pixel)] text-[13px] text-admin-primary font-bold">
+                            <code className="bg-[#f3f4f6] py-1 px-[10px] rounded-md font-[family-name:var(--font-family-admin)] text-[13px] text-admin-primary font-bold">
                               {session.code}
                             </code>
                           </td>

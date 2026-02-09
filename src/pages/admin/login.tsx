@@ -81,7 +81,7 @@ export default function AdminLogin() {
         <title>Admin Login - Binary Coven</title>
       </Head>
 
-      <div className="min-h-screen flex items-center justify-center bg-admin-purple-gradient font-[family-name:var(--font-family-pixel)] p-5">
+      <div className="admin-font min-h-screen flex items-center justify-center bg-admin-purple-gradient font-[family-name:var(--font-family-admin)] p-5">
         <div className="bg-admin-tan border-4 border-admin-purple rounded-xl py-10 px-[50px] w-full max-w-[420px] shadow-admin-card relative">
           <div className="text-center mb-[35px]">
             <h1 className="text-[32px] font-bold text-admin-purple m-0 mb-[10px] uppercase tracking-[2px] text-shadow-admin">Binary Coven</h1>
@@ -98,7 +98,7 @@ export default function AdminLogin() {
                 id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full py-[14px] px-4 bg-admin-tan-light border-2 border-admin-purple rounded-md text-admin-purple text-[15px] font-[family-name:var(--font-family-pixel)] transition-all duration-200 ease-in-out box-border outline-none focus:border-admin-purple focus:shadow-[0_0_0_2px_rgba(33,7,20,0.2)] disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-admin-purple/60"
+                className="w-full py-[14px] px-4 bg-admin-tan-light border-2 border-admin-purple rounded-md text-admin-purple text-[15px] font-[family-name:var(--font-family-admin)] transition-all duration-200 ease-in-out box-border outline-none focus:border-admin-purple focus:shadow-[0_0_0_2px_rgba(33,7,20,0.2)] disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-admin-purple/60"
                 placeholder="Enter admin username"
                 disabled={loading}
                 autoFocus
@@ -119,7 +119,7 @@ export default function AdminLogin() {
                     setPasswordTouched(true);
                   }}
                   onBlur={() => setPasswordTouched(true)}
-                  className="w-full py-[14px] px-4 pr-10 bg-admin-tan-light border-2 border-admin-purple rounded-md text-admin-purple text-[15px] font-[family-name:var(--font-family-pixel)] transition-all duration-200 ease-in-out box-border outline-none focus:border-admin-purple focus:shadow-[0_0_0_2px_rgba(33,7,20,0.2)] disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-admin-purple/60"
+                  className="w-full py-[14px] px-4 pr-10 bg-admin-tan-light border-2 border-admin-purple rounded-md text-admin-purple text-[15px] font-[family-name:var(--font-family-admin)] transition-all duration-200 ease-in-out box-border outline-none focus:border-admin-purple focus:shadow-[0_0_0_2px_rgba(33,7,20,0.2)] disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-admin-purple/60"
                   placeholder="Enter admin password"
                   disabled={loading}
                 />
@@ -158,7 +158,7 @@ export default function AdminLogin() {
 
             <button
               type="submit"
-              className="w-full py-[14px] px-6 bg-transparent text-admin-purple border-[3px] border-admin-purple rounded-md text-lg font-bold font-[family-name:var(--font-family-pixel)] cursor-pointer transition-all duration-200 ease-in-out uppercase tracking-[2px] shadow-admin-button hover:bg-admin-purple hover:text-admin-tan hover:translate-y-px hover:shadow-admin-button-hover active:translate-y-[2px] active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:bg-transparent disabled:hover:text-admin-purple disabled:hover:translate-y-0"
+              className="w-full py-[14px] px-6 bg-transparent text-admin-purple border-[3px] border-admin-purple rounded-md text-lg font-bold font-[family-name:var(--font-family-admin)] cursor-pointer transition-all duration-200 ease-in-out uppercase tracking-[2px] shadow-admin-button hover:bg-admin-purple hover:text-admin-tan hover:translate-y-px hover:shadow-admin-button-hover active:translate-y-[2px] active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:bg-transparent disabled:hover:text-admin-purple disabled:hover:translate-y-0"
               disabled={loading}
             >
               {loading ? 'Logging in...' : 'Login'}
