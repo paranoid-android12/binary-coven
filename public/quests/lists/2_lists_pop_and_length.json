@@ -1,0 +1,178 @@
+{
+  "id": "lists_pop_and_length",
+  "title": "Removing from Lists",
+  "description": "Learn to use pop() to remove items and length to count them.",
+  "difficulty": "beginner",
+  "category": "Lists",
+  "estimatedTime": 12,
+  "concepts": ["lists", "pop", "length", "list_size", "item_removal"],
+  "prerequisites": ["lists_append"],
+  "icon": "quest_lists.png",
+  "thumbnail": "quest_lists_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_pop_intro",
+      "title": "Taking Items Out",
+      "description": "Introduction to pop",
+      "preDialogues": [
+        {
+          "name": "Manu",
+          "content": "You've learned how to add items to lists. Now let's learn how to remove them!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "How do I take items out of a list?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Manu",
+          "content": "Use the pop() method! It removes and returns the last item. If you have [1, 2, 3] and call pop(myList), you get 3 and the list becomes [1, 2].",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_first_pop",
+      "title": "Your First Pop",
+      "description": "Use pop() to remove items",
+      "preDialogues": [
+        {
+          "name": "Manu",
+          "content": "Let's try it! Create a list with several numbers, then use pop() to remove the last one.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So pop() both removes it AND gives me the value?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Manu",
+          "content": "Exactly! You can store it in a variable: poppedItem = pop(myList)",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create a list with items",
+          "content": "= ["
+        },
+        {
+          "type": "code_content",
+          "description": "Use pop() to remove an item",
+          "content": "pop()"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Manu",
+          "content": "Perfect! You've removed an item from your list. Now let's learn about list length.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_length_property",
+      "title": "Counting Your Items",
+      "description": "Using the length property",
+      "preDialogues": [
+        {
+          "name": "Manu",
+          "content": "To find out how many items are in your list, use the len() property!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So if I have [1, 2, 3, 4], the length is 4?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Manu",
+          "content": "Exactly! Use len(myList) to get the count. Try creating a list and checking its length.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Use len() to get list size",
+          "content": "len("
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Manu",
+          "content": "Great! Length is very useful for knowing how much data you have.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_pop_practice",
+      "title": "Processing Harvests",
+      "description": "Use pop in farming context",
+      "preDialogues": [
+        {
+          "name": "Manu",
+          "content": "Here's a practical use: create a harvest queue! Add items, then pop them off as you process each harvest.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Like a to-do list that I check off?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Manu",
+          "content": "Exactly! Harvest 3 wheat, add them to a list, then pop items off. Try it!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "harvest_crop",
+          "description": "Harvest 3 wheat",
+          "cropType": "wheat",
+          "cropCount": 3
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Manu",
+          "content": "Excellent! You're managing data like a pro programmer! Next: calculations!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "What kind of calculations?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Manu",
+          "content": "You'll learn to calculate totals, averages, and more with the sum() function!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "lists_sum_calculations",
+      "description": "Unlocked quest: List Calculations"
+    },
+    {
+      "type": "resource",
+      "value": 120,
+      "description": "Gained 120 energy"
+    }
+  ]
+}

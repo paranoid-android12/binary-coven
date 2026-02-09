@@ -1,0 +1,191 @@
+{
+  "id": "variables_introduction",
+  "title": "Memory Boxes - Variables",
+  "description": "Learn to store and use data with variables - the foundation of managing information in code.",
+  "difficulty": "beginner",
+  "category": "Variables",
+  "estimatedTime": 15,
+  "concepts": ["variables", "assignment", "data_types", "naming"],
+  "prerequisites": [],
+  "icon": "quest_programming.png",
+  "thumbnail": "quest_programming_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_concept",
+      "title": "What Are Variables?",
+      "description": "Understanding data storage",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Hello! I'll teach you about variables!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Variables? What are those?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Think of variables as labeled boxes. You can put information inside them and retrieve it later. They're how computers remember things!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So like... a storage container with a name tag?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect analogy! Let's create your first variable.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_creating",
+      "title": "Creating Variables",
+      "description": "Your first variable declaration",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "To create a variable, give it a name and assign it a value using the equals sign. Let's create a variable called wheat_count and set it to 0!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "The equals sign puts the value in the box?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! The equals sign is called the assignment operator. It stores the value on the right into the variable on the left.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create a variable: wheat_count = 0",
+          "content": "wheat_count = 0"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Great! You've created your first variable. Now that wheat_count exists, you can use it in your code.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_using",
+      "title": "Using Variables",
+      "description": "Access stored data",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Variables aren't useful unless you use them! You can reference wheat_count anywhere in your code to get its value.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So if I write wheat_count later, it will have the value I stored?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Precisely! Variables persist throughout your program. Try using your variable in the code.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "play_button",
+          "description": "Run code that uses your variable"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! Your code remembered the value you stored. That's the power of variables!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_updating",
+      "title": "Updating Variables",
+      "description": "Change stored values",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Variables can change! If you harvest wheat, you want to track that by updating the variable's value.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "How do I update a variable?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "You can take the current value, add to it, and store the result back! Try making wheat_count equal to itself plus 1.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Oh! So it's like updating what's in the box. The old value gets replaced.",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! This is called incrementing. It's very useful for tracking counts!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Update the variable: wheat_count = wheat_count + 1",
+          "content": "wheat_count = wheat_count + 1"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Excellent! You've learned to create, use, and update variables. These are the building blocks of data management!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "I can see how this would be useful for tracking harvests, planted crops, and more!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Precisely! Next, we'll explore how to use variables for counting and arithmetic.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "variables_counting",
+      "description": "Unlocked quest: The Harvest Counter"
+    },
+    {
+      "type": "resource",
+      "value": 60,
+      "description": "Gained 60 energy"
+    }
+  ]
+}

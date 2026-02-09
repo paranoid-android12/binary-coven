@@ -1,0 +1,195 @@
+{
+  "id": "variables_counting",
+  "title": "The Harvest Counter",
+  "description": "Use variables to track your farming progress with counters and arithmetic operations.",
+  "difficulty": "beginner",
+  "category": "Variables",
+  "estimatedTime": 15,
+  "concepts": ["variables", "arithmetic", "increment", "tracking"],
+  "prerequisites": ["variables_introduction"],
+  "icon": "quest_programming.png",
+  "thumbnail": "quest_programming_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_counter",
+      "title": "Creating a Counter",
+      "description": "Initialize a counting variable",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's put variables to practical use! We'll create a counter to track how many times you've harvested.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "A counter? Like counting sheep, but for harvests?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Counters start at 0 and increase each time an action happens. Create a variable called harvest_count and set it to 0!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create a counter variable: harvest_count = 0",
+          "content": "harvest_count = 0"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! Now we have a counter ready to track harvests.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_incrementing",
+      "title": "Incrementing the Counter",
+      "description": "Add to the counter",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "After each harvest, we need to increase the counter. Update harvest_count by adding 1 to its current value!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "This adds 1 to whatever was in harvest_count before!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Each time this line runs, the counter goes up by one.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Increment the counter: harvest_count = harvest_count + 1",
+          "content": "harvest_count = harvest_count + 1"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Great! Now your code can count harvests automatically.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_tracking",
+      "title": "Tracking Multiple Operations",
+      "description": "Count multiple harvests",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's use this in practice! Track your harvests using your counter variable.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "What's my goal?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Harvest 5 wheat crops and increment your counter after each one! At the end, your harvest_count variable should equal 5.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "harvest_crop",
+          "description": "Harvest 5 wheat crops while tracking with your counter",
+          "cropType": "wheat",
+          "cropCount": 5
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "The counter worked! It tracked all 5 harvests!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Excellent! Variables let you track data as your program runs.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_math",
+      "title": "Arithmetic Operations",
+      "description": "Calculate values",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Variables can do more than counting! You can multiply, divide, add, and subtract with them. Create a total_value variable that multiplies wheat_count by 10!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So if wheat_count is 5, total_value becomes 50?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Variables make calculations automatic. Math operators work just like you'd expect!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Calculate a value: total_value = wheat_count * 10",
+          "content": "total_value"
+        },
+        {
+          "type": "code_content",
+          "description": "Use multiplication in your calculation",
+          "content": "*"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Wonderful! There's also a shorthand: harvest_count += 1 means the same as harvest_count = harvest_count + 1.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "A shortcut! That'll save typing!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Next, we'll explore variables that store text instead of numbers!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "variables_strings",
+      "description": "Unlocked quest: Talking in Code"
+    },
+    {
+      "type": "resource",
+      "value": 70,
+      "description": "Gained 70 energy"
+    }
+  ]
+}

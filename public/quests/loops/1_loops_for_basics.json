@@ -1,0 +1,182 @@
+{
+  "id": "loops_for_basics",
+  "title": "Counting Loops - For Loops",
+  "description": "Master the for loop for counted repetition - the most common loop pattern in programming.",
+  "difficulty": "intermediate",
+  "category": "Loops",
+  "estimatedTime": 20,
+  "concepts": ["for_loops", "range", "iteration", "loop_variables"],
+  "prerequisites": ["loops_while_basics"],
+  "icon": "quest_programming.png",
+  "thumbnail": "quest_programming_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_for_concept",
+      "title": "The For Loop Advantage",
+      "description": "Definite iteration",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "While loops are great when you don't know how many times to repeat. But when you know the exact count, use a for loop!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So for loops are better for 'repeat 10 times' scenarios?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! For loops handle the counting for you—no need to manually create and increment a counter!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_range_function",
+      "title": "The Range Function",
+      "description": "Generating number sequences",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "For loops use the range() function to generate numbers. You tell it how many numbers you want!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Does it start counting at 0 or 1?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Great question! Python starts counting at 0. So if you ask for 5 numbers, you get 0, 1, 2, 3, and 4!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create a for loop with range: for i in range(5):",
+          "content": "for i in range("
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! The variable 'i' automatically goes through each number.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_loop_variable",
+      "title": "Using the Loop Variable",
+      "description": "Access the counter inside the loop",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Inside the loop, you can use the loop variable 'i'. It holds the current number! You can use it in your code.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So on the first iteration i is 0, then 1, then 2, etc.?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! The loop variable automatically increments each iteration.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Use the loop variable inside your for loop",
+          "content": "for i in range"
+        },
+        {
+          "type": "play_button",
+          "description": "Execute your for loop"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "The loop variable changes automatically each time!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "That's the beauty of for loops—automatic counting!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_farming_for",
+      "title": "Farming with For Loops",
+      "description": "Repeat farming operations",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now let's farm with a for loop! Use it to automate your farming operations.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "What do I need to accomplish?",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Harvest 5 wheat crops using a for loop! Plant them, grow them, then let the loop automate the harvesting. Much cleaner than repeating commands!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create a for loop for farming operations",
+          "content": "for i in range("
+        },
+        {
+          "type": "harvest_crop",
+          "description": "Harvest 5 wheat crops using a for loop",
+          "cropType": "wheat",
+          "cropCount": 5
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Five plots farmed with just a few lines of code!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "That's efficient programming! But for loops can do even more—let me show you advanced patterns!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "loops_patterns",
+      "description": "Unlocked quest: Loop Mastery - Common Patterns"
+    },
+    {
+      "type": "resource",
+      "value": 100,
+      "description": "Gained 100 energy"
+    }
+  ]
+}

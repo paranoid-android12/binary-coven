@@ -3,7 +3,7 @@
   "title": "The Field of Repetition",
   "description": "Learn to use for loops to automate movement and repeat actions efficiently.",
   "difficulty": "beginner",
-  "category": "Farming",
+  "category": "Tutorial",
   "estimatedTime": 15,
   "concepts": ["loops", "for", "range", "iteration"],
   "prerequisites": ["tutorial_basics"],
@@ -16,9 +16,9 @@
       "description": "Meet the farmer and learn about repeating actions",
       "preDialogues": [
         {
-          "name": "Farmer Joe",
+          "name": "Maru",
           "content": "Hey Qubit! I heard you learned the basics from Lain. I need you to move across the field—about 5 steps to the right. Can you help?",
-          "sprite": "farmer-speaking.png"
+          "sprite": "manu-speaking.png"
         },
         {
           "name": "Qubit",
@@ -26,9 +26,9 @@
           "sprite": "qubit-speaking.png"
         },
         {
-          "name": "Farmer Joe",
+          "name": "Maru",
           "content": "Not if you use loops! Let me teach you a smarter way—the 'for loop.' It lets you repeat actions without typing the same thing over and over.",
-          "sprite": "farmer-pleased.png"
+          "sprite": "manu-pleased.png"
         }
       ],
       "objectives": [],
@@ -41,9 +41,9 @@
       "description": "Learn the for loop syntax",
       "preDialogues": [
         {
-          "name": "Farmer Joe",
+          "name": "Maru",
           "content": "A for loop looks like this: for i in range(5): move_right(). This runs move_right() five times! The 'i' is just a counter variable.",
-          "sprite": "farmer-speaking.png"
+          "sprite": "manu-speaking.png"
         },
         {
           "name": "Qubit",
@@ -51,9 +51,9 @@
           "sprite": "qubit-pleased.png"
         },
         {
-          "name": "Farmer Joe",
+          "name": "Maru",
           "content": "Exactly! Now try writing your own for loop in the code editor. Type: for i in range(3):",
-          "sprite": "farmer-speaking.png"
+          "sprite": "manu-speaking.png"
         }
       ],
       "objectives": [
@@ -65,9 +65,9 @@
       ],
       "postDialogues": [
         {
-          "name": "Farmer Joe",
+          "name": "Maru",
           "content": "Good start! Now you need to add the action inside the loop.",
-          "sprite": "farmer-pleased.png"
+          "sprite": "manu-pleased.png"
         }
       ],
       "autoAdvance": true
@@ -78,9 +78,9 @@
       "description": "Add the movement action inside the loop",
       "preDialogues": [
         {
-          "name": "Farmer Joe",
+          "name": "Maru",
           "content": "Inside the loop, you need to indent and add move_right(). In Python, indentation matters! Make sure move_right() is indented under the for line.",
-          "sprite": "farmer-speaking.png"
+          "sprite": "manu-speaking.png"
         }
       ],
       "objectives": [
@@ -97,9 +97,9 @@
           "sprite": "qubit-speaking.png"
         },
         {
-          "name": "Farmer Joe",
+          "name": "Maru",
           "content": "Perfect! Now click the play button to watch yourself move three times automatically!",
-          "sprite": "farmer-pleased.png"
+          "sprite": "manu-pleased.png"
         }
       ],
       "autoAdvance": true
@@ -110,9 +110,9 @@
       "description": "Run your for loop code",
       "preDialogues": [
         {
-          "name": "Farmer Joe",
+          "name": "Maru",
           "content": "Now click the play button to watch your loop in action!",
-          "sprite": "farmer-speaking.png"
+          "sprite": "manu-speaking.png"
         }
       ],
       "objectives": [
@@ -128,9 +128,9 @@
           "sprite": "qubit-pleased.png"
         },
         {
-          "name": "Farmer Joe",
+          "name": "Maru",
           "content": "That's the power of loops! They save you tons of time when you need to repeat actions.",
-          "sprite": "farmer-pleased.png"
+          "sprite": "manu-pleased.png"
         }
       ],
       "autoAdvance": true
@@ -141,9 +141,9 @@
       "description": "Learn to combine loops with movement commands",
       "preDialogues": [
         {
-          "name": "Farmer Joe",
+          "name": "Maru",
           "content": "Great! You've mastered basic loops. Now remember, you can use loops with any command—movement, planting, harvesting, you name it! Loops work with everything.",
-          "sprite": "farmer-speaking.png"
+          "sprite": "manu-speaking.png"
         },
         {
           "name": "Qubit",
@@ -154,9 +154,9 @@
       "objectives": [],
       "postDialogues": [
         {
-          "name": "Farmer Joe",
+          "name": "Maru",
           "content": "You've got the basics down! Loops are one of the most powerful tools in programming.",
-          "sprite": "farmer-pleased.png"
+          "sprite": "manu-pleased.png"
         }
       ],
       "autoAdvance": true
@@ -176,13 +176,13 @@
       "description": "Complete the farming loops quest",
       "preDialogues": [
         {
-          "name": "Farmer Joe",
+          "name": "Maru",
           "content": "You've got the hang of for loops! You can use them to repeat any action—moving, planting, harvesting, you name it. With loops, automation just got a whole lot easier!",
-          "sprite": "farmer-pleased.png"
+          "sprite": "manu-pleased.png"
         },
         {
           "name": "Qubit",
-          "content": "Thanks Farmer Joe! I can't wait to use loops for the next chore. This coding stuff is really powerful!",
+          "content": "I can't wait to use loops for the next chore. This coding stuff is really powerful!",
           "sprite": "qubit-pleased.png"
         }
       ],

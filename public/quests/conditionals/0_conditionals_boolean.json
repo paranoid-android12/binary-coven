@@ -1,0 +1,187 @@
+{
+  "id": "conditionals_boolean",
+  "title": "True or False - Boolean Logic",
+  "description": "Learn about truth values and logical operations - the foundation of making decisions in code.",
+  "difficulty": "intermediate",
+  "category": "Conditionals",
+  "estimatedTime": 18,
+  "concepts": ["boolean", "true_false", "comparisons", "logic"],
+  "prerequisites": ["variables_introduction"],
+  "icon": "quest_programming.png",
+  "thumbnail": "quest_programming_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_boolean_concept",
+      "title": "Understanding True and False",
+      "description": "The boolean data type",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let me teach you about booleans!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Booleans? That's a funny word!",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Named after George Boole! Booleans are values that are either True or False. They're how computers make decisions.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So everything is either true or false? Like yes or no?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Binary logic. It's the foundation of all computer decision-making.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_comparisons",
+      "title": "Comparison Operators",
+      "description": "Creating boolean values",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "We create booleans using comparisons. For example, you can ask 'is the wheat count greater than 5?' The answer is either True or False.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "What comparison operators can I use?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "You can check if values are equal, not equal, less than, greater than, less or equal, and greater or equal. Each gives you a True or False answer!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Use the comparison operator, >. There are other comparison operators such as >, == and !=",
+          "content": ">"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! Comparisons evaluate to True or False based on the condition.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_boolean_variables",
+      "title": "Storing Boolean Values",
+      "description": "Variables that hold True/False",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "You can store boolean values in variables! Create a variable that stores the result of a comparison. It will hold either True or False!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So I can save the result of a comparison for later?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! This is useful when you need to check the same condition multiple times.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create a boolean variable storing a comparison result starting with 'is_' to indicate it's a boolean",
+          "content": "is_"
+        },
+        {
+          "type": "code_content",
+          "description": "Use a comparison operator in the assignment",
+          "content": " = "
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Boolean variables make conditions readable!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Good variable names like 'is_ready' or 'has_wheat' make code self-documenting!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_logical_operators",
+      "title": "Combining Conditions",
+      "description": "And, Or, Not operators",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "You can combine booleans with logical operators like 'and', 'or', and 'not'. This lets you check multiple conditions at once!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So 'and' means both must be True?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Correct! 'or' means at least one must be True, and 'not' flips the result. Very powerful!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create a complex boolean expression using and/or",
+          "content": " and "
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Logical operators let me express complex conditions!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Now you have the foundation for conditional statements. Let's learn how to make code execute based on these conditions!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "conditionals_if",
+      "description": "Unlocked quest: Making Decisions - If Statements and Combining Conditions"
+    },
+    {
+      "type": "resource",
+      "value": 70,
+      "description": "Gained 70 energy"
+    }
+  ]
+}

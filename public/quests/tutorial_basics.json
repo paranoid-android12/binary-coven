@@ -16,7 +16,7 @@
       "description": "Learn to move around using arrow keys",
       "preDialogues": [
         {
-          "name": "Lain",
+          "name": "Qubit",
           "content": "Qubit! Wake up already. Grandpa left you three chores to finish before sunset!",
           "sprite": "manu-angry.png"
         },
@@ -26,7 +26,7 @@
           "sprite": "qubit-defeated.png"
         },
         {
-          "name": "Lain",
+          "name": "Qubit",
           "content": "Nope! He said they're important. And he told a few people around town some clues to help you out. But first—you need to get moving. Use the arrow keys ↑, ↓, ←, and → to walk around the farmland. Try walking in all four directions!",
           "sprite": "manu-speaking.png"
         }
@@ -53,7 +53,7 @@
       "description": "Learn to access the programming interface",
       "preDialogues": [
         {
-          "name": "Lain",
+          "name": "Qubit",
           "content": "Good! Now, before you start on the chores, Grandpa said you'd need to use his coding terminal to help automate your tasks. Click on the 'Code Editor' button to open it.",
           "sprite": "manu-pleased.png"
         }
@@ -66,7 +66,7 @@
       ],
       "postDialogues": [
         {
-          "name": "Lain",
+          "name": "Qubit",
           "content": "Perfect! This terminal is your tool for getting chores done faster. You can write commands to handle farming tasks automatically.",
           "sprite": "manu-pleased.png"
         }
@@ -79,7 +79,7 @@
       "description": "Learn to write a plant command",
       "preDialogues": [
         {
-          "name": "Lain",
+          "name": "Qubit",
           "content": "Let's start simple. In the main code window, type exactly this: plant(\"wheat\"). That's how you plant wheat seeds when you're standing on farmland.",
           "sprite": "manu-speaking.png"
         }
@@ -106,7 +106,7 @@
       "description": "Learn to run code with the play button",
       "preDialogues": [
         {
-          "name": "Lain",
+          "name": "Qubit",
           "content": "Not quite! Click the play button (▶) to execute your code and watch yourself plant those seeds!",
           "sprite": "manu-speaking.png"
         }
@@ -126,7 +126,7 @@
       "description": "Learn to move using code",
       "preDialogues": [
         {
-          "name": "Lain",
+          "name": "Qubit",
           "content": "Nice work! Grandpa's first chore involves planting crops, so this'll come in handy. But you'll need to move around, too. Try typing one of these next: move_left(), move_right(), move_up(), or move_down()",
           "sprite": "manu-pleased.png"
         }
@@ -153,7 +153,7 @@
       "description": "Run your movement command",
       "preDialogues": [
         {
-          "name": "Lain",
+          "name": "Qubit",
           "content": "Exactly! Click the play button again to execute your movement command and see yourself move automatically.",
           "sprite": "manu-speaking.png"
         }
@@ -173,7 +173,7 @@
       "description": "Ready to tackle Grandpa's chores",
       "preDialogues": [
         {
-          "name": "Lain",
+          "name": "Qubit",
           "content": "Excellent! You've mastered the basics—moving around, planting crops, and coding actions. You're ready to take on Grandpa's chores now!",
           "sprite": "manu-pleased.png"
         },
@@ -183,7 +183,7 @@
           "sprite": "qubit-pleased.png"
         },
         {
-          "name": "Lain",
+          "name": "Qubit",
           "content": "That's the spirit! You've completed your basic training. Now go show the town what you can do!",
           "sprite": "manu-pleased.png"
         }

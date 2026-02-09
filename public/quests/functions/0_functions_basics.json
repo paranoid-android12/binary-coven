@@ -1,0 +1,191 @@
+{
+  "id": "functions_basics",
+  "title": "Your First Function",
+  "description": "Learn to create reusable code blocks with functions - the key to organized, efficient programming.",
+  "difficulty": "intermediate",
+  "category": "Functions",
+  "estimatedTime": 18,
+  "concepts": ["functions", "def_keyword", "function_calls", "code_organization"],
+  "prerequisites": ["variables_energy_tracking"],
+  "icon": "quest_programming.png",
+  "thumbnail": "quest_programming_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_concept",
+      "title": "The Function Concept",
+      "description": "Understanding what functions are",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "You've been using functions like plant() and harvest(). Now let's learn to create your own!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Wait, I can make my own functions? Like plant() and harvest()?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Functions are reusable blocks of code. Instead of copying the same commands repeatedly, you package them in a function and call it whenever needed.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So functions are like... creating my own custom tools?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect analogy! Let's create your first custom tool.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_defining",
+      "title": "Defining Functions",
+      "description": "Create your first function",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "To create a function, use the 'def' keyword followed by a name and parentheses, then a colon. This defines your function!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "def is short for 'define'?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! The colon at the end tells Python you're about to write the function's body. Try creating a function called greet!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Define a function: def greet():",
+          "content": "def greet():"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Good start! But a function definition isn't complete without a body—the code it executes.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_body",
+      "title": "Adding Function Body",
+      "description": "Add code inside the function",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "The function body is the code that runs when you call the function. It must be indented! Add indented code under your def line.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Indentation matters in Python, right? Like with loops?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Python uses indentation to show what's inside the function. Add some farming commands inside your function!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Add code inside your function (indented)",
+          "content": "    "
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! You've defined a complete function. Now let's use it!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_calling",
+      "title": "Calling Functions",
+      "description": "Execute your custom function",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "To use a function, you 'call' it by writing its name with parentheses. This executes all the code inside!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So I define it once with def, then call it as many times as I want?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! That's the power of reusability. Call your function and click play to see it work!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Call your function: greet()",
+          "content": "greet()"
+        },
+        {
+          "type": "play_button",
+          "description": "Execute your code to see your function run"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "It worked! My custom function executed its code!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Congratulations! You've created and called your first function. Functions are fundamental to organized code.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "What if I want my function to be more flexible? Like plant different crops?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Great question! That's what parameters are for. Let's learn about those next!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "functions_parameters",
+      "description": "Unlocked quest: Flexible Functions"
+    },
+    {
+      "type": "resource",
+      "value": 70,
+      "description": "Gained 70 energy"
+    }
+  ]
+}

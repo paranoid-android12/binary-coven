@@ -1,0 +1,174 @@
+{
+  "id": "variables_energy_tracking",
+  "title": "Energy Tracking with Variables",
+  "description": "Use variables to track and manage your energy levels dynamically across farming operations.",
+  "difficulty": "beginner",
+  "category": "Variables",
+  "estimatedTime": 15,
+  "concepts": ["variables", "energy_management", "get_energy", "data_storage"],
+  "prerequisites": ["foundations_upgrade_system", "variables_positions"],
+  "icon": "quest_programming.png",
+  "thumbnail": "quest_programming_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_storing_energy",
+      "title": "Storing Energy Values",
+      "description": "Save energy data in variables",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now that you know about the energy system, let's use variables to track it dynamically!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Remember get_energy()? It returns a dictionary with 'energy' and 'maxEnergy'. We can store these!",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Try this: energy_data = get_energy(), then access the current energy with energy_data['energy']",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Store energy data in a variable",
+          "content": "energy_data = get_energy()"
+        },
+        {
+          "type": "code_content",
+          "description": "Access the energy value from the dictionary",
+          "content": "['energy']"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! Now you can check your energy programmatically and make decisions based on it.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_energy_budget",
+      "title": "Calculating Energy Budgets",
+      "description": "Plan your energy usage",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's calculate if you have enough energy for a farming route. Movement costs 5 per tile, plant and harvest cost energy too.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Store your current energy, calculate the cost, then check if you can afford it!",
+          "sprite": "qubit-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Calculate energy cost for operations via 'energy_cost' variable",
+          "content": "energy_cost"
+        },
+        {
+          "type": "code_content",
+          "description": "Compare current energy to cost using 'current_energy' variable",
+          "content": "current_energy"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Excellent budgeting! You're thinking like a programmer - plan before executing.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_tracking_consumption",
+      "title": "Tracking Energy Consumption",
+      "description": "Monitor energy usage over time",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Here's an advanced technique: store your starting energy, perform operations, then calculate how much you used!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "This helps optimize your code - you can see which operations are most expensive.",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Store starting energy before operations via 'start_energy' variable",
+          "content": "start_energy ="
+        },
+        {
+          "type": "code_content",
+          "description": "Calculate energy consumed via 'energy_used' variable",
+          "content": "energy_used ="
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Brilliant! You're tracking energy consumption. This is essential for optimizing large farming operations.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_dynamic_decisions",
+      "title": "Dynamic Energy Decisions",
+      "description": "Use energy tracking for smart decisions",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Final challenge: farm multiple plots, but stop and print a warning if your energy drops below 30.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Use variables to track energy after each operation. Print a message when it gets low!",
+          "sprite": "qubit-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Use print() to warn about low energy",
+          "content": "print("
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! You're using variables to make your code smarter and more adaptive.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Next, we'll learn conditionals - then you can automatically eat when energy is low!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "resource",
+      "value": 70,
+      "description": "Gained 70 energy"
+    }
+  ]
+}

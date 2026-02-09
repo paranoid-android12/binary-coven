@@ -1,0 +1,205 @@
+{
+  "id": "functions_library",
+  "title": "Building Your Function Toolbox",
+  "description": "Create a library of reusable farming functions - master the art of code organization.",
+  "difficulty": "intermediate",
+  "category": "Functions",
+  "estimatedTime": 20,
+  "concepts": ["functions", "code_organization", "reusability", "libraries"],
+  "prerequisites": ["functions_return"],
+  "icon": "quest_automation.png",
+  "thumbnail": "quest_automation_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_plant_helper",
+      "title": "Plant Helper Function",
+      "description": "Combine planting with waiting",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's create practical farming functions! Start with plant_and_wait() that combines plant() and sleep().",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So one function call does both actions?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Create: def plant_and_wait(): with plant() and sleep(11000) inside.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create plant_and_wait function",
+          "content": "def plant_and_wait():"
+        },
+        {
+          "type": "code_content",
+          "description": "Include both plant and sleep in the function",
+          "content": "sleep(11000)"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Now I can call plant_and_wait() instead of writing two commands!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "That's the power of helper functions—packaging common operations!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_harvest_helper",
+      "title": "Position-Based Harvest Function",
+      "description": "Harvest with parameters",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's create harvest_plot(x, y) that moves to a position and harvests. Use movement and harvest commands inside!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So it takes x and y parameters and uses them to navigate?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! This function encapsulates a common farming task with custom positions.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create harvest_plot function with x, y parameters",
+          "content": "def harvest_plot(x, y):"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "One function call to harvest any plot!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Your function library is growing!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_complete_cycle",
+      "title": "Complete Farming Function",
+      "description": "All-in-one farming operation",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now create the ultimate farming function: farm_plot(x, y) that moves, plants, waits, and harvests!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "One function that does everything? That's incredibly efficient!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! This is abstraction—hiding complexity behind a simple interface.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create farm_plot function with x, y parameters",
+          "content": "def farm_plot(x, y):"
+        },
+        {
+          "type": "code_content",
+          "description": "Include complete farming cycle in function",
+          "content": "harvest()"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "This function is amazing! It does a complete farming operation!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "This is professional-level code organization!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_using_library",
+      "title": "Using Your Function Library",
+      "description": "Apply your custom functions",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now use all your functions together! Call farm_plot() multiple times with different positions and crops.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So instead of 20+ lines of code, I can do it in just a few function calls?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! That's the power of a function library. Your code becomes readable, maintainable, and elegant.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "harvest_crop",
+          "description": "Use your function library to farm 5 plots efficiently",
+          "cropType": "wheat",
+          "cropCount": 5
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "My code is so clean and organized now! Functions are incredible!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "You've mastered the basics of functions! But there's more—checking your energy before actions is crucial. Let's upgrade your functions with energy guards!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "functions_energy_guard",
+      "description": "Unlocked quest: Energy Guard Functions"
+    },
+    {
+      "type": "resource",
+      "value": 100,
+      "description": "Gained 100 energy"
+    }
+  ]
+}

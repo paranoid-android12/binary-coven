@@ -712,6 +712,7 @@ export const GameInterface: React.FC = () => {
             try {
                 // Default quest files (all available quests)
                 const allQuestFiles = [
+                    // Top-level legacy quests
                     "quests/tutorial_basics.json",
                     "quests/game_intro.json",
                     "quests/full_automation.json",
@@ -722,6 +723,41 @@ export const GameInterface: React.FC = () => {
                     "quests/functions_intro.json",
                     "quests/alpha_drone_intro.json",
                     "quests/drone_farming_quest.json",
+                    // Foundations
+                    "quests/foundations/0_foundations_welcome.json",
+                    "quests/foundations/1_foundations_energy_management.json",
+                    "quests/foundations/2_foundations_scanner_function.json",
+                    "quests/foundations/3_foundations_upgrade_system.json",
+                    // Variables
+                    "quests/variables/0_variables_introduction.json",
+                    "quests/variables/1_variables_counting.json",
+                    "quests/variables/2_variables_strings.json",
+                    "quests/variables/3_variables_positions.json",
+                    "quests/variables/4_variables_energy_tracking.json",
+                    // Conditionals
+                    "quests/conditionals/0_conditionals_boolean.json",
+                    "quests/conditionals/1_conditionals_if.json",
+                    "quests/conditionals/2_conditionals_else.json",
+                    "quests/conditionals/3_conditionals_weather.json",
+                    "quests/conditionals/4_conditionals_logical_operators.json",
+                    // Loops
+                    "quests/loops/0_loops_while_basics.json",
+                    "quests/loops/1_loops_for_basics.json",
+                    "quests/loops/2_loops_patterns.json",
+                    "quests/loops/3_loops_with_conditionals.json",
+                    "quests/loops/4_loops_master_challenge.json",
+                    // Functions
+                    "quests/functions/0_functions_basics.json",
+                    "quests/functions/1_functions_parameters.json",
+                    "quests/functions/2_functions_return.json",
+                    "quests/functions/3_functions_library.json",
+                    "quests/functions/4_functions_energy_guard.json",
+                    // Lists
+                    "quests/lists/0_lists_introduction.json",
+                    "quests/lists/1_lists_append.json",
+                    "quests/lists/2_lists_pop_and_length.json",
+                    "quests/lists/3_lists_sum_calculations.json",
+                    "quests/lists/4_lists_advanced_management.json",
                 ];
 
                 let questFilesToLoad = allQuestFiles;

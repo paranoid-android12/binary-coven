@@ -1,0 +1,204 @@
+{
+  "id": "conditionals_else",
+  "title": "Alternative Paths - Else and Elif",
+  "description": "Handle multiple possibilities with else and elif - master complete decision trees.",
+  "difficulty": "intermediate",
+  "category": "Conditionals",
+  "estimatedTime": 20,
+  "concepts": ["else", "elif", "mutually_exclusive", "decision_trees"],
+  "prerequisites": ["conditionals_if"],
+  "icon": "quest_programming.png",
+  "thumbnail": "quest_programming_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_else_clause",
+      "title": "The Else Clause",
+      "description": "Default alternative action",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "The 'else' clause runs when the if condition is False. It's the 'otherwise' action.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So if/else gives me two paths? One for True, one for False?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Create an if statement, then add an else clause below it. Either the if block or the else block runs, never both!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create an if/else statement",
+          "content": "else:"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Now my code handles both scenarios!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect! If/else ensures one path is always taken.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_elif",
+      "title": "Elif - Multiple Conditions",
+      "description": "More than two paths",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "What if you have more than two options? Use 'elif' (else-if) to check additional conditions!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So elif adds more possibilities?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Yes! Start with if, add elif clauses for other conditions, and finish with else for any remaining cases. Python checks each in order!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create an if/elif/else chain",
+          "content": "elif "
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Elif lets me have multiple conditions checked in order!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Python checks each condition in order and runs the first True one.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_crop_selection",
+      "title": "Conditional Plot Selection",
+      "description": "Choose plots based on conditions",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's apply this! Use if/elif/else to decide which plot to plant in based on conditions!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So different conditions lead to planting in different plots?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Your farm can be smart and adaptive!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Use if/elif/else to decide which plot to plant in",
+          "content": "plant("
+        },
+        {
+          "type": "play_button",
+          "description": "Execute your conditional crop selection"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "My code adapts its behavior based on conditions!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "This is the beginning of true artificial intelligence in farming!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_smart_farming",
+      "title": "Dynamic Decision Making",
+      "description": "Complex conditional logic",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Final challenge! Create a smart farming system using if/elif/else chains to manage your crops.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "What's the goal?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Your goal: harvest 5 wheat crops using your conditional logic! Plant them, let them grow, then harvest. Show me your mastery!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "harvest_crop",
+          "description": "Harvest 5 wheat crops to complete the quest",
+          "cropType": "wheat",
+          "cropCount": 5
+        },
+        {
+          "type": "code_content",
+          "description": "Use if/elif/else to manage your farming decisions",
+          "content": "if "
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "My code makes intelligent farming decisions!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Outstanding! Now you understand branching logic. Ready to apply these skills to more complex scenarios?",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "conditionals_weather",
+      "description": "Unlocked quest: Adapting to Weather"
+    },
+    {
+      "type": "resource",
+      "value": 90,
+      "description": "Gained 90 energy"
+    }
+  ]
+}

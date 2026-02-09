@@ -1,0 +1,191 @@
+{
+  "id": "foundations_energy_management",
+  "title": "Energy Management",
+  "description": "Master the energy system - every action costs energy, and you need to eat to survive.",
+  "difficulty": "beginner",
+  "category": "Game Mechanics",
+  "estimatedTime": 15,
+  "concepts": ["energy_system", "hunger", "eat_function", "resource_management"],
+  "prerequisites": ["foundations_welcome"],
+  "icon": "quest_energy.png",
+  "thumbnail": "quest_energy_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_energy_basics",
+      "title": "The Energy System",
+      "description": "Understanding energy costs",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Here's something critical: every action costs energy. Movement costs 5 energy per tile. Planting and harvesting cost energy too.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Check your energy with get_energy(). It returns your current and max energy levels.",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "If you run out of energy, your code will fail. You need to manage it carefully!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Use get_energy() to check your energy level",
+          "content": "get_energy()"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Good. Now you know how to check energy. Let's learn how to restore it.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_food_stations",
+      "title": "Food Stations",
+      "description": "Learning to eat",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "See that table? That's a food station. Stand on it and call eat() to restore 20 energy.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Eating takes time though - about 2 seconds. Plan your eating breaks wisely!",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Navigate to the food station and eat. You'll need to incorporate this into your farming routines.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Use eat() at the food station",
+          "content": "eat()"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! Energy restored. You'll need to balance farming with eating breaks.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_waiting_for_crops",
+      "title": "Waiting for Growth",
+      "description": "Learning about crop growth time",
+      "preDialogues": [
+        {
+          "name": "Qubit",
+          "content": "After I plant a crop, how long until I can harvest it?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Wheat takes 10 seconds to grow. Your code needs to wait! Use sleep(10000) to pause for 10,000 milliseconds (10 seconds).",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So sleep() lets my code wait for things to happen?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Try it: plant wheat, then sleep(10000), then harvest. This is essential for farming automation!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Use sleep() to wait for crops to grow",
+          "content": "sleep("
+        },
+        {
+          "type": "harvest_crop",
+          "description": "Harvest 1 wheat crop after waiting",
+          "cropType": "wheat",
+          "cropCount": 1
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! Now you understand timing. sleep() is crucial for automation.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "I can automate plant-wait-harvest sequences now!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_energy_planning",
+      "title": "Planning Energy Usage",
+      "description": "Calculate energy needs",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Here's a challenge: farm 3 plots without running out of energy. Calculate your energy costs first!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Remember: movement is 5 per tile, plant() costs energy, and harvest() costs energy. You might need to eat in the middle!",
+          "sprite": "qubit-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "harvest_crop",
+          "description": "You should have 3 wheat crops harvested",
+          "cropType": "wheat",
+          "cropCount": 3
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Excellent energy management! This will become second nature as you code more complex farming operations.",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Wait until you meet Alphabot - your robotic assistant. It has its own energy system too!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "foundations_scanner_function",
+      "description": "Unlocked quest: The Scanner Function"
+    },
+    {
+      "type": "resource",
+      "value": 60,
+      "description": "Gained 60 energy"
+    }
+  ]
+}

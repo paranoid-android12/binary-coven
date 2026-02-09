@@ -157,94 +157,25 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
     return organized;
   };
 
-  // Get learning insights based on completed quests - focused on programming concepts
+  // Get learning insights based on completed quests - focused on quest topic groups
   const getLearningInsights = (avQuests: Quest[], compQuests: Quest[]) => {
     const insights: { message: string; type: 'success' | 'suggestion' | 'next' }[] = [];
 
-    // Collect all programming concepts from completed quests
-    const masteredConcepts = new Set<string>();
+    // Compute topic mastery from quest IDs
+    const mastery = computeTopicMastery(avQuests, compQuests);
 
-    // Map concepts to broader programming topic groups
-    // Note: Keys use underscores to match normalized concept strings
-    const conceptToTopic: { [key: string]: string } = {
-      // Control Flow & Iteration
-      'loops': 'Control Flow',
-      'iteration': 'Control Flow',
-      'for': 'Control Flow',
-      'range': 'Control Flow',
-      'conditionals': 'Control Flow',
-      
-      // Functions & Code Organization
-      'functions': 'Functions',
-      'def': 'Functions',
-      'parameters': 'Functions',
-      'return': 'Functions',
-      'code_organization': 'Functions', // Changed from 'code-organization' to match normalization
-      'harvest_function': 'Functions',
-      'plant_function': 'Functions',
-      'sleep_function': 'Functions',
-      
-      // Automation & Advanced Programming
-      'automation': 'Automation',
-      'full_automation': 'Automation',
-      'programming': 'Automation',
-      'drones': 'Automation',
-      
-      // Basic Programming Fundamentals
-      'code_terminal': 'Basic Programming',
-      'movement_commands': 'Basic Programming',
-      'movement': 'Basic Programming',
-      'manual_controls': 'Basic Programming',
-      'manual_buttons': 'Basic Programming',
-      'interaction': 'Basic Programming',
-      
-      // Domain Concepts (game-related but still programming)
-      'planting': 'Applied Programming',
-      'harvesting': 'Applied Programming',
-      'wheat': 'Applied Programming',
-      'farming': 'Applied Programming',
-    };
-
-    // Programming topic descriptions
-    const topicDescriptions: { [key: string]: string } = {
-      'Control Flow': 'Control Flow helps you repeat actions and make decisions in your code.',
-      'Functions': 'Functions let you organize code into reusable blocks - a key programming skill!',
-      'Automation': 'Automation allows your programs to run tasks independently.',
-      'Basic Programming': 'These fundamentals are the building blocks of all programming!',
-      'Applied Programming': 'You\'re applying programming concepts to solve real problems!',
-    };
-
-    // Gather concepts from completed quests
-    compQuests.forEach(quest => {
-      if (quest.concepts && Array.isArray(quest.concepts)) {
-        quest.concepts.forEach((concept: string) => {
-          // Normalize: lowercase, replace spaces and hyphens with underscores
-          const normalizedConcept = concept.toLowerCase().replace(/[ -]/g, '_');
-          masteredConcepts.add(normalizedConcept);
-        });
-      }
-    });
-
-    // Group mastered concepts by programming topic
-    const masteredTopics = new Map<string, string[]>();
-    masteredConcepts.forEach(concept => {
-      const topic = conceptToTopic[concept] || 'Programming Concepts';
-      if (!masteredTopics.has(topic)) {
-        masteredTopics.set(topic, []);
-      }
-      masteredTopics.get(topic)!.push(concept);
-    });
-
-    // Define topic priority order (most important programming topics first)
-    const topicPriority = ['Basic Programming', 'Functions', 'Control Flow', 'Automation', 'Applied Programming'];
-
-    // Generate insights based on programming topics mastered (in priority order)
-    topicPriority.forEach(topic => {
-      if (masteredTopics.has(topic)) {
-        const description = topicDescriptions[topic] || '';
+    // Generate insights for mastered / in-progress topics
+    mastery.forEach(tm => {
+      if (tm.level === 'mastered') {
+        const desc = TOPIC_DESCRIPTIONS[tm.topic] || '';
         insights.push({
-          message: `${topic}: ${description}`,
+          message: `${tm.topic}: ${desc}`,
           type: 'success'
+        });
+      } else if (tm.level === 'in-progress') {
+        insights.push({
+          message: `${tm.topic}: Keep going — ${tm.completedQuests}/${tm.totalQuests} quests done!`,
+          type: 'suggestion'
         });
       }
     });
@@ -257,11 +188,11 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
       });
     }
 
-    // Find topics not yet learned to suggest next steps
-    const unlearnedTopics = topicPriority.filter(topic => !masteredTopics.has(topic));
-    
-    if (unlearnedTopics.length > 0 && compQuests.length > 0) {
-      const nextTopic = unlearnedTopics[0];
+    // Find topics not yet started to suggest next steps
+    const notStarted = mastery.filter(tm => tm.level === 'not-started');
+
+    if (notStarted.length > 0 && compQuests.length > 0) {
+      const nextTopic = notStarted[0].topic;
       insights.push({
         message: `Next: Continue learning to discover ${nextTopic}!`,
         type: 'next'
@@ -727,7 +658,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                 border: 'none',
                 cursor: 'pointer',
                 fontFamily: 'BoldPixels, monospace',
-                fontSize: '16px',
+                fontSize: '17px',
                 transition: 'background-color 0.2s',
               }}
               onMouseEnter={(e) => {
@@ -749,7 +680,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                 border: 'none',
                 cursor: 'pointer',
                 fontFamily: 'BoldPixels, monospace',
-                fontSize: '16px',
+                fontSize: '17px',
                 transition: 'background-color 0.2s',
               }}
               onMouseEnter={(e) => {
@@ -771,7 +702,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                 border: 'none',
                 cursor: 'pointer',
                 fontFamily: 'BoldPixels, monospace',
-                fontSize: '16px',
+                fontSize: '17px',
                 transition: 'background-color 0.2s',
               }}
               onMouseEnter={(e) => {
@@ -793,7 +724,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                 border: 'none',
                 cursor: 'pointer',
                 fontFamily: 'BoldPixels, monospace',
-                fontSize: '16px',
+                fontSize: '17px',
                 transition: 'background-color 0.2s',
               }}
               onMouseEnter={(e) => {
@@ -842,7 +773,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                   <div style={{ flex: 1 }}>
                     <h3 style={{
                       margin: 0,
-                      fontSize: '22px',
+                      fontSize: '23px',
                       fontWeight: 'bold',
                       color: 'white',
                       fontFamily: 'BoldPixels, monospace',
@@ -852,7 +783,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                     {studentDisplayName && studentDisplayName !== studentUsername && (
                       <p style={{
                         margin: '4px 0 0 0',
-                        fontSize: '14px',
+                        fontSize: '15px',
                         color: '#999999',
                         fontFamily: 'BoldPixels, monospace',
                       }}>
@@ -866,11 +797,11 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                       flexWrap: 'wrap',
                     }}>
                       {sessionInfo && (
-                        <span style={{ fontSize: '16px', color: '#888888', fontFamily: 'BoldPixels, monospace' }}>
+                        <span style={{ fontSize: '17px', color: '#888888', fontFamily: 'BoldPixels, monospace' }}>
                           Session: <span style={{ color: '#00c9ff' }}>{sessionInfo.code}</span>
                         </span>
                       )}
-                      <span style={{ fontSize: '16px', color: '#888888', fontFamily: 'BoldPixels, monospace' }}>
+                      <span style={{ fontSize: '17px', color: '#888888', fontFamily: 'BoldPixels, monospace' }}>
                         {overallProgress}% Complete
                       </span>
                     </div>
@@ -882,7 +813,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                       background: 'linear-gradient(135deg, #f5a623, #f7c948)',
                       borderRadius: '20px',
                       color: '#1e1e1e',
-                      fontSize: '15px',
+                      fontSize: '16px',
                       fontWeight: 'bold',
                       fontFamily: 'BoldPixels, monospace',
                       whiteSpace: 'nowrap',
@@ -921,7 +852,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                         {stat.value}
                       </div>
                       <div style={{
-                        fontSize: '14px',
+                        fontSize: '15px',
                         color: '#999999',
                         textTransform: 'uppercase',
                         letterSpacing: '0.5px',
@@ -941,7 +872,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                   padding: '20px',
                 }}>
                   <h3 style={{
-                    fontSize: '18px',
+                    fontSize: '19px',
                     fontWeight: 'bold',
                     color: 'white',
                     margin: '0 0 14px 0',
@@ -961,7 +892,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                             color: colors.text,
                             border: `1px solid ${colors.border}`,
                             borderRadius: '20px',
-                            fontSize: '15px',
+                            fontSize: '16px',
                             fontFamily: 'BoldPixels, monospace',
                             display: 'flex',
                             alignItems: 'center',
@@ -971,7 +902,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                           {tm.level === 'mastered' ? '✓ ' : tm.level === 'in-progress' ? '◐ ' : '○ '}
                           {tm.topic}
                           {tm.totalQuests > 0 && (
-                            <span style={{ opacity: 0.7, fontSize: '14px' }}>
+                            <span style={{ opacity: 0.7, fontSize: '15px' }}>
                               ({tm.completedQuests}/{tm.totalQuests})
                             </span>
                           )}
@@ -989,7 +920,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                   padding: '20px',
                 }}>
                   <h3 style={{
-                    fontSize: '18px',
+                    fontSize: '19px',
                     fontWeight: 'bold',
                     color: 'white',
                     margin: '0 0 16px 0',
@@ -1010,14 +941,14 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                             marginBottom: '4px',
                           }}>
                             <span style={{
-                              fontSize: '16px',
+                              fontSize: '17px',
                               color: '#cccccc',
                               fontFamily: 'BoldPixels, monospace',
                             }}>
                               {tm.topic}
                             </span>
                             <span style={{
-                              fontSize: '16px',
+                              fontSize: '17px',
                               color: barColor,
                               fontWeight: 'bold',
                               fontFamily: 'BoldPixels, monospace',
@@ -1046,7 +977,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                     {topicMastery.filter(tm => tm.totalQuests > 0).length === 0 && (
                       <p style={{
                         color: '#666666',
-                        fontSize: '14px',
+                        fontSize: '15px',
                         textAlign: 'center',
                         fontFamily: 'BoldPixels, monospace',
                         margin: 0,
@@ -1071,7 +1002,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                     <h3 style={{ 
-                      fontSize: '20px', 
+                      fontSize: '21px', 
                       fontWeight: 'bold', 
                       color: 'white', 
                       margin: 0,
@@ -1105,7 +1036,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                   </div>
                   <p style={{ 
                     color: '#cccccc', 
-                    fontSize: '16px', 
+                    fontSize: '17px', 
                     marginTop: '8px', 
                     marginBottom: 0,
                     fontFamily: 'BoldPixels, monospace',
@@ -1126,7 +1057,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                         padding: '20px',
                       }}>
                         <h3 style={{ 
-                          fontSize: '20px', 
+                          fontSize: '21px', 
                           fontWeight: 'bold', 
                           color: 'white', 
                           margin: '0 0 16px 0',
@@ -1157,7 +1088,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                               {execStats.totalRuns}
                             </div>
                             <div style={{ 
-                              fontSize: '14px', 
+                              fontSize: '15px', 
                               color: '#999999',
                               textTransform: 'uppercase',
                               letterSpacing: '0.5px',
@@ -1185,7 +1116,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                               {execStats.successfulRuns}
                             </div>
                             <div style={{ 
-                              fontSize: '14px', 
+                              fontSize: '15px', 
                               color: '#999999',
                               textTransform: 'uppercase',
                               letterSpacing: '0.5px',
@@ -1213,7 +1144,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                               {execStats.failedRuns}
                             </div>
                             <div style={{ 
-                              fontSize: '14px', 
+                              fontSize: '15px', 
                               color: '#999999',
                               textTransform: 'uppercase',
                               letterSpacing: '0.5px',
@@ -1241,7 +1172,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                               {isNaN(execStats.avgDuration) ? 'N/A' : `${Math.round(execStats.avgDuration)}ms`}
                             </div>
                             <div style={{ 
-                              fontSize: '14px', 
+                              fontSize: '15px', 
                               color: '#999999',
                               textTransform: 'uppercase',
                               letterSpacing: '0.5px',
@@ -1260,7 +1191,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                 {/* Organized Quests by Category */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   <h3 style={{ 
-                    fontSize: '20px', 
+                    fontSize: '21px', 
                     fontWeight: 'bold', 
                     color: 'white', 
                     margin: '8px 0 0 0',
@@ -1309,7 +1240,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                                     backgroundColor: '#7ed321',
                                     color: 'white',
                                     borderRadius: '4px',
-                                    fontSize: '14px',
+                                    fontSize: '15px',
                                     fontFamily: 'BoldPixels, monospace',
                                   }}>
                                     {catIndex + 1}
@@ -1319,14 +1250,14 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                                     color: 'white', 
                                     margin: 0,
                                     fontFamily: 'BoldPixels, monospace',
-                                    fontSize: '16px',
+                                    fontSize: '17px',
                                   }}>
                                     {category}
                                   </h4>
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                   <span style={{
-                                    fontSize: '14px',
+                                    fontSize: '15px',
                                     color: completedInCategory === quests.length ? '#7ed321' : 
                                            completedInCategory > 0 ? '#f5a623' : '#666666',
                                     fontFamily: 'BoldPixels, monospace',
@@ -1335,7 +1266,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                                      completedInCategory > 0 ? 'IN PROGRESS' : 'NOT STARTED'}
                                   </span>
                                   <span style={{
-                                    fontSize: '14px',
+                                    fontSize: '15px',
                                     color: '#cccccc',
                                     fontFamily: 'BoldPixels, monospace',
                                     transition: 'transform 0.2s ease',
@@ -1363,7 +1294,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                               </div>
                               <p style={{ 
                                 color: '#888888', 
-                                fontSize: '14px', 
+                                fontSize: '15px', 
                                 margin: 0,
                                 fontFamily: 'BoldPixels, monospace',
                               }}>
@@ -1435,7 +1366,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                                               backgroundColor: statusColor,
                                               color: 'white',
                                               borderRadius: '4px',
-                                              fontSize: '12px',
+                                              fontSize: '13px',
                                               fontFamily: 'BoldPixels, monospace',
                                               fontWeight: 'bold',
                                               minWidth: '80px',
@@ -1451,14 +1382,14 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                                                 color: 'white', 
                                                 margin: '0 0 3px 0',
                                                 fontFamily: 'BoldPixels, monospace',
-                                                fontSize: '15px',
+                                                fontSize: '16px',
                                               }}>
                                                 {quest.title}
                                               </h5>
                                               {quest.description && (
                                                 <p style={{
                                                   color: '#888888',
-                                                  fontSize: '13px',
+                                                  fontSize: '14px',
                                                   margin: 0,
                                                   fontFamily: 'BoldPixels, monospace',
                                                 }}>
@@ -1471,7 +1402,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                                           {hasExpandableContent && (
                                             <span style={{
                                               color: '#888888',
-                                              fontSize: '12px',
+                                              fontSize: '13px',
                                               transition: 'transform 0.2s ease',
                                               transform: expandedQuestStats === quest.id ? 'rotate(180deg)' : 'rotate(0deg)',
                                             }}>
@@ -1486,7 +1417,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                                             marginTop: '8px', 
                                             paddingTop: '8px', 
                                             borderTop: '1px solid #3c3c3c',
-                                            fontSize: '12px',
+                                            fontSize: '13px',
                                             color: '#999999',
                                             fontFamily: 'BoldPixels, monospace',
                                           }}>
@@ -1494,23 +1425,23 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px', marginBottom: questStat && questStat.totalAttempts > 0 ? '12px' : '0' }}>
                                               <div>
                                                 <div style={{ color: '#666666', marginBottom: '1px' }}>STARTED</div>
-                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>{formatDateTime(questProgress?.startedAt)}</div>
+                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '12px' }}>{formatDateTime(questProgress?.startedAt)}</div>
                                               </div>
                                               <div>
                                                 <div style={{ color: '#666666', marginBottom: '1px' }}>COMPLETED</div>
-                                                <div style={{ color: isCompleted ? '#7ed321' : '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>{formatDateTime(questProgress?.completedAt)}</div>
+                                                <div style={{ color: isCompleted ? '#7ed321' : '#cccccc', fontWeight: 'bold', fontSize: '12px' }}>{formatDateTime(questProgress?.completedAt)}</div>
                                               </div>
                                               <div>
                                                 <div style={{ color: '#666666', marginBottom: '1px' }}>TIME SPENT</div>
-                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>{formatTimeSpentFromDb(questProgress?.timeSpentSeconds)}</div>
+                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '12px' }}>{formatTimeSpentFromDb(questProgress?.timeSpentSeconds)}</div>
                                               </div>
                                               <div>
                                                 <div style={{ color: '#666666', marginBottom: '1px' }}>ATTEMPTS</div>
-                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>{questProgress?.attempts || 0}</div>
+                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '12px' }}>{questProgress?.attempts || 0}</div>
                                               </div>
                                               <div>
                                                 <div style={{ color: '#666666', marginBottom: '1px' }}>CURRENT PHASE</div>
-                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '11px' }}>Phase {(questProgress?.currentPhaseIndex || 0) + 1}</div>
+                                                <div style={{ color: '#cccccc', fontWeight: 'bold', fontSize: '12px' }}>Phase {(questProgress?.currentPhaseIndex || 0) + 1}</div>
                                               </div>
                                             </div>
                                             
@@ -1520,7 +1451,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                                                 paddingTop: '8px', 
                                                 borderTop: '1px solid #3c3c3c',
                                               }}>
-                                                <div style={{ color: '#888888', marginBottom: '6px', fontSize: '10px' }}>CODE EXECUTION STATS</div>
+                                                <div style={{ color: '#888888', marginBottom: '6px', fontSize: '11px' }}>CODE EXECUTION STATS</div>
                                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
                                                   <div>
                                                     <div style={{ color: '#666666', marginBottom: '1px' }}>Runs</div>
@@ -1579,7 +1510,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                         backgroundColor: '#f5a623',
                         color: 'white',
                         borderRadius: '4px',
-                        fontSize: '12px',
+                        fontSize: '13px',
                         fontFamily: 'BoldPixels, monospace',
                       }}>
                         ACTIVE
@@ -1594,7 +1525,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                       {currentActiveQuest?.title}
                     </h4>
                     <p style={{ 
-                      fontSize: '14px', 
+                      fontSize: '15px', 
                       color: '#cccccc', 
                       margin: 0,
                       fontFamily: 'BoldPixels, monospace',
@@ -1618,7 +1549,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                     padding: '20px',
                   }}>
                     <h3 style={{ 
-                      fontSize: '20px', 
+                      fontSize: '21px', 
                       fontWeight: 'bold', 
                       color: 'white', 
                       margin: '0 0 16px 0',
@@ -1649,7 +1580,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                           {objectiveStats.objectivesCompleted}
                         </div>
                         <div style={{ 
-                          fontSize: '14px', 
+                          fontSize: '15px', 
                           color: '#999999',
                           textTransform: 'uppercase',
                           letterSpacing: '0.5px',
@@ -1677,7 +1608,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                           {formatTime(objectiveStats.totalTimeSpent)}
                         </div>
                         <div style={{ 
-                          fontSize: '14px', 
+                          fontSize: '15px', 
                           color: '#999999',
                           textTransform: 'uppercase',
                           letterSpacing: '0.5px',
@@ -1705,7 +1636,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                           {objectiveStats.totalAttempts}
                         </div>
                         <div style={{ 
-                          fontSize: '14px', 
+                          fontSize: '15px', 
                           color: '#999999',
                           textTransform: 'uppercase',
                           letterSpacing: '0.5px',
@@ -1733,7 +1664,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                           {objectiveStats.totalHintsUsed}
                         </div>
                         <div style={{ 
-                          fontSize: '14px', 
+                          fontSize: '15px', 
                           color: '#999999',
                           textTransform: 'uppercase',
                           letterSpacing: '0.5px',
@@ -1761,7 +1692,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                           {formatTime(objectiveStats.avgTimePerObjective)}
                         </div>
                         <div style={{ 
-                          fontSize: '14px', 
+                          fontSize: '15px', 
                           color: '#999999',
                           textTransform: 'uppercase',
                           letterSpacing: '0.5px',
@@ -1779,14 +1710,14 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                   <div style={{ textAlign: 'center', padding: '60px 0' }}>
                     <p style={{ 
                       color: '#666666', 
-                      fontSize: '16px',
+                      fontSize: '17px',
                       fontFamily: 'BoldPixels, monospace',
                     }}>
                       Complete quests to unlock learning insights!
                     </p>
                     <p style={{ 
                       color: '#555555', 
-                      fontSize: '14px', 
+                      fontSize: '15px', 
                       marginTop: '8px',
                       fontFamily: 'BoldPixels, monospace',
                     }}>
@@ -1796,7 +1727,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                 ) : (
                   <>
                     <h3 style={{
-                      fontSize: '18px',
+                      fontSize: '19px',
                       fontWeight: 'bold',
                       color: 'white',
                       marginBottom: '12px',
@@ -1821,7 +1752,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                           color: 'white', 
                           margin: 0,
                           fontFamily: 'BoldPixels, monospace',
-                          fontSize: '16px',
+                          fontSize: '17px',
                           lineHeight: '1.5',
                         }}>
                           {insight.message}
@@ -1833,7 +1764,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                     {localCompletedQuests.length > 0 && (
                       <div style={{ marginTop: '16px' }}>
                         <h3 style={{
-                          fontSize: '18px',
+                          fontSize: '19px',
                           fontWeight: 'bold',
                           color: 'white',
                           marginBottom: '12px',
@@ -1860,7 +1791,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                               return (
                                 <span style={{
                                   color: '#666666',
-                                  fontSize: '14px',
+                                  fontSize: '15px',
                                   fontFamily: 'BoldPixels, monospace',
                                 }}>
                                   Complete quests to learn new concepts!
@@ -1875,7 +1806,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                                   padding: '6px 14px',
                                   backgroundColor: '#2d5016',
                                   color: '#7ed321',
-                                  fontSize: '16px',
+                                  fontSize: '17px',
                                   borderRadius: '20px',
                                   fontFamily: 'BoldPixels, monospace',
                                   textTransform: 'uppercase',
@@ -1894,7 +1825,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                     {topicMastery.filter(tm => tm.totalQuests > 0).length > 0 && (
                       <div style={{ marginTop: '20px' }}>
                         <h3 style={{
-                          fontSize: '18px',
+                          fontSize: '19px',
                           fontWeight: 'bold',
                           color: 'white',
                           marginBottom: '14px',
@@ -1939,7 +1870,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                               }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                                   <span style={{
-                                    fontSize: '14px',
+                                    fontSize: '15px',
                                     color: 'white',
                                     fontFamily: 'BoldPixels, monospace',
                                     fontWeight: 'bold',
@@ -1947,7 +1878,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                                     {tm.topic}
                                   </span>
                                   <span style={{
-                                    fontSize: '16px',
+                                    fontSize: '17px',
                                     color: barColor,
                                     fontWeight: 'bold',
                                     fontFamily: 'BoldPixels, monospace',
@@ -1977,7 +1908,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                                   display: 'grid',
                                   gridTemplateColumns: 'repeat(4, 1fr)',
                                   gap: '8px',
-                                  fontSize: '14px',
+                                  fontSize: '15px',
                                   fontFamily: 'BoldPixels, monospace',
                                 }}>
                                   <div>
@@ -2008,7 +1939,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                                 {/* Description */}
                                 <p style={{
                                   color: '#777777',
-                                  fontSize: '14px',
+                                  fontSize: '15px',
                                   margin: '8px 0 0 0',
                                   fontFamily: 'BoldPixels, monospace',
                                   fontStyle: 'italic',
@@ -2046,22 +1977,22 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                     }}>
                       <div style={{ display: 'flex', gap: '32px', flexWrap: 'wrap' }}>
                         <div>
-                          <span style={{ color: '#888888', fontSize: '13px', fontFamily: 'BoldPixels, monospace' }}>SESSION CODE</span>
-                          <div style={{ color: '#00c9ff', fontSize: '18px', fontFamily: 'BoldPixels, monospace', fontWeight: 'bold' }}>{sessionInfo.code}</div>
+                          <span style={{ color: '#888888', fontSize: '14px', fontFamily: 'BoldPixels, monospace' }}>SESSION CODE</span>
+                          <div style={{ color: '#00c9ff', fontSize: '19px', fontFamily: 'BoldPixels, monospace', fontWeight: 'bold' }}>{sessionInfo.code}</div>
                         </div>
                         {sessionInfo.createdByAdmin && (
                           <div>
-                            <span style={{ color: '#888888', fontSize: '13px', fontFamily: 'BoldPixels, monospace' }}>CREATED BY</span>
-                            <div style={{ color: '#cccccc', fontSize: '18px', fontFamily: 'BoldPixels, monospace' }}>{sessionInfo.createdByAdmin}</div>
+                            <span style={{ color: '#888888', fontSize: '14px', fontFamily: 'BoldPixels, monospace' }}>CREATED BY</span>
+                            <div style={{ color: '#cccccc', fontSize: '19px', fontFamily: 'BoldPixels, monospace' }}>{sessionInfo.createdByAdmin}</div>
                           </div>
                         )}
                         <div>
-                          <span style={{ color: '#888888', fontSize: '13px', fontFamily: 'BoldPixels, monospace' }}>STUDENTS</span>
-                          <div style={{ color: '#cccccc', fontSize: '18px', fontFamily: 'BoldPixels, monospace' }}>{classStats.length}</div>
+                          <span style={{ color: '#888888', fontSize: '14px', fontFamily: 'BoldPixels, monospace' }}>STUDENTS</span>
+                          <div style={{ color: '#cccccc', fontSize: '19px', fontFamily: 'BoldPixels, monospace' }}>{classStats.length}</div>
                         </div>
                         <div>
-                          <span style={{ color: '#888888', fontSize: '13px', fontFamily: 'BoldPixels, monospace' }}>EXPIRES</span>
-                          <div style={{ color: '#cccccc', fontSize: '16px', fontFamily: 'BoldPixels, monospace' }}>
+                          <span style={{ color: '#888888', fontSize: '14px', fontFamily: 'BoldPixels, monospace' }}>EXPIRES</span>
+                          <div style={{ color: '#cccccc', fontSize: '17px', fontFamily: 'BoldPixels, monospace' }}>
                             {new Date(sessionInfo.validityEnd).toLocaleDateString()} {new Date(sessionInfo.validityEnd).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </div>
                         </div>
@@ -2084,7 +2015,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                         borderRadius: '4px',
                         cursor: loading ? 'not-allowed' : 'pointer',
                         fontFamily: 'BoldPixels, monospace',
-                        fontSize: '14px',
+                        fontSize: '15px',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '8px',
@@ -2107,7 +2038,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                     <p style={{ 
                       color: '#cccccc',
                       fontFamily: 'BoldPixels, monospace',
-                      fontSize: '16px',
+                      fontSize: '17px',
                     }}>
                       Loading class statistics...
                     </p>
@@ -2123,7 +2054,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                       <p style={{ 
                         color: '#cccccc',
                         fontFamily: 'BoldPixels, monospace',
-                        fontSize: '16px',
+                        fontSize: '17px',
                         marginBottom: '8px',
                       }}>
                         Unable to load class leaderboard
@@ -2131,7 +2062,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                       <p style={{ 
                         color: '#888888',
                         fontFamily: 'BoldPixels, monospace',
-                        fontSize: '14px',
+                        fontSize: '15px',
                         margin: 0,
                       }}>
                         Please check your connection and try again.
@@ -2143,7 +2074,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                     <p style={{ 
                       color: '#666666',
                       fontFamily: 'BoldPixels, monospace',
-                      fontSize: '16px',
+                      fontSize: '17px',
                     }}>
                       No class statistics available yet.
                     </p>
@@ -2179,7 +2110,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                           marginBottom: '8px',
                         }}>
                           <div style={{
-                            fontSize: '14px',
+                            fontSize: '15px',
                             color: '#888888',
                             fontFamily: 'BoldPixels, monospace',
                             marginBottom: '4px',
@@ -2195,7 +2126,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                             Top {topPercentage}%
                           </div>
                           <div style={{
-                            fontSize: '16px',
+                            fontSize: '17px',
                             color: percentileColor,
                             fontFamily: 'BoldPixels, monospace',
                             marginTop: '4px',
@@ -2206,7 +2137,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                              topPercentage <= 75 ? 'Keep climbing!' : 'Keep pushing!'}
                           </div>
                           <div style={{
-                            fontSize: '13px',
+                            fontSize: '14px',
                             color: '#666666',
                             fontFamily: 'BoldPixels, monospace',
                             marginTop: '8px',
@@ -2233,25 +2164,25 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                         backgroundColor: '#252526',
                       }}>
                         <span style={{ 
-                          fontSize: '16px', 
+                          fontSize: '17px', 
                           fontWeight: 'bold', 
                           color: '#cccccc',
                           fontFamily: 'BoldPixels, monospace',
                         }}>Rank</span>
                         <span style={{ 
-                          fontSize: '16px', 
+                          fontSize: '17px', 
                           fontWeight: 'bold', 
                           color: '#cccccc',
                           fontFamily: 'BoldPixels, monospace',
                         }}>Student</span>
                         <span style={{ 
-                          fontSize: '16px', 
+                          fontSize: '17px', 
                           fontWeight: 'bold', 
                           color: '#cccccc',
                           fontFamily: 'BoldPixels, monospace',
                         }}>Quests</span>
                         <span style={{ 
-                          fontSize: '16px', 
+                          fontSize: '17px', 
                           fontWeight: 'bold', 
                           color: '#cccccc',
                           fontFamily: 'BoldPixels, monospace',
@@ -2303,7 +2234,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                               fontWeight: 'bold', 
                               color: student.rank === 1 ? '#f5a623' : student.rank === 2 ? '#c0c0c0' : student.rank === 3 ? '#cd7f32' : 'white',
                               fontFamily: 'BoldPixels, monospace',
-                              fontSize: '16px',
+                              fontSize: '17px',
                             }}>
                               #{student.rank}
                             </span>
@@ -2311,14 +2242,14 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                               color: isYou ? '#007acc' : 'white',
                               fontWeight: isYou ? 'bold' : 'normal',
                               fontFamily: 'BoldPixels, monospace',
-                              fontSize: '16px',
+                              fontSize: '17px',
                               display: 'flex',
                               alignItems: 'center',
                               gap: '8px',
                             }}>
                               {student.studentName}
                               {isClickable && (
-                                <span style={{ color: '#666666', fontSize: '12px' }}>
+                                <span style={{ color: '#666666', fontSize: '13px' }}>
                                   {isExpanded ? '▼' : '▶'}
                                 </span>
                               )}
@@ -2326,14 +2257,14 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                             <span style={{ 
                               color: '#cccccc',
                               fontFamily: 'BoldPixels, monospace',
-                              fontSize: '16px',
+                              fontSize: '17px',
                             }}>
                               {student.questsCompleted}
                             </span>
                             <span style={{ 
                               color: '#cccccc',
                               fontFamily: 'BoldPixels, monospace',
-                              fontSize: '16px',
+                              fontSize: '17px',
                             }}>
                               {formatTime(student.totalTime)}
                             </span>
@@ -2353,26 +2284,26 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                               ) : selectedStudentStats ? (
                                 <div style={{ display: 'flex', gap: '32px', flexWrap: 'wrap' }}>
                                   <div>
-                                    <span style={{ color: '#888888', fontSize: '12px', fontFamily: 'BoldPixels, monospace' }}>JOINED</span>
-                                    <div style={{ color: '#cccccc', fontSize: '15px', fontFamily: 'BoldPixels, monospace' }}>
+                                    <span style={{ color: '#888888', fontSize: '13px', fontFamily: 'BoldPixels, monospace' }}>JOINED</span>
+                                    <div style={{ color: '#cccccc', fontSize: '16px', fontFamily: 'BoldPixels, monospace' }}>
                                       {new Date(selectedStudentStats.student.joinedAt).toLocaleDateString()}
                                     </div>
                                   </div>
                                   <div>
-                                    <span style={{ color: '#888888', fontSize: '12px', fontFamily: 'BoldPixels, monospace' }}>COMPLETED</span>
-                                    <div style={{ color: '#7ed321', fontSize: '15px', fontFamily: 'BoldPixels, monospace' }}>
+                                    <span style={{ color: '#888888', fontSize: '13px', fontFamily: 'BoldPixels, monospace' }}>COMPLETED</span>
+                                    <div style={{ color: '#7ed321', fontSize: '16px', fontFamily: 'BoldPixels, monospace' }}>
                                       {selectedStudentStats.summary.completedQuests}/{selectedStudentStats.summary.totalQuests} quests
                                     </div>
                                   </div>
                                   <div>
-                                    <span style={{ color: '#888888', fontSize: '12px', fontFamily: 'BoldPixels, monospace' }}>TOTAL TIME</span>
-                                    <div style={{ color: '#cccccc', fontSize: '15px', fontFamily: 'BoldPixels, monospace' }}>
+                                    <span style={{ color: '#888888', fontSize: '13px', fontFamily: 'BoldPixels, monospace' }}>TOTAL TIME</span>
+                                    <div style={{ color: '#cccccc', fontSize: '16px', fontFamily: 'BoldPixels, monospace' }}>
                                       {formatTime(selectedStudentStats.summary.totalTimeSpent)}
                                     </div>
                                   </div>
                                   <div>
-                                    <span style={{ color: '#888888', fontSize: '12px', fontFamily: 'BoldPixels, monospace' }}>ATTEMPTS</span>
-                                    <div style={{ color: '#cccccc', fontSize: '15px', fontFamily: 'BoldPixels, monospace' }}>
+                                    <span style={{ color: '#888888', fontSize: '13px', fontFamily: 'BoldPixels, monospace' }}>ATTEMPTS</span>
+                                    <div style={{ color: '#cccccc', fontSize: '16px', fontFamily: 'BoldPixels, monospace' }}>
                                       {selectedStudentStats.summary.totalAttempts}
                                     </div>
                                   </div>
@@ -2390,7 +2321,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                     </div>
                     <p style={{
                       color: '#666666',
-                      fontSize: '14px',
+                      fontSize: '15px',
                       textAlign: 'center',
                       fontFamily: 'BoldPixels, monospace',
                     }}>
@@ -2420,7 +2351,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                 border: 'none',
                 cursor: 'pointer',
                 fontFamily: 'BoldPixels, monospace',
-                fontSize: '16px',
+                fontSize: '17px',
                 transition: 'background-color 0.2s',
               }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#005a9e'}

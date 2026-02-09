@@ -1,0 +1,128 @@
+{
+  "id": "foundations_scanner_function",
+  "title": "The Scanner Function",
+  "description": "Learn to use scanner() to check crop status and grid states before acting.",
+  "difficulty": "beginner",
+  "category": "Game Mechanics",
+  "estimatedTime": 10,
+  "concepts": ["scanner", "grid_inspection", "crop_status", "data_queries"],
+  "prerequisites": ["foundations_energy_management"],
+  "icon": "quest_scanner.png",
+  "thumbnail": "quest_scanner_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_scanner_intro",
+      "title": "Remote Inspection",
+      "description": "Introduction to scanner()",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "One of the most powerful functions is scanner(x, y). It lets you inspect any grid position without moving there!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "It returns data about what's at that position - the grid type, crop status, and available functions.",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "This is essential for writing efficient code. Check before you act!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Use scanner() to inspect a farmland position",
+          "content": "scanner("
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Good! The scanner returns an object with status info. You can check if crops are 'ready' for harvest.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_can_harvest",
+      "title": "The can_harvest() Helper",
+      "description": "Checking harvest readiness",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "There's also can_harvest() - stand on farmland and it returns True/False if the crop is ready.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "This is perfect for conditional logic - you'll use this a lot with if statements!",
+          "sprite": "qubit-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Use can_harvest() to check crop status",
+          "content": "can_harvest()"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! These inspection functions will be critical when you start using loops and conditionals for smart farming.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_smart_harvest",
+      "title": "Smart Harvesting",
+      "description": "Combine scanner with farming",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now for a practical challenge: scan multiple farmland positions, then harvest only the ready crops.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "You'll need to: scan positions, check their status, move to ready ones, and harvest. Think it through!",
+          "sprite": "qubit-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "harvest_crop",
+          "description": "Harvest 2 crops",
+          "cropType": "wheat",
+          "cropCount": 2
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Excellent work! You're using scanner() like a pro. Next, let's talk about the upgrade system.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "foundations_upgrade_system",
+      "description": "Unlocked quest: The Upgrade System"
+    },
+    {
+      "type": "resource",
+      "value": 50,
+      "description": "Gained 50 energy"
+    }
+  ]
+}

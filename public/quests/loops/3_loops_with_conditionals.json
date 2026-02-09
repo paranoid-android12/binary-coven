@@ -1,0 +1,205 @@
+{
+  "id": "loops_with_conditionals",
+  "title": "Smart Loops - Combining Iteration and Logic",
+  "description": "Combine loops and conditionals for powerful automation - master advanced algorithmic thinking.",
+  "difficulty": "advanced",
+  "category": "Loops",
+  "estimatedTime": 25,
+  "concepts": ["loops", "conditionals", "algorithms", "complex_logic"],
+  "prerequisites": ["loops_patterns"],
+  "icon": "quest_automation.png",
+  "thumbnail": "quest_automation_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_selective_processing",
+      "title": "Conditionals Inside Loops",
+      "description": "Selective iteration",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "The real power comes from combining loops with conditionals! Loop through many items, but only process the ones that meet certain criteria.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Like: loop through all plots, but only harvest the ones that are ready?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect example! Use a for loop with an if statement inside to filter what gets processed!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create a loop with an if statement inside",
+          "content": "for "
+        },
+        {
+          "type": "code_content",
+          "description": "Add conditional logic inside the loop",
+          "content": "    if "
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Selective processing! The loop checks every item but only acts on some!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "This pattern is everywhere in real programming!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_loop_break",
+      "title": "Early Exit with Break",
+      "description": "Stop when condition is met",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "When you find what you're looking for, why keep looping? Use 'break' to exit the loop early!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So I check with an if statement, and if the condition is met, I break out?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! This is the search-and-stop pattern. Very efficient!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Use if inside a loop with break",
+          "content": "if "
+        },
+        {
+          "type": "code_content",
+          "description": "Include break statement",
+          "content": "break"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Conditionals control when the loop stops!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Efficiency is key in programming!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_loop_continue",
+      "title": "Skipping with Continue",
+      "description": "Skip certain iterations",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Sometimes you want to skip an iteration without stopping the whole loop. Use 'continue' to jump to the next iteration!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So: if this plot is already harvested, continue to the next one?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Continue says 'skip the rest of this iteration and move to the next one.'",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Use continue to skip iterations",
+          "content": "continue"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "Break exits the loop, continue skips to the next iteration!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "You've got it! These are essential loop control tools!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_adaptive_farming",
+      "title": "Adaptive Farming Algorithm",
+      "description": "Complex loop with conditionals",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Final challenge! Create an adaptive farming algorithm that combines loops and conditionals for intelligent farming!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "What's my goal?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Harvest 15 wheat crops using loops with conditional logic! Use your loop to check each plot and make smart decisions. This is real algorithmic thinking!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "harvest_crop",
+          "description": "Harvest 15 wheat crops with loops and conditionals",
+          "cropType": "wheat",
+          "cropCount": 15
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "I built a complete intelligent farming algorithm!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Outstanding! You've mastered loops and conditionals. Ready for the ultimate challenge—the master quest?",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "loops_master_challenge",
+      "description": "Unlocked quest: The Automated Farm Empire"
+    },
+    {
+      "type": "resource",
+      "value": 100,
+      "description": "Gained 100 energy"
+    }
+  ]
+}

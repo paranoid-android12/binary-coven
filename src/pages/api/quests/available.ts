@@ -3,6 +3,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { promises as fs } from 'fs'
 import path from 'path'
+import { getAllQuestFilePaths } from '../../../utils/questFileDiscovery'
 
 // Quest metadata structure (subset of full quest data)
 interface QuestMetadata {
@@ -39,26 +40,25 @@ export default async function handler(
     // Get the quests directory path
     const questsDir = path.join(process.cwd(), 'public', 'quests')
     
-    // Read all files in the quests directory asynchronously
-    const allFiles = await fs.readdir(questsDir)
-    const files = allFiles.filter(file => file.endsWith('.json'))
+    // Recursively discover all quest JSON files (top-level + subdirectories)
+    const files = getAllQuestFilePaths()
 
     const quests: QuestMetadata[] = []
 
     // Read all quest files in parallel
-    const questPromises = files.map(async (file) => {
+    const questPromises = files.map(async (relPath) => {
       try {
-        const filePath = path.join(questsDir, file)
+        const filePath = path.join(questsDir, relPath)
         const content = await fs.readFile(filePath, 'utf-8')
         const questData = JSON.parse(content)
 
         // Validate required fields
         if (!questData.id || typeof questData.id !== 'string') {
-          console.warn(`Quest file ${file} missing valid id, skipping`)
+          console.warn(`Quest file ${relPath} missing valid id, skipping`)
           return null
         }
         if (!questData.title || typeof questData.title !== 'string') {
-          console.warn(`Quest file ${file} missing valid title, skipping`)
+          console.warn(`Quest file ${relPath} missing valid title, skipping`)
           return null
         }
 
@@ -72,10 +72,10 @@ export default async function handler(
           estimatedTime: questData.estimatedTime || 0,
           concepts: Array.isArray(questData.concepts) ? questData.concepts : [],
           prerequisites: Array.isArray(questData.prerequisites) ? questData.prerequisites : [],
-          fileName: file,
+          fileName: relPath,
         } as QuestMetadata
       } catch (parseError) {
-        console.error(`Error parsing quest file ${file}:`, parseError)
+        console.error(`Error parsing quest file ${relPath}:`, parseError)
         return null
       }
     })

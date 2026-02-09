@@ -1,0 +1,203 @@
+{
+  "id": "loops_while_basics",
+  "title": "Repeating Until Done - While Loops",
+  "description": "Learn to repeat code while a condition is true - master conditional repetition.",
+  "difficulty": "intermediate",
+  "category": "Loops",
+  "estimatedTime": 20,
+  "concepts": ["while_loops", "iteration", "conditions", "repetition"],
+  "prerequisites": ["conditionals_weather"],
+  "icon": "quest_programming.png",
+  "thumbnail": "quest_programming_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_while_concept",
+      "title": "The While Loop Concept",
+      "description": "Understanding conditional repetition",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let me teach you about while loops!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "While loops? How are they different from the code we've written?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Loops repeat code automatically! A while loop says: 'While this condition is True, keep doing this action.' It's like saying 'keep watering until the tank is empty.'",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So it combines repetition with conditionals?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! The loop repeats as long as the condition stays True.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_while_syntax",
+      "title": "While Loop Structure",
+      "description": "Writing your first while loop",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "A while loop has a condition followed by a colon, with indented code below. Just like an if statement, but it repeats!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So it checks the condition, runs the code, then checks again?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! But be careful—you must change the condition inside the loop, or it runs forever!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create a while loop: while condition:",
+          "content": "while "
+        },
+        {
+          "type": "code_content",
+          "description": "Include a counter",
+          "content": " = "
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Good! Remember: the loop continues while the condition is True.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_simple_while",
+      "title": "Counting with While",
+      "description": "Use a counter in a while loop",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Let's create a counting loop. Start with a counter at 0, then make a while loop that repeats while the counter is less than 3. Inside the loop, increment the counter!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Incrementing the counter makes sure the loop eventually ends?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Without it, the counter stays at its starting value forever, and the loop never stops. That's called an infinite loop!",
+          "sprite": "manu-speaking.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create a 'counter' variable before the loop",
+          "content": "counter = 0"
+        },
+        {
+          "type": "code_content",
+          "description": "Increment the 'counter' inside the loop (counter += 1)",
+          "content": "counter += 1"
+        },
+        {
+          "type": "code_content",
+          "description": "Add the condition to the while loop (while counter < 3:)",
+          "content": "counter < 3"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "The loop repeated 3 times then stopped!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect! That's controlled repetition!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_farming_while",
+      "title": "Farming with While Loops",
+      "description": "Apply while loops to farming",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now apply it to farming! Create a while loop that automates harvesting. Use a counter to track your progress!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "What's my goal?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Harvest 5 wheat crops using a while loop! Plant them, let them grow, then use your loop to harvest them all. The loop handles the repetition for you!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create a while loop for farming operations",
+          "content": "while "
+        },
+        {
+          "type": "harvest_crop",
+          "description": "Harvest 5 wheat crops using a while loop",
+          "cropType": "wheat",
+          "cropCount": 5
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "The while loop automated all 5 harvests!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "That's the power of loops! But there's an even better loop for counted repetition—the for loop!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "loops_for_basics",
+      "description": "Unlocked quest: Counting Loops - For Loops"
+    },
+    {
+      "type": "resource",
+      "value": 90,
+      "description": "Gained 90 energy"
+    }
+  ]
+}

@@ -1,0 +1,203 @@
+{
+  "id": "variables_strings",
+  "title": "Talking in Code",
+  "description": "Work with text data using string variables - learn to store and manipulate words and messages.",
+  "difficulty": "intermediate",
+  "category": "Variables",
+  "estimatedTime": 15,
+  "concepts": ["strings", "text_data", "concatenation"],
+  "prerequisites": ["variables_counting"],
+  "icon": "quest_programming.png",
+  "thumbnail": "quest_programming_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_string_basics",
+      "title": "String Variables",
+      "description": "Create text variables",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Variables aren't just for numbers! You can also store text, which we call 'strings' in programming.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Strings? Like... a string of letters?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Strings are text wrapped in quotes. Try creating: crop_type = \"wheat\"",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So the quotes tell the computer this is text, not code?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Precisely! Without quotes, wheat would be a variable name. With quotes, \"wheat\" is text data.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create a string variable: crop_type = \"wheat\"",
+          "content": "crop_type = \"wheat\""
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Perfect! You've created a string variable. Now you can use crop_type wherever you need that text.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_concatenation",
+      "title": "Combining Strings",
+      "description": "Join text together",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "You can combine strings using the + operator. Try: message = \"Growing \" + crop_type",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So if crop_type is \"wheat\", message becomes \"Growing wheat\"?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! This is called concatenation—joining strings together.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Concatenate strings: message = \"Growing \" + crop_type",
+          "content": "+"
+        },
+        {
+          "type": "code_content",
+          "description": "Create a message variable",
+          "content": "message"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Great! String concatenation lets you build dynamic messages.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_dynamic_messages",
+      "title": "Dynamic Messages",
+      "description": "Use variables in text",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "There's an even better way to put variables in strings: f-strings! Try: message = f\"Planting {crop_type} now\"",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "The f before the quote and curly braces around the variable?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Yes! f-strings automatically insert variable values where you put {variable_name}. It's cleaner than using +.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create an f-string with a variable",
+          "content": "f\""
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "F-strings are so much more readable!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "They're one of Python's most loved features!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_farming_strings",
+      "title": "Farming with Strings",
+      "description": "Practical string application",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now the practical part! Remember plant() can take a crop type? Try: plant(crop_type) where crop_type is your string variable.",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Oh! So I can change crop_type once, and all my plant() calls use the new value?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! That's the flexibility of variables. Change one line, and the whole program adapts.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Use a string variable with plant: plant(crop_type)",
+          "content": "plant(crop_type)"
+        },
+        {
+          "type": "play_button",
+          "description": "Execute your code with string variables"
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "This makes my code so much more flexible! I can easily switch crops!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Precisely! Variables make your code adaptable. Next, we'll learn about storing position data!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "unlock_quest",
+      "value": "variables_positions",
+      "description": "Unlocked quest: Coordinate Magic"
+    },
+    {
+      "type": "resource",
+      "value": 80,
+      "description": "Gained 80 energy"
+    }
+  ]
+}

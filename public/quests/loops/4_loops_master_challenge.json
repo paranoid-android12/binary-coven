@@ -1,0 +1,236 @@
+{
+  "id": "loops_master_challenge",
+  "title": "The Automated Farm Empire",
+  "description": "Create a completely automated farming system using all programming concepts - the ultimate programming challenge.",
+  "difficulty": "advanced",
+  "category": "Loops",
+  "estimatedTime": 30,
+  "concepts": ["loops", "conditionals", "functions", "variables", "algorithms", "full_automation"],
+  "prerequisites": ["loops_with_conditionals"],
+  "icon": "quest_master.png",
+  "thumbnail": "quest_master_thumb.png",
+  "phases": [
+    {
+      "id": "phase_1_system_design",
+      "title": "Designing Your Empire",
+      "description": "Plan the complete system",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "You've learned everything: variables, functions, conditionals, loops. Now it's time for the ultimate test!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "The ultimate test?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Build a complete automated farm empire! Use all your skills: functions for organization, variables for tracking, conditionals for decisions, and loops for automation!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "All the concepts together in one massive system?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Plan it carefully. Think about what functions you need, what variables to track, and how to structure your loops and conditionals.",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Good planning is the foundation of good code. Now let's build!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_2_core_functions",
+      "title": "Build Core Functions",
+      "description": "Create helper functions",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Start by creating reusable functions for common operations. Think: planting, harvesting, checking conditions, moving—make each a function!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Functions with parameters so they're flexible?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Build your function library first!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create multiple helper functions (at least 3)",
+          "content": "def "
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Great function library! Now let's add the loop systems!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_3_loop_system",
+      "title": "Main Loop System",
+      "description": "Create the automation loop",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Now create the main loop system. Use nested loops to process all your farm plots systematically!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Outer loop for rows, inner loop for columns?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Perfect! Call your functions inside the loops!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Create nested loops for grid processing",
+          "content": "for "
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Excellent! Now add intelligence with conditionals!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_4_conditional_logic",
+      "title": "Add Smart Decisions",
+      "description": "Integrate conditional logic",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "Make your system intelligent! Add conditionals inside your loops to make decisions based on plot state, resources, weather—whatever matters!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "So the system adapts to conditions automatically?",
+          "sprite": "qubit-speaking.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! That's true automation—systems that think!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "code_content",
+          "description": "Add conditional logic to your loop system",
+          "content": "if "
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Maru",
+          "content": "Your system is nearly complete! Now for the final test!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    },
+    {
+      "id": "phase_5_master_challenge",
+      "title": "The Complete Empire",
+      "description": "Ultimate automation challenge",
+      "preDialogues": [
+        {
+          "name": "Maru",
+          "content": "This is it! Run your complete automated farm empire and farm at least 20 plots using all your skills!",
+          "sprite": "manu-speaking.png"
+        },
+        {
+          "name": "Qubit",
+          "content": "Variables tracking state, functions organizing code, loops automating repetition, conditionals making decisions—all working together!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Exactly! Show me what you can build with everything you've learned!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "objectives": [
+        {
+          "type": "harvest_crop",
+          "description": "Farm 20+ plots using your complete automated system",
+          "cropType": "wheat",
+          "cropCount": 20
+        }
+      ],
+      "postDialogues": [
+        {
+          "name": "Qubit",
+          "content": "I DID IT! A complete automated farm empire!",
+          "sprite": "qubit-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Congratulations! You've mastered programming! From basic commands to complex algorithms—you can now build anything!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "Your journey from beginner to master programmer has been incredible!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "You've proven yourself as a true computational farmer!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "From manual clicking to full automation—you've come so far!",
+          "sprite": "manu-pleased.png"
+        },
+        {
+          "name": "Maru",
+          "content": "You've completed the Binary Coven programming curriculum. Go forth and code amazing things!",
+          "sprite": "manu-pleased.png"
+        }
+      ],
+      "autoAdvance": true
+    }
+  ],
+  "rewards": [
+    {
+      "type": "resource",
+      "value": 200,
+      "description": "Gained 200 energy - Master Programmer Achievement!"
+    }
+  ]
+}
