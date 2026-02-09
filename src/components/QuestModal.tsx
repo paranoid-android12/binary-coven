@@ -586,23 +586,25 @@ export const QuestModal: React.FC<QuestModalProps> = ({ isOpen, onClose }) => {
         <div style={{ marginTop: '16px', display: 'flex', gap: '12px' }}>
           {!isActive && !isCompleted && (
             <button
-              onClick={() => handleStartQuest(quest.id)}
+              onClick={() => !activeQuest && handleStartQuest(quest.id)}
+              disabled={!!activeQuest}
               style={{
                 flex: 1,
                 padding: '12px 24px',
-                backgroundColor: '#007acc',
-                color: 'white',
+                backgroundColor: activeQuest ? '#444' : '#007acc',
+                color: activeQuest ? '#888' : 'white',
                 border: 'none',
                 borderRadius: '4px',
-                cursor: 'pointer',
+                cursor: activeQuest ? 'not-allowed' : 'pointer',
                 fontSize: '16px',
                 fontFamily: 'BoldPixels, monospace',
                 fontWeight: 'bold',
+                opacity: activeQuest ? 0.7 : 1,
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#005a9e')}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#007acc')}
+              onMouseEnter={(e) => { if (!activeQuest) e.currentTarget.style.backgroundColor = '#005a9e'; }}
+              onMouseLeave={(e) => { if (!activeQuest) e.currentTarget.style.backgroundColor = '#007acc'; }}
             >
-              Start Quest
+              {activeQuest ? '⚡ Quest in Progress' : 'Start Quest'}
             </button>
           )}
 
