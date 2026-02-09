@@ -1,7 +1,7 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import Link from 'next/link';
-import { Users, Target, Clock, Play, Zap, Award, Search } from 'lucide-react';
+import { Users, Target, Clock, Play, Zap, Award, Search, ChevronDown } from 'lucide-react';
 import { adminFetch } from '../../utils/adminFetch';
 
 interface Student {
@@ -34,6 +34,19 @@ export default function StudentsPage() {
   const [sessionFilter, setSessionFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'username' | 'quests' | 'time' | 'lastLogin'>('lastLogin');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     fetchAllStudents();
@@ -269,18 +282,43 @@ export default function StudentsPage() {
             />
           </div>
 
-          <select
-            value={sessionFilter}
-            onChange={(e) => setSessionFilter(e.target.value)}
-            className="p-[12px_16px] border border-[#d1d5db] rounded-lg text-sm text-[#374151] bg-white transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-admin-primary focus:border-transparent cursor-pointer max-tablet:w-full"
-          >
-            <option value="all">All Sessions</option>
-            {sessionCodes.map((session) => (
-              <option key={session.id} value={session.code}>
-                {session.code}
-              </option>
-            ))}
-          </select>
+          <div className="relative" ref={dropdownRef}>
+            <button
+              type="button"
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="p-[12px_16px] pr-10 border border-[#d1d5db] rounded-lg text-sm text-[#374151] bg-white transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-admin-primary focus:border-transparent cursor-pointer max-tablet:w-full min-w-[180px] text-left relative"
+            >
+              {sessionFilter === 'all' ? 'All Sessions' : sessionFilter}
+              <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 text-[#9ca3af] transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} size={16} />
+            </button>
+            {dropdownOpen && (
+              <div className="absolute top-full left-0 mt-1 w-full bg-white border border-[#e5e7eb] rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.1)] z-50 overflow-hidden">
+                <div className="max-h-[240px] overflow-y-auto">
+                  <button
+                    type="button"
+                    onClick={() => { setSessionFilter('all'); setDropdownOpen(false); }}
+                    className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer transition-colors duration-150 border-none font-[family-name:var(--font-family-admin)] ${
+                      sessionFilter === 'all' ? 'bg-admin-primary/10 text-admin-primary font-semibold' : 'text-[#374151] hover:bg-[#f9fafb]'
+                    }`}
+                  >
+                    All Sessions
+                  </button>
+                  {sessionCodes.map((session) => (
+                    <button
+                      key={session.id}
+                      type="button"
+                      onClick={() => { setSessionFilter(session.code); setDropdownOpen(false); }}
+                      className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer transition-colors duration-150 border-none font-[family-name:var(--font-family-admin)] ${
+                        sessionFilter === session.code ? 'bg-admin-primary/10 text-admin-primary font-semibold' : 'text-[#374151] hover:bg-[#f9fafb]'
+                      }`}
+                    >
+                      {session.code}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Loading State */}
