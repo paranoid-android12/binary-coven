@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
-import { Check, Copy, AlertTriangle, Users, Zap, MoreVertical } from 'lucide-react';
+import { Check, Copy, AlertTriangle, Users, Zap, MoreVertical, BookOpen, Calendar, Clock } from 'lucide-react';
+import { adminFetch } from '../../utils/adminFetch';
 
 interface SessionCodeCardProps {
   sessionCode: {
@@ -54,7 +55,7 @@ export default function SessionCodeCard({ sessionCode, onRefresh }: SessionCodeC
     setIsExtending(true);
     setError(null);
     try {
-      const response = await fetch(`/api/session-codes/${sessionCode.code}/extend`, {
+      const response = await adminFetch(`/api/session-codes/${sessionCode.code}/extend`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -86,7 +87,7 @@ export default function SessionCodeCard({ sessionCode, onRefresh }: SessionCodeC
     setIsDeactivating(true);
     setError(null);
     try {
-      const response = await fetch(`/api/session-codes/${sessionCode.code}/deactivate`, {
+      const response = await adminFetch(`/api/session-codes/${sessionCode.code}/deactivate`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -146,15 +147,15 @@ export default function SessionCodeCard({ sessionCode, onRefresh }: SessionCodeC
   };
 
   return (
-    <div className={`bg-white border-2 border-gray-200 rounded-xl p-6 transition-all duration-300 shadow-sm hover:border-admin-primary hover:shadow-[0_4px_12px_rgba(14,195,201,0.15)] hover:-translate-y-0.5 max-tablet:p-[18px] ${sessionCode.status === 'expired' ? 'opacity-70 bg-gray-50' : ''}`}>
-      <div className="flex items-start justify-between mb-5 gap-[15px] max-tablet:flex-col max-tablet:items-stretch">
-        <div className="flex-1 flex items-center gap-2.5">
+    <div className={`bg-white border-2 rounded-xl p-6 transition-all duration-300 shadow-sm max-tablet:p-[18px] ${sessionCode.status === 'expired' ? 'border-gray-200 bg-[#fafafa] opacity-75 hover:opacity-100 hover:border-gray-300 hover:shadow-md' : 'border-gray-200 hover:border-admin-primary hover:shadow-[0_4px_12px_rgba(14,195,201,0.15)] hover:-translate-y-0.5'}`}>
+      <div className="flex items-start justify-between mb-5 gap-3 max-tablet:flex-col max-tablet:items-stretch">
+        <div className="flex-1 min-w-0 flex items-center gap-2.5">
           <button
             onClick={handleCopy}
-            className="flex items-center gap-2.5 bg-gradient-to-br from-[#e0f9fa] to-[#d1f4f6] border-2 border-admin-primary rounded-[10px] py-3 px-5 cursor-pointer transition-all duration-300 hover:bg-gradient-to-br hover:from-[#d1f4f6] hover:to-[#c2eff2] hover:shadow-[0_2px_8px_rgba(14,195,201,0.2)] hover:-translate-y-px active:translate-y-0"
+            className="flex items-center gap-2.5 bg-gradient-to-br from-[#e0f9fa] to-[#d1f4f6] border-2 border-admin-primary rounded-[10px] py-3 px-5 cursor-pointer transition-all duration-300 hover:bg-gradient-to-br hover:from-[#d1f4f6] hover:to-[#c2eff2] hover:shadow-[0_2px_8px_rgba(14,195,201,0.2)] hover:-translate-y-px active:translate-y-0 max-w-full overflow-hidden"
             title="Click to copy"
           >
-            <span className="font-pixel text-xl font-bold text-admin-primary-dark tracking-wide">
+            <span className="font-pixel text-xl font-bold text-admin-primary-dark tracking-wide truncate">
               {sessionCode.code}
             </span>
             {copied ? (
@@ -184,41 +185,50 @@ export default function SessionCodeCard({ sessionCode, onRefresh }: SessionCodeC
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-4 mb-5 max-tablet:grid-cols-1">
-        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-          <div className="flex flex-col gap-0.5">
-            <span className="text-lg font-bold text-admin-primary">
+      <div className="grid grid-cols-3 gap-2 mb-5 max-tablet:grid-cols-1">
+        <div className="flex items-center gap-2 py-2.5 px-3 bg-gray-50 rounded-lg overflow-hidden">
+          <Users className="text-admin-primary flex-shrink-0" size={14} />
+          <div className="flex flex-col min-w-0">
+            <span className="text-base font-bold text-[#1a1a2e] leading-none">
               {sessionCode.studentCount}
-              {sessionCode.maxStudents ? ` / ${sessionCode.maxStudents}` : ''}
+              {sessionCode.maxStudents ? <span className="text-[10px] text-gray-400 font-medium">/{sessionCode.maxStudents}</span> : ''}
             </span>
-            <span className="text-xs text-gray-500 font-medium">Students</span>
+            <span className="text-[10px] text-gray-500 font-medium">Students</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-          <div className="flex flex-col gap-0.5">
-            <span className="text-lg font-bold text-admin-primary">{sessionCode.activeStudents24h}</span>
-            <span className="text-xs text-gray-500 font-medium">Active (24h)</span>
+        <div className="flex items-center gap-2 py-2.5 px-3 bg-gray-50 rounded-lg overflow-hidden">
+          <Zap className="text-admin-primary flex-shrink-0" size={14} />
+          <div className="flex flex-col min-w-0">
+            <span className="text-base font-bold text-[#1a1a2e] leading-none">{sessionCode.activeStudents24h}</span>
+            <span className="text-[10px] text-gray-500 font-medium whitespace-nowrap">Active 24h</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-          <div className="flex flex-col gap-0.5">
-            <span className="text-lg font-bold text-admin-primary">
+        <div className="flex items-center gap-2 py-2.5 px-3 bg-gray-50 rounded-lg overflow-hidden">
+          <BookOpen className="text-admin-primary flex-shrink-0" size={14} />
+          <div className="flex flex-col min-w-0">
+            <span className="text-base font-bold text-[#1a1a2e] leading-none">
               {sessionCode.questCount === 0 || sessionCode.questCount === undefined ? 'All' : sessionCode.questCount}
             </span>
-            <span className="text-xs text-gray-500 font-medium">Quests</span>
+            <span className="text-[10px] text-gray-500 font-medium">Quests</span>
           </div>
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 p-4 bg-gray-50 rounded-lg mb-5">
+      <div className="flex flex-col gap-2 p-3.5 bg-gray-50 rounded-lg mb-5">
         <div className="flex justify-between items-center gap-3">
-          <span className="text-[13px] text-gray-500 font-medium">Valid From:</span>
+          <span className="flex items-center gap-1.5 text-[13px] text-gray-400 font-medium">
+            <Calendar size={13} />
+            From
+          </span>
           <span className="text-[13px] text-gray-700 font-semibold">{formatDate(sessionCode.validityStart)}</span>
         </div>
         <div className="flex justify-between items-center gap-3">
-          <span className="text-[13px] text-gray-500 font-medium">Valid Until:</span>
+          <span className="flex items-center gap-1.5 text-[13px] text-gray-400 font-medium">
+            <Clock size={13} />
+            Until
+          </span>
           <span className="text-[13px] text-gray-700 font-semibold">{formatDate(sessionCode.validityEnd)}</span>
         </div>
       </div>

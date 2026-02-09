@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { Eye, EyeOff } from 'lucide-react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { useUser, isAdminUser } from '../../contexts/UserContext';
+import { adminFetch } from '../../utils/adminFetch';
 
 interface AdminUserItem {
   id: string;
@@ -62,7 +63,7 @@ export default function UsersPage() {
   const fetchAdminUsers = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/admin/list');
+      const response = await adminFetch('/api/admin/list');
       const data = await response.json();
 
       if (data.success) {
@@ -84,7 +85,7 @@ export default function UsersPage() {
     setSubmitting(true);
 
     try {
-      const response = await fetch('/api/admin/create', {
+      const response = await adminFetch('/api/admin/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -113,7 +114,7 @@ export default function UsersPage() {
     }
 
     try {
-      const response = await fetch(`/api/admin/${adminId}/archive`, {
+      const response = await adminFetch(`/api/admin/${adminId}/archive`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ is_active: !currentStatus }),

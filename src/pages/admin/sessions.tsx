@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import SessionCodeCard from '../../components/admin/SessionCodeCard';
 import CreateSessionModal from '../../components/admin/CreateSessionModal';
+import { adminFetch } from '../../utils/adminFetch';
 
 interface SessionCode {
   id: string;
@@ -24,7 +25,7 @@ export default function SessionsPage() {
   const [error, setError] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'expired' | 'scheduled'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'expired' | 'scheduled' | 'inactive'>('all');
 
   useEffect(() => {
     fetchSessionCodes();
@@ -37,7 +38,7 @@ export default function SessionsPage() {
   const fetchSessionCodes = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/session-codes/list');
+      const response = await adminFetch('/api/session-codes/list');
       const data = await response.json();
 
       if (data.success) {
@@ -57,7 +58,9 @@ export default function SessionsPage() {
     let filtered = [...sessionCodes];
 
     // Apply status filter
-    if (statusFilter !== 'all') {
+    if (statusFilter === 'inactive') {
+      filtered = filtered.filter((code) => !code.isActive);
+    } else if (statusFilter !== 'all') {
       filtered = filtered.filter((code) => code.status === statusFilter);
     }
 
@@ -82,6 +85,7 @@ export default function SessionsPage() {
       active: sessionCodes.filter((c) => c.status === 'active').length,
       expired: sessionCodes.filter((c) => c.status === 'expired').length,
       scheduled: sessionCodes.filter((c) => c.status === 'scheduled').length,
+      inactive: sessionCodes.filter((c) => !c.isActive).length,
     };
   };
 
@@ -149,6 +153,16 @@ export default function SessionsPage() {
               onClick={() => setStatusFilter('scheduled')}
             >
               Scheduled ({counts.scheduled})
+            </button>
+            <button
+              className={`py-[10px] px-[18px] bg-white border-2 rounded-lg text-sm font-semibold font-[family-name:var(--font-family-admin)] text-[#374151] cursor-pointer transition-all duration-300 ease-in-out ${
+                statusFilter === 'inactive'
+                  ? 'bg-admin-primary-gradient border-admin-primary text-white hover:bg-admin-primary-gradient-hover hover:border-admin-primary-dark'
+                  : 'border-[#e5e7eb] hover:border-admin-primary hover:bg-[#f0feff] hover:text-admin-primary-dark'
+              } max-tablet:flex-1 max-tablet:min-w-0 max-tablet:px-3 max-tablet:text-[13px]`}
+              onClick={() => setStatusFilter('inactive')}
+            >
+              Inactive ({counts.inactive})
             </button>
           </div>
 

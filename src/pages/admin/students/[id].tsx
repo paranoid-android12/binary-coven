@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import AdminLayout from '../../../components/admin/AdminLayout';
 import Link from 'next/link';
 import { Target, FileText, Clock, Play, Save, Award } from 'lucide-react';
+import { adminFetch } from '../../../utils/adminFetch';
 import QuestProgressChart from '../../../components/admin/QuestProgressChart';
 import CodeExecutionViewer from '../../../components/admin/CodeExecutionViewer';
 import ObjectiveProgressList from '../../../components/admin/ObjectiveProgressList';
@@ -97,7 +98,7 @@ export default function StudentDetailPage() {
   /** Fetch quest definitions dynamically from API (not hardcoded) */
   const fetchQuestDefinitions = async () => {
     try {
-      const res = await fetch('/api/quests/definitions');
+      const res = await adminFetch('/api/quests/definitions');
       const data = await res.json();
       if (data.success) {
         setQuestDefinitions(data.quests as Quest[]);
@@ -112,7 +113,7 @@ export default function StudentDetailPage() {
       setLoading(true);
       setError('');
 
-      const response = await fetch(`/api/analytics/student/${id}`);
+      const response = await adminFetch(`/api/analytics/student/${id}`);
       const data = await response.json();
 
       if (data.success) {
