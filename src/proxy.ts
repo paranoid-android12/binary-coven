@@ -10,7 +10,7 @@ import type { NextRequest } from 'next/server';
  * - Student authentication checks
  * - Redirect logic for unauthenticated users
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const url = request.nextUrl.clone();
 
