@@ -73,27 +73,28 @@ export default function StudentsPage() {
       const codes = sessionData.sessionCodes;
       setSessionCodes(codes);
 
-      // Fetch students for each session code
-      const allStudents: Student[] = [];
+      // Fetch students for all session codes in parallel
+      const results = await Promise.all(
+        codes.map(async (session) => {
+          try {
+            const studentResponse = await adminFetch(`/api/session-codes/${session.code}/students`);
+            const studentData = await studentResponse.json();
 
-      for (const session of codes) {
-        try {
-          const studentResponse = await adminFetch(`/api/session-codes/${session.code}/students`);
-          const studentData = await studentResponse.json();
-
-          if (studentData.success && studentData.students) {
-            // Add session code to each student
-            const studentsWithSession = studentData.students.map((student: any) => ({
-              ...student,
-              sessionCode: session.code,
-              sessionCodeId: session.id,
-            }));
-            allStudents.push(...studentsWithSession);
+            if (studentData.success && studentData.students) {
+              return studentData.students.map((student: any) => ({
+                ...student,
+                sessionCode: session.code,
+                sessionCodeId: session.id,
+              }));
+            }
+          } catch (err) {
+            console.error(`Error fetching students for ${session.code}:`, err);
           }
-        } catch (err) {
-          console.error(`Error fetching students for ${session.code}:`, err);
-        }
-      }
+          return [];
+        })
+      );
+
+      const allStudents: Student[] = results.flat();
 
       setStudents(allStudents);
     } catch (err) {
