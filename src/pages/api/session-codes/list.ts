@@ -12,7 +12,7 @@ type SessionCodeItem = {
   createdAt: string
   studentCount: number
   activeStudents24h: number
-  status: 'active' | 'expired' | 'scheduled'
+  status: 'active' | 'expired' | 'scheduled' | 'inactive'
   questCount: number // Number of assigned quests (0 = all quests available)
 }
 
@@ -94,7 +94,7 @@ export default async function handler(
       createdAt: code.created_at,
       studentCount: code.student_count || 0,
       activeStudents24h: code.active_students_24h || 0,
-      status: code.status as 'active' | 'expired' | 'scheduled',
+      status: !code.is_active ? 'inactive' : code.status as 'active' | 'expired' | 'scheduled',
       questCount: questCountMap[code.id] || 0, // 0 means all quests available
     }))
 

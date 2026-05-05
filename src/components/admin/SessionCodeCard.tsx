@@ -13,7 +13,7 @@ interface SessionCodeCardProps {
     createdAt: string;
     studentCount: number;
     activeStudents24h: number;
-    status: 'active' | 'expired' | 'scheduled';
+    status: 'active' | 'expired' | 'scheduled' | 'inactive';
     maxStudents?: number;
     questCount?: number;
   };
@@ -120,6 +120,8 @@ export default function SessionCodeCard({ sessionCode, onRefresh }: SessionCodeC
         return 'bg-red-100 text-red-600';
       case 'scheduled':
         return 'bg-blue-100 text-blue-700';
+      case 'inactive':
+        return 'bg-gray-100 text-gray-500';
       default:
         return '';
     }
@@ -133,6 +135,8 @@ export default function SessionCodeCard({ sessionCode, onRefresh }: SessionCodeC
         return AlertTriangle;
       case 'scheduled':
         return Zap;
+      case 'inactive':
+        return AlertTriangle;
       default:
         return null;
     }
@@ -147,7 +151,7 @@ export default function SessionCodeCard({ sessionCode, onRefresh }: SessionCodeC
   };
 
   return (
-    <div className={`bg-white border-2 rounded-xl p-6 transition-all duration-300 shadow-sm max-tablet:p-[18px] ${sessionCode.status === 'expired' ? 'border-gray-200 bg-[#fafafa] opacity-75 hover:opacity-100 hover:border-gray-300 hover:shadow-md' : 'border-gray-200 hover:border-admin-primary hover:shadow-[0_4px_12px_rgba(14,195,201,0.15)] hover:-translate-y-0.5'}`}>
+    <div className={`bg-white border-2 rounded-xl p-6 transition-all duration-300 shadow-sm max-tablet:p-[18px] ${sessionCode.status === 'expired' || sessionCode.status === 'inactive' ? 'border-gray-200 bg-[#fafafa] opacity-75 hover:opacity-100 hover:border-gray-300 hover:shadow-md' : 'border-gray-200 hover:border-admin-primary hover:shadow-[0_4px_12px_rgba(14,195,201,0.15)] hover:-translate-y-0.5'}`}>
       <div className="flex items-start justify-between mb-5 gap-3 max-tablet:flex-col max-tablet:items-stretch">
         <div className="flex-1 min-w-0 flex items-center gap-2.5">
           <button

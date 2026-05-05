@@ -13,7 +13,7 @@ interface SessionCode {
   createdAt: string;
   studentCount: number;
   activeStudents24h: number;
-  status: 'active' | 'expired' | 'scheduled';
+  status: 'active' | 'expired' | 'scheduled' | 'inactive';
   maxStudents?: number;
   questCount?: number;
 }
