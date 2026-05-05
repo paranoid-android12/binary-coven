@@ -60,11 +60,23 @@ export default async function handler(
       });
     }
 
-    // Validate password strength (min 8 characters)
-    if (password.length < 8) {
+    // Validate password strength
+    if (!/[A-Z]/.test(password)) {
       return res.status(400).json({
         success: false,
-        message: 'Password must be at least 8 characters long',
+        message: 'Password must contain at least one uppercase letter',
+      });
+    }
+    if (!/[0-9]/.test(password)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must contain at least one number',
+      });
+    }
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must contain at least one special character',
       });
     }
 

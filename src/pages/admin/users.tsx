@@ -4,6 +4,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { useUser, isAdminUser } from '../../contexts/UserContext';
 import { adminFetch } from '../../utils/adminFetch';
+import { validatePassword, checkPasswordRequirements } from '../../utils/passwordValidation';
 
 interface AdminUserItem {
   id: string;
@@ -39,6 +40,7 @@ export default function UsersPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [passwordTouched, setPasswordTouched] = useState(false);
 
   // Check if user is super admin
   useEffect(() => {
@@ -82,6 +84,14 @@ export default function UsersPage() {
   const handleCreateAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
+
+    const passwordValidation = validatePassword(formData.password);
+    if (!passwordValidation.isValid) {
+      setPasswordTouched(true);
+      setFormError(passwordValidation.errors[0]);
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -96,6 +106,7 @@ export default function UsersPage() {
       if (data.success) {
         setShowCreateModal(false);
         setFormData({ username: '', password: '', email: '', role: 'admin' });
+        setPasswordTouched(false);
         fetchAdminUsers();
       } else {
         setFormError(data.message || 'Failed to create admin user');
@@ -238,13 +249,13 @@ export default function UsersPage() {
         </div>
 
         {showCreateModal && (
-          <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/70 flex items-center justify-center z-[1000] p-5 backdrop-blur-sm" onClick={() => setShowCreateModal(false)}>
+          <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/70 flex items-center justify-center z-[1000] p-5 backdrop-blur-sm" onClick={() => { setShowCreateModal(false); setPasswordTouched(false); setFormData({ username: '', password: '', email: '', role: 'admin' }); setFormError(''); }}>
             <div className="bg-white rounded-2xl w-full max-w-[500px] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.3)] animate-[modalSlideIn_0.3s_ease] max-tablet:max-w-full max-tablet:m-0" onClick={(e) => e.stopPropagation()}>
               <div className="flex justify-between items-center p-6 border-b-2 border-gray-200 max-tablet:p-5">
                 <h2 className="text-2xl font-bold text-admin-dark m-0 font-pixel max-tablet:text-xl">Create Admin User</h2>
                 <button
                   className="bg-gray-100 border-none text-[28px] text-gray-500 cursor-pointer p-0 w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-300 leading-none hover:bg-gray-200 hover:text-gray-700"
-                  onClick={() => setShowCreateModal(false)}
+                  onClick={() => { setShowCreateModal(false); setPasswordTouched(false); setFormData({ username: '', password: '', email: '', role: 'admin' }); setFormError(''); }}
                 >
                   ×
                 </button>
@@ -270,8 +281,12 @@ export default function UsersPage() {
                     <input
                       type={showPassword ? 'text' : 'password'}
                       value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      placeholder="Enter password (min 8 characters)"
+                      onChange={(e) => {
+                        setFormData({ ...formData, password: e.target.value });
+                        setPasswordTouched(true);
+                      }}
+                      onBlur={() => setPasswordTouched(true)}
+                      placeholder="Enter password"
                       required
                       className="w-full py-3 px-3 pr-10 border-2 border-gray-200 rounded-lg text-sm font-pixel bg-white text-admin-dark transition-all duration-300 box-border placeholder:text-gray-400 focus:outline-none focus:border-admin-primary focus:shadow-[0_0_0_3px_rgba(14,195,201,0.1)]"
                     />
@@ -284,6 +299,22 @@ export default function UsersPage() {
                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
                   </div>
+                  {passwordTouched && formData.password && (() => {
+                    const requirements = checkPasswordRequirements(formData.password);
+                    return (
+                      <div className="text-[0.8em] p-2 bg-gray-50 rounded mt-2 flex flex-col gap-1 border border-gray-200">
+                        <div className={requirements.hasUpperCase ? 'text-[#0b7607]' : 'text-[#b10000]'}>
+                          {requirements.hasUpperCase ? '✓' : '✗'} One uppercase letter
+                        </div>
+                        <div className={requirements.hasNumber ? 'text-[#0b7607]' : 'text-[#b10000]'}>
+                          {requirements.hasNumber ? '✓' : '✗'} One number
+                        </div>
+                        <div className={requirements.hasSpecialChar ? 'text-[#0b7607]' : 'text-[#b10000]'}>
+                          {requirements.hasSpecialChar ? '✓' : '✗'} One special character (!@#$%^&*...)
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 <div className="mb-5">
@@ -315,7 +346,7 @@ export default function UsersPage() {
                   <button
                     type="button"
                     className="py-3 px-6 rounded-lg text-[15px] font-bold font-pixel border-none cursor-pointer transition-all duration-300 bg-gray-100 text-gray-500 border-2 border-gray-200 hover:bg-gray-200 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed max-tablet:w-full"
-                    onClick={() => setShowCreateModal(false)}
+                    onClick={() => { setShowCreateModal(false); setPasswordTouched(false); setFormData({ username: '', password: '', email: '', role: 'admin' }); setFormError(''); }}
                     disabled={submitting}
                   >
                     Cancel

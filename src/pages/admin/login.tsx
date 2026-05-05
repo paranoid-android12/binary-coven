@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { Eye, EyeOff } from 'lucide-react';
-import { validatePassword, checkPasswordRequirements } from '@/utils/passwordValidation';
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -11,7 +10,6 @@ export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [passwordTouched, setPasswordTouched] = useState(false);
 
   // Check if already authenticated
   useEffect(() => {
@@ -38,15 +36,6 @@ export default function AdminLogin() {
 
     if (!username.trim() || !password.trim()) {
       setError('Please enter both username and password');
-      setLoading(false);
-      return;
-    }
-
-    // Validate password requirements
-    const passwordValidation = validatePassword(password);
-    if (!passwordValidation.isValid) {
-      setError(passwordValidation.errors[0]);
-      setPasswordTouched(true);
       setLoading(false);
       return;
     }
@@ -114,11 +103,7 @@ export default function AdminLogin() {
                   type={showPassword ? 'text' : 'password'}
                   id="password"
                   value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setPasswordTouched(true);
-                  }}
-                  onBlur={() => setPasswordTouched(true)}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full py-[14px] px-4 pr-10 bg-admin-tan-light border-2 border-admin-purple rounded-md text-admin-purple text-[15px] font-[family-name:var(--font-family-admin)] transition-all duration-200 ease-in-out box-border outline-none focus:border-admin-purple focus:shadow-[0_0_0_2px_rgba(33,7,20,0.2)] disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-admin-purple/60"
                   placeholder="Enter admin password"
                   disabled={loading}
@@ -132,22 +117,6 @@ export default function AdminLogin() {
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
-              {passwordTouched && password && (() => {
-                const requirements = checkPasswordRequirements(password);
-                return (
-                  <div className="text-[0.8em] p-2 bg-[#f5f5f5] rounded mt-2 flex flex-col gap-1">
-                    <div className={requirements.hasUpperCase ? 'text-[#0b7607]' : 'text-[#b10000]'}>
-                      {requirements.hasUpperCase ? '✓' : '✗'} One uppercase letter
-                    </div>
-                    <div className={requirements.hasNumber ? 'text-[#0b7607]' : 'text-[#b10000]'}>
-                      {requirements.hasNumber ? '✓' : '✗'} One number
-                    </div>
-                    <div className={requirements.hasSpecialChar ? 'text-[#0b7607]' : 'text-[#b10000]'}>
-                      {requirements.hasSpecialChar ? '✓' : '✗'} One special character (!@#$%^&*...)
-                    </div>
-                  </div>
-                );
-              })()}
             </div>
 
             {error && (
