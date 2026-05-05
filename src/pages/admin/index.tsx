@@ -143,7 +143,7 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-5 mb-10 max-laptop:grid-cols-2 max-tablet:grid-cols-1">
               <div className="bg-white border border-[#e5e7eb] rounded-xl overflow-hidden transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
                 <div className="p-[25px] flex items-center gap-5 max-tablet:p-5">
-                  <Users className="text-admin-primary flex-shrink-0" size={22} />
+                  <Users className="text-admin-indigo flex-shrink-0" size={22} />
                   <div className="flex-1">
                     <h3 className="text-[32px] font-bold text-[#1a1a2e] m-0 mb-[2px] max-tablet:text-[26px]">{stats.totalStudents}</h3>
                     <p className="text-sm text-[#6b7280] m-0 font-medium">Total Students</p>
@@ -163,7 +163,7 @@ export default function AdminDashboard() {
 
               <div className="bg-white border border-[#e5e7eb] rounded-xl overflow-hidden transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
                 <div className="p-[25px] flex items-center gap-5 max-tablet:p-5">
-                  <BookOpen className="text-admin-primary flex-shrink-0" size={22} />
+                  <BookOpen className="text-admin-violet flex-shrink-0" size={22} />
                   <div className="flex-1">
                     <h3 className="text-[32px] font-bold text-[#1a1a2e] m-0 mb-[2px] max-tablet:text-[26px]">{stats.totalSessions}</h3>
                     <p className="text-sm text-[#6b7280] m-0 font-medium">Total Sessions</p>
@@ -202,11 +202,11 @@ export default function AdminDashboard() {
 
                 <Link
                   href="/admin/students"
-                  className="group bg-white border-2 border-[#e5e7eb] rounded-xl p-6 no-underline transition-all duration-300 ease-in-out block hover:border-admin-primary hover:shadow-[0_4px_12px_rgba(14,195,201,0.15)] hover:-translate-y-[3px]"
+                  className="group bg-white border-2 border-[#e5e7eb] rounded-xl p-6 no-underline transition-all duration-300 ease-in-out block hover:border-admin-indigo hover:shadow-[0_4px_12px_rgba(99,102,241,0.15)] hover:-translate-y-[3px]"
                 >
                   <div className="flex items-start justify-between mb-4">
-                    <Users className="text-admin-primary" size={24} />
-                    <ArrowRight className="text-[#d1d5db] transition-all duration-300 group-hover:text-admin-primary group-hover:translate-x-1" size={20} />
+                    <Users className="text-admin-indigo" size={24} />
+                    <ArrowRight className="text-[#d1d5db] transition-all duration-300 group-hover:text-admin-indigo group-hover:translate-x-1" size={20} />
                   </div>
                   <h3 className="text-lg font-bold text-admin-dark m-0 mb-[6px]">View Students</h3>
                   <p className="text-sm text-[#6b7280] m-0 leading-[1.5]">
@@ -216,11 +216,11 @@ export default function AdminDashboard() {
 
                 <Link
                   href="/admin/users"
-                  className="group bg-white border-2 border-[#e5e7eb] rounded-xl p-6 no-underline transition-all duration-300 ease-in-out block hover:border-admin-primary hover:shadow-[0_4px_12px_rgba(14,195,201,0.15)] hover:-translate-y-[3px]"
+                  className="group bg-white border-2 border-[#e5e7eb] rounded-xl p-6 no-underline transition-all duration-300 ease-in-out block hover:border-admin-violet hover:shadow-[0_4px_12px_rgba(167,139,250,0.15)] hover:-translate-y-[3px]"
                 >
                   <div className="flex items-start justify-between mb-4">
-                    <UserCog className="text-admin-primary" size={24} />
-                    <ArrowRight className="text-[#d1d5db] transition-all duration-300 group-hover:text-admin-primary group-hover:translate-x-1" size={20} />
+                    <UserCog className="text-admin-violet" size={24} />
+                    <ArrowRight className="text-[#d1d5db] transition-all duration-300 group-hover:text-admin-violet group-hover:translate-x-1" size={20} />
                   </div>
                   <h3 className="text-lg font-bold text-admin-dark m-0 mb-[6px]">Admin Users</h3>
                   <p className="text-sm text-[#6b7280] m-0 leading-[1.5]">

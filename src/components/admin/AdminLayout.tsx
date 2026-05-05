@@ -69,14 +69,14 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
   }
 
   const baseNavItems = [
-    { href: '/admin', label: 'Dashboard', icon: BarChart3 },
-    { href: '/admin/sessions', label: 'Session Codes', icon: Key },
-    { href: '/admin/students', label: 'Students', icon: Users },
+    { href: '/admin', label: 'Dashboard', icon: BarChart3, activeColor: 'text-admin-primary' },
+    { href: '/admin/sessions', label: 'Session Codes', icon: Key, activeColor: 'text-admin-primary' },
+    { href: '/admin/students', label: 'Students', icon: Users, activeColor: 'text-admin-indigo' },
   ];
 
   // Add Users management link for super admins
   const navItems = adminUser?.role === 'super_admin'
-    ? [...baseNavItems, { href: '/admin/users', label: 'Admin Users', icon: UserCog }]
+    ? [...baseNavItems, { href: '/admin/users', label: 'Admin Users', icon: UserCog, activeColor: 'text-admin-violet' }]
     : baseNavItems;
 
   const currentPath = router.pathname;
@@ -93,7 +93,7 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
           mobileMenuOpen ? 'translate-x-0' : 'max-laptop:-translate-x-full'
         }`}>
           <div className="p-[28px_24px] border-b border-white/[0.08] text-center">
-            <h1 className="text-[22px] font-bold text-admin-primary m-0 mb-1 uppercase tracking-[0.15em]">Binary Coven</h1>
+            <p className="text-[22px] font-bold text-admin-primary m-0 mb-1 uppercase">Binary Coven</p>
             <p className="text-xs text-white/40 m-0 tracking-wide">Admin Panel</p>
           </div>
 
@@ -107,7 +107,7 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
                   href={item.href}
                   className={`flex items-center py-[11px] px-4 rounded-lg no-underline transition-all duration-200 ease-in-out mb-[2px] ${
                     isActive
-                      ? 'bg-white/[0.12] text-admin-primary font-semibold'
+                      ? `bg-white/[0.12] ${item.activeColor} font-semibold`
                       : 'text-white/60 hover:bg-white/[0.06] hover:text-white/90'
                   }`}
                 >

@@ -12,6 +12,12 @@
   --color-admin-purple-darker: #12040c;
   --color-admin-tan: #d8a888;
   --color-admin-tan-light: #e8c4a8;
+  --color-admin-indigo: #6366f1;
+  --color-admin-indigo-dark: #4f46e5;
+  --color-admin-indigo-darker: #3730a3;
+  --color-admin-violet: #a78bfa;
+  --color-admin-violet-dark: #8b5cf6;
+  --color-admin-violet-darker: #7c3aed;
 
   /* Breakpoints */
   --breakpoint-tablet: 768px;
@@ -187,6 +193,22 @@ h4, h5, h6 {
 
   .bg-admin-purple-gradient {
     background: radial-gradient(circle at top, #3b1522 0%, #210714 60%, #12040c 100%);
+  }
+
+  .bg-admin-indigo-gradient {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  }
+
+  .bg-admin-indigo-gradient-hover {
+    background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+  }
+
+  .bg-admin-violet-gradient {
+    background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+  }
+
+  .bg-admin-violet-gradient-hover {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
   }
 
   /* Custom text shadow for admin login */
