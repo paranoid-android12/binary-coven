@@ -46,6 +46,7 @@ export const StatusModal: React.FC<StatusModalProps> = ({
     const handleOpenProgrammingTab = () => {
       if (isOpen && entity) {
         setActiveTab('program');
+        EventBus.emit('tutorial-terminal-opened');
       }
     };
 
