@@ -1,6 +1,5 @@
 import { EventBus } from '../EventBus';
 import { DialogueEntry, QuestRequirement } from '../../types/quest';
-import { ProgrammingGame } from '../scenes/ProgrammingGame';
 import { useGameStore } from '../../stores/gameStore';
 
 /**
@@ -13,7 +12,6 @@ import { useGameStore } from '../../stores/gameStore';
  * - Load and display dialogue sequences from JSON files
  * - Track tutorial state (movement, terminal opened, code content, etc.)
  * - Check requirement completion and auto-advance dialogue
- * - Camera panning support for dialogue entries
  * - Challenge Grid activation/deactivation per dialogue
  * - EventBus integration for global dialogue control
  */
@@ -69,7 +67,6 @@ export class DialogueManager {
 
   // Callbacks for UI updates
   private onStateChangeCallback?: (state: DialogueState, tutorialState: TutorialState) => void;
-  private phaserSceneRef?: ProgrammingGame;
 
   private constructor() {
     this.setupEventListeners();
@@ -162,12 +159,6 @@ export class DialogueManager {
     this.onStateChangeCallback = callback;
   }
 
-  /**
-   * Set reference to Phaser scene for camera control
-   */
-  public setPhaserScene(scene: ProgrammingGame): void {
-    this.phaserSceneRef = scene;
-  }
 
   /**
    * Notify UI of state changes
@@ -350,12 +341,6 @@ export class DialogueManager {
       // Reset tutorial state
       this.resetTutorialState();
 
-      // Handle camera panning for first dialogue if specified
-      if (dialogues[0]?.camera && this.phaserSceneRef) {
-        console.log(`[DIALOGUE MANAGER] Panning camera to (${dialogues[0].camera.x}, ${dialogues[0].camera.y})`);
-        this.phaserSceneRef.panCameraTo(dialogues[0].camera.x, dialogues[0].camera.y, 1000);
-      }
-
       // Handle Challenge Grid activation for first dialogue if specified
       if (dialogues[0]?.challengeGrids) {
         const store = useGameStore.getState();
@@ -408,12 +393,6 @@ export class DialogueManager {
       }
     });
 
-    // Handle camera panning for first dialogue if specified
-    if (dialogues[0]?.camera && this.phaserSceneRef) {
-      console.log(`[DIALOGUE MANAGER] Panning camera to (${dialogues[0].camera.x}, ${dialogues[0].camera.y})`);
-      this.phaserSceneRef.panCameraTo(dialogues[0].camera.x, dialogues[0].camera.y, 1000);
-    }
-
     // Handle Challenge Grid activation for first dialogue if specified
     if (dialogues[0]?.challengeGrids) {
       const store = useGameStore.getState();
@@ -461,12 +440,6 @@ export class DialogueManager {
     const nextIndex = this.dialogueState.currentIndex + 1;
     const nextDialogue = this.dialogueState.dialogues[nextIndex];
 
-    // Handle camera panning if specified
-    if (nextDialogue?.camera && this.phaserSceneRef) {
-      console.log(`[DIALOGUE MANAGER] Panning camera to (${nextDialogue.camera.x}, ${nextDialogue.camera.y})`);
-      this.phaserSceneRef.panCameraTo(nextDialogue.camera.x, nextDialogue.camera.y, 1000);
-    }
-
     // Handle Challenge Grid activation/deactivation if specified
     if (nextDialogue?.challengeGrids) {
       const store = useGameStore.getState();
@@ -502,12 +475,6 @@ export class DialogueManager {
     console.log(`[DIALOGUE MANAGER]   Terminal opened: ${this.tutorialState.terminalOpened}`);
     console.log(`[DIALOGUE MANAGER]   Code content: "${this.tutorialState.codeContent}"`);
     console.log(`[DIALOGUE MANAGER]   Play button clicked: ${this.tutorialState.playButtonClicked}`);
-
-    // Re-lock camera to qubit when dialogue ends
-    if (this.phaserSceneRef && this.phaserSceneRef.lockCameraToQubit) {
-      console.log('[DIALOGUE MANAGER] Re-locking camera to qubit');
-      this.phaserSceneRef.lockCameraToQubit();
-    }
 
     // Deactivate all Challenge Grids when dialogue ends
     const store = useGameStore.getState();

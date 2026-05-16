@@ -223,7 +223,6 @@ export class ProgrammingGame extends Scene {
   };
   private isLockedToQubit: boolean = true;
   private cameraSpeed: number = 300;
-  private isCameraPanning: boolean = false;
   
   // Constants
   private readonly GRID_SIZE = 128; // About 1/3 of 128 for smaller, more detailed grids
@@ -726,48 +725,6 @@ export class ProgrammingGame extends Scene {
     EventBus.emit('camera-locked-to-qubit', true);
   }
 
-  private unlockCamera() {
-    if (this.isLockedToQubit) {
-      this.isLockedToQubit = false;
-      this.cameras.main.stopFollow();
-      EventBus.emit('camera-locked-to-qubit', false);
-    }
-  }
-
-  public panCameraTo(x: number, y: number, duration: number = 1000): Promise<void> {
-    return new Promise((resolve) => {
-      // Prevent multiple simultaneous camera pans
-      if (this.isCameraPanning) {
-        console.log('[CAMERA] Camera is already panning, ignoring request');
-        resolve();
-        return;
-      }
-
-      this.isCameraPanning = true;
-      console.log('[CAMERA] Starting camera pan to', x, y);
-
-      // Ensure camera is unlocked during dialogue-driven panning
-      this.unlockCamera();
-
-      // Convert grid coordinates to pixel coordinates
-      const pixelX = x * this.GRID_SIZE + this.GRID_SIZE / 2;
-      const pixelY = y * this.GRID_SIZE + this.GRID_SIZE / 2;
-
-      // Set up completion event listener
-      const onPanComplete = () => {
-        console.log('[CAMERA] Pan completed');
-        this.isCameraPanning = false;
-        this.cameras.main.off('camerapancomplete', onPanComplete);
-        resolve();
-      };
-
-      // Listen for pan completion
-      this.cameras.main.once('camerapancomplete', onPanComplete);
-
-      // Start the camera pan
-      this.cameras.main.pan(pixelX, pixelY, duration, 'Power2');
-    });
-  }
 
   private setupStateListeners() {
     // This would be implemented with proper state management
@@ -1725,10 +1682,6 @@ export class ProgrammingGame extends Scene {
       callback(this.movementManager);
     });
 
-    // Handle camera panning requests
-    EventBus.on('pan-camera-to', async (data: { x: number, y: number, duration?: number }) => {
-      await this.panCameraTo(data.x, data.y, data.duration || 1000);
-    });
   }
 
   private setupExecutionTextSystem() {
@@ -2480,7 +2433,6 @@ export class ProgrammingGame extends Scene {
     EventBus.removeAllListeners('entity-movement-completed');
     EventBus.removeAllListeners('request-smooth-movement');
     EventBus.removeAllListeners('request-movement-manager');
-    EventBus.removeAllListeners('pan-camera-to');
     EventBus.removeAllListeners('tile-selected');
     EventBus.removeAllListeners('save-map');
     EventBus.removeAllListeners('load-map');

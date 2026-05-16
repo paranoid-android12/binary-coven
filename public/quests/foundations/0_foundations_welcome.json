@@ -18,8 +18,7 @@
         {
           "name": "Maru",
           "content": "Welcome to Binary Coven! I see you're already familiar with coding. Perfect! Here, we use code to control everything on the farm.",
-          "sprite": "manu-pleased.png",
-          "camera": { "x": 10, "y": 5 }
+          "sprite": "manu-pleased.png"
         },
         {
           "name": "Qubit",

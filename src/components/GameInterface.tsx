@@ -639,15 +639,7 @@ export const GameInterface: React.FC = () => {
             }
         });
 
-        // Set Phaser scene reference when scene is ready
-        const handleSceneReady = (scene: ProgrammingGame) => {
-            DialogueManager.setPhaserScene(scene);
-        };
-
-        EventBus.on("current-scene-ready", handleSceneReady);
-
         return () => {
-            EventBus.removeListener("current-scene-ready", handleSceneReady);
         };
     }, [openModal, closeModal, globalModalState.openModals]);
 
