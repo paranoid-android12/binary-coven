@@ -248,6 +248,15 @@ export class QuestManager {
     this.activeQuestId = undefined;
     this.currentPhaseIndex = 0;
 
+    // Close any active dialogue
+    const dialogueManager = DialogueManager.getInstance();
+    if (dialogueManager.isActive()) {
+      dialogueManager.closeDialogue();
+    }
+
+    // Clear objective tracker state
+    ObjectiveTracker.getInstance().clearPhase();
+
     this.saveProgressToStorage();
 
     console.log(`[QuestManager] Cancelled quest: ${questId}`);
