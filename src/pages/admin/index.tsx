@@ -96,11 +96,11 @@ export default function AdminDashboard() {
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-[#d1fae5] text-[#047857]';
+        return 'bg-lime-50 text-[#4d7c0f]';
       case 'expired':
-        return 'bg-[#fee2e2] text-[#dc2626]';
+        return 'bg-red-50 text-[#b91c1c]';
       case 'scheduled':
-        return 'bg-[#dbeafe] text-[#1d4ed8]';
+        return 'bg-slate-100 text-[#475569]';
       default:
         return '';
     }
@@ -110,16 +110,16 @@ export default function AdminDashboard() {
     <AdminLayout title="Dashboard">
       <div className="max-w-[1400px] mx-auto">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-[60px] px-5 text-[#6b7280]">
-            <div className="w-[50px] h-[50px] border-4 border-[#e5e7eb] border-t-admin-primary rounded-full animate-spin-slow mb-5"></div>
+          <div className="flex flex-col items-center justify-center py-[60px] px-5 text-admin-text-muted">
+            <div className="w-[50px] h-[50px] border-4 border-admin-border border-t-admin-accent rounded-full animate-spin-slow mb-5"></div>
             <p>Loading dashboard...</p>
           </div>
         ) : error ? (
-          <div className="bg-[#fef2f2] border border-[#fecaca] rounded-xl p-[30px] text-center text-[#dc2626]">
+          <div className="bg-red-50 border border-red-200 rounded-xl p-[30px] text-center text-[#b91c1c]">
             <p className="m-0 mb-[15px] text-base">{error}</p>
             <button
               onClick={fetchDashboardData}
-              className="bg-[#dc2626] text-white border-none py-[10px] px-5 rounded-lg text-sm font-[family-name:var(--font-family-admin)] cursor-pointer transition-colors duration-300 ease-in-out hover:bg-[#b91c1c]"
+              className="bg-[#b91c1c] text-white border-none py-[10px] px-5 rounded-lg text-sm cursor-pointer transition-colors duration-200 hover:bg-[#991b1b]"
             >
               Retry
             </button>
@@ -128,7 +128,7 @@ export default function AdminDashboard() {
           <>
             {/* Greeting */}
             <div className="mb-8">
-              <h1 className="text-[28px] font-bold text-admin-dark m-0 mb-1">
+              <h1 className="text-[28px] font-bold text-admin-text m-0 mb-1">
                 {(() => {
                   const hour = new Date().getHours();
                   if (hour < 12) return 'Good morning';
@@ -136,47 +136,47 @@ export default function AdminDashboard() {
                   return 'Good evening';
                 })()}, {adminName}
               </h1>
-              <p className="text-sm text-[#6b7280] m-0">Here&apos;s your overview for today.</p>
+              <p className="text-sm text-admin-text-muted m-0">Here&apos;s your overview for today.</p>
             </div>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-5 mb-10 max-laptop:grid-cols-2 max-tablet:grid-cols-1">
-              <div className="bg-white border border-[#e5e7eb] rounded-xl overflow-hidden transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+              <div className="bg-admin-card border border-admin-border rounded-xl overflow-hidden transition-colors duration-200 hover:border-admin-border-hover">
                 <div className="p-[25px] flex items-center gap-5 max-tablet:p-5">
-                  <Users className="text-admin-indigo flex-shrink-0" size={22} />
+                  <Users className="text-admin-accent flex-shrink-0" size={22} />
                   <div className="flex-1">
-                    <h3 className="text-[32px] font-bold text-[#1a1a2e] m-0 mb-[2px] max-tablet:text-[26px]">{stats.totalStudents}</h3>
-                    <p className="text-sm text-[#6b7280] m-0 font-medium">Total Students</p>
+                    <h3 className="text-[32px] font-bold text-admin-text m-0 mb-[2px] max-tablet:text-[26px]">{stats.totalStudents}</h3>
+                    <p className="text-sm text-admin-text-muted m-0 font-medium">Total Students</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white border border-[#e5e7eb] rounded-xl overflow-hidden transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+              <div className="bg-admin-card border border-admin-border rounded-xl overflow-hidden transition-colors duration-200 hover:border-admin-border-hover">
                 <div className="p-[25px] flex items-center gap-5 max-tablet:p-5">
-                  <Key className="text-admin-primary flex-shrink-0" size={22} />
+                  <Key className="text-admin-accent flex-shrink-0" size={22} />
                   <div className="flex-1">
-                    <h3 className="text-[32px] font-bold text-[#1a1a2e] m-0 mb-[2px] max-tablet:text-[26px]">{stats.activeSessions}</h3>
-                    <p className="text-sm text-[#6b7280] m-0 font-medium">Active Sessions</p>
+                    <h3 className="text-[32px] font-bold text-admin-text m-0 mb-[2px] max-tablet:text-[26px]">{stats.activeSessions}</h3>
+                    <p className="text-sm text-admin-text-muted m-0 font-medium">Active Sessions</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white border border-[#e5e7eb] rounded-xl overflow-hidden transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+              <div className="bg-admin-card border border-admin-border rounded-xl overflow-hidden transition-colors duration-200 hover:border-admin-border-hover">
                 <div className="p-[25px] flex items-center gap-5 max-tablet:p-5">
-                  <BookOpen className="text-admin-violet flex-shrink-0" size={22} />
+                  <BookOpen className="text-admin-accent flex-shrink-0" size={22} />
                   <div className="flex-1">
-                    <h3 className="text-[32px] font-bold text-[#1a1a2e] m-0 mb-[2px] max-tablet:text-[26px]">{stats.totalSessions}</h3>
-                    <p className="text-sm text-[#6b7280] m-0 font-medium">Total Sessions</p>
+                    <h3 className="text-[32px] font-bold text-admin-text m-0 mb-[2px] max-tablet:text-[26px]">{stats.totalSessions}</h3>
+                    <p className="text-sm text-admin-text-muted m-0 font-medium">Total Sessions</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white border border-[#e5e7eb] rounded-xl overflow-hidden transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+              <div className="bg-admin-card border border-admin-border rounded-xl overflow-hidden transition-colors duration-200 hover:border-admin-border-hover">
                 <div className="p-[25px] flex items-center gap-5 max-tablet:p-5">
-                  <Zap className="text-admin-primary flex-shrink-0" size={22} />
+                  <Zap className="text-admin-accent flex-shrink-0" size={22} />
                   <div className="flex-1">
-                    <h3 className="text-[32px] font-bold text-[#1a1a2e] m-0 mb-[2px] max-tablet:text-[26px]">{stats.recentActivity}</h3>
-                    <p className="text-sm text-[#6b7280] m-0 font-medium">Active (24h)</p>
+                    <h3 className="text-[32px] font-bold text-admin-text m-0 mb-[2px] max-tablet:text-[26px]">{stats.recentActivity}</h3>
+                    <p className="text-sm text-admin-text-muted m-0 font-medium">Active (24h)</p>
                   </div>
                 </div>
               </div>
@@ -184,46 +184,46 @@ export default function AdminDashboard() {
 
             {/* Quick Actions */}
             <div className="mb-10">
-              <h2 className="text-[22px] font-bold text-admin-dark m-0 mb-5">Quick Actions</h2>
+              <h2 className="text-[22px] font-bold text-admin-text m-0 mb-5">Quick Actions</h2>
               <div className="grid grid-cols-3 gap-5 max-laptop:grid-cols-2 max-tablet:grid-cols-1">
                 <Link
                   href="/admin/sessions"
-                  className="group bg-white border-2 border-[#e5e7eb] rounded-xl p-6 no-underline transition-all duration-300 ease-in-out block hover:border-admin-primary hover:shadow-[0_4px_12px_rgba(14,195,201,0.15)] hover:-translate-y-[3px]"
+                  className="group bg-admin-card border border-admin-border rounded-xl p-6 no-underline transition-colors duration-200 block hover:border-admin-accent"
                 >
                   <div className="flex items-start justify-between mb-4">
-                    <Key className="text-admin-primary" size={24} />
-                    <ArrowRight className="text-[#d1d5db] transition-all duration-300 group-hover:text-admin-primary group-hover:translate-x-1" size={20} />
+                    <Key className="text-admin-accent" size={24} />
+                    <ArrowRight className="text-admin-text-faint transition-all duration-200 group-hover:text-admin-accent group-hover:translate-x-1" size={20} />
                   </div>
-                  <h3 className="text-lg font-bold text-admin-dark m-0 mb-[6px]">Manage Sessions</h3>
-                  <p className="text-sm text-[#6b7280] m-0 leading-[1.5]">
+                  <h3 className="text-lg font-bold text-admin-text m-0 mb-[6px]">Manage Sessions</h3>
+                  <p className="text-sm text-admin-text-muted m-0 leading-[1.5]">
                     Create and manage session codes for students
                   </p>
                 </Link>
 
                 <Link
                   href="/admin/students"
-                  className="group bg-white border-2 border-[#e5e7eb] rounded-xl p-6 no-underline transition-all duration-300 ease-in-out block hover:border-admin-indigo hover:shadow-[0_4px_12px_rgba(99,102,241,0.15)] hover:-translate-y-[3px]"
+                  className="group bg-admin-card border border-admin-border rounded-xl p-6 no-underline transition-colors duration-200 block hover:border-admin-accent"
                 >
                   <div className="flex items-start justify-between mb-4">
-                    <Users className="text-admin-indigo" size={24} />
-                    <ArrowRight className="text-[#d1d5db] transition-all duration-300 group-hover:text-admin-indigo group-hover:translate-x-1" size={20} />
+                    <Users className="text-admin-accent" size={24} />
+                    <ArrowRight className="text-admin-text-faint transition-all duration-200 group-hover:text-admin-accent group-hover:translate-x-1" size={20} />
                   </div>
-                  <h3 className="text-lg font-bold text-admin-dark m-0 mb-[6px]">View Students</h3>
-                  <p className="text-sm text-[#6b7280] m-0 leading-[1.5]">
+                  <h3 className="text-lg font-bold text-admin-text m-0 mb-[6px]">View Students</h3>
+                  <p className="text-sm text-admin-text-muted m-0 leading-[1.5]">
                     Track student progress and analytics
                   </p>
                 </Link>
 
                 <Link
                   href="/admin/users"
-                  className="group bg-white border-2 border-[#e5e7eb] rounded-xl p-6 no-underline transition-all duration-300 ease-in-out block hover:border-admin-violet hover:shadow-[0_4px_12px_rgba(167,139,250,0.15)] hover:-translate-y-[3px]"
+                  className="group bg-admin-card border border-admin-border rounded-xl p-6 no-underline transition-colors duration-200 block hover:border-admin-accent"
                 >
                   <div className="flex items-start justify-between mb-4">
-                    <UserCog className="text-admin-violet" size={24} />
-                    <ArrowRight className="text-[#d1d5db] transition-all duration-300 group-hover:text-admin-violet group-hover:translate-x-1" size={20} />
+                    <UserCog className="text-admin-accent" size={24} />
+                    <ArrowRight className="text-admin-text-faint transition-all duration-200 group-hover:text-admin-accent group-hover:translate-x-1" size={20} />
                   </div>
-                  <h3 className="text-lg font-bold text-admin-dark m-0 mb-[6px]">Admin Users</h3>
-                  <p className="text-sm text-[#6b7280] m-0 leading-[1.5]">
+                  <h3 className="text-lg font-bold text-admin-text m-0 mb-[6px]">Admin Users</h3>
+                  <p className="text-sm text-admin-text-muted m-0 leading-[1.5]">
                     Manage admin accounts and permissions
                   </p>
                 </Link>
@@ -234,44 +234,44 @@ export default function AdminDashboard() {
             {recentSessions.length > 0 && (
               <div className="mb-10">
                 <div className="flex items-center justify-between mb-5 max-tablet:flex-col max-tablet:items-start max-tablet:gap-[10px]">
-                  <h2 className="text-[22px] font-bold text-admin-dark m-0">Recent Session Codes</h2>
+                  <h2 className="text-[22px] font-bold text-admin-text m-0">Recent Session Codes</h2>
                   <Link
                     href="/admin/sessions"
-                    className="text-admin-primary no-underline text-[15px] font-medium transition-colors duration-300 ease-in-out hover:text-admin-primary-dark"
+                    className="text-admin-accent no-underline text-[15px] font-medium transition-colors duration-200 hover:text-admin-accent-hover"
                   >
                     View All →
                   </Link>
                 </div>
 
-                <div className="bg-white border border-[#e5e7eb] rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.05)] max-tablet:overflow-x-auto">
+                <div className="bg-admin-card border border-admin-border rounded-xl overflow-hidden max-tablet:overflow-x-auto">
                   <table className="w-full border-collapse max-tablet:min-w-[600px]">
                     <thead>
-                      <tr className="bg-[#f9fafb] border-b-2 border-[#e5e7eb]">
-                        <th className="p-[15px_20px] text-left text-[13px] font-bold text-[#374151] uppercase tracking-[0.5px]">Code</th>
-                        <th className="p-[15px_20px] text-left text-[13px] font-bold text-[#374151] uppercase tracking-[0.5px]">Status</th>
-                        <th className="p-[15px_20px] text-left text-[13px] font-bold text-[#374151] uppercase tracking-[0.5px]">Students</th>
-                        <th className="p-[15px_20px] text-left text-[13px] font-bold text-[#374151] uppercase tracking-[0.5px]">Active (24h)</th>
-                        <th className="p-[15px_20px] text-left text-[13px] font-bold text-[#374151] uppercase tracking-[0.5px]">Valid Until</th>
-                        <th className="p-[15px_20px] text-left text-[13px] font-bold text-[#374151] uppercase tracking-[0.5px]">Created</th>
+                      <tr className="bg-[#faf9f7] border-b-2 border-admin-border">
+                        <th className="p-[15px_20px] text-left text-[13px] font-bold text-admin-text uppercase tracking-[0.5px]">Code</th>
+                        <th className="p-[15px_20px] text-left text-[13px] font-bold text-admin-text uppercase tracking-[0.5px]">Status</th>
+                        <th className="p-[15px_20px] text-left text-[13px] font-bold text-admin-text uppercase tracking-[0.5px]">Students</th>
+                        <th className="p-[15px_20px] text-left text-[13px] font-bold text-admin-text uppercase tracking-[0.5px]">Active (24h)</th>
+                        <th className="p-[15px_20px] text-left text-[13px] font-bold text-admin-text uppercase tracking-[0.5px]">Valid Until</th>
+                        <th className="p-[15px_20px] text-left text-[13px] font-bold text-admin-text uppercase tracking-[0.5px]">Created</th>
                       </tr>
                     </thead>
                     <tbody>
                       {recentSessions.map((session) => (
-                        <tr key={session.id} className="border-b border-[#e5e7eb] last:border-b-0 transition-colors duration-200 ease-in-out hover:bg-[#f9fafb]">
-                          <td className="p-[15px_20px] text-sm text-[#374151] font-medium">
-                            <code className="bg-[#f3f4f6] py-1 px-[10px] rounded-md font-[family-name:var(--font-family-admin)] text-[13px] text-admin-primary font-bold">
+                        <tr key={session.id} className="border-b border-admin-border last:border-b-0 transition-colors duration-200 ease-in-out hover:bg-[#faf9f7]">
+                          <td className="p-[15px_20px] text-sm text-admin-text font-medium">
+                            <code className="bg-stone-100 py-1 px-[10px] rounded-md font-mono text-[13px] text-admin-text font-bold">
                               {session.code}
                             </code>
                           </td>
-                          <td className="p-[15px_20px] text-sm text-[#374151]">
+                          <td className="p-[15px_20px] text-sm text-admin-text">
                             <span className={`inline-block py-1 px-3 rounded-xl text-xs font-bold uppercase tracking-[0.5px] ${getStatusBadgeClass(session.status)}`}>
                               {session.status}
                             </span>
                           </td>
-                          <td className="p-[15px_20px] text-sm text-[#374151] font-semibold text-center">{session.studentCount}</td>
-                          <td className="p-[15px_20px] text-sm text-[#374151] font-semibold text-center">{session.activeStudents24h}</td>
-                          <td className="p-[15px_20px] text-sm text-[#374151]">{formatDate(session.validityEnd)}</td>
-                          <td className="p-[15px_20px] text-sm text-[#374151]">{formatDate(session.createdAt)}</td>
+                          <td className="p-[15px_20px] text-sm text-admin-text font-semibold text-center">{session.studentCount}</td>
+                          <td className="p-[15px_20px] text-sm text-admin-text font-semibold text-center">{session.activeStudents24h}</td>
+                          <td className="p-[15px_20px] text-sm text-admin-text">{formatDate(session.validityEnd)}</td>
+                          <td className="p-[15px_20px] text-sm text-admin-text">{formatDate(session.createdAt)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -282,12 +282,12 @@ export default function AdminDashboard() {
 
             {/* Welcome Message */}
             {stats.totalSessions === 0 && (
-              <div className="bg-[linear-gradient(135deg,#e0f9fa_0%,#d1f4f6_100%)] border-2 border-admin-primary rounded-xl py-[50px] px-10 text-center mt-10 max-tablet:py-[30px] max-tablet:px-5">
-                <h2 className="text-[28px] text-admin-primary-dark m-0 mb-[15px] max-tablet:text-[22px]">Welcome to Binary Coven Admin</h2>
-                <p className="text-base text-[#374151] m-0 mb-[25px] max-tablet:text-sm">Get started by creating your first session code!</p>
+              <div className="bg-admin-accent-light border border-admin-accent rounded-xl py-[50px] px-10 text-center mt-10 max-tablet:py-[30px] max-tablet:px-5">
+                <h2 className="text-[28px] text-admin-accent-hover m-0 mb-[15px] max-tablet:text-[22px]">Welcome to Binary Coven Admin</h2>
+                <p className="text-base text-admin-text m-0 mb-[25px] max-tablet:text-sm">Get started by creating your first session code!</p>
                 <Link
                   href="/admin/sessions"
-                  className="inline-block bg-admin-primary-gradient text-white py-[14px] px-7 rounded-lg no-underline text-[15px] font-bold transition-all duration-300 ease-in-out shadow-[0_2px_8px_rgba(14,195,201,0.3)] hover:bg-admin-primary-gradient-hover hover:shadow-[0_4px_12px_rgba(14,195,201,0.4)] hover:-translate-y-[2px]"
+                  className="inline-block bg-admin-accent text-white py-[14px] px-7 rounded-lg no-underline text-[15px] font-bold transition-colors duration-200 hover:bg-admin-accent-hover"
                 >
                   Create Session Code
                 </Link>

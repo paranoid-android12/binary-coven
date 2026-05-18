@@ -3,6 +3,11 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getSupabaseAdminClient } from '@/lib/supabase/server'
 import { requireAdmin } from '@/lib/auth/adminAuth'
 
+type QuestProgressEntry = {
+  questId: string
+  state: string
+}
+
 type StudentInfo = {
   id: string
   username: string
@@ -14,6 +19,7 @@ type StudentInfo = {
   totalTimeSpentSeconds: number
   totalCodeExecutions: number
   lastSaveTime: string | null
+  questProgress: QuestProgressEntry[]
 }
 
 type StudentsResponse = {
@@ -95,6 +101,25 @@ export default async function handler(
       })
     }
 
+    // Batch fetch quest progress for all students in this session
+    const studentIds = students.map((s) => s.student_profile_id)
+    const questProgressMap = new Map<string, QuestProgressEntry[]>()
+
+    if (studentIds.length > 0) {
+      const { data: progressData, error: progressError } = await supabase
+        .from('quest_progress')
+        .select('student_profile_id, quest_id, state')
+        .in('student_profile_id', studentIds)
+
+      if (!progressError && progressData) {
+        for (const row of progressData) {
+          const existing = questProgressMap.get(row.student_profile_id) || []
+          existing.push({ questId: row.quest_id, state: row.state })
+          questProgressMap.set(row.student_profile_id, existing)
+        }
+      }
+    }
+
     const formattedStudents: StudentInfo[] = students.map((student) => ({
       id: student.student_profile_id,
       username: student.username,
@@ -106,6 +131,7 @@ export default async function handler(
       totalTimeSpentSeconds: student.total_time_spent_seconds || 0,
       totalCodeExecutions: student.total_code_executions || 0,
       lastSaveTime: student.last_save_time,
+      questProgress: questProgressMap.get(student.student_profile_id) || [],
     }))
 
     return res.status(200).json({

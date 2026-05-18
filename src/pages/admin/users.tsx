@@ -155,7 +155,7 @@ export default function UsersPage() {
   if (isLoading || loading) {
     return (
       <AdminLayout>
-        <div className="flex flex-col items-center justify-center py-20 px-5 text-gray-500 before:content-[''] before:w-[50px] before:h-[50px] before:border-4 before:border-gray-200 before:border-t-admin-primary before:rounded-full before:animate-spin-slow before:mb-5">
+        <div className="flex flex-col items-center justify-center py-20 px-5 text-gray-500 before:content-[''] before:w-[50px] before:h-[50px] before:border-4 before:border-gray-200 before:border-t-admin-accent before:rounded-full before:animate-spin-slow before:mb-5">
           Loading admin users...
         </div>
       </AdminLayout>
@@ -165,7 +165,7 @@ export default function UsersPage() {
   if (error) {
     return (
       <AdminLayout>
-        <div className="bg-red-50 border border-red-200 rounded-xl p-[30px] text-center text-red-600 text-base">{error}</div>
+        <div className="bg-red-50 border border-red-200 rounded-xl p-[30px] text-center text-[#b91c1c] text-base">{error}</div>
       </AdminLayout>
     );
   }
@@ -174,9 +174,9 @@ export default function UsersPage() {
     <AdminLayout>
       <div className="max-w-[1400px] mx-auto">
         <div className="flex justify-between items-center mb-[30px] max-tablet:flex-col max-tablet:items-start max-tablet:gap-[15px]">
-          <h1 className="text-[28px] font-bold text-admin-dark m-0">Admin User Management</h1>
+          <h1 className="text-[28px] font-bold text-admin-text m-0">Admin User Management</h1>
           <button
-            className="flex items-center gap-2 py-3 px-6 bg-admin-primary-gradient text-white border-none rounded-lg text-[15px] font-bold font-pixel cursor-pointer transition-all duration-300 shadow-[0_2px_8px_rgba(14,195,201,0.3)] hover:bg-admin-primary-gradient-hover hover:shadow-[0_4px_12px_rgba(14,195,201,0.4)] hover:-translate-y-0.5 max-tablet:w-full max-tablet:justify-center"
+            className="flex items-center gap-2 py-3 px-6 bg-admin-accent text-white border-none rounded-lg text-[15px] font-bold cursor-pointer transition-all duration-300 hover:bg-admin-accent-hover max-tablet:w-full max-tablet:justify-center"
             onClick={() => setShowCreateModal(true)}
           >
             + Create Admin
@@ -184,25 +184,25 @@ export default function UsersPage() {
         </div>
 
         <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-5 mb-10">
-          <div className="bg-white border border-gray-200 rounded-xl p-[25px] transition-all duration-300 shadow-sm hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] max-tablet:grid-cols-1">
-            <div className="text-sm text-gray-500 m-0 mb-[5px] font-medium">Total Admins</div>
-            <div className="text-[32px] font-bold text-admin-primary m-0">{adminUsers.length}</div>
+          <div className="bg-admin-card border border-admin-border rounded-xl p-[25px] transition-all duration-300 shadow-sm hover:border-admin-border-hover max-tablet:grid-cols-1">
+            <div className="text-sm text-admin-text-muted m-0 mb-[5px] font-medium">Total Admins</div>
+            <div className="text-[32px] font-bold text-admin-accent m-0">{adminUsers.length}</div>
           </div>
-          <div className="bg-white border border-gray-200 rounded-xl p-[25px] transition-all duration-300 shadow-sm hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
-            <div className="text-sm text-gray-500 m-0 mb-[5px] font-medium">Active Admins</div>
-            <div className="text-[32px] font-bold text-admin-primary m-0">
+          <div className="bg-admin-card border border-admin-border rounded-xl p-[25px] transition-all duration-300 shadow-sm hover:border-admin-border-hover">
+            <div className="text-sm text-admin-text-muted m-0 mb-[5px] font-medium">Active Admins</div>
+            <div className="text-[32px] font-bold text-admin-accent m-0">
               {adminUsers.filter((a) => a.is_active).length}
             </div>
           </div>
-          <div className="bg-white border border-gray-200 rounded-xl p-[25px] transition-all duration-300 shadow-sm hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
-            <div className="text-sm text-gray-500 m-0 mb-[5px] font-medium">Super Admins</div>
-            <div className="text-[32px] font-bold text-admin-primary m-0">
+          <div className="bg-admin-card border border-admin-border rounded-xl p-[25px] transition-all duration-300 shadow-sm hover:border-admin-border-hover">
+            <div className="text-sm text-admin-text-muted m-0 mb-[5px] font-medium">Super Admins</div>
+            <div className="text-[32px] font-bold text-admin-accent m-0">
               {adminUsers.filter((a) => a.role === 'super_admin').length}
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm max-tablet:overflow-x-auto">
+        <div className="bg-admin-card border border-admin-border rounded-xl overflow-hidden shadow-sm max-tablet:overflow-x-auto">
           <table className="w-full border-collapse max-tablet:min-w-[800px]">
             <thead className="bg-gray-50 border-b-2 border-gray-200">
               <tr>
@@ -218,15 +218,15 @@ export default function UsersPage() {
             <tbody>
               {adminUsers.map((admin) => (
                 <tr key={admin.id} className="border-b border-gray-200 last:border-b-0 transition-colors duration-200 hover:bg-gray-50">
-                  <td className="py-[15px] px-5 text-sm text-gray-700 font-semibold text-admin-primary">{admin.username}</td>
+                  <td className="py-[15px] px-5 text-sm font-semibold text-admin-accent">{admin.username}</td>
                   <td className="py-[15px] px-5 text-sm text-gray-700">{admin.email || '—'}</td>
                   <td className="py-[15px] px-5 text-sm text-gray-700">
-                    <span className={`inline-block py-1 px-3 rounded-xl text-xs font-bold uppercase tracking-wider ${admin.role === 'super_admin' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-500'}`}>
+                    <span className={`inline-block py-1 px-3 rounded-xl text-xs font-bold uppercase tracking-wider ${admin.role === 'super_admin' ? 'bg-red-50 text-[#b91c1c]' : 'bg-slate-100 text-[#475569]'}`}>
                       {admin.role === 'super_admin' ? 'Super Admin' : 'Admin'}
                     </span>
                   </td>
                   <td className="py-[15px] px-5 text-sm text-gray-700">
-                    <span className={`inline-block py-1 px-3 rounded-xl text-xs font-bold uppercase tracking-wider ${admin.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
+                    <span className={`inline-block py-1 px-3 rounded-xl text-xs font-bold uppercase tracking-wider ${admin.is_active ? 'bg-lime-50 text-[#4d7c0f]' : 'bg-stone-100 text-stone-500'}`}>
                       {admin.is_active ? 'Active' : 'Archived'}
                     </span>
                   </td>
@@ -235,7 +235,7 @@ export default function UsersPage() {
                   <td className="py-[15px] px-5 text-sm text-gray-700">
                     {user && admin.id !== user.id && (
                       <button
-                        className={`py-2 px-4 rounded-md text-sm font-semibold font-pixel border-2 border-transparent cursor-pointer transition-all duration-300 ${admin.is_active ? 'bg-red-100 text-red-600 border-red-200 hover:bg-red-600 hover:text-white hover:border-red-600' : 'bg-emerald-100 text-emerald-700 border-green-200 hover:bg-emerald-500 hover:text-white hover:border-emerald-500'}`}
+                        className={`py-2 px-4 rounded-md text-sm font-semibold border-2 border-transparent cursor-pointer transition-all duration-300 ${admin.is_active ? 'bg-red-50 text-[#b91c1c] border-red-200 hover:bg-red-100 hover:border-red-300' : 'bg-lime-50 text-[#4d7c0f] border-green-200 hover:bg-lime-100 hover:border-green-300'}`}
                         onClick={() => handleArchiveToggle(admin.id, admin.is_active)}
                       >
                         {admin.is_active ? 'Archive' : 'Activate'}
@@ -252,7 +252,7 @@ export default function UsersPage() {
           <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/70 flex items-center justify-center z-[1000] p-5 backdrop-blur-sm" onClick={() => { setShowCreateModal(false); setPasswordTouched(false); setFormData({ username: '', password: '', email: '', role: 'admin' }); setFormError(''); }}>
             <div className="bg-white rounded-2xl w-full max-w-[500px] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.3)] animate-[modalSlideIn_0.3s_ease] max-tablet:max-w-full max-tablet:m-0" onClick={(e) => e.stopPropagation()}>
               <div className="flex justify-between items-center p-6 border-b-2 border-gray-200 max-tablet:p-5">
-                <h2 className="text-2xl font-bold text-admin-dark m-0 font-pixel max-tablet:text-xl">Create Admin User</h2>
+                <h2 className="text-2xl font-bold text-admin-text m-0 max-tablet:text-xl">Create Admin User</h2>
                 <button
                   className="bg-gray-100 border-none text-[28px] text-gray-500 cursor-pointer p-0 w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-300 leading-none hover:bg-gray-200 hover:text-gray-700"
                   onClick={() => { setShowCreateModal(false); setPasswordTouched(false); setFormData({ username: '', password: '', email: '', role: 'admin' }); setFormError(''); }}
@@ -263,7 +263,7 @@ export default function UsersPage() {
 
               <form onSubmit={handleCreateAdmin} className="p-6 max-tablet:p-5">
                 <div className="mb-5">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 font-pixel">Username</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Username</label>
                   <input
                     type="text"
                     value={formData.username}
@@ -271,12 +271,12 @@ export default function UsersPage() {
                     placeholder="Enter username"
                     required
                     autoFocus
-                    className="w-full py-3 px-3 border-2 border-gray-200 rounded-lg text-sm font-pixel bg-white text-admin-dark transition-all duration-300 box-border placeholder:text-gray-400 focus:outline-none focus:border-admin-primary focus:shadow-[0_0_0_3px_rgba(14,195,201,0.1)]"
+                    className="w-full py-3 px-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-admin-text transition-all duration-300 box-border placeholder:text-gray-400 focus:outline-none focus:border-admin-accent focus:shadow-[0_0_0_3px_rgba(180,83,9,0.1)]"
                   />
                 </div>
 
                 <div className="mb-5">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 font-pixel">Password</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
@@ -288,7 +288,7 @@ export default function UsersPage() {
                       onBlur={() => setPasswordTouched(true)}
                       placeholder="Enter password"
                       required
-                      className="w-full py-3 px-3 pr-10 border-2 border-gray-200 rounded-lg text-sm font-pixel bg-white text-admin-dark transition-all duration-300 box-border placeholder:text-gray-400 focus:outline-none focus:border-admin-primary focus:shadow-[0_0_0_3px_rgba(14,195,201,0.1)]"
+                      className="w-full py-3 px-3 pr-10 border-2 border-gray-200 rounded-lg text-sm bg-white text-admin-text transition-all duration-300 box-border placeholder:text-gray-400 focus:outline-none focus:border-admin-accent focus:shadow-[0_0_0_3px_rgba(180,83,9,0.1)]"
                     />
                     <button
                       type="button"
@@ -318,22 +318,22 @@ export default function UsersPage() {
                 </div>
 
                 <div className="mb-5">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 font-pixel">Email (optional)</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Email (optional)</label>
                   <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="Enter email address"
-                    className="w-full py-3 px-3 border-2 border-gray-200 rounded-lg text-sm font-pixel bg-white text-admin-dark transition-all duration-300 box-border placeholder:text-gray-400 focus:outline-none focus:border-admin-primary focus:shadow-[0_0_0_3px_rgba(14,195,201,0.1)]"
+                    className="w-full py-3 px-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-admin-text transition-all duration-300 box-border placeholder:text-gray-400 focus:outline-none focus:border-admin-accent focus:shadow-[0_0_0_3px_rgba(180,83,9,0.1)]"
                   />
                 </div>
 
                 <div className="mb-5">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 font-pixel">Role</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Role</label>
                   <select
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value as 'super_admin' | 'admin' })}
-                    className="w-full py-3 px-3 border-2 border-gray-200 rounded-lg text-sm font-pixel bg-white text-admin-dark transition-all duration-300 box-border focus:outline-none focus:border-admin-primary focus:shadow-[0_0_0_3px_rgba(14,195,201,0.1)]"
+                    className="w-full py-3 px-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-admin-text transition-all duration-300 box-border focus:outline-none focus:border-admin-accent focus:shadow-[0_0_0_3px_rgba(180,83,9,0.1)]"
                   >
                     <option value="admin">Admin</option>
                     <option value="super_admin">Super Admin</option>
@@ -345,7 +345,7 @@ export default function UsersPage() {
                 <div className="flex gap-3 justify-end max-tablet:flex-col">
                   <button
                     type="button"
-                    className="py-3 px-6 rounded-lg text-[15px] font-bold font-pixel border-none cursor-pointer transition-all duration-300 bg-gray-100 text-gray-500 border-2 border-gray-200 hover:bg-gray-200 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed max-tablet:w-full"
+                    className="py-3 px-6 rounded-lg text-[15px] font-bold border-2 border-admin-border cursor-pointer transition-all duration-300 bg-white text-gray-500 hover:bg-gray-50 hover:border-admin-border-hover hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed max-tablet:w-full"
                     onClick={() => { setShowCreateModal(false); setPasswordTouched(false); setFormData({ username: '', password: '', email: '', role: 'admin' }); setFormError(''); }}
                     disabled={submitting}
                   >
@@ -353,7 +353,7 @@ export default function UsersPage() {
                   </button>
                   <button
                     type="submit"
-                    className="py-3 px-6 rounded-lg text-[15px] font-bold font-pixel border-none cursor-pointer transition-all duration-300 bg-admin-primary-gradient text-white shadow-[0_2px_8px_rgba(14,195,201,0.3)] hover:bg-admin-primary-gradient-hover hover:shadow-[0_4px_12px_rgba(14,195,201,0.4)] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed max-tablet:w-full"
+                    className="py-3 px-6 rounded-lg text-[15px] font-bold border-none cursor-pointer transition-all duration-300 bg-admin-accent text-white hover:bg-admin-accent-hover disabled:opacity-50 disabled:cursor-not-allowed max-tablet:w-full"
                     disabled={submitting}
                   >
                     {submitting ? 'Creating...' : 'Create Admin'}

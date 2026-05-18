@@ -27,7 +27,7 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
   const [maxStudents, setMaxStudents] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   // Quest selection state
   const [availableQuests, setAvailableQuests] = useState<QuestMetadata[]>([]);
   const [selectedQuests, setSelectedQuests] = useState<Set<string>>(new Set());
@@ -40,8 +40,8 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
   const categories = ['all', ...Array.from(new Set(availableQuests.map(q => q.category))).sort()];
 
   // Filter quests by selected category
-  const filteredQuests = selectedCategory === 'all' 
-    ? availableQuests 
+  const filteredQuests = selectedCategory === 'all'
+    ? availableQuests
     : availableQuests.filter(q => q.category === selectedCategory);
 
   // Load available quests function wrapped in useCallback
@@ -53,7 +53,7 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
         throw new Error('Failed to load quests');
       }
       const data = await response.json();
-      
+
       if (data.success && data.quests) {
         setAvailableQuests(data.quests);
         // By default, select all quests
@@ -200,9 +200,9 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
     <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/70 flex items-center justify-center z-[2000] p-5 animate-[fadeIn_0.2s_ease]" onClick={handleClose}>
       <div className="bg-white rounded-xl w-full max-w-[650px] max-h-[90vh] overflow-y-auto shadow-[0_10px_40px_rgba(0,0,0,0.3)] animate-[slideUp_0.3s_ease]" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between py-[25px] px-[30px] border-b border-gray-200 max-tablet:p-5">
-          <h2 className="text-[22px] font-bold text-admin-dark m-0 max-tablet:text-xl">Create New Session Code</h2>
+          <h2 className="text-[22px] font-bold text-admin-text m-0 max-tablet:text-xl">Create New Session Code</h2>
           <button
-            className="bg-none border-none text-[32px] text-gray-500 cursor-pointer p-0 w-8 h-8 flex items-center justify-center rounded-md transition-all duration-200 hover:bg-gray-100 hover:text-admin-dark disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-none border-none text-[32px] text-gray-500 cursor-pointer p-0 w-8 h-8 flex items-center justify-center rounded-md transition-all duration-200 hover:bg-gray-100 hover:text-admin-text disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={handleClose}
             disabled={loading}
           >
@@ -220,7 +220,7 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
               id="customCode"
               value={customCode}
               onChange={(e) => setCustomCode(e.target.value.toUpperCase())}
-              className="w-full py-3 px-4 border-2 border-gray-200 rounded-lg text-[15px] font-pixel text-admin-dark transition-all duration-300 box-border placeholder:text-gray-400 focus:outline-none focus:border-admin-primary focus:shadow-[0_0_0_3px_rgba(14,195,201,0.1)] disabled:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full py-3 px-4 border-2 border-gray-200 rounded-lg text-[15px] text-admin-text transition-all duration-300 box-border placeholder:text-gray-400 focus:outline-none focus:border-admin-accent focus:shadow-[0_0_0_3px_rgba(180,83,9,0.1)] disabled:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
               placeholder="Leave empty to auto-generate"
               disabled={loading}
               maxLength={20}
@@ -237,7 +237,7 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
                 type="number"
                 value={durationValue}
                 onChange={(e) => setDurationValue(e.target.value)}
-                className="flex-1 py-3 px-4 border-2 border-gray-200 rounded-lg text-[15px] font-pixel text-admin-dark transition-all duration-300 focus:outline-none focus:border-admin-primary focus:shadow-[0_0_0_3px_rgba(14,195,201,0.1)] disabled:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex-1 py-3 px-4 border-2 border-gray-200 rounded-lg text-[15px] text-admin-text transition-all duration-300 focus:outline-none focus:border-admin-accent focus:shadow-[0_0_0_3px_rgba(180,83,9,0.1)] disabled:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
                 min="1"
                 max={durationType === 'hours' ? '720' : '30'}
                 required
@@ -246,7 +246,7 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
               <select
                 value={durationType}
                 onChange={(e) => setDurationType(e.target.value as 'hours' | 'days')}
-                className="py-3 px-4 border-2 border-gray-200 rounded-lg text-[15px] font-pixel text-admin-dark bg-white cursor-pointer transition-all duration-300 min-w-[120px] focus:outline-none focus:border-admin-primary focus:shadow-[0_0_0_3px_rgba(14,195,201,0.1)] disabled:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                className="py-3 px-4 border-2 border-gray-200 rounded-lg text-[15px] text-admin-text bg-white cursor-pointer transition-all duration-300 min-w-[120px] focus:outline-none focus:border-admin-accent focus:shadow-[0_0_0_3px_rgba(180,83,9,0.1)] disabled:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
                 disabled={loading}
               >
                 <option value="hours">Hours</option>
@@ -267,7 +267,7 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
               id="maxStudents"
               value={maxStudents}
               onChange={(e) => setMaxStudents(e.target.value)}
-              className="w-full py-3 px-4 border-2 border-gray-200 rounded-lg text-[15px] font-pixel text-admin-dark transition-all duration-300 box-border placeholder:text-gray-400 focus:outline-none focus:border-admin-primary focus:shadow-[0_0_0_3px_rgba(14,195,201,0.1)] disabled:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full py-3 px-4 border-2 border-gray-200 rounded-lg text-[15px] text-admin-text transition-all duration-300 box-border placeholder:text-gray-400 focus:outline-none focus:border-admin-accent focus:shadow-[0_0_0_3px_rgba(180,83,9,0.1)] disabled:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
               placeholder="Unlimited"
               min="1"
               disabled={loading}
@@ -279,7 +279,7 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
 
           {/* Quest Selection Section */}
           <div className="mb-[25px]">
-            <div 
+            <div
               className="flex items-center justify-between cursor-pointer mb-2"
               onClick={() => setQuestsExpanded(!questsExpanded)}
             >
@@ -290,7 +290,7 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
                 {questsExpanded ? '▼' : '▶'}
               </span>
             </div>
-            
+
             {questsExpanded && (
               <>
                 {/* Category Filter */}
@@ -302,7 +302,7 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
                       onClick={() => setSelectedCategory(category)}
                       className={`py-1 px-2.5 text-xs rounded-full transition-colors ${
                         selectedCategory === category
-                          ? 'bg-admin-primary text-white'
+                          ? 'bg-admin-accent text-white'
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                       disabled={loading}
@@ -344,7 +344,7 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
                         key={quest.id}
                         className={`flex items-start gap-3 p-3 cursor-pointer hover:bg-gray-50 transition-colors ${
                           index !== filteredQuests.length - 1 ? 'border-b border-gray-100' : ''
-                        } ${selectedQuests.has(quest.id) ? 'bg-cyan-50' : ''}`}
+                        } ${selectedQuests.has(quest.id) ? 'bg-amber-50' : ''}`}
                         onClick={() => !loading && handleToggleQuest(quest.id)}
                       >
                         <input
@@ -355,7 +355,7 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
                             e.stopPropagation();
                             if (!loading) handleToggleQuest(quest.id);
                           }}
-                          className="mt-1 w-4 h-4 accent-admin-primary cursor-pointer"
+                          className="mt-1 w-4 h-4 accent-[#b45309] cursor-pointer"
                           disabled={loading}
                         />
                         <div className="flex-1 min-w-0">
@@ -407,7 +407,7 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
                 )}
 
                 <p className="text-[13px] text-gray-500 mt-1.5 mb-0 italic">
-                  {selectedQuests.size === availableQuests.length 
+                  {selectedQuests.size === availableQuests.length
                     ? 'All quests will be available to students'
                     : `Only ${selectedQuests.size} selected quest(s) will be available`}
                 </p>
@@ -423,7 +423,7 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
                   Enforce Quest Prerequisites
                 </label>
                 <p className="text-[13px] text-gray-500 mt-1 mb-0">
-                  {enforcePrerequisites 
+                  {enforcePrerequisites
                     ? 'Students must complete prerequisites before starting dependent quests'
                     : 'All selected quests are immediately available (recommended for custom sessions)'}
                 </p>
@@ -432,8 +432,8 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
                 type="button"
                 onClick={() => setEnforcePrerequisites(!enforcePrerequisites)}
                 disabled={loading}
-                className={`relative w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-admin-primary focus:ring-offset-2 ${
-                  enforcePrerequisites ? 'bg-admin-primary' : 'bg-gray-300'
+                className={`relative w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#b45309] focus:ring-offset-2 ${
+                  enforcePrerequisites ? 'bg-admin-accent' : 'bg-gray-300'
                 } disabled:opacity-60 disabled:cursor-not-allowed`}
               >
                 <span
@@ -455,14 +455,14 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
             <button
               type="button"
               onClick={handleClose}
-              className="py-3 px-6 border-2 border-gray-200 bg-white text-gray-700 rounded-lg text-[15px] font-semibold font-pixel cursor-pointer transition-all duration-300 hover:border-gray-300 hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed max-tablet:w-full"
+              className="py-3 px-6 border-2 border-admin-border bg-white text-gray-700 rounded-lg text-[15px] font-semibold cursor-pointer transition-all duration-300 hover:border-admin-border-hover hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed max-tablet:w-full"
               disabled={loading}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="py-3 px-6 bg-admin-primary-gradient text-white border-none rounded-lg text-[15px] font-semibold font-pixel cursor-pointer transition-all duration-300 hover:bg-admin-primary-gradient-hover hover:shadow-[0_4px_12px_rgba(14,195,201,0.3)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none max-tablet:w-full"
+              className="py-3 px-6 bg-admin-accent text-white border-none rounded-lg text-[15px] font-semibold cursor-pointer transition-all duration-300 hover:bg-admin-accent-hover active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none max-tablet:w-full"
               disabled={isSubmitDisabled}
             >
               {loading ? 'Creating...' : loadingQuests ? 'Loading Quests...' : 'Create Session Code'}

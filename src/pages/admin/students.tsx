@@ -3,6 +3,8 @@ import AdminLayout from '../../components/admin/AdminLayout';
 import Link from 'next/link';
 import { Users, Target, Clock, Play, Zap, Award, Search, ChevronDown } from 'lucide-react';
 import { adminFetch } from '../../utils/adminFetch';
+import StudentProgressCard from '../../components/admin/StudentProgressCard';
+import type { Quest } from '../../types/quest';
 
 interface Student {
   id: string;
@@ -17,6 +19,7 @@ interface Student {
   totalTimeSpentSeconds: number;
   totalCodeExecutions: number;
   lastSaveTime: string | null;
+  questProgress: { questId: string; state: string }[];
 }
 
 interface SessionCode {
@@ -36,6 +39,7 @@ export default function StudentsPage() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [questDefinitions, setQuestDefinitions] = useState<Quest[]>([]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -50,7 +54,20 @@ export default function StudentsPage() {
 
   useEffect(() => {
     fetchAllStudents();
+    fetchQuestDefinitions();
   }, []);
+
+  const fetchQuestDefinitions = async () => {
+    try {
+      const res = await adminFetch('/api/quests/definitions');
+      const data = await res.json();
+      if (data.success) {
+        setQuestDefinitions(data.quests as Quest[]);
+      }
+    } catch {
+      // Silently skip — mastery badges will not appear
+    }
+  };
 
   useEffect(() => {
     filterAndSortStudents();
@@ -224,8 +241,8 @@ export default function StudentsPage() {
         {/* Header */}
         <div className="mb-8">
           <div>
-            <h1 className="text-[28px] font-bold text-admin-dark m-0 mb-[10px] max-tablet:text-[24px]">All Students</h1>
-            <p className="text-[15px] text-[#6b7280] m-0">
+            <h1 className="text-[28px] font-bold text-admin-text m-0 mb-[10px] max-tablet:text-[24px]">All Students</h1>
+            <p className="text-[15px] text-admin-text-muted m-0">
               Manage and view student progress across all sessions
             </p>
           </div>
@@ -233,39 +250,39 @@ export default function StudentsPage() {
 
         {/* Summary Stats */}
         <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5 mb-8 max-laptop:grid-cols-3 max-tablet:grid-cols-2">
-          <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 flex items-center gap-4 transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
-            <Users className="text-admin-primary flex-shrink-0" size={18} />
+          <div className="bg-admin-card border border-admin-border rounded-xl p-5 flex items-center gap-4 transition-colors duration-200 hover:border-admin-border-hover">
+            <Users className="text-admin-accent flex-shrink-0" size={18} />
             <div className="flex-1">
-              <div className="text-[24px] font-bold text-[#1a1a2e] m-0 mb-[2px]">{stats.totalStudents}</div>
-              <div className="text-xs text-[#6b7280] m-0 font-medium">Total Students</div>
+              <div className="text-[24px] font-bold text-admin-text m-0 mb-[2px]">{stats.totalStudents}</div>
+              <div className="text-xs text-admin-text-muted m-0 font-medium">Total Students</div>
             </div>
           </div>
-          <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 flex items-center gap-4 transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
-            <Target className="text-admin-primary flex-shrink-0" size={18} />
+          <div className="bg-admin-card border border-admin-border rounded-xl p-5 flex items-center gap-4 transition-colors duration-200 hover:border-admin-border-hover">
+            <Target className="text-admin-accent flex-shrink-0" size={18} />
             <div className="flex-1">
-              <div className="text-[24px] font-bold text-[#1a1a2e] m-0 mb-[2px]">{stats.totalQuests}</div>
-              <div className="text-xs text-[#6b7280] m-0 font-medium">Quests Completed</div>
+              <div className="text-[24px] font-bold text-admin-text m-0 mb-[2px]">{stats.totalQuests}</div>
+              <div className="text-xs text-admin-text-muted m-0 font-medium">Quests Completed</div>
             </div>
           </div>
-          <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 flex items-center gap-4 transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
-            <Clock className="text-admin-primary flex-shrink-0" size={18} />
+          <div className="bg-admin-card border border-admin-border rounded-xl p-5 flex items-center gap-4 transition-colors duration-200 hover:border-admin-border-hover">
+            <Clock className="text-admin-accent flex-shrink-0" size={18} />
             <div className="flex-1">
-              <div className="text-[24px] font-bold text-[#1a1a2e] m-0 mb-[2px]">{formatTime(stats.totalTime)}</div>
-              <div className="text-xs text-[#6b7280] m-0 font-medium">Total Time</div>
+              <div className="text-[24px] font-bold text-admin-text m-0 mb-[2px]">{formatTime(stats.totalTime)}</div>
+              <div className="text-xs text-admin-text-muted m-0 font-medium">Total Time</div>
             </div>
           </div>
-          <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 flex items-center gap-4 transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
-            <Play className="text-admin-primary flex-shrink-0" size={18} />
+          <div className="bg-admin-card border border-admin-border rounded-xl p-5 flex items-center gap-4 transition-colors duration-200 hover:border-admin-border-hover">
+            <Play className="text-admin-accent flex-shrink-0" size={18} />
             <div className="flex-1">
-              <div className="text-[24px] font-bold text-[#1a1a2e] m-0 mb-[2px]">{stats.totalExecutions}</div>
-              <div className="text-xs text-[#6b7280] m-0 font-medium">Code Executions</div>
+              <div className="text-[24px] font-bold text-admin-text m-0 mb-[2px]">{stats.totalExecutions}</div>
+              <div className="text-xs text-admin-text-muted m-0 font-medium">Code Executions</div>
             </div>
           </div>
-          <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 flex items-center gap-4 transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:-translate-y-[2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
-            <Zap className="text-admin-primary flex-shrink-0" size={18} />
+          <div className="bg-admin-card border border-admin-border rounded-xl p-5 flex items-center gap-4 transition-colors duration-200 hover:border-admin-border-hover">
+            <Zap className="text-admin-accent flex-shrink-0" size={18} />
             <div className="flex-1">
-              <div className="text-[24px] font-bold text-[#1a1a2e] m-0 mb-[2px]">{stats.activeToday}</div>
-              <div className="text-xs text-[#6b7280] m-0 font-medium">Active Today</div>
+              <div className="text-[24px] font-bold text-admin-text m-0 mb-[2px]">{stats.activeToday}</div>
+              <div className="text-xs text-admin-text-muted m-0 font-medium">Active Today</div>
             </div>
           </div>
         </div>
@@ -273,13 +290,13 @@ export default function StudentsPage() {
         {/* Filters */}
         <div className="flex gap-[15px] mb-8 max-tablet:flex-col">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9ca3af] pointer-events-none" size={16} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-admin-text-faint pointer-events-none" size={16} />
             <input
               type="text"
               placeholder="Search by username or display name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full p-[12px_16px] pl-10 border border-[#d1d5db] rounded-lg text-sm text-[#374151] transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-admin-primary focus:border-transparent"
+              className="w-full p-[12px_16px] pl-10 border border-admin-border rounded-lg text-sm text-admin-text transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-admin-accent focus:border-transparent"
             />
           </div>
 
@@ -287,19 +304,19 @@ export default function StudentsPage() {
             <button
               type="button"
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="p-[12px_16px] pr-10 border border-[#d1d5db] rounded-lg text-sm text-[#374151] bg-white transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-admin-primary focus:border-transparent cursor-pointer max-tablet:w-full min-w-[180px] text-left relative"
+              className="p-[12px_16px] pr-10 border border-admin-border rounded-lg text-sm text-admin-text bg-admin-card transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-admin-accent focus:border-transparent cursor-pointer max-tablet:w-full min-w-[180px] text-left relative"
             >
               {sessionFilter === 'all' ? 'All Sessions' : sessionFilter}
-              <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 text-[#9ca3af] transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} size={16} />
+              <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 text-admin-text-faint transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} size={16} />
             </button>
             {dropdownOpen && (
-              <div className="absolute top-full left-0 mt-1 w-full bg-white border border-[#e5e7eb] rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.1)] z-50 overflow-hidden">
+              <div className="absolute top-full left-0 mt-1 w-full bg-admin-card border border-admin-border rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.08)] z-50 overflow-hidden">
                 <div className="max-h-[240px] overflow-y-auto">
                   <button
                     type="button"
                     onClick={() => { setSessionFilter('all'); setDropdownOpen(false); }}
-                    className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer transition-colors duration-150 border-none font-[family-name:var(--font-family-admin)] ${
-                      sessionFilter === 'all' ? 'bg-admin-primary/10 text-admin-primary font-semibold' : 'text-[#374151] hover:bg-[#f9fafb]'
+                    className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer transition-colors duration-150 border-none ${
+                      sessionFilter === 'all' ? 'bg-amber-50 text-admin-accent font-semibold' : 'text-admin-text hover:bg-stone-50'
                     }`}
                   >
                     All Sessions
@@ -309,8 +326,8 @@ export default function StudentsPage() {
                       key={session.id}
                       type="button"
                       onClick={() => { setSessionFilter(session.code); setDropdownOpen(false); }}
-                      className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer transition-colors duration-150 border-none font-[family-name:var(--font-family-admin)] ${
-                        sessionFilter === session.code ? 'bg-admin-primary/10 text-admin-primary font-semibold' : 'text-[#374151] hover:bg-[#f9fafb]'
+                      className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer transition-colors duration-150 border-none ${
+                        sessionFilter === session.code ? 'bg-amber-50 text-admin-accent font-semibold' : 'text-admin-text hover:bg-stone-50'
                       }`}
                     >
                       {session.code}
@@ -324,17 +341,17 @@ export default function StudentsPage() {
 
         {/* Loading State */}
         {loading && (
-          <div className="flex flex-col items-center justify-center py-[60px] px-5 text-[#6b7280]">
-            <div className="w-[50px] h-[50px] border-4 border-[#e5e7eb] border-t-admin-primary rounded-full animate-spin-slow mb-5"></div>
+          <div className="flex flex-col items-center justify-center py-[60px] px-5 text-admin-text-muted">
+            <div className="w-[50px] h-[50px] border-4 border-admin-border border-t-admin-accent rounded-full animate-spin-slow mb-5"></div>
             <p>Loading students...</p>
           </div>
         )}
 
         {/* Error State */}
         {error && (
-          <div className="bg-[#fef2f2] border border-[#fecaca] rounded-xl p-[30px] text-center text-[#dc2626]">
+          <div className="bg-red-50 border border-red-200 rounded-xl p-[30px] text-center text-[#b91c1c]">
             <p className="m-0 mb-[15px] text-base">{error}</p>
-            <button onClick={fetchAllStudents} className="bg-[#dc2626] text-white border-none py-[10px] px-5 rounded-lg text-sm font-[family-name:var(--font-family-admin)] cursor-pointer transition-colors duration-300 ease-in-out hover:bg-[#b91c1c]">
+            <button onClick={fetchAllStudents} className="bg-[#b91c1c] text-white border-none py-[10px] px-5 rounded-lg text-sm cursor-pointer transition-colors duration-200 hover:bg-[#991b1b]">
               Retry
             </button>
           </div>
@@ -344,8 +361,8 @@ export default function StudentsPage() {
         {!loading && !error && (
           <>
             {filteredStudents.length === 0 ? (
-              <div className="bg-white border border-[#e5e7eb] rounded-xl py-[50px] px-10 text-center max-tablet:py-[30px] max-tablet:px-5">
-                <p className="text-[15px] text-[#6b7280] m-0">
+              <div className="bg-admin-card border border-admin-border rounded-xl py-[50px] px-10 text-center max-tablet:py-[30px] max-tablet:px-5">
+                <p className="text-[15px] text-admin-text-muted m-0">
                   {students.length === 0
                     ? 'No students yet. Students will appear here once they register with a session code.'
                     : 'No students match your search criteria.'}
@@ -353,97 +370,41 @@ export default function StudentsPage() {
               </div>
             ) : (
               <div className="mb-8">
-                <div className="bg-white border border-[#e5e7eb] rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.05)] max-tablet:overflow-x-auto">
-                  <table className="w-full border-collapse max-tablet:min-w-[900px]">
-                    <thead>
-                      <tr className="bg-[#f9fafb] border-b-2 border-[#e5e7eb]">
-                        <th
-                          onClick={() => handleSort('username')}
-                          className="p-[15px_20px] text-left text-[13px] font-bold text-[#374151] uppercase tracking-[0.5px] cursor-pointer transition-colors duration-200 ease-in-out hover:text-admin-primary"
-                        >
-                          Username {getSortIcon('username')}
-                        </th>
-                        <th className="p-[15px_20px] text-left text-[13px] font-bold text-[#374151] uppercase tracking-[0.5px]">Session Code</th>
-                        <th
-                          onClick={() => handleSort('quests')}
-                          className="p-[15px_20px] text-left text-[13px] font-bold text-[#374151] uppercase tracking-[0.5px] cursor-pointer transition-colors duration-200 ease-in-out hover:text-admin-primary"
-                        >
-                          Quests {getSortIcon('quests')}
-                        </th>
-                        <th
-                          onClick={() => handleSort('time')}
-                          className="p-[15px_20px] text-left text-[13px] font-bold text-[#374151] uppercase tracking-[0.5px] cursor-pointer transition-colors duration-200 ease-in-out hover:text-admin-primary"
-                        >
-                          Time Spent {getSortIcon('time')}
-                        </th>
-                        <th className="p-[15px_20px] text-left text-[13px] font-bold text-[#374151] uppercase tracking-[0.5px]">Executions</th>
-                        <th
-                          onClick={() => handleSort('lastLogin')}
-                          className="p-[15px_20px] text-left text-[13px] font-bold text-[#374151] uppercase tracking-[0.5px] cursor-pointer transition-colors duration-200 ease-in-out hover:text-admin-primary"
-                        >
-                          Last Active {getSortIcon('lastLogin')}
-                        </th>
-                        <th className="p-[15px_20px] text-left text-[13px] font-bold text-[#374151] uppercase tracking-[0.5px]">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredStudents.map((student) => (
-                        <tr key={student.id} className="border-b border-[#e5e7eb] last:border-b-0 transition-colors duration-200 ease-in-out hover:bg-[#f0fdfa] group">
-                          <td className="p-[15px_20px] text-sm text-[#374151]">
-                            <div className="font-semibold text-admin-dark">{student.username}</div>
-                            {student.displayName && student.displayName !== student.username && (
-                              <div className="text-xs text-[#9ca3af] mt-[3px]">{student.displayName}</div>
-                            )}
-                          </td>
-                          <td className="p-[15px_20px] text-sm text-[#374151]">
-                            <Link
-                              href={`/admin/sessions/${student.sessionCode}/students`}
-                              className="text-admin-primary no-underline font-[family-name:var(--font-family-admin)] text-[13px] font-bold transition-colors duration-300 ease-in-out hover:text-admin-primary-dark"
-                            >
-                              {student.sessionCode}
-                            </Link>
-                          </td>
-                          <td className="p-[15px_20px] text-sm text-[#374151]">
-                            <div className="flex items-center gap-[8px]">
-                              <span className="font-semibold text-admin-dark">{student.questsCompleted}</span>
-                              {student.questsActive > 0 && (
-                                <span className="text-[#10b981] text-xs font-semibold">+{student.questsActive}</span>
-                              )}
-                            </div>
-                            {/* Completion Progress Bar */}
-                            {(student.questsCompleted > 0 || student.questsActive > 0) && (
-                              <div className="w-full h-1.5 bg-[#e5e7eb] rounded-full mt-1.5 overflow-hidden max-w-[80px]">
-                                <div
-                                  className="h-full rounded-full transition-all duration-300"
-                                  style={{
-                                    width: `${Math.min(100, ((student.questsCompleted) / Math.max(1, student.questsCompleted + student.questsActive)) * 100)}%`,
-                                    backgroundColor: student.questsActive === 0 && student.questsCompleted > 0 ? '#22c55e' : '#0ec5c9',
-                                  }}
-                                />
-                              </div>
-                            )}
-                          </td>
-                          <td className="p-[15px_20px] text-sm text-[#374151] font-medium">{formatTime(student.totalTimeSpentSeconds)}</td>
-                          <td className="p-[15px_20px] text-sm text-[#374151] font-medium">{student.totalCodeExecutions}</td>
-                          <td className="p-[15px_20px] text-sm text-[#374151]">{formatDate(student.lastLogin)}</td>
-                          <td className="p-[15px_20px] text-sm text-[#374151]">
-                            <Link
-                              href={`/admin/students/${student.id}`}
-                              className="inline-block bg-admin-primary text-white py-[6px] px-[14px] rounded-lg no-underline text-xs font-semibold transition-all duration-300 ease-in-out hover:bg-admin-primary-dark hover:-translate-y-[1px] hover:shadow-[0_2px_8px_rgba(14,195,201,0.3)]"
-                            >
-                              View Details
-                            </Link>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                {/* Sort controls */}
+                <div className="flex items-center gap-3 mb-4 text-xs text-admin-text-muted">
+                  <span className="font-medium">Sort by:</span>
+                  {(['username', 'quests', 'time', 'lastLogin'] as const).map((col) => (
+                    <button
+                      key={col}
+                      onClick={() => handleSort(col)}
+                      className={`px-2 py-1 rounded text-xs border-none cursor-pointer transition-colors duration-200 ${
+                        sortBy === col
+                          ? 'bg-amber-50 text-admin-accent font-semibold'
+                          : 'text-admin-text-muted hover:text-admin-accent bg-transparent'
+                      }`}
+                    >
+                      {col === 'username' ? 'Name' : col === 'quests' ? 'Quests' : col === 'time' ? 'Time' : 'Last Active'}{' '}
+                      {getSortIcon(col)}
+                    </button>
+                  ))}
+                </div>
 
-                  <div className="bg-[#f9fafb] p-[15px_20px] border-t border-[#e5e7eb]">
-                    <p className="text-sm text-[#6b7280] m-0">
-                      Showing {filteredStudents.length} of {students.length} students
-                    </p>
-                  </div>
+                {/* Card grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {filteredStudents.map((student) => (
+                    <StudentProgressCard
+                      key={student.id}
+                      student={student}
+                      questDefinitions={questDefinitions}
+                      showSessionCode={true}
+                      formatTime={formatTime}
+                      formatDate={formatDate}
+                    />
+                  ))}
+                </div>
+
+                <div className="mt-4 text-sm text-admin-text-muted">
+                  Showing {filteredStudents.length} of {students.length} students
                 </div>
               </div>
             )}

@@ -1,23 +1,21 @@
 @import "tailwindcss";
 
 @theme {
-  /* Custom Colors for Admin UI */
-  --color-admin-dark: #1a1a2e;
-  --color-admin-darker: #16213e;
-  --color-admin-primary: #0ec3c9;
-  --color-admin-primary-dark: #0a9ba0;
-  --color-admin-primary-darker: #087074;
-  --color-admin-purple: #210714;
-  --color-admin-purple-light: #3b1522;
-  --color-admin-purple-darker: #12040c;
-  --color-admin-tan: #d8a888;
-  --color-admin-tan-light: #e8c4a8;
-  --color-admin-indigo: #6366f1;
-  --color-admin-indigo-dark: #4f46e5;
-  --color-admin-indigo-darker: #3730a3;
-  --color-admin-violet: #a78bfa;
-  --color-admin-violet-dark: #8b5cf6;
-  --color-admin-violet-darker: #7c3aed;
+  /* Admin Warm Neutral Palette */
+  --color-admin-bg: #f8f7f4;
+  --color-admin-card: #ffffff;
+  --color-admin-border: #e7e5e0;
+  --color-admin-border-hover: #d5d3ce;
+  --color-admin-sidebar: #1e293b;
+  --color-admin-text: #1c1917;
+  --color-admin-text-muted: #78716c;
+  --color-admin-text-faint: #a8a29e;
+  --color-admin-accent: #b45309;
+  --color-admin-accent-hover: #92400e;
+  --color-admin-accent-light: #fef3c7;
+  --color-admin-success: #4d7c0f;
+  --color-admin-error: #b91c1c;
+  --color-admin-info: #475569;
 
   /* Breakpoints */
   --breakpoint-tablet: 768px;
@@ -172,60 +170,5 @@ h4, h5, h6 {
 
   .animate-spin-slow {
     animation: spin 1s linear infinite;
-  }
-
-  /* Admin gradient backgrounds */
-  .bg-admin-gradient {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  }
-
-  .bg-admin-gradient-vertical {
-    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-  }
-
-  .bg-admin-primary-gradient {
-    background: linear-gradient(135deg, #0ec3c9 0%, #0a9ba0 100%);
-  }
-
-  .bg-admin-primary-gradient-hover {
-    background: linear-gradient(135deg, #0a9ba0 0%, #087074 100%);
-  }
-
-  .bg-admin-purple-gradient {
-    background: radial-gradient(circle at top, #3b1522 0%, #210714 60%, #12040c 100%);
-  }
-
-  .bg-admin-indigo-gradient {
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-  }
-
-  .bg-admin-indigo-gradient-hover {
-    background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
-  }
-
-  .bg-admin-violet-gradient {
-    background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
-  }
-
-  .bg-admin-violet-gradient-hover {
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-  }
-
-  /* Custom text shadow for admin login */
-  .text-shadow-admin {
-    text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.3);
-  }
-
-  /* Custom box shadows */
-  .shadow-admin-card {
-    box-shadow: 0 8px 0 #210714, 0 12px 20px rgba(0, 0, 0, 0.45);
-  }
-
-  .shadow-admin-button {
-    box-shadow: 0 4px 0 #210714;
-  }
-
-  .shadow-admin-button-hover {
-    box-shadow: 0 2px 0 #210714;
   }
 }

@@ -57,8 +57,8 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
 
   if (loading) {
     return (
-      <div className="admin-font min-h-screen flex flex-col items-center justify-center bg-admin-gradient text-white font-[family-name:var(--font-family-admin)]">
-        <div className="w-[50px] h-[50px] border-4 border-[rgba(14,195,201,0.2)] border-t-admin-primary rounded-full animate-spin-slow mb-5"></div>
+      <div className="admin-font min-h-screen flex flex-col items-center justify-center bg-admin-sidebar text-white">
+        <div className="w-[50px] h-[50px] border-4 border-white/20 border-t-admin-accent rounded-full animate-spin-slow mb-5"></div>
         <p>Loading...</p>
       </div>
     );
@@ -68,16 +68,16 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
     return null;
   }
 
-  const baseNavItems = [
-    { href: '/admin', label: 'Dashboard', icon: BarChart3, activeColor: 'text-admin-primary' },
-    { href: '/admin/sessions', label: 'Session Codes', icon: Key, activeColor: 'text-admin-primary' },
-    { href: '/admin/students', label: 'Students', icon: Users, activeColor: 'text-admin-indigo' },
+  const navItems = [
+    { href: '/admin', label: 'Dashboard', icon: BarChart3 },
+    { href: '/admin/sessions', label: 'Session Codes', icon: Key },
+    { href: '/admin/students', label: 'Students', icon: Users },
   ];
 
   // Add Users management link for super admins
-  const navItems = adminUser?.role === 'super_admin'
-    ? [...baseNavItems, { href: '/admin/users', label: 'Admin Users', icon: UserCog, activeColor: 'text-admin-violet' }]
-    : baseNavItems;
+  const allNavItems = adminUser?.role === 'super_admin'
+    ? [...navItems, { href: '/admin/users', label: 'Admin Users', icon: UserCog }]
+    : navItems;
 
   const currentPath = router.pathname;
 
@@ -87,18 +87,18 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
         <title>{title} - Binary Coven Admin</title>
       </Head>
 
-      <div className="admin-font flex min-h-screen bg-[#f5f7fa] font-[family-name:var(--font-family-admin)]">
+      <div className="admin-font flex min-h-screen bg-admin-bg">
         {/* Sidebar Navigation */}
-        <aside className={`w-[260px] bg-admin-gradient-vertical text-white flex flex-col fixed h-screen left-0 top-0 z-[1000] shadow-[2px_0_10px_rgba(0,0,0,0.1)] transition-transform duration-300 ease-in-out ${
+        <aside className={`w-[260px] bg-admin-sidebar text-white flex flex-col fixed h-screen left-0 top-0 z-[1000] shadow-[2px_0_10px_rgba(0,0,0,0.1)] transition-transform duration-300 ease-in-out ${
           mobileMenuOpen ? 'translate-x-0' : 'max-laptop:-translate-x-full'
         }`}>
           <div className="p-[28px_24px] border-b border-white/[0.08] text-center">
-            <p className="text-[22px] font-bold text-admin-primary m-0 mb-1 uppercase">Binary Coven</p>
+            <p className="text-[22px] font-bold text-admin-accent m-0 mb-1 uppercase">Binary Coven</p>
             <p className="text-xs text-white/40 m-0 tracking-wide">Admin Panel</p>
           </div>
 
           <nav className="flex-1 py-3 px-3 overflow-y-auto">
-            {navItems.map((item) => {
+            {allNavItems.map((item) => {
               const IconComponent = item.icon;
               const isActive = currentPath === item.href;
               return (
@@ -107,8 +107,8 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
                   href={item.href}
                   className={`flex items-center py-[11px] px-4 rounded-lg no-underline transition-all duration-200 ease-in-out mb-[2px] ${
                     isActive
-                      ? `bg-white/[0.12] ${item.activeColor} font-semibold`
-                      : 'text-white/60 hover:bg-white/[0.06] hover:text-white/90'
+                      ? 'border-l-[3px] border-admin-accent text-white font-semibold bg-white/[0.06]'
+                      : 'border-l-[3px] border-transparent text-white/60 hover:bg-white/[0.06] hover:text-white/90'
                   }`}
                 >
                   <IconComponent className="mr-3 flex-shrink-0" size={18} />
@@ -121,7 +121,7 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
           <div className="p-4 border-t border-white/[0.08]">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center py-[10px] px-4 bg-[rgba(255,82,82,0.08)] border border-[rgba(255,82,82,0.2)] rounded-lg text-[#ff8a8a] text-[14px] font-[family-name:var(--font-family-admin)] cursor-pointer transition-all duration-200 ease-in-out hover:bg-[rgba(255,82,82,0.15)] hover:border-[rgba(255,82,82,0.35)]"
+              className="w-full flex items-center py-[10px] px-4 bg-[rgba(255,82,82,0.08)] border border-[rgba(255,82,82,0.2)] rounded-lg text-[#ff8a8a] text-[14px] cursor-pointer transition-all duration-200 ease-in-out hover:bg-[rgba(255,82,82,0.15)] hover:border-[rgba(255,82,82,0.35)]"
             >
               <LogOut className="mr-3 flex-shrink-0" size={18} />
               <span>Logout</span>
@@ -132,26 +132,26 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
         {/* Main Content Area */}
         <div className="flex-1 ml-[260px] flex flex-col min-h-screen max-laptop:ml-0">
           {/* Top Header */}
-          <header className="bg-white border-b border-[#e5e7eb] py-5 px-[30px] sticky top-0 z-[100] shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
+          <header className="bg-admin-card border-b border-admin-border py-5 px-[30px] sticky top-0 z-[100] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
             <button
-              className="hidden max-laptop:block bg-none border-none text-2xl text-admin-dark cursor-pointer p-[5px_10px] mr-[15px]"
+              className="hidden max-laptop:block bg-none border-none text-2xl text-admin-text cursor-pointer p-[5px_10px] mr-[15px]"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               <Menu size={24} />
             </button>
 
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-admin-dark m-0">{title}</h2>
+              <h2 className="text-2xl font-bold text-admin-text m-0">{title}</h2>
 
               <div className="flex items-center gap-3">
                 {/* Avatar */}
-                <div className="w-10 h-10 rounded-full bg-admin-primary-gradient flex items-center justify-center text-white text-base font-bold shadow-[0_2px_8px_rgba(14,195,201,0.3)]">
+                <div className="w-10 h-10 rounded-full bg-admin-accent flex items-center justify-center text-white text-base font-bold">
                   {adminUser?.username?.charAt(0).toUpperCase() || 'A'}
                 </div>
                 <div className="flex flex-col leading-tight max-tablet:hidden">
-                  <span className="text-sm font-bold text-admin-dark">{adminUser?.username || 'Admin'}</span>
+                  <span className="text-sm font-bold text-admin-text">{adminUser?.username || 'Admin'}</span>
                   <span className={`text-[11px] font-semibold ${
-                    adminUser?.role === 'super_admin' ? 'text-amber-500' : 'text-admin-primary'
+                    adminUser?.role === 'super_admin' ? 'text-admin-accent' : 'text-admin-text-muted'
                   }`}>
                     {adminUser?.role === 'super_admin' ? 'Super Admin' : 'Admin'}
                   </span>
@@ -161,13 +161,13 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
           </header>
 
           {/* Page Content */}
-          <main className="flex-1 p-[30px] bg-[#f5f7fa]">
+          <main className="flex-1 p-[30px] bg-admin-bg">
             {children}
           </main>
 
           {/* Footer */}
-          <footer className="bg-white border-t border-[#e5e7eb] py-5 px-[30px] text-center">
-            <p className="m-0 text-[#6b7280] text-[13px]">Binary Coven Learning Management System © {new Date().getFullYear()}</p>
+          <footer className="bg-admin-card border-t border-admin-border py-5 px-[30px] text-center">
+            <p className="m-0 text-admin-text-muted text-[13px]">Binary Coven Learning Management System © {new Date().getFullYear()}</p>
           </footer>
         </div>
 

@@ -17,6 +17,9 @@ import {
   type TopicMastery,
 } from '../../../utils/masteryComputation';
 import type { Quest } from '../../../types/quest';
+import {
+  PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend,
+} from 'recharts';
 
 interface StudentProfile {
   id: string;
@@ -79,13 +82,21 @@ interface StudentAnalytics {
   gameState: any;
 }
 
+const CHART_COLORS = {
+  completed: '#4d7c0f',
+  active: '#b45309',
+  available: '#78716c',
+  locked: '#a8a29e',
+  failed: '#b91c1c',
+};
+
 export default function StudentDetailPage() {
   const router = useRouter();
   const { id } = router.query;
   const [analytics, setAnalytics] = useState<StudentAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'profile' | 'overview' | 'quests' | 'objectives' | 'code' | 'gamestate'>('profile');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'quests' | 'code' | 'gamestate'>('dashboard');
   const [questDefinitions, setQuestDefinitions] = useState<Quest[]>([]);
 
   useEffect(() => {
@@ -166,7 +177,6 @@ export default function StudentDetailPage() {
   };
 
   // Compute mastery from quest definitions + student progress
-  // Only include quests in the student's progress (session-assigned quests)
   const studentQuestDefs = useMemo(() => {
     if (!analytics || questDefinitions.length === 0) return [];
     const studentQuestIds = new Set(
@@ -199,29 +209,59 @@ export default function StudentDetailPage() {
       : 0
     : 0;
 
+  // Pie chart data for quest completion
+  const pieData = useMemo(() => {
+    if (!analytics) return [];
+    const states: Record<string, number> = {};
+    analytics.questProgress.forEach((qp) => {
+      const s = qp.state.toLowerCase();
+      states[s] = (states[s] || 0) + 1;
+    });
+    return Object.entries(states).map(([name, value]) => ({
+      name: name.charAt(0).toUpperCase() + name.slice(1),
+      value,
+      color: CHART_COLORS[name as keyof typeof CHART_COLORS] || '#a8a29e',
+    }));
+  }, [analytics]);
+
+  // Bar chart data for time per quest (top 8 by time)
+  const barData = useMemo(() => {
+    if (!analytics) return [];
+    return [...analytics.questProgress]
+      .filter((qp) => qp.timeSpentSeconds > 0)
+      .sort((a, b) => b.timeSpentSeconds - a.timeSpentSeconds)
+      .slice(0, 8)
+      .map((qp) => ({
+        name: (qp.questTitle || qp.questId).length > 18
+          ? (qp.questTitle || qp.questId).substring(0, 18) + '...'
+          : (qp.questTitle || qp.questId),
+        minutes: Math.round(qp.timeSpentSeconds / 60),
+      }));
+  }, [analytics]);
+
   return (
     <AdminLayout title={analytics?.profile.username || 'Student Details'}>
       <div className="max-w-[1400px] mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <Link href="/admin/students" className="inline-block text-admin-primary no-underline text-[15px] font-medium mb-5 transition-colors duration-300 ease-in-out hover:text-admin-primary-dark">
+          <Link href="/admin/students" className="inline-block text-admin-accent no-underline text-[15px] font-medium mb-5 transition-colors duration-200 hover:text-admin-accent-hover">
             ← Back to Students
           </Link>
         </div>
 
         {/* Loading State */}
         {loading && (
-          <div className="flex flex-col items-center justify-center py-[60px] px-5 text-[#6b7280]">
-            <div className="w-[50px] h-[50px] border-4 border-[#e5e7eb] border-t-admin-primary rounded-full animate-spin-slow mb-5"></div>
+          <div className="flex flex-col items-center justify-center py-[60px] px-5 text-admin-text-muted">
+            <div className="w-[50px] h-[50px] border-4 border-admin-border border-t-admin-accent rounded-full animate-spin-slow mb-5"></div>
             <p>Loading student analytics...</p>
           </div>
         )}
 
         {/* Error State */}
         {error && (
-          <div className="bg-[#fef2f2] border border-[#fecaca] rounded-xl p-[30px] text-center text-[#dc2626]">
+          <div className="bg-red-50 border border-red-200 rounded-xl p-[30px] text-center text-[#b91c1c]">
             <p className="m-0 mb-[15px] text-base">{error}</p>
-            <button onClick={fetchStudentAnalytics} className="bg-[#dc2626] text-white border-none py-[10px] px-5 rounded-lg text-sm font-[family-name:var(--font-family-admin)] cursor-pointer transition-colors duration-300 ease-in-out hover:bg-[#b91c1c]">
+            <button onClick={fetchStudentAnalytics} className="bg-[#b91c1c] text-white border-none py-[10px] px-5 rounded-lg text-sm cursor-pointer transition-colors duration-200 hover:bg-[#991b1b]">
               Retry
             </button>
           </div>
@@ -231,25 +271,25 @@ export default function StudentDetailPage() {
         {!loading && !error && analytics && (
           <>
             {/* Student Info Card */}
-            <div className="bg-white border border-[#e5e7eb] rounded-xl p-[30px] mb-8 shadow-[0_1px_3px_rgba(0,0,0,0.05)] max-tablet:p-5">
+            <div className="bg-admin-card border border-admin-border rounded-xl p-[30px] mb-8 max-tablet:p-5">
               <div className="flex items-start gap-5 mb-8 max-tablet:flex-col">
-                <div className="w-[80px] h-[80px] rounded-full bg-admin-primary-gradient flex items-center justify-center text-white text-[32px] font-bold flex-shrink-0 max-tablet:w-[60px] max-tablet:h-[60px] max-tablet:text-[24px]">
+                <div className="w-[80px] h-[80px] rounded-full bg-admin-accent flex items-center justify-center text-white text-[32px] font-bold flex-shrink-0 max-tablet:w-[60px] max-tablet:h-[60px] max-tablet:text-[24px]">
                   {analytics.profile.username.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1">
-                  <h1 className="text-[28px] font-bold text-admin-dark m-0 mb-[5px] max-tablet:text-[24px]">{analytics.profile.username}</h1>
+                  <h1 className="text-[28px] font-bold text-admin-text m-0 mb-[5px] max-tablet:text-[24px]">{analytics.profile.username}</h1>
                   {analytics.profile.displayName && analytics.profile.displayName !== analytics.profile.username && (
-                    <p className="text-base text-[#6b7280] m-0 mb-[10px]">{analytics.profile.displayName}</p>
+                    <p className="text-base text-admin-text-muted m-0 mb-[10px]">{analytics.profile.displayName}</p>
                   )}
-                  <div className="flex items-center gap-[10px] flex-wrap text-sm text-[#6b7280]">
+                  <div className="flex items-center gap-[10px] flex-wrap text-sm text-admin-text-muted">
                     <span>
-                      Session: <Link href={`/admin/sessions/${analytics.profile.sessionCode}/students`} className="text-admin-primary no-underline font-semibold transition-colors duration-300 ease-in-out hover:text-admin-primary-dark">{analytics.profile.sessionCode}</Link>
+                      Session: <Link href={`/admin/sessions/${analytics.profile.sessionCode}/students`} className="text-admin-accent no-underline font-semibold transition-colors duration-200 hover:text-admin-accent-hover">{analytics.profile.sessionCode}</Link>
                     </span>
-                    <span className="text-[#d1d5db]">•</span>
+                    <span className="text-admin-text-faint">•</span>
                     <span>
                       Joined: {formatDate(analytics.profile.joinedAt)}
                     </span>
-                    <span className="text-[#d1d5db]">•</span>
+                    <span className="text-admin-text-faint">•</span>
                     <span>
                       Last active: {getRelativeTime(analytics.profile.lastLogin)}
                     </span>
@@ -266,7 +306,7 @@ export default function StudentDetailPage() {
                         </span>
                       ))}
                       {allMastered && (
-                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border bg-amber-100 text-amber-700 border-amber-300">
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border bg-amber-50 text-admin-accent border-amber-300">
                           <Award size={12} /> All Mastered
                         </span>
                       )}
@@ -278,42 +318,42 @@ export default function StudentDetailPage() {
               {/* Summary Stats */}
               <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-5 max-tablet:grid-cols-2">
                 <div className="flex items-center gap-[12px]">
-                  <Target className="text-admin-primary flex-shrink-0" size={20} />
+                  <Target className="text-admin-accent flex-shrink-0" size={20} />
                   <div>
-                    <div className="text-[20px] font-bold text-admin-dark m-0">{analytics.summary.questsCompleted}</div>
-                    <div className="text-xs text-[#6b7280] m-0">Quests Completed</div>
+                    <div className="text-[20px] font-bold text-admin-text m-0">{analytics.summary.questsCompleted}</div>
+                    <div className="text-xs text-admin-text-muted m-0">Quests Completed</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-[12px]">
-                  <FileText className="text-admin-primary flex-shrink-0" size={20} />
+                  <FileText className="text-admin-accent flex-shrink-0" size={20} />
                   <div>
-                    <div className="text-[20px] font-bold text-admin-dark m-0">{analytics.summary.questsActive}</div>
-                    <div className="text-xs text-[#6b7280] m-0">Quests Active</div>
+                    <div className="text-[20px] font-bold text-admin-text m-0">{analytics.summary.questsActive}</div>
+                    <div className="text-xs text-admin-text-muted m-0">Quests Active</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-[12px]">
-                  <Clock className="text-admin-primary flex-shrink-0" size={20} />
+                  <Clock className="text-admin-accent flex-shrink-0" size={20} />
                   <div>
-                    <div className="text-[20px] font-bold text-admin-dark m-0">{formatTime(analytics.summary.totalTimeSpentSeconds)}</div>
-                    <div className="text-xs text-[#6b7280] m-0">Total Time</div>
+                    <div className="text-[20px] font-bold text-admin-text m-0">{formatTime(analytics.summary.totalTimeSpentSeconds)}</div>
+                    <div className="text-xs text-admin-text-muted m-0">Total Time</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-[12px]">
-                  <Play className="text-admin-primary flex-shrink-0" size={20} />
+                  <Play className="text-admin-accent flex-shrink-0" size={20} />
                   <div>
-                    <div className="text-[20px] font-bold text-admin-dark m-0">{analytics.summary.totalCodeExecutions}</div>
-                    <div className="text-xs text-[#6b7280] m-0">Code Runs</div>
+                    <div className="text-[20px] font-bold text-admin-text m-0">{analytics.summary.totalCodeExecutions}</div>
+                    <div className="text-xs text-admin-text-muted m-0">Code Runs</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-[12px]">
-                  <Save className="text-admin-primary flex-shrink-0" size={20} />
+                  <Save className="text-admin-accent flex-shrink-0" size={20} />
                   <div>
-                    <div className="text-[20px] font-bold text-admin-dark m-0">
+                    <div className="text-[20px] font-bold text-admin-text m-0">
                       {analytics.summary.lastSaveTime ? '✓' : '✕'}
                     </div>
-                    <div className="text-xs text-[#6b7280] m-0">Last Saved</div>
+                    <div className="text-xs text-admin-text-muted m-0">Last Saved</div>
                     {analytics.summary.lastSaveTime && (
-                      <div className="text-[10px] text-[#9ca3af] mt-[2px]">{getRelativeTime(analytics.summary.lastSaveTime)}</div>
+                      <div className="text-[10px] text-admin-text-faint mt-[2px]">{getRelativeTime(analytics.summary.lastSaveTime)}</div>
                     )}
                   </div>
                 </div>
@@ -321,62 +361,42 @@ export default function StudentDetailPage() {
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-[10px] mb-8 border-b-2 border-[#e5e7eb] overflow-x-auto max-tablet:gap-[5px]">
+            <div className="flex gap-[10px] mb-8 border-b-2 border-admin-border overflow-x-auto max-tablet:gap-[5px]">
               <button
-                className={`py-[12px] px-5 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-300 ease-in-out whitespace-nowrap ${
-                  activeTab === 'profile'
-                    ? 'text-admin-primary border-b-2 border-admin-primary mb-[-2px]'
-                    : 'text-[#6b7280] hover:text-admin-dark'
+                className={`py-[12px] px-5 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-200 whitespace-nowrap ${
+                  activeTab === 'dashboard'
+                    ? 'text-admin-accent border-b-2 border-admin-accent mb-[-2px]'
+                    : 'text-admin-text-muted hover:text-admin-text'
                 }`}
-                onClick={() => setActiveTab('profile')}
+                onClick={() => setActiveTab('dashboard')}
               >
-                Profile
+                Dashboard
               </button>
               <button
-                className={`py-[12px] px-5 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-300 ease-in-out whitespace-nowrap ${
-                  activeTab === 'overview'
-                    ? 'text-admin-primary border-b-2 border-admin-primary mb-[-2px]'
-                    : 'text-[#6b7280] hover:text-admin-dark'
-                }`}
-                onClick={() => setActiveTab('overview')}
-              >
-                Overview
-              </button>
-              <button
-                className={`py-[12px] px-5 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-300 ease-in-out whitespace-nowrap ${
+                className={`py-[12px] px-5 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-200 whitespace-nowrap ${
                   activeTab === 'quests'
-                    ? 'text-admin-primary border-b-2 border-admin-primary mb-[-2px]'
-                    : 'text-[#6b7280] hover:text-admin-dark'
+                    ? 'text-admin-accent border-b-2 border-admin-accent mb-[-2px]'
+                    : 'text-admin-text-muted hover:text-admin-text'
                 }`}
                 onClick={() => setActiveTab('quests')}
               >
-                Quest Progress
+                Quests
               </button>
               <button
-                className={`py-[12px] px-5 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-300 ease-in-out whitespace-nowrap ${
-                  activeTab === 'objectives'
-                    ? 'text-admin-primary border-b-2 border-admin-primary mb-[-2px]'
-                    : 'text-[#6b7280] hover:text-admin-dark'
-                }`}
-                onClick={() => setActiveTab('objectives')}
-              >
-                Objectives
-              </button>
-              <button
-                className={`py-[12px] px-5 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-300 ease-in-out whitespace-nowrap ${
+                className={`py-[12px] px-5 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-200 whitespace-nowrap ${
                   activeTab === 'code'
-                    ? 'text-admin-primary border-b-2 border-admin-primary mb-[-2px]'
-                    : 'text-[#6b7280] hover:text-admin-dark'
+                    ? 'text-admin-accent border-b-2 border-admin-accent mb-[-2px]'
+                    : 'text-admin-text-muted hover:text-admin-text'
                 }`}
                 onClick={() => setActiveTab('code')}
               >
                 Code History
               </button>
               <button
-                className={`py-[12px] px-5 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-300 ease-in-out whitespace-nowrap ${
+                className={`py-[12px] px-5 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-200 whitespace-nowrap ${
                   activeTab === 'gamestate'
-                    ? 'text-admin-primary border-b-2 border-admin-primary mb-[-2px]'
-                    : 'text-[#6b7280] hover:text-admin-dark'
+                    ? 'text-admin-accent border-b-2 border-admin-accent mb-[-2px]'
+                    : 'text-admin-text-muted hover:text-admin-text'
                 }`}
                 onClick={() => setActiveTab('gamestate')}
               >
@@ -386,83 +406,137 @@ export default function StudentDetailPage() {
 
             {/* Tab Content */}
             <div>
-              {activeTab === 'profile' && (
+              {activeTab === 'dashboard' && (
                 <div className="space-y-6">
-                  {/* Profile Summary Cards */}
+                  {/* Row 1: Summary stat cards */}
                   <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-5">
-                    <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 text-center">
-                      <div className="text-3xl font-bold text-admin-primary mb-1">{completionRate}%</div>
-                      <div className="text-xs text-[#6b7280] font-medium">Completion Rate</div>
+                    <div className="bg-admin-card border border-admin-border rounded-xl p-5 text-center">
+                      <div className="text-3xl font-bold text-admin-accent mb-1">{completionRate}%</div>
+                      <div className="text-xs text-admin-text-muted font-medium">Completion Rate</div>
                     </div>
-                    <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 text-center">
-                      <div className="text-3xl font-bold text-admin-primary mb-1">{analytics.summary.questsCompleted}</div>
-                      <div className="text-xs text-[#6b7280] font-medium">Quests Done</div>
+                    <div className="bg-admin-card border border-admin-border rounded-xl p-5 text-center">
+                      <div className="text-3xl font-bold text-admin-accent mb-1">{analytics.summary.questsCompleted}</div>
+                      <div className="text-xs text-admin-text-muted font-medium">Quests Done</div>
                     </div>
-                    <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 text-center">
-                      <div className="text-3xl font-bold text-admin-primary mb-1">{formatTime(analytics.summary.totalTimeSpentSeconds)}</div>
-                      <div className="text-xs text-[#6b7280] font-medium">Total Time</div>
+                    <div className="bg-admin-card border border-admin-border rounded-xl p-5 text-center">
+                      <div className="text-3xl font-bold text-admin-accent mb-1">{formatTime(analytics.summary.totalTimeSpentSeconds)}</div>
+                      <div className="text-xs text-admin-text-muted font-medium">Total Time</div>
                     </div>
-                    <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 text-center">
-                      <div className="text-3xl font-bold text-admin-primary mb-1">{analytics.summary.totalCodeExecutions}</div>
-                      <div className="text-xs text-[#6b7280] font-medium">Code Runs</div>
+                    <div className="bg-admin-card border border-admin-border rounded-xl p-5 text-center">
+                      <div className="text-3xl font-bold text-admin-accent mb-1">{analytics.summary.totalCodeExecutions}</div>
+                      <div className="text-xs text-admin-text-muted font-medium">Code Runs</div>
                     </div>
                   </div>
 
-                  {/* Topic Mastery Section */}
-                  <div className="bg-white border border-[#e5e7eb] rounded-xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
-                    <h2 className="text-lg font-bold text-admin-dark m-0 mb-4">Topic Mastery</h2>
+                  {/* Row 2: Charts — PieChart + BarChart */}
+                  {analytics.questProgress.length > 0 && (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Quest Completion Donut */}
+                      <div className="bg-admin-card border border-admin-border rounded-xl p-6">
+                        <h3 className="text-base font-bold text-admin-text m-0 mb-4">Quest Status</h3>
+                        <ResponsiveContainer width="100%" height={240}>
+                          <PieChart>
+                            <Pie
+                              data={pieData}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={55}
+                              outerRadius={90}
+                              paddingAngle={3}
+                              dataKey="value"
+                            >
+                              {pieData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
+                              ))}
+                            </Pie>
+                            <Tooltip
+                              contentStyle={{ borderRadius: 8, border: '1px solid #e7e5e0', fontSize: 13 }}
+                            />
+                            <Legend
+                              verticalAlign="bottom"
+                              iconType="circle"
+                              iconSize={8}
+                              formatter={(value) => <span style={{ color: '#78716c', fontSize: 12 }}>{value}</span>}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+
+                      {/* Time Per Quest Bar Chart */}
+                      {barData.length > 0 && (
+                        <div className="bg-admin-card border border-admin-border rounded-xl p-6">
+                          <h3 className="text-base font-bold text-admin-text m-0 mb-4">Time per Quest (min)</h3>
+                          <ResponsiveContainer width="100%" height={240}>
+                            <BarChart data={barData} layout="vertical" margin={{ left: 10, right: 20 }}>
+                              <XAxis type="number" tick={{ fontSize: 11, fill: '#78716c' }} />
+                              <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 11, fill: '#78716c' }} />
+                              <Tooltip
+                                contentStyle={{ borderRadius: 8, border: '1px solid #e7e5e0', fontSize: 13 }}
+                                formatter={(value: number) => [`${value} min`, 'Time']}
+                              />
+                              <Bar dataKey="minutes" fill="#b45309" radius={[0, 4, 4, 0]} />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Row 3: Topic Mastery Section */}
+                  <div className="bg-admin-card border border-admin-border rounded-xl p-6">
+                    <h2 className="text-lg font-bold text-admin-text m-0 mb-4">Topic Mastery</h2>
                     <div className="space-y-4">
                       {topicMastery.filter(tm => tm.totalQuests > 0).map((tm) => {
-                        const barColor = tm.level === 'mastered' ? '#22c55e'
-                          : tm.level === 'in-progress' ? '#eab308'
-                          : '#d1d5db';
+                        const barColor = tm.level === 'mastered' ? '#4d7c0f'
+                          : tm.level === 'in-progress' ? '#b45309'
+                          : '#d5d3ce';
                         return (
                           <div key={tm.topic}>
                             <div className="flex justify-between items-center mb-1">
                               <div className="flex items-center gap-2">
-                                <span className="text-sm font-semibold text-admin-dark">{tm.topic}</span>
+                                <span className="text-sm font-semibold text-admin-text">{tm.topic}</span>
                                 <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${MASTERY_ADMIN_CLASSES[tm.level]}`}>
                                   {tm.level === 'mastered' ? 'MASTERED' : tm.level === 'in-progress' ? 'IN PROGRESS' : 'NOT STARTED'}
                                 </span>
                               </div>
                               <span className="text-sm font-bold" style={{ color: barColor }}>{tm.proficiency}%</span>
                             </div>
-                            <div className="w-full h-2 bg-[#f3f4f6] rounded-full overflow-hidden">
+                            <div className="w-full h-2 bg-stone-100 rounded-full overflow-hidden">
                               <div
                                 className="h-full rounded-full transition-all duration-500"
                                 style={{ width: `${tm.proficiency}%`, backgroundColor: barColor }}
                               />
                             </div>
                             <div className="flex justify-between mt-1">
-                              <span className="text-[11px] text-[#9ca3af]">{tm.completedQuests}/{tm.totalQuests} quests</span>
-                              <span className="text-[11px] text-[#9ca3af] italic">{TOPIC_DESCRIPTIONS[tm.topic]}</span>
+                              <span className="text-[11px] text-admin-text-faint">{tm.completedQuests}/{tm.totalQuests} quests</span>
+                              <span className="text-[11px] text-admin-text-faint italic">{TOPIC_DESCRIPTIONS[tm.topic]}</span>
                             </div>
                           </div>
                         );
                       })}
                       {topicMastery.filter(tm => tm.totalQuests > 0).length === 0 && (
-                        <p className="text-sm text-[#6b7280] text-center py-4">No quest data available to compute mastery.</p>
+                        <p className="text-sm text-admin-text-muted text-center py-4">No quest data available to compute mastery.</p>
                       )}
                     </div>
                   </div>
 
-                  {/* Recent Activity */}
-                  <div className="bg-white border border-[#e5e7eb] rounded-xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
-                    <h2 className="text-lg font-bold text-admin-dark m-0 mb-4">Recent Quest Activity</h2>
+                  {/* Row 4: Recent Activity */}
+                  <div className="bg-admin-card border border-admin-border rounded-xl p-6">
+                    <h2 className="text-lg font-bold text-admin-text m-0 mb-4">Recent Quest Activity</h2>
                     {analytics.questProgress.length > 0 ? (
                       <div className="space-y-3">
                         {analytics.questProgress.slice(0, 5).map((qp) => (
-                          <div key={qp.questId} className="flex items-center justify-between p-3 bg-[#f9fafb] rounded-lg">
+                          <div key={qp.questId} className="flex items-center justify-between p-3 bg-stone-50 rounded-lg">
                             <div>
-                              <span className="text-sm font-semibold text-admin-dark">{qp.questTitle || qp.questId}</span>
-                              <div className="text-xs text-[#6b7280] mt-0.5">
+                              <span className="text-sm font-semibold text-admin-text">{qp.questTitle || qp.questId}</span>
+                              <div className="text-xs text-admin-text-muted mt-0.5">
                                 {qp.state === 'completed' ? `Completed ${formatDate(qp.completedAt)}` : `Started ${formatDate(qp.startedAt)}`}
                               </div>
                             </div>
                             <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
-                              qp.state === 'completed' ? 'bg-green-100 text-green-700' :
-                              qp.state === 'active' ? 'bg-yellow-100 text-yellow-700' :
-                              'bg-gray-100 text-gray-600'
+                              qp.state === 'completed' ? 'bg-lime-50 text-[#4d7c0f]' :
+                              qp.state === 'active' ? 'bg-amber-50 text-[#b45309]' :
+                              'bg-stone-100 text-stone-500'
                             }`}>
                               {qp.state}
                             </span>
@@ -470,49 +544,31 @@ export default function StudentDetailPage() {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-sm text-[#6b7280] text-center py-4">No quest activity yet.</p>
+                      <p className="text-sm text-admin-text-muted text-center py-4">No quest activity yet.</p>
                     )}
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'overview' && (
-                <div>
-                  <div className="mb-8">
-                    <h2 className="text-[22px] font-bold text-admin-dark m-0 mb-5">Quest Progress Summary</h2>
-                    <QuestProgressChart questProgress={analytics.questProgress} />
-                  </div>
-
-                  <div className="mb-8">
-                    <h2 className="text-[22px] font-bold text-admin-dark m-0 mb-5">Recent Code Executions</h2>
-                    <CodeExecutionViewer
-                      codeExecutions={analytics.recentCodeExecutions.slice(0, 10)}
-                      compact={true}
-                    />
                   </div>
                 </div>
               )}
 
               {activeTab === 'quests' && (
                 <div className="mb-8">
-                  <h2 className="text-[22px] font-bold text-admin-dark m-0 mb-5">Quest Progress Details</h2>
+                  <h2 className="text-[22px] font-bold text-admin-text m-0 mb-5">Quest Progress Details</h2>
                   <QuestProgressChart questProgress={analytics.questProgress} showDetails={true} />
-                </div>
-              )}
-
-              {activeTab === 'objectives' && (
-                <div className="mb-8">
-                  <h2 className="text-[22px] font-bold text-admin-dark m-0 mb-5">Objective Completion Details</h2>
-                  <ObjectiveProgressList
-                    objectiveProgress={analytics.objectiveProgress}
-                    questProgress={analytics.questProgress}
-                  />
+                  {analytics.objectiveProgress.length > 0 && (
+                    <div className="mt-8">
+                      <h2 className="text-[22px] font-bold text-admin-text m-0 mb-5">Objective Completion Details</h2>
+                      <ObjectiveProgressList
+                        objectiveProgress={analytics.objectiveProgress}
+                        questProgress={analytics.questProgress}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
 
               {activeTab === 'code' && (
                 <div className="mb-8">
-                  <h2 className="text-[22px] font-bold text-admin-dark m-0 mb-5">Code Execution History</h2>
+                  <h2 className="text-[22px] font-bold text-admin-text m-0 mb-5">Code Execution History</h2>
                   <CodeExecutionViewer
                     codeExecutions={analytics.recentCodeExecutions}
                     compact={false}
@@ -522,7 +578,7 @@ export default function StudentDetailPage() {
 
               {activeTab === 'gamestate' && (
                 <div className="mb-8">
-                  <h2 className="text-[22px] font-bold text-admin-dark m-0 mb-5">Game State</h2>
+                  <h2 className="text-[22px] font-bold text-admin-text m-0 mb-5">Game State</h2>
                   <GameStateViewer gameState={analytics.gameState} />
                 </div>
               )}

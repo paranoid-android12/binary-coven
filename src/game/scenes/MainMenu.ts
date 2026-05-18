@@ -22,7 +22,7 @@ export class MainMenu extends Scene
             this.load.image(`background_frame_${i}`, `/assets/f${i}.png`);
         }
 
-        this.load.image("mainTitle", "/title.png");
+        this.load.image("mainTitle", "/assets/QUBIT.png");
         this.load.atlas("mainButton", "/button.png", {
             "frames": {
                 "startButtonUp": {

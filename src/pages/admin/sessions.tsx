@@ -91,19 +91,26 @@ export default function SessionsPage() {
 
   const counts = getStatusCounts();
 
+  const filterButtonClass = (isActive: boolean) =>
+    `py-[10px] px-[18px] bg-admin-card border rounded-lg text-sm font-semibold cursor-pointer transition-colors duration-200 ${
+      isActive
+        ? 'bg-admin-accent border-admin-accent text-white'
+        : 'border-admin-border text-admin-text hover:border-admin-accent hover:text-admin-accent'
+    } max-tablet:flex-1 max-tablet:min-w-0 max-tablet:px-3 max-tablet:text-[13px]`;
+
   return (
     <AdminLayout title="Session Code Management">
       <div className="max-w-[1400px] mx-auto">
         {/* Header with Create Button */}
         <div className="flex items-center justify-between mb-[30px] gap-5 max-laptop:flex-col max-laptop:items-start">
           <div className="flex-1">
-            <h1 className="text-[28px] font-bold text-admin-dark m-0 mb-2">Session Codes</h1>
-            <p className="text-[15px] text-[#6b7280] m-0">
+            <h1 className="text-[28px] font-bold text-admin-text m-0 mb-2">Session Codes</h1>
+            <p className="text-[15px] text-admin-text-muted m-0">
               Manage session codes for student access
             </p>
           </div>
           <button
-            className="flex items-center gap-2 py-3 px-6 bg-admin-primary-gradient text-white border-none rounded-lg text-[15px] font-bold font-[family-name:var(--font-family-admin)] cursor-pointer transition-all duration-300 ease-in-out shadow-[0_2px_8px_rgba(14,195,201,0.3)] flex-shrink-0 hover:bg-admin-primary-gradient-hover hover:shadow-[0_4px_12px_rgba(14,195,201,0.4)] hover:-translate-y-[2px] active:translate-y-0 max-laptop:w-full max-laptop:justify-center"
+            className="flex items-center gap-2 py-3 px-6 bg-admin-accent text-white border-none rounded-lg text-[15px] font-bold cursor-pointer transition-colors duration-200 flex-shrink-0 hover:bg-admin-accent-hover max-laptop:w-full max-laptop:justify-center"
             onClick={() => setShowCreateModal(true)}
           >
             <span className="text-xl font-bold">+</span>
@@ -114,54 +121,19 @@ export default function SessionsPage() {
         {/* Filters and Search */}
         <div className="flex items-center justify-between gap-5 mb-[30px] flex-wrap max-laptop:flex-col max-laptop:items-stretch">
           <div className="flex gap-[10px] flex-wrap max-tablet:w-full">
-            <button
-              className={`py-[10px] px-[18px] bg-white border-2 rounded-lg text-sm font-semibold font-[family-name:var(--font-family-admin)] text-[#374151] cursor-pointer transition-all duration-300 ease-in-out ${
-                statusFilter === 'all'
-                  ? 'bg-admin-primary-gradient border-admin-primary text-white hover:bg-admin-primary-gradient-hover hover:border-admin-primary-dark'
-                  : 'border-[#e5e7eb] hover:border-admin-primary hover:bg-[#f0feff] hover:text-admin-primary-dark'
-              } max-tablet:flex-1 max-tablet:min-w-0 max-tablet:px-3 max-tablet:text-[13px]`}
-              onClick={() => setStatusFilter('all')}
-            >
+            <button className={filterButtonClass(statusFilter === 'all')} onClick={() => setStatusFilter('all')}>
               All ({counts.all})
             </button>
-            <button
-              className={`py-[10px] px-[18px] bg-white border-2 rounded-lg text-sm font-semibold font-[family-name:var(--font-family-admin)] text-[#374151] cursor-pointer transition-all duration-300 ease-in-out ${
-                statusFilter === 'active'
-                  ? 'bg-admin-primary-gradient border-admin-primary text-white hover:bg-admin-primary-gradient-hover hover:border-admin-primary-dark'
-                  : 'border-[#e5e7eb] hover:border-admin-primary hover:bg-[#f0feff] hover:text-admin-primary-dark'
-              } max-tablet:flex-1 max-tablet:min-w-0 max-tablet:px-3 max-tablet:text-[13px]`}
-              onClick={() => setStatusFilter('active')}
-            >
+            <button className={filterButtonClass(statusFilter === 'active')} onClick={() => setStatusFilter('active')}>
               Active ({counts.active})
             </button>
-            <button
-              className={`py-[10px] px-[18px] bg-white border-2 rounded-lg text-sm font-semibold font-[family-name:var(--font-family-admin)] text-[#374151] cursor-pointer transition-all duration-300 ease-in-out ${
-                statusFilter === 'expired'
-                  ? 'bg-admin-primary-gradient border-admin-primary text-white hover:bg-admin-primary-gradient-hover hover:border-admin-primary-dark'
-                  : 'border-[#e5e7eb] hover:border-admin-primary hover:bg-[#f0feff] hover:text-admin-primary-dark'
-              } max-tablet:flex-1 max-tablet:min-w-0 max-tablet:px-3 max-tablet:text-[13px]`}
-              onClick={() => setStatusFilter('expired')}
-            >
+            <button className={filterButtonClass(statusFilter === 'expired')} onClick={() => setStatusFilter('expired')}>
               Expired ({counts.expired})
             </button>
-            <button
-              className={`py-[10px] px-[18px] bg-white border-2 rounded-lg text-sm font-semibold font-[family-name:var(--font-family-admin)] text-[#374151] cursor-pointer transition-all duration-300 ease-in-out ${
-                statusFilter === 'scheduled'
-                  ? 'bg-admin-primary-gradient border-admin-primary text-white hover:bg-admin-primary-gradient-hover hover:border-admin-primary-dark'
-                  : 'border-[#e5e7eb] hover:border-admin-primary hover:bg-[#f0feff] hover:text-admin-primary-dark'
-              } max-tablet:flex-1 max-tablet:min-w-0 max-tablet:px-3 max-tablet:text-[13px]`}
-              onClick={() => setStatusFilter('scheduled')}
-            >
+            <button className={filterButtonClass(statusFilter === 'scheduled')} onClick={() => setStatusFilter('scheduled')}>
               Scheduled ({counts.scheduled})
             </button>
-            <button
-              className={`py-[10px] px-[18px] bg-white border-2 rounded-lg text-sm font-semibold font-[family-name:var(--font-family-admin)] text-[#374151] cursor-pointer transition-all duration-300 ease-in-out ${
-                statusFilter === 'inactive'
-                  ? 'bg-admin-primary-gradient border-admin-primary text-white hover:bg-admin-primary-gradient-hover hover:border-admin-primary-dark'
-                  : 'border-[#e5e7eb] hover:border-admin-primary hover:bg-[#f0feff] hover:text-admin-primary-dark'
-              } max-tablet:flex-1 max-tablet:min-w-0 max-tablet:px-3 max-tablet:text-[13px]`}
-              onClick={() => setStatusFilter('inactive')}
-            >
+            <button className={filterButtonClass(statusFilter === 'inactive')} onClick={() => setStatusFilter('inactive')}>
               Inactive ({counts.inactive})
             </button>
           </div>
@@ -172,11 +144,11 @@ export default function SessionsPage() {
               placeholder="Search by code..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full py-3 pr-10 pl-4 border-2 border-[#e5e7eb] rounded-lg text-sm font-[family-name:var(--font-family-admin)] text-admin-dark transition-all duration-300 ease-in-out box-border focus:outline-none focus:border-admin-primary focus:shadow-[0_0_0_3px_rgba(14,195,201,0.1)] placeholder:text-[#9ca3af]"
+              className="w-full py-3 pr-10 pl-4 border border-admin-border rounded-lg text-sm text-admin-text transition-colors duration-200 box-border focus:outline-none focus:border-admin-accent focus:shadow-[0_0_0_3px_rgba(180,83,9,0.1)] placeholder:text-admin-text-faint"
             />
             {searchQuery && (
               <button
-                className="absolute right-[10px] top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center bg-[#e5e7eb] border-none rounded-full text-xl text-[#6b7280] cursor-pointer transition-all duration-200 ease-in-out hover:bg-[#d1d5db] hover:text-[#374151]"
+                className="absolute right-[10px] top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center bg-stone-200 border-none rounded-full text-xl text-admin-text-muted cursor-pointer transition-colors duration-200 hover:bg-stone-300 hover:text-admin-text"
                 onClick={() => setSearchQuery('')}
               >
                 ×
@@ -187,16 +159,16 @@ export default function SessionsPage() {
 
         {/* Content */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 px-5 text-[#6b7280]">
-            <div className="w-[50px] h-[50px] border-4 border-[#e5e7eb] border-t-admin-primary rounded-full animate-spin-slow mb-5"></div>
+          <div className="flex flex-col items-center justify-center py-20 px-5 text-admin-text-muted">
+            <div className="w-[50px] h-[50px] border-4 border-admin-border border-t-admin-accent rounded-full animate-spin-slow mb-5"></div>
             <p>Loading session codes...</p>
           </div>
         ) : error ? (
-          <div className="bg-[#fef2f2] border border-[#fecaca] rounded-xl p-[30px] text-center text-[#dc2626]">
+          <div className="bg-red-50 border border-red-200 rounded-xl p-[30px] text-center text-[#b91c1c]">
             <p className="m-0 mb-[15px] text-base">{error}</p>
             <button
               onClick={fetchSessionCodes}
-              className="bg-[#dc2626] text-white border-none py-[10px] px-5 rounded-lg text-sm font-[family-name:var(--font-family-admin)] cursor-pointer transition-colors duration-300 ease-in-out hover:bg-[#b91c1c]"
+              className="bg-[#b91c1c] text-white border-none py-[10px] px-5 rounded-lg text-sm cursor-pointer transition-colors duration-200 hover:bg-[#991b1b]"
             >
               Retry
             </button>
@@ -206,12 +178,12 @@ export default function SessionsPage() {
             {searchQuery || statusFilter !== 'all' ? (
               <>
                 <div className="text-[72px] mb-5 opacity-70 max-tablet:text-[56px]">🔍</div>
-                <h3 className="text-2xl font-bold text-admin-dark m-0 mb-[10px] max-tablet:text-xl">No session codes found</h3>
-                <p className="text-base text-[#6b7280] m-0 mb-[25px] max-w-[400px] max-tablet:text-sm">
+                <h3 className="text-2xl font-bold text-admin-text m-0 mb-[10px] max-tablet:text-xl">No session codes found</h3>
+                <p className="text-base text-admin-text-muted m-0 mb-[25px] max-w-[400px] max-tablet:text-sm">
                   Try adjusting your filters or search query
                 </p>
                 <button
-                  className="py-3 px-6 bg-[#f9fafb] border-2 border-[#e5e7eb] rounded-lg text-[15px] font-semibold font-[family-name:var(--font-family-admin)] text-[#374151] cursor-pointer transition-all duration-300 ease-in-out hover:bg-[#f3f4f6] hover:border-[#d1d5db]"
+                  className="py-3 px-6 bg-stone-50 border border-admin-border rounded-lg text-[15px] font-semibold text-admin-text cursor-pointer transition-colors duration-200 hover:bg-stone-100 hover:border-admin-border-hover"
                   onClick={() => {
                     setSearchQuery('');
                     setStatusFilter('all');
@@ -222,12 +194,12 @@ export default function SessionsPage() {
               </>
             ) : (
               <>
-                <h3 className="text-2xl font-bold text-admin-dark m-0 mb-[10px] max-tablet:text-xl">No session codes yet</h3>
-                <p className="text-base text-[#6b7280] m-0 mb-[25px] max-w-[400px] max-tablet:text-sm">
+                <h3 className="text-2xl font-bold text-admin-text m-0 mb-[10px] max-tablet:text-xl">No session codes yet</h3>
+                <p className="text-base text-admin-text-muted m-0 mb-[25px] max-w-[400px] max-tablet:text-sm">
                   Create your first session code to get started
                 </p>
                 <button
-                  className="flex items-center gap-2 py-3 px-6 bg-admin-primary-gradient text-white border-none rounded-lg text-[15px] font-bold font-[family-name:var(--font-family-admin)] cursor-pointer transition-all duration-300 ease-in-out shadow-[0_2px_8px_rgba(14,195,201,0.3)] hover:bg-admin-primary-gradient-hover hover:shadow-[0_4px_12px_rgba(14,195,201,0.4)] hover:-translate-y-[2px] active:translate-y-0"
+                  className="flex items-center gap-2 py-3 px-6 bg-admin-accent text-white border-none rounded-lg text-[15px] font-bold cursor-pointer transition-colors duration-200 hover:bg-admin-accent-hover"
                   onClick={() => setShowCreateModal(true)}
                 >
                   <span className="text-xl font-bold">+</span>

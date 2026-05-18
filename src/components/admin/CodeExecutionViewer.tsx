@@ -75,9 +75,9 @@ export default function CodeExecutionViewer({ codeExecutions, compact = false }:
 
   if (codeExecutions.length === 0) {
     return (
-      <div className="text-center py-12 px-8 bg-white border border-gray-200 rounded-xl shadow-sm">
-        <FileText className="text-5xl mb-4 opacity-30 text-gray-400" size={48} />
-        <p className="text-gray-500 text-base m-0">No code executions yet</p>
+      <div className="text-center py-12 px-8 bg-admin-card border border-admin-border rounded-xl shadow-sm">
+        <FileText className="text-5xl mb-4 opacity-30 text-admin-text-faint" size={48} />
+        <p className="text-admin-text-muted text-base m-0">No code executions yet</p>
       </div>
     );
   }
@@ -88,25 +88,25 @@ export default function CodeExecutionViewer({ codeExecutions, compact = false }:
       {!compact && (
         <>
           <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-4 mb-6">
-            <div className="bg-white border border-gray-200 rounded-xl p-6 text-center transition-all duration-300 shadow-sm hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:-translate-y-0.5">
-              <div className="font-pixel text-[2rem] text-admin-primary leading-none mb-2 font-bold">{codeExecutions.length}</div>
-              <div className="text-gray-500 text-[0.8rem] uppercase tracking-wider font-medium">Total Runs</div>
+            <div className="bg-admin-card border border-admin-border rounded-xl p-6 text-center transition-all duration-300 shadow-sm">
+              <div className="text-2xl text-admin-accent leading-none mb-2 font-bold">{codeExecutions.length}</div>
+              <div className="text-admin-text-muted text-[0.8rem] uppercase tracking-wider font-medium">Total Runs</div>
             </div>
-            <div className="bg-white border border-gray-200 rounded-xl p-6 text-center transition-all duration-300 shadow-sm hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:-translate-y-0.5">
-              <div className="font-pixel text-[2rem] leading-none mb-2 font-bold" style={{ color: '#75ba75' }}>
+            <div className="bg-admin-card border border-admin-border rounded-xl p-6 text-center transition-all duration-300 shadow-sm">
+              <div className="text-2xl leading-none mb-2 font-bold" style={{ color: '#4d7c0f' }}>
                 {successCount}
               </div>
-              <div className="text-gray-500 text-[0.8rem] uppercase tracking-wider font-medium">Successful</div>
+              <div className="text-admin-text-muted text-[0.8rem] uppercase tracking-wider font-medium">Successful</div>
             </div>
-            <div className="bg-white border border-gray-200 rounded-xl p-6 text-center transition-all duration-300 shadow-sm hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:-translate-y-0.5">
-              <div className="font-pixel text-[2rem] leading-none mb-2 font-bold" style={{ color: '#ff4444' }}>
+            <div className="bg-admin-card border border-admin-border rounded-xl p-6 text-center transition-all duration-300 shadow-sm">
+              <div className="text-2xl leading-none mb-2 font-bold" style={{ color: '#b91c1c' }}>
                 {failedCount}
               </div>
-              <div className="text-gray-500 text-[0.8rem] uppercase tracking-wider font-medium">Failed</div>
+              <div className="text-admin-text-muted text-[0.8rem] uppercase tracking-wider font-medium">Failed</div>
             </div>
-            <div className="bg-white border border-gray-200 rounded-xl p-6 text-center transition-all duration-300 shadow-sm hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:-translate-y-0.5">
-              <div className="font-pixel text-[2rem] text-admin-primary leading-none mb-2 font-bold">{avgDuration}ms</div>
-              <div className="text-gray-500 text-[0.8rem] uppercase tracking-wider font-medium">Avg Duration</div>
+            <div className="bg-admin-card border border-admin-border rounded-xl p-6 text-center transition-all duration-300 shadow-sm">
+              <div className="text-2xl text-admin-accent leading-none mb-2 font-bold">{avgDuration}ms</div>
+              <div className="text-admin-text-muted text-[0.8rem] uppercase tracking-wider font-medium">Avg Duration</div>
             </div>
           </div>
 
@@ -115,7 +115,7 @@ export default function CodeExecutionViewer({ codeExecutions, compact = false }:
             <select
               value={filterQuest}
               onChange={(e) => setFilterQuest(e.target.value)}
-              className="bg-white border border-gray-200 rounded-lg py-3 px-4 text-gray-700 font-pixel text-[0.95rem] cursor-pointer transition-all duration-300 min-w-[200px] focus:outline-none focus:border-admin-primary focus:shadow-[0_0_0_3px_rgba(14,195,201,0.1)] hover:border-gray-300 max-tablet:w-full"
+              className="bg-admin-card border border-admin-border rounded-lg py-3 px-4 text-admin-text text-[0.95rem] cursor-pointer transition-all duration-300 min-w-[200px] focus:outline-none focus:border-admin-accent focus:shadow-[0_0_0_3px_rgba(180,83,9,0.1)] hover:border-admin-text-faint max-tablet:w-full"
             >
               <option value="all">All Quests</option>
               {uniqueQuests.map((questId) => (
@@ -128,7 +128,7 @@ export default function CodeExecutionViewer({ codeExecutions, compact = false }:
             <select
               value={filterSuccess}
               onChange={(e) => setFilterSuccess(e.target.value)}
-              className="bg-white border border-gray-200 rounded-lg py-3 px-4 text-gray-700 font-pixel text-[0.95rem] cursor-pointer transition-all duration-300 min-w-[200px] focus:outline-none focus:border-admin-primary focus:shadow-[0_0_0_3px_rgba(14,195,201,0.1)] hover:border-gray-300 max-tablet:w-full"
+              className="bg-admin-card border border-admin-border rounded-lg py-3 px-4 text-admin-text text-[0.95rem] cursor-pointer transition-all duration-300 min-w-[200px] focus:outline-none focus:border-admin-accent focus:shadow-[0_0_0_3px_rgba(180,83,9,0.1)] hover:border-admin-text-faint max-tablet:w-full"
             >
               <option value="all">All Results</option>
               <option value="success">Success Only</option>
@@ -141,7 +141,7 @@ export default function CodeExecutionViewer({ codeExecutions, compact = false }:
       {/* Execution List */}
       <div className="flex flex-col gap-3">
         {filteredExecutions.length === 0 ? (
-          <div className="text-center py-8 text-gray-500 bg-white border border-gray-200 rounded-xl shadow-sm">
+          <div className="text-center py-8 text-admin-text-muted bg-admin-card border border-admin-border rounded-xl shadow-sm">
             <p>No executions match your filters</p>
           </div>
         ) : (
@@ -150,62 +150,62 @@ export default function CodeExecutionViewer({ codeExecutions, compact = false }:
             const isExpanded = expandedId === exec.id;
 
             return (
-              <div key={exec.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 shadow-sm hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+              <div key={exec.id} className="bg-admin-card border border-admin-border rounded-xl overflow-hidden transition-all duration-300 shadow-sm">
                 <div className="flex items-center gap-4 p-4 cursor-pointer select-none" onClick={() => toggleExpand(exec.id)}>
                   {success ? (
-                    <Check className="text-2xl leading-none flex-shrink-0" size={20} style={{ color: '#75ba75' }} />
+                    <Check className="text-2xl leading-none flex-shrink-0" size={20} style={{ color: '#4d7c0f' }} />
                   ) : (
-                    <X className="text-2xl leading-none flex-shrink-0" size={20} style={{ color: '#ff4444' }} />
+                    <X className="text-2xl leading-none flex-shrink-0" size={20} style={{ color: '#b91c1c' }} />
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap max-tablet:flex-col max-tablet:items-start">
-                      <span className="font-pixel text-base text-gray-800 font-bold">
+                      <span className="text-base text-admin-text font-bold">
                         {exec.questId
                           ? exec.questId
                           : 'Overworld'}
                       </span>
                       {exec.phaseId && (
                         <>
-                          <span className="text-gray-300 max-tablet:hidden">›</span>
-                          <span className="font-pixel text-[0.9rem] text-admin-primary">{exec.phaseId}</span>
+                          <span className="text-admin-border max-tablet:hidden">›</span>
+                          <span className="text-[0.9rem] text-admin-accent">{exec.phaseId}</span>
                         </>
                       )}
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-gray-500 text-[0.85rem]">{formatDate(exec.executedAt)}</span>
-                      <span className="text-gray-300">•</span>
-                      <span className="text-gray-500 text-[0.85rem]">{exec.executionDurationMs != null ? `${exec.executionDurationMs}ms` : '—'}</span>
-                      <span className="text-gray-300">•</span>
-                      <span className="text-gray-500 text-[0.85rem]">{exec.entityId}</span>
+                      <span className="text-admin-text-muted text-[0.85rem]">{formatDate(exec.executedAt)}</span>
+                      <span className="text-admin-border">•</span>
+                      <span className="text-admin-text-muted text-[0.85rem]">{exec.executionDurationMs != null ? `${exec.executionDurationMs}ms` : '—'}</span>
+                      <span className="text-admin-border">•</span>
+                      <span className="text-admin-text-muted text-[0.85rem]">{exec.entityId}</span>
                     </div>
                   </div>
                   {isExpanded ? (
-                    <ChevronDown className="text-gray-400 text-[0.85rem] transition-transform duration-300" size={20} />
+                    <ChevronDown className="text-admin-text-faint text-[0.85rem] transition-transform duration-300" size={20} />
                   ) : (
-                    <ChevronRight className="text-gray-400 text-[0.85rem] transition-transform duration-300" size={20} />
+                    <ChevronRight className="text-admin-text-faint text-[0.85rem] transition-transform duration-300" size={20} />
                   )}
                 </div>
 
                 {isExpanded && (
-                  <div className="py-0 px-4 pb-4 border-t border-gray-200 bg-gray-50">
+                  <div className="py-0 px-4 pb-4 border-t border-admin-border bg-admin-bg">
                     <div className="mt-4">
-                      <div className="text-admin-primary font-pixel text-[0.85rem] uppercase tracking-wider mb-2 font-bold">Code:</div>
-                      <pre className="bg-gray-800 border border-gray-700 rounded-md p-4 text-emerald-400 font-pixel text-[0.9rem] overflow-x-auto m-0 whitespace-pre-wrap break-words">{exec.codeContent || 'No code content'}</pre>
+                      <div className="text-admin-accent text-[0.85rem] uppercase tracking-wider mb-2 font-bold">Code:</div>
+                      <pre className="bg-gray-800 border border-gray-700 rounded-md p-4 text-amber-300 font-mono text-[0.9rem] overflow-x-auto m-0 whitespace-pre-wrap break-words">{exec.codeContent || 'No code content'}</pre>
                     </div>
 
                     {exec.executionResult && (
                       <div className="mt-4">
-                        <div className="text-admin-primary font-pixel text-[0.85rem] uppercase tracking-wider mb-2 font-bold">Result:</div>
+                        <div className="text-admin-accent text-[0.85rem] uppercase tracking-wider mb-2 font-bold">Result:</div>
                         {exec.executionResult.errors && exec.executionResult.errors.length > 0 ? (
                           <div className="bg-red-50 border border-red-200 rounded-md p-4">
                             {exec.executionResult.errors.map((error: any, idx: number) => (
-                              <div key={idx} className="text-red-600 font-pixel text-[0.85rem] mb-2 last:mb-0">
+                              <div key={idx} className="text-red-600 text-[0.85rem] mb-2 last:mb-0">
                                 {typeof error === 'string' ? error : JSON.stringify(error)}
                               </div>
                             ))}
                           </div>
                         ) : (
-                          <div className="bg-green-50 border border-green-300 rounded-md p-4 text-green-600 font-pixel text-[0.85rem]">
+                          <div className="bg-green-50 border border-green-300 rounded-md p-4 text-green-600 text-[0.85rem]">
                             {exec.executionResult.output ? (
                               <pre className="m-0 whitespace-pre-wrap break-words text-green-600">{exec.executionResult.output}</pre>
                             ) : (
@@ -224,8 +224,8 @@ export default function CodeExecutionViewer({ codeExecutions, compact = false }:
       </div>
 
       {!compact && filteredExecutions.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-gray-200 text-center">
-          <p className="text-gray-500 m-0 text-[0.9rem]">
+        <div className="mt-4 pt-4 border-t border-admin-border text-center">
+          <p className="text-admin-text-muted m-0 text-[0.9rem]">
             Showing {filteredExecutions.length} of {codeExecutions.length} executions
           </p>
         </div>
