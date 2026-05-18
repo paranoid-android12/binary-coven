@@ -70,8 +70,8 @@ export class MainMenu extends Scene
         this.background = this.add.sprite(width / 2, height / 2, 'background_frame_0');
         this.background.play('background_animation');
 
-        // Create a black overlay in front of background at 20% opacity
-        this.overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);
+        // Black overlay dimming the animated background behind UI
+        this.overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.8);
         this.overlay.setDepth(100);
 
         this.mainTitle = this.add.image(width / 2, (height / 2) - 170, "mainTitle").setScale(0.7);
