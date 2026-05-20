@@ -96,14 +96,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
       // Force a full page refresh by navigating to the appropriate page
       // This ensures all state is cleared and the page is completely reloaded
-      const redirectPath = currentUserType === 'admin' ? '/admin/login' : '/';
+      const redirectPath = currentUserType === 'admin' ? '/admin/login' : '/menu';
       window.location.href = redirectPath;
 
       console.log('[UserContext] Logout complete - forcing page refresh');
     } catch (error) {
       console.error('Logout error:', error);
       // Even on error, force refresh to ensure clean state
-      const redirectPath = currentUserType === 'admin' ? '/admin/login' : '/';
+      const redirectPath = currentUserType === 'admin' ? '/admin/login' : '/menu';
       window.location.href = redirectPath;
     }
   };

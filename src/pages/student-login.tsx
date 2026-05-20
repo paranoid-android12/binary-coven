@@ -108,7 +108,7 @@ export default function StudentLogin() {
       const data: StudentLoginResponse = await response.json();
       if (data.success && data.student) {
         login(data.student, 'student');
-        router.push('/');
+        router.push('/menu');
       } else {
         setError(data.error || data.message || 'Verification failed');
       }
@@ -355,7 +355,7 @@ export default function StudentLogin() {
         // Update user context
         login(data.student, 'student');
         // Redirect to game
-        router.push('/');
+        router.push('/menu');
       } else {
         setError(data.error || data.message || 'Login failed');
       }
