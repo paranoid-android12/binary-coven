@@ -2125,7 +2125,6 @@ export const GameInterface: React.FC = () => {
                             left: 0,
                             right: 0,
                             bottom: 0,
-                            backgroundColor: "rgba(0, 0, 0, 0.3)",
                             display: "flex",
                             alignItems: "flex-end",
                             justifyContent: "center",

@@ -29,13 +29,13 @@ body{
 }
 
 /* ================= HERO ================= */
-.hero{height:6in;position:relative;overflow:hidden;flex:none;}
+.hero{height:4.9in;position:relative;overflow:hidden;flex:none;}
 .hero .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  image-rendering:pixelated;}
+  object-position:center 55%;image-rendering:pixelated;}
 .hero .veil{position:absolute;inset:0;
   background:linear-gradient(180deg,
-   rgba(10,16,22,.62) 0%,rgba(10,16,22,.12) 22%,rgba(10,16,22,.1) 44%,
-   rgba(10,16,22,.78) 70%,#0e161e 100%);}
+   rgba(10,16,22,.66) 0%,rgba(10,16,22,.14) 20%,rgba(10,16,22,.2) 40%,
+   rgba(10,16,22,.97) 60%,#0e161e 100%);}
 .hero .scan{position:absolute;inset:0;opacity:.5;
   background:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 2px,transparent 2px 5px);}
 .hero-top{position:absolute;top:.42in;left:0;right:0;text-align:center;z-index:3;}
@@ -56,7 +56,7 @@ body{
 
 /* ================= STATS ================= */
 .stats{
-  height:1.72in;flex:none;background:var(--bg-band);
+  height:1.55in;flex:none;background:var(--bg-band);
   border-top:3px solid var(--teal);border-bottom:3px solid var(--ink);
   display:flex;align-items:center;justify-content:center;gap:.34in;padding:0 .62in;
 }
@@ -72,7 +72,7 @@ body{
 
 /* ================= SECTION SHELL ================= */
 .section{flex:none;padding:.34in .62in;position:relative;}
-.sec-head{display:flex;align-items:center;gap:.2in;margin-bottom:.24in;}
+.sec-head{display:flex;align-items:center;gap:.2in;margin-bottom:.18in;}
 .sec-head .bar{width:.32in;height:.32in;background:var(--teal);flex:none;
   box-shadow:.09in .09in 0 var(--ink);}
 .sec-head .tt{font-family:'BoldPixels';font-size:24pt;color:var(--cream);letter-spacing:.03em;}
@@ -80,7 +80,7 @@ body{
 .sec-head .sd{font-size:10.5pt;color:var(--cream-dim);margin-left:auto;letter-spacing:.05em;}
 
 /* ================= HOW IT WORKS ================= */
-.how{height:3.46in;}
+.how{height:3.4in;}
 .steps{display:flex;align-items:stretch;gap:0;}
 .step{
   flex:1;background:var(--panel);border:3px solid var(--ink);border-radius:10px;
@@ -105,7 +105,7 @@ body{
   font-family:'BoldPixels';font-size:26pt;color:var(--teal);}
 
 /* ================= CONCEPTS ================= */
-.concepts{height:1.62in;background:var(--bg-band);
+.concepts{height:1.5in;background:var(--bg-band);
   border-top:3px solid var(--ink);border-bottom:3px solid var(--ink);}
 .pills{display:flex;flex-wrap:wrap;gap:.13in;justify-content:center;}
 .pill{
@@ -122,7 +122,7 @@ body{
 .pill.c7{background:var(--green);}
 
 /* ================= FEATURES ================= */
-.features{height:4.5in;display:flex;gap:.36in;}
+.features{height:5.95in;display:flex;gap:.36in;}
 .fpanel{
   flex:1;background:var(--panel);border:3px solid var(--ink);border-radius:12px;
   box-shadow:0 8px 0 var(--ink),0 15px 24px rgba(0,0,0,.5);
@@ -138,7 +138,8 @@ body{
 .fpanel h2{font-family:'BoldPixels';font-size:21pt;color:var(--ink);margin-top:.12in;
   line-height:1;}
 .fpanel .shot{
-  margin-top:.16in;height:1.5in;border:3px solid var(--ink);background:var(--ink);
+  margin-top:.16in;height:1.5in;flex:none;
+  border:3px solid var(--ink);background:var(--ink);
   border-radius:7px;overflow:hidden;box-shadow:0 5px 0 #0c0207;
 }
 .fpanel .shot img{width:100%;height:100%;object-fit:cover;object-position:top;display:block;}
@@ -177,7 +178,7 @@ body{
 
   <!-- ========= HERO ========= -->
   <div class="hero">
-    <img class="bg" src="assets/title-screen.png" alt="">
+    <img class="bg" src="assets/world.png" alt="">
     <div class="veil"></div>
     <div class="scan"></div>
     <div class="hero-top">
