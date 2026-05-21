@@ -1,0 +1,57 @@
+[
+  {
+    "key": "Box",
+    "name": "Box",
+    "filename": "Box.png",
+    "path": "tilesets/Box.png",
+    "tileSize": 16,
+    "columns": 9,
+    "rows": 20,
+    "width": 144,
+    "height": 320
+  },
+  {
+    "key": "Exterior",
+    "name": "Exterior",
+    "filename": "Exterior.png",
+    "path": "tilesets/Exterior.png",
+    "tileSize": 16,
+    "columns": 32,
+    "rows": 24,
+    "width": 512,
+    "height": 384
+  },
+  {
+    "key": "Fence_Wood",
+    "name": "Fence Wood",
+    "filename": "Fence Wood.png",
+    "path": "tilesets/Fence Wood.png",
+    "tileSize": 16,
+    "columns": 12,
+    "rows": 14,
+    "width": 192,
+    "height": 224
+  },
+  {
+    "key": "Ground_Tileset",
+    "name": "Ground_Tileset",
+    "filename": "Ground_Tileset.png",
+    "path": "tilesets/Ground_Tileset.png",
+    "tileSize": 16,
+    "columns": 25,
+    "rows": 27,
+    "width": 400,
+    "height": 432
+  },
+  {
+    "key": "wood_moss",
+    "name": "wood moss",
+    "filename": "wood moss.png",
+    "path": "tilesets/wood moss.png",
+    "tileSize": 16,
+    "columns": 3,
+    "rows": 2,
+    "width": 48,
+    "height": 32
+  }
+]

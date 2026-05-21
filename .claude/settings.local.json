@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Add-Type -AssemblyName System.IO.Compression.FileSystem; $zip=[System.IO.Compression.ZipFile]::OpenRead\\(\"$PWD\\\\BinaryCoven_UserManual.docx\"\\); $zip.Entries | Select-Object FullName, Length | Format-Table -AutoSize; $zip.Dispose\\(\\))",
+      "PowerShell(Test-Path *)",
+      "Read(//c/Program Files \\(x86\\)/Microsoft/Edge/Application/**)",
+      "Read(//c/Program Files/Google/Chrome/Application/**)",
+      "Bash(mkdir -p manual/assets)",
+      "Bash(cp _docx_extract/word/media/image1.png manual/assets/title-screen.png)",
+      "Bash(cp _docx_extract/word/media/image2.png manual/assets/login.png)",
+      "Bash(cp _docx_extract/word/media/image3.png manual/assets/world.png)",
+      "Bash(cp _docx_extract/word/media/image4.png manual/assets/hud.png)",
+      "PowerShell(Get-Item *)",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless --disable-gpu --no-pdf-header-footer --allow-file-access-from-files --print-to-pdf=\"manual/BinaryCoven_UserManual.pdf\" \"file:///C:/Users/Kirk/Documents/GitHub/binary-coven/manual/BinaryCoven_UserManual.html\")",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless --disable-gpu --no-pdf-header-footer --allow-file-access-from-files \"--print-to-pdf=C:\\\\Users\\\\Kirk\\\\Documents\\\\GitHub\\\\binary-coven\\\\manual\\\\BinaryCoven_UserManual.pdf\" \"file:///C:/Users/Kirk/Documents/GitHub/binary-coven/manual/BinaryCoven_UserManual.html\")",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=1.5 --window-size=794,1123 --allow-file-access-from-files \"--screenshot=C:\\\\Users\\\\Kirk\\\\Documents\\\\GitHub\\\\binary-coven\\\\manual\\\\_preview_full.png\" \"file:///C:/Users/Kirk/Documents/GitHub/binary-coven/manual/BinaryCoven_UserManual.html\")",
+      "Bash(rm -f manual/_preview_full.png)",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=1.5 --window-size=794,20210 --allow-file-access-from-files \"--screenshot=C:\\\\Users\\\\Kirk\\\\Documents\\\\GitHub\\\\binary-coven\\\\manual\\\\_preview_full.png\" \"file:///C:/Users/Kirk/Documents/GitHub/binary-coven/manual/BinaryCoven_UserManual.html\")",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=1.5 --window-size=794,20210 --allow-file-access-from-files \"--screenshot=C:\\\\Users\\\\Kirk\\\\Documents\\\\GitHub\\\\binary-coven\\\\manual\\\\_chk.png\" \"file:///C:/Users/Kirk/Documents/GitHub/binary-coven/manual/BinaryCoven_UserManual.html\")",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless --disable-gpu --no-pdf-header-footer --allow-file-access-from-files \"--print-to-pdf=C:\\\\Users\\\\Kirk\\\\Documents\\\\GitHub\\\\binary-coven\\\\poster\\\\BinaryCoven_Poster.pdf\" \"file:///C:/Users/Kirk/Documents/GitHub/binary-coven/poster/BinaryCoven_Poster.html\")",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=2 --window-size=1152,1728 --allow-file-access-from-files \"--screenshot=C:\\\\Users\\\\Kirk\\\\Documents\\\\GitHub\\\\binary-coven\\\\poster\\\\_preview.png\" \"file:///C:/Users/Kirk/Documents/GitHub/binary-coven/poster/BinaryCoven_Poster.html\")",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\Kirk\\\\Documents\\\\GitHub\\\\binary-coven\\\\docs-source\" -Recurse -File | Select-Object -ExpandProperty FullName | ForEach-Object { $_.Replace\\(\"C:\\\\Users\\\\Kirk\\\\Documents\\\\GitHub\\\\binary-coven\\\\docs-source\\\\\", \"\"\\) } | Sort-Object)",
+      "Bash(grep -rn \"^\\\\s*//\" C:/Users/Kirk/Documents/GitHub/binary-coven/docs-source --include=\"*.ts\" --include=\"*.tsx\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Kirk\\\\Documents\\\\GitHub\\\\binary-coven\\\\docs-source\" -Recurse -Include \"*.ts\",\"*.tsx\")",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(grep *)"
+    ]
+  }
+}

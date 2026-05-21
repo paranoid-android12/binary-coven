@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Binary Coven User Manual</title>
+<link rel="stylesheet" href="assets/font.css">
+<style>
+:root{
+  --bg:#17232f; --bg-deep:#0e161e;
+  --panel:#e8c4a3; --panel-hi:#f4dcc2; --box:#dcad88;
+  --ink:#210714; --ink-soft:rgba(33,7,20,.62);
+  --cream:#f4e4ce; --cream-dim:rgba(244,228,206,.6);
+  --teal:#16c2c8; --green:#5f9f2e; --amber:#e3a526; --red:#c8472f; --wood:#b9774a;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+@page{size:A4;margin:0;}
+html,body{background:var(--bg-deep);}
+body{
+  font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  color:var(--ink);
+}
+.pix{font-family:'BoldPixels','Segoe UI',sans-serif;letter-spacing:.04em;}
+.mono{font-family:'Consolas','Courier New',monospace;}
+
+/* ---- PAGE SHELL ---- */
+.page{
+  width:210mm;height:297mm;position:relative;overflow:hidden;
+  background:var(--bg);display:flex;flex-direction:column;
+}
+.page::after{ /* subtle vignette */
+  content:"";position:absolute;inset:0;pointer-events:none;
+  box-shadow:inset 0 0 90mm rgba(0,0,0,.45);
+}
+.content{flex:1;padding:13mm 17mm 7mm;position:relative;z-index:2;display:flex;flex-direction:column;}
+
+/* ---- RUNNING HEAD / FOOT ---- */
+.rhead{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6mm 17mm 0;position:relative;z-index:3;
+}
+.rhead .brand{display:flex;align-items:center;gap:3mm;}
+.rhead .brand img{height:6.5mm;image-rendering:pixelated;}
+.rhead .brand b{font-size:9pt;color:var(--cream);letter-spacing:.12em;}
+.rhead .sect{font-size:8pt;color:var(--teal);letter-spacing:.18em;}
+.rhead::after{content:"";position:absolute;left:17mm;right:17mm;bottom:-2.5mm;height:2px;
+  background:linear-gradient(90deg,var(--teal),rgba(22,194,200,0));}
+.rfoot{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 17mm 6mm;position:relative;z-index:3;
+}
+.rfoot span{font-size:7.5pt;color:var(--cream-dim);letter-spacing:.14em;}
+.pgnum{
+  font-size:9pt;color:var(--cream);background:var(--ink);
+  border:2px solid var(--teal);padding:1mm 2.6mm;border-radius:3px;
+}
+
+/* ---- HEADINGS ---- */
+.kicker{font-size:8.5pt;color:var(--teal);letter-spacing:.28em;margin-bottom:2.5mm;}
+.h1{font-size:31pt;color:var(--cream);line-height:.98;text-shadow:3px 3px 0 rgba(0,0,0,.45);}
+.h1 .dot{color:var(--teal);}
+.watermark{
+  position:absolute;top:6mm;right:14mm;font-size:150pt;line-height:1;
+  color:rgba(22,194,200,.07);z-index:1;
+}
+.lead{font-size:10.5pt;line-height:1.55;color:var(--cream);margin-top:4mm;max-width:150mm;}
+.lead b{color:var(--teal);}
+
+/* ---- PANELS ---- */
+.panel{
+  background:var(--panel);border:3px solid var(--ink);border-radius:9px;
+  box-shadow:0 6px 0 var(--ink),0 13px 20px rgba(0,0,0,.5);
+  padding:6mm 7mm;position:relative;
+}
+.panel.tight{padding:5mm 6mm;}
+.panel-title{
+  font-size:12pt;color:var(--ink);margin-bottom:3.5mm;display:flex;align-items:center;gap:2.5mm;
+}
+.panel-title .tk{
+  background:var(--ink);color:var(--panel-hi);font-size:8.5pt;
+  padding:1mm 2.4mm;border-radius:3px;letter-spacing:.1em;
+}
+.row{display:flex;gap:6mm;}
+.row>*{flex:1;min-width:0;}
+
+/* ---- STEPS ---- */
+.steps{display:flex;flex-direction:column;gap:3.4mm;}
+.step{display:flex;gap:3.5mm;align-items:flex-start;}
+.step .n{
+  flex:none;width:8mm;height:8mm;background:var(--ink);color:var(--cream);
+  font-family:'BoldPixels';font-size:11pt;display:flex;align-items:center;justify-content:center;
+  border-radius:4px;box-shadow:0 3px 0 rgba(0,0,0,.4);
+}
+.step .t{font-size:9.7pt;line-height:1.46;padding-top:.6mm;}
+.step .t b{color:var(--wood);}
+
+/* ---- CALLOUT ---- */
+.callout{
+  background:var(--box);border:2px solid var(--ink);border-left:5px solid var(--green);
+  border-radius:6px;padding:3.6mm 4.5mm;position:relative;
+}
+.callout.note{border-left-color:var(--amber);}
+.callout .lab{
+  font-family:'BoldPixels';font-size:8.5pt;letter-spacing:.12em;
+  color:var(--green);margin-bottom:1.4mm;display:block;
+}
+.callout.note .lab{color:#9a6a08;}
+.callout p{font-size:9.2pt;line-height:1.45;}
+
+/* ---- TABLES ---- */
+.tbl{width:100%;border-collapse:collapse;border:2.5px solid var(--ink);border-radius:6px;overflow:hidden;}
+.tbl thead th{
+  background:var(--ink);color:var(--panel-hi);font-family:'BoldPixels';
+  font-size:8.5pt;letter-spacing:.08em;text-align:left;padding:2.6mm 3.4mm;
+}
+.tbl td{padding:2.4mm 3.4mm;font-size:9pt;border-top:1.5px solid rgba(33,7,20,.35);vertical-align:middle;}
+.tbl tbody tr:nth-child(odd){background:rgba(255,255,255,.16);}
+.tbl.dense td{padding:1.7mm 3.4mm;}
+.tbl .cmd{font-family:'Consolas','Courier New',monospace;font-weight:bold;color:#7a1f12;font-size:9pt;}
+.tbl .ctr{text-align:center;}
+.pill{
+  display:inline-block;font-family:'BoldPixels';font-size:7pt;letter-spacing:.06em;
+  color:#fff;padding:.8mm 2mm;border-radius:3px;border:1.5px solid rgba(0,0,0,.35);
+}
+.pill.no{background:#8a8f96;}
+.pill.tile{background:var(--wood);}
+
+/* ---- SCREENSHOT ---- */
+.shot{
+  border:3px solid var(--ink);background:var(--ink);border-radius:6px;
+  box-shadow:0 6px 0 #0c0207,0 13px 20px rgba(0,0,0,.5);overflow:hidden;
+}
+.shot img{display:block;width:100%;}
+.shot.cover-img{height:100%;}
+.shot.cover-img img{height:100%;object-fit:cover;object-position:top;}
+.cap{font-size:7.6pt;color:var(--cream-dim);letter-spacing:.06em;margin-top:2.2mm;text-align:center;}
+
+/* ---- TAGS ---- */
+.tag{font-family:'BoldPixels';font-size:7.5pt;color:#fff;padding:1mm 2.4mm;border-radius:3px;
+  border:1.6px solid rgba(0,0,0,.4);letter-spacing:.05em;}
+.tag.beg{background:var(--green);}
+.tag.int{background:var(--amber);}
+.tag.adv{background:var(--red);}
+
+/* ---- MINI FEATURE CARD ---- */
+.fcard{background:var(--box);border:2px solid var(--ink);border-radius:6px;padding:3.6mm 4mm;}
+.fcard h4{font-family:'BoldPixels';font-size:9.5pt;color:var(--ink);margin-bottom:1.6mm;letter-spacing:.03em;}
+.fcard p{font-size:8.7pt;line-height:1.42;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:4mm;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4mm;}
+
+/* ---- DEFINITION ROW ---- */
+.deflist{display:flex;flex-direction:column;gap:2.6mm;}
+.defrow{display:flex;gap:3.5mm;align-items:baseline;}
+.defrow .k{
+  flex:none;width:36mm;font-family:'BoldPixels';font-size:8.6pt;color:#7a1f12;letter-spacing:.02em;
+}
+.defrow .v{font-size:9pt;line-height:1.4;}
+
+/* ================= COVER ================= */
+.cover{justify-content:flex-end;}
+.cover .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;image-rendering:pixelated;z-index:0;}
+.cover .veil{position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,rgba(10,16,22,.55) 0%,rgba(10,16,22,.05) 26%,
+   rgba(10,16,22,.2) 50%,rgba(10,16,22,.93) 76%,#0b1118 100%);}
+.cover .ctop{position:absolute;top:14mm;left:0;right:0;text-align:center;z-index:3;}
+.cover .ctop .k{font-size:9pt;color:var(--cream);letter-spacing:.32em;}
+.cover .cwrap{position:relative;z-index:3;padding:0 0 26mm;text-align:center;}
+.cover .banner{
+  display:inline-block;background:var(--panel);border:4px solid var(--ink);border-radius:12px;
+  box-shadow:0 9px 0 var(--ink),0 18px 30px rgba(0,0,0,.6);
+  padding:7mm 18mm 8mm;
+}
+.cover .banner .um{font-size:42pt;color:var(--ink);line-height:1;
+  text-shadow:3px 3px 0 rgba(255,255,255,.28);}
+.cover .banner .ln{height:3px;background:var(--ink);opacity:.4;margin:4mm 0 3.5mm;}
+.cover .banner .sub{font-size:8.6pt;color:var(--ink-soft);letter-spacing:.04em;max-width:115mm;
+  margin:0 auto;line-height:1.4;}
+.cover .vchip{display:inline-block;margin-top:7mm;background:var(--ink);color:var(--teal);
+  font-family:'BoldPixels';font-size:9pt;letter-spacing:.14em;padding:2mm 5mm;border-radius:5px;
+  border:2px solid var(--teal);}
+.cover .college{margin-top:6mm;color:var(--cream);font-size:8.4pt;letter-spacing:.16em;line-height:1.7;}
+.cover .college b{color:var(--teal);letter-spacing:.16em;}
+
+/* ================= DIVIDER ================= */
+.divider{justify-content:center;align-items:center;}
+.divider .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;image-rendering:pixelated;z-index:0;opacity:.55;}
+.divider .veil{position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,rgba(11,17,24,.82),rgba(11,17,24,.62) 45%,rgba(11,17,24,.92));}
+.divider .dwrap{position:relative;z-index:3;text-align:center;padding:0 24mm;}
+.divider .ppill{display:inline-block;background:var(--ink);color:var(--cream);
+  font-family:'BoldPixels';font-size:11pt;letter-spacing:.26em;padding:2.4mm 7mm;border-radius:5px;
+  border:2px solid var(--teal);}
+.divider .dtitle{font-size:46pt;color:var(--cream);margin:7mm 0 0;line-height:1;
+  text-shadow:4px 4px 0 rgba(0,0,0,.55);}
+.divider .dtitle .dot{color:var(--teal);}
+.divider .drule{width:46mm;height:4px;background:var(--teal);margin:8mm auto;}
+.divider .dpanel{
+  background:var(--panel);border:3px solid var(--ink);border-radius:9px;
+  box-shadow:0 7px 0 var(--ink),0 15px 24px rgba(0,0,0,.55);
+  padding:6mm 8mm;max-width:135mm;margin:0 auto;
+}
+.divider .dpanel p{font-size:10pt;line-height:1.6;color:var(--ink);}
+.divider .dpanel p b{color:var(--wood);}
+.divider .dchapters{margin-top:7mm;display:flex;gap:3mm;justify-content:center;flex-wrap:wrap;}
+.divider .dchapters span{background:rgba(244,228,206,.1);border:1.5px solid rgba(22,194,200,.4);
+  color:var(--cream);font-size:7.6pt;letter-spacing:.08em;padding:1.6mm 3.2mm;border-radius:4px;}
+
+/* ================= CONTENTS ================= */
+.toc-col{margin-top:5mm;}
+.toc-part{font-family:'BoldPixels';font-size:12pt;color:var(--teal);letter-spacing:.1em;
+  margin:0 0 3.5mm;display:flex;align-items:center;gap:3mm;}
+.toc-part::after{content:"";flex:1;height:2px;background:rgba(22,194,200,.35);}
+.toc-row{display:flex;align-items:baseline;gap:3mm;margin-bottom:3.6mm;}
+.toc-row .tn{font-family:'BoldPixels';font-size:10pt;color:var(--ink);background:var(--panel);
+  border:2px solid var(--ink);border-radius:4px;padding:.8mm 2.4mm;flex:none;}
+.toc-row .tt{font-size:10.5pt;color:var(--cream);}
+.toc-row .tt small{display:block;font-size:7.6pt;color:var(--cream-dim);letter-spacing:.04em;margin-top:.5mm;}
+.toc-row .dots{flex:1;border-bottom:2px dotted rgba(244,228,206,.32);align-self:flex-end;margin-bottom:1mm;}
+.toc-row .tp{font-family:'BoldPixels';font-size:11pt;color:var(--teal);flex:none;}
+
+/* ---- BACK COVER ---- */
+.back{justify-content:center;align-items:center;}
+.back .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;image-rendering:pixelated;z-index:0;opacity:.4;}
+.back .veil{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(11,17,24,.9),#0b1118);}
+.back .bwrap{position:relative;z-index:3;text-align:center;}
+.back img.logo{width:115mm;image-rendering:pixelated;}
+.back .bq{margin-top:8mm;font-size:11pt;color:var(--cream);letter-spacing:.04em;line-height:1.6;}
+.back .bq b{color:var(--teal);}
+.back .bline{width:40mm;height:3px;background:var(--teal);margin:8mm auto;}
+.back .bmeta{color:var(--cream-dim);font-size:8pt;letter-spacing:.16em;line-height:1.9;}
+
+.note-inline{font-size:8.6pt;color:var(--ink-soft);font-style:italic;margin-top:2mm;}
+</style>
+</head>
+<body>
+
+<!-- ============ PAGE 1 - COVER ============ -->
+<div class="page cover">
+  <img class="bg" src="assets/title-screen.png" alt="">
+  <div class="veil"></div>
+  <div class="ctop">
+    <div class="k pix">GORDON COLLEGE &nbsp;&middot;&nbsp; COLLEGE OF COMPUTER STUDIES</div>
+  </div>
+  <div class="cwrap">
+    <div class="banner">
+      <div class="um pix">USER MANUAL</div>
+      <div class="ln"></div>
+      <div class="sub">A web-based, quest-oriented learning system for introductory
+      programming, with instructor management features.</div>
+    </div>
+    <div><span class="vchip pix">VERSION 1.0 &nbsp;&middot;&nbsp; APRIL 2026</span></div>
+    <div class="college pix">
+      <b>BINARY COVEN</b><br>
+      Olongapo City, Zambales, Philippines
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAGE 2 - CONTENTS ============ -->
+<div class="page">
+  <div class="rhead">
+    <div class="brand"><img src="assets/logo.png" alt=""><b class="pix">BINARY COVEN</b></div>
+    <div class="sect pix">USER MANUAL</div>
+  </div>
+  <div class="content">
+    <div class="kicker pix">WHAT&rsquo;S INSIDE</div>
+    <div class="h1 pix">CONTENTS</div>
+    <div class="watermark pix">&sect;</div>
+
+    <div class="toc-col">
+      <div class="toc-part pix">PART I: STUDENT GUIDE</div>
+      <div class="toc-row"><span class="tn pix">1</span>
+        <span class="tt">Getting Started<small>Accounts, session codes &amp; logging in</small></span>
+        <span class="dots"></span><span class="tp pix">04</span></div>
+      <div class="toc-row"><span class="tn pix">2</span>
+        <span class="tt">Navigating the World<small>Controls and the heads-up display</small></span>
+        <span class="dots"></span><span class="tp pix">06</span></div>
+      <div class="toc-row"><span class="tn pix">3</span>
+        <span class="tt">The Quest System<small>How you learn, one quest at a time</small></span>
+        <span class="dots"></span><span class="tp pix">07</span></div>
+      <div class="toc-row"><span class="tn pix">4</span>
+        <span class="tt">The Programming Terminal<small>Writing code that commands Qubit</small></span>
+        <span class="dots"></span><span class="tp pix">08</span></div>
+      <div class="toc-row"><span class="tn pix">5</span>
+        <span class="tt">Saving Your Progress<small>The two-tier save system</small></span>
+        <span class="dots"></span><span class="tp pix">11</span></div>
+    </div>
+
+    <div class="toc-col" style="margin-top:9mm;">
+      <div class="toc-part pix">PART II: INSTRUCTOR GUIDE</div>
+      <div class="toc-row"><span class="tn pix">6</span>
+        <span class="tt">Getting Started (Admin)<small>Login and the dashboard</small></span>
+        <span class="dots"></span><span class="tp pix">13</span></div>
+      <div class="toc-row"><span class="tn pix">7</span>
+        <span class="tt">Managing Sessions<small>Creating sessions &amp; their lifecycle</small></span>
+        <span class="dots"></span><span class="tp pix">14</span></div>
+      <div class="toc-row"><span class="tn pix">8</span>
+        <span class="tt">Monitoring Students<small>Progress, objectives &amp; code review</small></span>
+        <span class="dots"></span><span class="tp pix">15</span></div>
+      <div class="toc-row"><span class="tn pix">9</span>
+        <span class="tt">Admin User Management<small>Super Admin account controls</small></span>
+        <span class="dots"></span><span class="tp pix">16</span></div>
+      <div class="toc-row"><span class="tn pix">10</span>
+        <span class="tt">Quick Reference<small>Command cheat sheet &amp; admin URLs</small></span>
+        <span class="dots"></span><span class="tp pix">16</span></div>
+    </div>
+  </div>
+  <div class="rfoot"><span class="pix">BINARY COVEN &middot; USER MANUAL</span><span class="pgnum pix">02</span></div>
+</div>
+
+<!-- ============ PAGE 3 - PART I DIVIDER ============ -->
+<div class="page divider">
+  <img class="bg" src="assets/world.png" alt="">
+  <div class="veil"></div>
+  <div class="dwrap">
+    <span class="ppill pix">PART I</span>
+    <div class="dtitle pix">STUDENT<br>GUIDE<span class="dot">.</span></div>
+    <div class="drule"></div>
+    <div class="dpanel">
+      <p>Welcome, aspiring coder. Your robot companion <b>Qubit</b> is waiting for
+      instructions, and you&rsquo;re about to learn how to give them. This half of the
+      manual takes you from your very first login all the way to writing real
+      automation code.</p>
+    </div>
+    <div class="dchapters">
+      <span>1 &middot; Getting Started</span>
+      <span>2 &middot; Navigating</span>
+      <span>3 &middot; Quests</span>
+      <span>4 &middot; The Terminal</span>
+      <span>5 &middot; Saving</span>
+    </div>
+  </div>
+  <div class="rfoot" style="position:absolute;bottom:0;left:0;right:0;">
+    <span class="pix">BINARY COVEN &middot; USER MANUAL</span><span class="pgnum pix">03</span></div>
+</div>
+
+<!-- ============ PAGE 4 -§1 GETTING STARTED ============ -->
+<div class="page">
+  <div class="rhead">
+    <div class="brand"><img src="assets/logo.png" alt=""><b class="pix">BINARY COVEN</b></div>
+    <div class="sect pix">STUDENT GUIDE</div>
+  </div>
+  <div class="content">
+    <div class="watermark pix">1</div>
+    <div class="kicker pix">SECTION 1</div>
+    <div class="h1 pix">GETTING STARTED<span class="dot">.</span></div>
+    <div class="lead">You need just two things to begin: an <b>account</b> and a
+      <b>session code</b> from your instructor. Think of the code as your ticket
+      into the classroom.</div>
+
+    <div class="row" style="margin-top:7mm;align-items:stretch;">
+      <div style="flex:1.18;">
+        <div class="panel" style="height:100%;">
+          <div class="panel-title pix"><span class="tk pix">1.1</span> Create your account</div>
+          <div class="steps">
+            <div class="step"><div class="n">1</div><div class="t">Enter the
+              <b>session code</b>. A green check means you&rsquo;re good; a red X means it&rsquo;s
+              expired or wrong.</div></div>
+            <div class="step"><div class="n">2</div><div class="t">Fill in your
+              <b>email, username,</b> and <b>password</b>. The password needs one uppercase
+              letter, one number, and one special character.</div></div>
+            <div class="step"><div class="n">3</div><div class="t">Click <b>Submit</b>.
+              A brand-new username jumps straight to email verification.</div></div>
+            <div class="step"><div class="n">4</div><div class="t">Check your inbox for a
+              <b>6-digit code</b> and type it in. No email? Wait 60s and hit Resend.</div></div>
+            <div class="step"><div class="n">5</div><div class="t"><b>Verified!</b> Your
+              account is created, your game state loads, and you&rsquo;re in.</div></div>
+          </div>
+        </div>
+      </div>
+      <div style="flex:.82;display:flex;flex-direction:column;">
+        <div class="shot"><img src="assets/login.png" alt=""></div>
+        <div class="cap pix">THE STUDENT PORTAL LOGIN</div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:6mm;">
+      <span class="lab">TIP: ONE ACCOUNT, EVERY SESSION</span>
+      <p>Got a new session code next week? Just log in with the same username and
+      password, and Binary Coven links your account to the new session automatically.</p>
+    </div>
+  </div>
+  <div class="rfoot"><span class="pix">SECTION 1 &middot; GETTING STARTED</span><span class="pgnum pix">04</span></div>
+</div>
+
+<!-- ============ PAGE 5 -§1 CONT ============ -->
+<div class="page">
+  <div class="rhead">
+    <div class="brand"><img src="assets/logo.png" alt=""><b class="pix">BINARY COVEN</b></div>
+    <div class="sect pix">STUDENT GUIDE</div>
+  </div>
+  <div class="content">
+    <div class="kicker pix">SECTION 1 &middot; CONTINUED</div>
+    <div class="h1 pix" style="font-size:24pt;">JOIN, RETURN &amp; RECOVER</div>
+
+    <div class="grid3" style="margin-top:7mm;">
+      <div class="panel tight">
+        <div class="panel-title pix" style="font-size:10.5pt;"><span class="tk pix">1.2</span> Join a session</div>
+        <p style="font-size:9pt;line-height:1.5;">Sessions open and close on a schedule
+        and may have a student cap. If your code is <b>expired</b> or the room is
+        <b>full</b>, the app tells you. Just ask your instructor for a fresh one.</p>
+      </div>
+      <div class="panel tight">
+        <div class="panel-title pix" style="font-size:10.5pt;"><span class="tk pix">1.3</span> Log in again</div>
+        <p style="font-size:9pt;line-height:1.5;">Returning player? Enter your
+        <b>username</b>, <b>password</b>, and the <b>current session code</b>. No email
+        verification needed the second time around.</p>
+      </div>
+      <div class="panel tight">
+        <div class="panel-title pix" style="font-size:10.5pt;"><span class="tk pix">1.4</span> Forgot password</div>
+        <p style="font-size:9pt;line-height:1.5;">Enter your username and session code.
+        A reset code is emailed to you. Type it in, then choose a new password.</p>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:7mm;">
+      <div class="panel-title pix"><span class="tk pix">i</span> Reset your password in three steps</div>
+      <div class="steps">
+        <div class="step"><div class="n">1</div><div class="t">On the login screen,
+          enter your <b>username</b> and <b>session code</b>.</div></div>
+        <div class="step"><div class="n">2</div><div class="t">A reset code is sent to your
+          registered email (shown partly masked for privacy).</div></div>
+        <div class="step"><div class="n">3</div><div class="t">Enter the code and set a
+          fresh password and get back to coding.</div></div>
+      </div>
+    </div>
+
+    <div class="callout note" style="margin-top:6mm;">
+      <span class="lab">NOTE</span>
+      <p>Session codes have time windows: <i>scheduled</i>, <i>active,</i> or
+      <i>expired</i>, and sometimes a maximum number of students. Only an
+      <i>active</i> code with room to spare will let you in.</p>
+    </div>
+  </div>
+  <div class="rfoot"><span class="pix">SECTION 1 &middot; GETTING STARTED</span><span class="pgnum pix">05</span></div>
+</div>
+
+<!-- ============ PAGE 6 -§2 NAVIGATING ============ -->
+<div class="page">
+  <div class="rhead">
+    <div class="brand"><img src="assets/logo.png" alt=""><b class="pix">BINARY COVEN</b></div>
+    <div class="sect pix">STUDENT GUIDE</div>
+  </div>
+  <div class="content">
+    <div class="watermark pix">2</div>
+    <div class="kicker pix">SECTION 2</div>
+    <div class="h1 pix">NAVIGATING THE WORLD<span class="dot">.</span></div>
+    <div class="lead">Binary Coven is a pixel world built on a grid. Move by
+      <b>clicking</b>, by <b>arrow keys</b>, or (the real goal) by
+      <b>writing code</b> that tells Qubit exactly where to go.</div>
+
+    <div class="row" style="margin-top:6mm;align-items:stretch;">
+      <div style="flex:1.05;">
+        <div class="panel" style="height:100%;">
+          <div class="panel-title pix"><span class="tk pix">2.1</span> Basic controls</div>
+          <table class="tbl">
+            <thead><tr><th>INPUT</th><th>WHAT IT DOES</th></tr></thead>
+            <tbody>
+              <tr><td><b>Click Qubit</b></td><td>Opens the status / programming panel</td></tr>
+              <tr><td><b>Click a tile</b></td><td>Shows tile info &amp; actions</td></tr>
+              <tr><td><b>Arrow keys</b></td><td>Manual movement for testing</td></tr>
+              <tr><td><b>Drag</b></td><td>Move windows &amp; panels around</td></tr>
+              <tr><td><b>Corner handles</b></td><td>Resize windows &amp; panels</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="flex:.95;display:flex;flex-direction:column;">
+        <div class="shot"><img src="assets/world.png" alt=""></div>
+        <div class="cap pix">QUBIT EXPLORING THE GRID</div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:6mm;">
+      <div class="panel-title pix"><span class="tk pix">2.2</span> The HUD</div>
+      <div class="row" style="gap:6mm;align-items:center;">
+        <div style="flex:1.25;">
+          <div class="deflist">
+            <div class="defrow"><span class="k">QUESTS</span><span class="v">Your quest log: available, active &amp; completed</span></div>
+            <div class="defrow"><span class="k">GLOSSARY</span><span class="v">Every command and its syntax</span></div>
+            <div class="defrow"><span class="k">STATUS</span><span class="v">Qubit&rsquo;s energy, position &amp; inventory</span></div>
+            <div class="defrow"><span class="k">EXPLORE</span><span class="v">World map and points of interest</span></div>
+            <div class="defrow"><span class="k">MAP EDITOR</span><span class="v">Edit the grid (available in some contexts)</span></div>
+          </div>
+        </div>
+        <div style="flex:.75;">
+          <div class="shot"><img src="assets/hud.png" alt=""></div>
+          <div class="cap pix">THE HUD BUTTON BAR</div>
+        </div>
+      </div>
+      <div class="note-inline">Toast pop-ups announce quest updates, errors and
+      achievements. Errors also get their own dedicated panel with line numbers.</div>
+    </div>
+  </div>
+  <div class="rfoot"><span class="pix">SECTION 2 &middot; NAVIGATING THE WORLD</span><span class="pgnum pix">06</span></div>
+</div>
+
+<!-- ============ PAGE 7 -§3 QUESTS ============ -->
+<div class="page">
+  <div class="rhead">
+    <div class="brand"><img src="assets/logo.png" alt=""><b class="pix">BINARY COVEN</b></div>
+    <div class="sect pix">STUDENT GUIDE</div>
+  </div>
+  <div class="content">
+    <div class="watermark pix">3</div>
+    <div class="kicker pix">SECTION 3</div>
+    <div class="h1 pix">THE QUEST SYSTEM<span class="dot">.</span></div>
+    <div class="lead">Quests are how you learn. Each one teaches a concept
+      (sequencing, conditionals, loops, functions, optimization) by making you
+      write code that moves Qubit through the world.</div>
+
+    <div class="row" style="margin-top:6mm;align-items:stretch;">
+      <div style="flex:1.1;display:flex;flex-direction:column;">
+        <div class="shot"><img src="assets/quests.png" alt=""></div>
+        <div class="cap pix">THE QUEST LOG: THREE TABS</div>
+      </div>
+      <div style="flex:.9;">
+        <div class="panel" style="height:100%;">
+          <div class="panel-title pix"><span class="tk pix">3.1</span> Three tabs</div>
+          <div class="deflist">
+            <div class="defrow"><span class="k" style="width:26mm;">AVAILABLE</span><span class="v">Quests you can start right now</span></div>
+            <div class="defrow"><span class="k" style="width:26mm;">ACTIVE</span><span class="v">Your current quest, one at a time</span></div>
+            <div class="defrow"><span class="k" style="width:26mm;">COMPLETED</span><span class="v">Finished quests, fully replayable</span></div>
+          </div>
+          <div style="margin-top:4mm;font-size:8.8pt;line-height:1.5;">
+            Every card shows difficulty, category, time estimate, the concepts it
+            teaches, and any prerequisites:
+          </div>
+          <div style="margin-top:3mm;display:flex;gap:2.5mm;">
+            <span class="tag beg pix">BEGINNER</span>
+            <span class="tag int pix">INTERMEDIATE</span>
+            <span class="tag adv pix">ADVANCED</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:6mm;">
+      <div class="panel tight">
+        <div class="panel-title pix" style="font-size:11pt;"><span class="tk pix">3.2</span> Phases &amp; objectives</div>
+        <p style="font-size:9pt;line-height:1.5;">Quests split into <b>phases</b>, and each
+        phase has <b>objectives</b>. Clear the objectives and the phase advances with a
+        bit of dialogue. Clear the final phase and the quest (plus anything it
+        unlocks) is done. Wrong answer? The world resets to the phase start so you
+        can try again. <b>No penalty. Experiment freely.</b></p>
+      </div>
+      <div class="panel tight">
+        <div class="panel-title pix" style="font-size:11pt;"><span class="tk pix">3.3</span> Cancel &amp; restart</div>
+        <p style="font-size:9pt;line-height:1.5;">Cancel an active quest any time to try
+        a different one, or restart a finished quest to practice again. All progress is
+        saved to the server and persists across logins.</p>
+      </div>
+    </div>
+
+    <div class="callout note" style="margin-top:6mm;">
+      <span class="lab">NOTE: LOCKED QUESTS</span>
+      <p>If your instructor enables prerequisites, some quests stay locked until you
+      finish the ones before them. That&rsquo;s by design: the concepts build on
+      each other.</p>
+    </div>
+  </div>
+  <div class="rfoot"><span class="pix">SECTION 3 &middot; THE QUEST SYSTEM</span><span class="pgnum pix">07</span></div>
+</div>
+
+<!-- ============ PAGE 8 -§4 TERMINAL ============ -->
+<div class="page">
+  <div class="rhead">
+    <div class="brand"><img src="assets/logo.png" alt=""><b class="pix">BINARY COVEN</b></div>
+    <div class="sect pix">STUDENT GUIDE</div>
+  </div>
+  <div class="content">
+    <div class="watermark pix">4</div>
+    <div class="kicker pix">SECTION 4</div>
+    <div class="h1 pix">THE PROGRAMMING TERMINAL<span class="dot">.</span></div>
+    <div class="lead">This is the heart of Binary Coven: a <b>Monaco</b> code editor
+      (the same engine behind VS Code) with syntax highlighting and autocomplete.
+      Here&rsquo;s where you command Qubit.</div>
+
+    <div class="row" style="margin-top:6mm;align-items:stretch;">
+      <div style="flex:1.05;display:flex;flex-direction:column;">
+        <div class="shot"><img src="assets/terminal.png" alt=""></div>
+        <div class="cap pix">THE CODE EDITOR: PROGRAM TAB</div>
+      </div>
+      <div style="flex:.95;">
+        <div class="panel" style="height:100%;">
+          <div class="panel-title pix"><span class="tk pix">4.1</span> Open the editor</div>
+          <p style="font-size:9pt;line-height:1.5;">Click <b>Qubit</b>, then the
+          <b>Program</b> tab. The sidebar lists your functions; the editor shows the
+          selected one. Execution always starts at <span class="mono">main()</span>.</p>
+          <div class="panel-title pix" style="margin-top:5mm;"><span class="tk pix">4.2</span> Write &amp; run</div>
+          <p style="font-size:9pt;line-height:1.5;">Binary Coven uses <b>Python-like
+          syntax</b>. Never coded before? The quests teach you step by step. Press
+          <b>Run</b> and watch Qubit move in real time. Mistakes appear in the Error
+          Display with line numbers.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:6mm;">
+      <div class="panel-title pix"><span class="tk pix">4.4</span> Create your own functions</div>
+      <div class="grid2" style="gap:5mm;">
+        <div class="steps">
+          <div class="step"><div class="n">1</div><div class="t">Click the
+            <b>+</b> button in the sidebar.</div></div>
+          <div class="step"><div class="n">2</div><div class="t">Give it a
+            <b>unique name</b> (duplicates are rejected).</div></div>
+        </div>
+        <div class="steps">
+          <div class="step"><div class="n">3</div><div class="t">A new tab opens with a
+            stub: <span class="mono">def name(): pass</span></div></div>
+          <div class="step"><div class="n">4</div><div class="t">Write the body, then
+            call it from <span class="mono">main()</span>, just like Python.</div></div>
+        </div>
+      </div>
+      <div class="note-inline">Delete any function with the trash icon. The
+      <span class="mono">main()</span> function stays. It is your entry point.</div>
+    </div>
+  </div>
+  <div class="rfoot"><span class="pix">SECTION 4 &middot; THE PROGRAMMING TERMINAL</span><span class="pgnum pix">08</span></div>
+</div>
+
+<!-- ============ PAGE 9 -§4 COMMANDS ============ -->
+<div class="page">
+  <div class="rhead">
+    <div class="brand"><img src="assets/logo.png" alt=""><b class="pix">BINARY COVEN</b></div>
+    <div class="sect pix">STUDENT GUIDE</div>
+  </div>
+  <div class="content">
+    <div class="kicker pix">SECTION 4 &middot; 4.3 BUILT-IN COMMANDS</div>
+    <div class="h1 pix" style="font-size:24pt;">QUBIT&rsquo;S TOOLKIT</div>
+    <div class="lead" style="font-size:10pt;">These commands are available to you from the
+      very start. Tile-bound actions only work when Qubit is standing on the
+      matching tile.</div>
+
+    <div class="row" style="margin-top:6mm;align-items:stretch;">
+      <div class="panel tight">
+        <div class="panel-title pix" style="font-size:11pt;">
+          <span class="tk pix" style="background:var(--green);">MOVE</span> Movement</div>
+        <table class="tbl">
+          <thead><tr><th>COMMAND</th><th>WHAT IT DOES</th></tr></thead>
+          <tbody>
+            <tr><td class="cmd">move_up()</td><td>One tile up</td></tr>
+            <tr><td class="cmd">move_down()</td><td>One tile down</td></tr>
+            <tr><td class="cmd">move_left()</td><td>One tile left</td></tr>
+            <tr><td class="cmd">move_right()</td><td>One tile right</td></tr>
+            <tr><td class="cmd">move_to(x,y)</td><td>To a grid coordinate</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel tight">
+        <div class="panel-title pix" style="font-size:11pt;">
+          <span class="tk pix" style="background:var(--teal);">INFO</span> Utilities</div>
+        <table class="tbl">
+          <thead><tr><th>COMMAND</th><th>WHAT IT DOES</th></tr></thead>
+          <tbody>
+            <tr><td class="cmd">get_position()</td><td>Qubit&rsquo;s (x, y)</td></tr>
+            <tr><td class="cmd">get_current_grid()</td><td>Info on current tile</td></tr>
+            <tr><td class="cmd">get_energy()</td><td>Current energy level</td></tr>
+            <tr><td class="cmd">get_inventory()</td><td>Items being carried</td></tr>
+            <tr><td class="cmd">wait(seconds)</td><td>Pause execution</td></tr>
+            <tr><td class="cmd">print(...)</td><td>Print to the terminal</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:6mm;">
+      <div class="panel-title pix">
+        <span class="tk pix" style="background:var(--wood);">TILE</span> Tile-bound actions</div>
+      <table class="tbl">
+        <thead><tr><th>COMMAND</th><th>REQUIRES TILE</th><th>WHAT IT DOES</th></tr></thead>
+        <tbody>
+          <tr><td class="cmd">mine_initiate() / collect()</td><td><span class="pill tile pix">MINING TERMINAL</span></td><td>Mine and gather resources</td></tr>
+          <tr><td class="cmd">crank()</td><td><span class="pill tile pix">DYNAMO</span></td><td>Refill Qubit&rsquo;s energy</td></tr>
+          <tr><td class="cmd">store(amount)</td><td><span class="pill tile pix">WALLET</span></td><td>Deposit what you&rsquo;ve earned</td></tr>
+          <tr><td class="cmd">plant() / harvest() / can_harvest()</td><td><span class="pill tile pix">FARMING PLOT</span></td><td>Grow and reap crops</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top:6mm;">
+      <span class="lab">TIP</span>
+      <p>Open the <b>Glossary</b> from the HUD any time for the full, searchable list of
+      commands with live syntax. It always matches what Qubit can currently do.</p>
+    </div>
+  </div>
+  <div class="rfoot"><span class="pix">SECTION 4 &middot; THE PROGRAMMING TERMINAL</span><span class="pgnum pix">09</span></div>
+</div>
+
+<!-- ============ PAGE 10 -§4 CONT ============ -->
+<div class="page">
+  <div class="rhead">
+    <div class="brand"><img src="assets/logo.png" alt=""><b class="pix">BINARY COVEN</b></div>
+    <div class="sect pix">STUDENT GUIDE</div>
+  </div>
+  <div class="content">
+    <div class="kicker pix">SECTION 4 &middot; CONTINUED</div>
+    <div class="h1 pix" style="font-size:24pt;">PRESETS, ENERGY &amp; DRONES</div>
+
+    <div class="panel" style="margin-top:6mm;">
+      <div class="panel-title pix"><span class="tk pix">4.5</span> Preset templates</div>
+      <p style="font-size:9pt;line-height:1.5;margin-bottom:3.5mm;">Not sure where to
+      start? The preset menu loads ready-made code templates straight into the editor:</p>
+      <div class="grid3" style="gap:3mm;">
+        <div class="fcard"><h4>BASIC MOVEMENT</h4><p>Simple directional commands</p></div>
+        <div class="fcard"><h4>PLANT &amp; HARVEST</h4><p>Farming with loops &amp; conditionals</p></div>
+        <div class="fcard"><h4>MOVEMENT LOOP</h4><p>Repeated movement with for&hellip;range</p></div>
+        <div class="fcard"><h4>ENERGY MANAGE</h4><p>Check energy, refill at a dynamo</p></div>
+        <div class="fcard"><h4>SMART FARMING</h4><p>Conditionals, loops &amp; tile actions</p></div>
+        <div class="fcard"><h4>PATROL PATTERN</h4><p>Multi-step sequences with functions</p></div>
+      </div>
+      <div class="note-inline">Loading a preset replaces your current code. The
+      app always asks for confirmation first.</div>
+    </div>
+
+    <div class="row" style="margin-top:6mm;align-items:stretch;">
+      <div style="flex:1.1;">
+        <div class="panel" style="height:100%;">
+          <div class="panel-title pix"><span class="tk pix">4.6</span> Energy management</div>
+          <p style="font-size:9pt;line-height:1.5;">Every action drains the battery:
+          moving, mining, planting, harvesting. At <b>zero energy</b>, Qubit stops. To
+          refill, move onto a <b>dynamo</b> tile and run <span class="mono">crank()</span>.
+          Planning efficient routes is itself a programming lesson.</p>
+          <div class="panel-title pix" style="margin-top:5mm;"><span class="tk pix">4.7</span> Drones</div>
+          <p style="font-size:9pt;line-height:1.5;">Later you&rsquo;ll meet <b>drones</b>,
+          separate programmable entities with their own code windows. Program a drone and
+          you&rsquo;re editing <i>its</i> functions, not Qubit&rsquo;s. Drones always run their
+          own <span class="mono">main()</span>.</p>
+        </div>
+      </div>
+      <div style="flex:.9;display:flex;flex-direction:column;">
+        <div class="shot"><img src="assets/dynamo.png" alt=""></div>
+        <div class="cap pix">A DYNAMO: STAND HERE &amp; CRANK()</div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:6mm;">
+      <span class="lab">TIP: THINK LIKE AN ENGINEER</span>
+      <p>Watch the energy bar before you commit to a long route. A short detour to a
+      dynamo beats stalling halfway across the map.</p>
+    </div>
+  </div>
+  <div class="rfoot"><span class="pix">SECTION 4 &middot; THE PROGRAMMING TERMINAL</span><span class="pgnum pix">10</span></div>
+</div>
+
+<!-- ============ PAGE 11 -§5 SAVING ============ -->
+<div class="page">
+  <div class="rhead">
+    <div class="brand"><img src="assets/logo.png" alt=""><b class="pix">BINARY COVEN</b></div>
+    <div class="sect pix">STUDENT GUIDE</div>
+  </div>
+  <div class="content">
+    <div class="watermark pix">5</div>
+    <div class="kicker pix">SECTION 5</div>
+    <div class="h1 pix">SAVING YOUR PROGRESS<span class="dot">.</span></div>
+    <div class="lead">Binary Coven saves in <b>two tiers</b>: one fast, one
+      permanent. Knowing the difference keeps your hard work safe.</div>
+
+    <div class="row" style="margin-top:7mm;align-items:stretch;">
+      <div style="flex:1.05;">
+        <div class="panel" style="height:100%;">
+          <div class="panel-title pix"><span class="tk pix">5.1</span> The two-tier save</div>
+          <div class="deflist">
+            <div class="defrow"><span class="k" style="width:24mm;">BROWSER</span>
+              <span class="v">While you play, your state lives in your browser for speed.</span></div>
+            <div class="defrow"><span class="k" style="width:24mm;">SAVE</span>
+              <span class="v">Click <b>Save</b>, everything syncs to the server database.</span></div>
+            <div class="defrow"><span class="k" style="width:24mm;">LOAD</span>
+              <span class="v">Click <b>Load</b>, your latest server save is restored.</span></div>
+          </div>
+          <p style="font-size:9pt;line-height:1.5;margin-top:4mm;">Your <b>quest
+          progress</b> (every phase and objective) also saves to the server.
+          Close the tab, return tomorrow, and pick up exactly where you left off.</p>
+        </div>
+      </div>
+      <div style="flex:.95;display:flex;flex-direction:column;">
+        <div class="shot"><img src="assets/gamemenu.png" alt=""></div>
+        <div class="cap pix">THE GAME MENU: SAVE &amp; LOAD</div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:7mm;">
+      <span class="lab">TIP: SAVE OFTEN</span>
+      <p>Clearing your browser cache wipes the fast local copy. The <b>server save is
+      permanent</b>, so click Save regularly, especially before you log out.</p>
+    </div>
+
+    <div class="panel" style="margin-top:7mm;background:var(--ink);border-color:var(--teal);">
+      <div style="text-align:center;color:var(--cream);">
+        <div class="pix" style="font-size:13pt;color:var(--teal);letter-spacing:.1em;">
+          END OF PART I</div>
+        <p style="font-size:9pt;margin-top:2.5mm;color:var(--cream-dim);">
+          You now have everything you need to explore, quest, and code. Part II is
+          written for instructors. Turn the page if that&rsquo;s you.</p>
+      </div>
+    </div>
+  </div>
+  <div class="rfoot"><span class="pix">SECTION 5 &middot; SAVING YOUR PROGRESS</span><span class="pgnum pix">11</span></div>
+</div>
+
+<!-- ============ PAGE 12 - PART II DIVIDER ============ -->
+<div class="page divider">
+  <img class="bg" src="assets/night.png" alt="">
+  <div class="veil"></div>
+  <div class="dwrap">
+    <span class="ppill pix">PART II</span>
+    <div class="dtitle pix">INSTRUCTOR<br>GUIDE<span class="dot">.</span></div>
+    <div class="drule"></div>
+    <div class="dpanel">
+      <p>For <b>instructors and administrators</b>: create sessions, monitor student
+      progress in real time, review the code your class is writing, and curate exactly
+      what each room learns.</p>
+    </div>
+    <div class="dchapters">
+      <span>6 &middot; Getting Started</span>
+      <span>7 &middot; Sessions</span>
+      <span>8 &middot; Monitoring</span>
+      <span>9 &middot; User Management</span>
+      <span>10 &middot; Quick Reference</span>
+    </div>
+  </div>
+  <div class="rfoot" style="position:absolute;bottom:0;left:0;right:0;">
+    <span class="pix">BINARY COVEN &middot; USER MANUAL</span><span class="pgnum pix">12</span></div>
+</div>
+
+<!-- ============ PAGE 13 -§6 ADMIN START ============ -->
+<div class="page">
+  <div class="rhead">
+    <div class="brand"><img src="assets/logo.png" alt=""><b class="pix">BINARY COVEN</b></div>
+    <div class="sect pix">INSTRUCTOR GUIDE</div>
+  </div>
+  <div class="content">
+    <div class="watermark pix">6</div>
+    <div class="kicker pix">SECTION 6</div>
+    <div class="h1 pix">GETTING STARTED <span style="font-size:18pt;">(ADMIN)</span><span class="dot">.</span></div>
+    <div class="lead">Admin accounts are <b>completely separate</b> from student
+      accounts. Neither can use the other&rsquo;s door.</div>
+
+    <div class="row" style="margin-top:6mm;">
+      <div class="panel tight">
+        <div class="panel-title pix" style="font-size:11pt;"><span class="tk pix">6.1</span> Logging in</div>
+        <p style="font-size:9pt;line-height:1.5;">Navigate to
+        <span class="mono">/admin/login</span>. Your session is checked on every
+        page. If it expires, you&rsquo;re sent back to the login screen.</p>
+        <div style="margin-top:3.5mm;display:flex;flex-direction:column;gap:2.5mm;">
+          <div class="fcard"><h4 style="color:var(--green);">ADMIN</h4>
+            <p>Manage sessions, view students, monitor progress.</p></div>
+          <div class="fcard"><h4 style="color:var(--red);">SUPER ADMIN</h4>
+            <p>All of the above, plus creating &amp; removing admin accounts.</p></div>
+        </div>
+      </div>
+      <div class="panel tight">
+        <div class="panel-title pix" style="font-size:11pt;"><span class="tk pix">6.2</span> The dashboard</div>
+        <p style="font-size:9pt;line-height:1.5;"><span class="mono">/admin</span> lands
+        you on the dashboard. At a glance:</p>
+        <div class="deflist" style="margin-top:3mm;">
+          <div class="defrow"><span class="k" style="width:30mm;font-size:7.8pt;">TOTAL STUDENTS</span><span class="v" style="font-size:8.4pt;">Registered accounts across all sessions</span></div>
+          <div class="defrow"><span class="k" style="width:30mm;font-size:7.8pt;">ACTIVE SESSIONS</span><span class="v" style="font-size:8.4pt;">Sessions inside their validity window</span></div>
+          <div class="defrow"><span class="k" style="width:30mm;font-size:7.8pt;">TOTAL SESSIONS</span><span class="v" style="font-size:8.4pt;">Every session ever created</span></div>
+          <div class="defrow"><span class="k" style="width:30mm;font-size:7.8pt;">RECENT ACTIVITY</span><span class="v" style="font-size:8.4pt;">Student logins in the last 24 hours</span></div>
+        </div>
+        <div class="note-inline">The five newest sessions sit below the stats with
+        quick links to their detail pages.</div>
+      </div>
+    </div>
+
+    <div style="margin-top:6mm;">
+      <div class="shot"><img src="assets/admin-dashboard.png" alt=""></div>
+      <div class="cap pix">THE ADMIN DASHBOARD: YOUR COMMAND CENTRE</div>
+    </div>
+  </div>
+  <div class="rfoot"><span class="pix">SECTION 6 &middot; GETTING STARTED (ADMIN)</span><span class="pgnum pix">13</span></div>
+</div>
+
+<!-- ============ PAGE 14 -§7 SESSIONS ============ -->
+<div class="page">
+  <div class="rhead">
+    <div class="brand"><img src="assets/logo.png" alt=""><b class="pix">BINARY COVEN</b></div>
+    <div class="sect pix">INSTRUCTOR GUIDE</div>
+  </div>
+  <div class="content">
+    <div class="watermark pix">7</div>
+    <div class="kicker pix">SECTION 7</div>
+    <div class="h1 pix">MANAGING SESSIONS<span class="dot">.</span></div>
+
+    <div class="row" style="margin-top:6mm;align-items:stretch;">
+      <div style="flex:1.1;">
+        <div class="panel" style="height:100%;">
+          <div class="panel-title pix"><span class="tk pix">7.1</span> Create a session</div>
+          <p style="font-size:8.8pt;line-height:1.45;margin-bottom:3mm;">Go to
+          <span class="mono">/admin/sessions</span> &rarr; <b>Create Session</b>:</p>
+          <div class="steps">
+            <div class="step"><div class="n">1</div><div class="t" style="font-size:9pt;">
+              <b>Session Code</b>: type your own or leave blank to auto-generate.</div></div>
+            <div class="step"><div class="n">2</div><div class="t" style="font-size:9pt;">
+              <b>Duration</b>: validity window in hours or days. Default: 7 days.</div></div>
+            <div class="step"><div class="n">3</div><div class="t" style="font-size:9pt;">
+              <b>Max Students</b>: optional cap. Blank means unlimited.</div></div>
+            <div class="step"><div class="n">4</div><div class="t" style="font-size:9pt;">
+              <b>Quest Selection</b>: filter, Select All, or pick individually.</div></div>
+            <div class="step"><div class="n">5</div><div class="t" style="font-size:9pt;">
+              <b>Enforce Prerequisites</b>: on for ordered unlocking, off for free
+              choice.</div></div>
+          </div>
+        </div>
+      </div>
+      <div style="flex:.9;display:flex;flex-direction:column;">
+        <div class="shot cover-img" style="height:108mm;"><img src="assets/admin-session.png" alt=""></div>
+        <div class="cap pix">THE CREATE-SESSION DIALOG</div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:6mm;">
+      <div class="panel-title pix"><span class="tk pix">7.2</span> Session lifecycle</div>
+      <table class="tbl">
+        <thead><tr><th>STATUS</th><th>WHAT IT MEANS</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tag int pix">SCHEDULED</span></td><td>Created but not yet open, students cannot join</td></tr>
+          <tr><td><span class="tag beg pix">ACTIVE</span></td><td>Inside its window, students can join and play</td></tr>
+          <tr><td><span class="tag adv pix">EXPIRED</span></td><td>Past its window, students can no longer join</td></tr>
+          <tr><td><span class="pill no pix">INACTIVE</span></td><td>Manually switched off by an admin</td></tr>
+        </tbody>
+      </table>
+      <div class="note-inline">Search sessions by code, filter by status, and deactivate
+      them from the list view.</div>
+    </div>
+
+    <div class="callout" style="margin-top:5mm;">
+      <span class="lab">TIP: BUILD A LESSON PLAN</span>
+      <p>For a structured class, enable prerequisites and select only this week&rsquo;s
+      quests. Students then progress through them in the intended order.</p>
+    </div>
+  </div>
+  <div class="rfoot"><span class="pix">SECTION 7 &middot; MANAGING SESSIONS</span><span class="pgnum pix">14</span></div>
+</div>
+
+<!-- ============ PAGE 15 -§8 MONITORING ============ -->
+<div class="page">
+  <div class="rhead">
+    <div class="brand"><img src="assets/logo.png" alt=""><b class="pix">BINARY COVEN</b></div>
+    <div class="sect pix">INSTRUCTOR GUIDE</div>
+  </div>
+  <div class="content">
+    <div class="watermark pix">8</div>
+    <div class="kicker pix">SECTION 8</div>
+    <div class="h1 pix">MONITORING STUDENTS<span class="dot">.</span></div>
+
+    <div class="row" style="margin-top:5mm;">
+      <div class="panel tight">
+        <div class="panel-title pix" style="font-size:10.5pt;"><span class="tk pix">8.1</span> Student list</div>
+        <p style="font-size:8.7pt;line-height:1.45;">Browse everyone at
+        <span class="mono">/admin/students</span>, or one room at
+        <span class="mono">/admin/sessions/[code]/students</span>. Shows username,
+        linked sessions and last activity.</p>
+      </div>
+      <div class="panel tight">
+        <div class="panel-title pix" style="font-size:10.5pt;"><span class="tk pix">8.3</span> View student code</div>
+        <p style="font-size:8.7pt;line-height:1.45;">The <b>Code Execution Viewer</b>
+        logs every run a student makes: the code, its quest &amp; phase, and
+        whether it passed. Perfect for spotting common mistakes.</p>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:5mm;">
+      <div class="panel-title pix"><span class="tk pix">8.2</span> Individual student view</div>
+      <div class="grid2" style="gap:3mm;">
+        <div class="fcard"><h4>PROFILE</h4><p>Username, email &amp; linked sessions</p></div>
+        <div class="fcard"><h4>QUEST PROGRESS CHART</h4><p>Completed, active &amp; available at a glance</p></div>
+        <div class="fcard"><h4>OBJECTIVE LIST</h4><p>Drill into phases to see exactly where they&rsquo;re stuck</p></div>
+        <div class="fcard"><h4>GAME STATE VIEWER</h4><p>Position, inventory, energy, code &amp; drones</p></div>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:5mm;align-items:stretch;">
+      <div style="flex:1;display:flex;flex-direction:column;">
+        <div class="shot cover-img" style="height:55mm;"><img src="assets/admin-detail.png" alt=""></div>
+        <div class="cap pix">STUDENT DETAIL PAGE</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;">
+        <div class="shot cover-img" style="height:55mm;"><img src="assets/admin-code.png" alt=""></div>
+        <div class="cap pix">CODE EXECUTION VIEWER</div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:5mm;">
+      <span class="lab">TIP: READ THE NUMBERS</span>
+      <p>Watch the attempt count on objectives. 15 attempts on one objective means that
+      student needs you. A high class average on one quest means the quest itself needs
+      clearer instructions.</p>
+    </div>
+  </div>
+  <div class="rfoot"><span class="pix">SECTION 8 &middot; MONITORING STUDENTS</span><span class="pgnum pix">15</span></div>
+</div>
+
+<!-- ============ PAGE 16 -§9 + §10 URLS ============ -->
+<div class="page">
+  <div class="rhead">
+    <div class="brand"><img src="assets/logo.png" alt=""><b class="pix">BINARY COVEN</b></div>
+    <div class="sect pix">INSTRUCTOR GUIDE</div>
+  </div>
+  <div class="content">
+    <div class="watermark pix">9</div>
+    <div class="kicker pix">SECTION 9</div>
+    <div class="h1 pix">ADMIN USER MANAGEMENT<span class="dot">.</span></div>
+    <div class="lead">Available to <b>Super Admin</b> accounts only, at
+      <span class="mono" style="color:var(--teal);">/admin/users</span>.</div>
+
+    <div class="panel" style="margin-top:6mm;">
+      <div class="panel-title pix"><span class="tk pix">9</span> What Super Admins can do</div>
+      <div class="grid3" style="gap:3mm;">
+        <div class="fcard"><h4>CREATE</h4><p>Add new admin accounts and assign their role</p></div>
+        <div class="fcard"><h4>EDIT</h4><p>Change passwords and update existing roles</p></div>
+        <div class="fcard"><h4>REMOVE</h4><p>Delete admin accounts that are no longer needed</p></div>
+      </div>
+    </div>
+
+    <div class="callout note" style="margin-top:5mm;">
+      <span class="lab">NOTE: HANDLE WITH CARE</span>
+      <p>Be thoughtful about Super Admin access. A Super Admin can create <i>and delete</i>
+      other admin accounts, including other Super Admins.</p>
+    </div>
+
+    <div class="kicker pix" style="margin-top:9mm;">SECTION 10 &middot; QUICK REFERENCE</div>
+    <div class="h1 pix" style="font-size:21pt;">ADMIN URL MAP</div>
+
+    <div class="panel" style="margin-top:5mm;">
+      <table class="tbl">
+        <thead><tr><th>URL</th><th>PURPOSE</th></tr></thead>
+        <tbody>
+          <tr><td class="cmd">/admin/login</td><td>Admin login page</td></tr>
+          <tr><td class="cmd">/admin</td><td>Dashboard: stats overview</td></tr>
+          <tr><td class="cmd">/admin/sessions</td><td>Session list, search &amp; create</td></tr>
+          <tr><td class="cmd">/admin/students</td><td>All students across sessions</td></tr>
+          <tr><td class="cmd">/admin/sessions/[code]/students</td><td>Students in one specific session</td></tr>
+          <tr><td class="cmd">/admin/students/[id]</td><td>Individual student detail page</td></tr>
+          <tr><td class="cmd">/admin/users</td><td>Admin account management (Super Admin only)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="rfoot"><span class="pix">SECTION 9&ndash;10 &middot; ADMIN REFERENCE</span><span class="pgnum pix">16</span></div>
+</div>
+
+<!-- ============ PAGE 17 - COMMAND CHEAT SHEET ============ -->
+<div class="page">
+  <div class="rhead">
+    <div class="brand"><img src="assets/logo.png" alt=""><b class="pix">BINARY COVEN</b></div>
+    <div class="sect pix">QUICK REFERENCE</div>
+  </div>
+  <div class="content">
+    <div class="kicker pix">SECTION 10 &middot; QUICK REFERENCE</div>
+    <div class="h1 pix">COMMAND CHEAT SHEET<span class="dot">.</span></div>
+    <div class="lead" style="font-size:10pt;">Every command a student can use. Keep
+      this page open while you code.</div>
+
+    <div class="panel" style="margin-top:6mm;">
+      <table class="tbl dense">
+        <thead><tr><th>COMMAND</th><th>CATEGORY</th><th class="ctr">REQUIRES TILE</th></tr></thead>
+        <tbody>
+          <tr><td class="cmd">move_up()</td><td>Movement</td><td class="ctr"><span class="pill no pix">NONE</span></td></tr>
+          <tr><td class="cmd">move_down()</td><td>Movement</td><td class="ctr"><span class="pill no pix">NONE</span></td></tr>
+          <tr><td class="cmd">move_left()</td><td>Movement</td><td class="ctr"><span class="pill no pix">NONE</span></td></tr>
+          <tr><td class="cmd">move_right()</td><td>Movement</td><td class="ctr"><span class="pill no pix">NONE</span></td></tr>
+          <tr><td class="cmd">move_to(x, y)</td><td>Movement</td><td class="ctr"><span class="pill no pix">NONE</span></td></tr>
+          <tr><td class="cmd">get_position()</td><td>Utility</td><td class="ctr"><span class="pill no pix">NONE</span></td></tr>
+          <tr><td class="cmd">get_current_grid()</td><td>Utility</td><td class="ctr"><span class="pill no pix">NONE</span></td></tr>
+          <tr><td class="cmd">get_energy()</td><td>Utility</td><td class="ctr"><span class="pill no pix">NONE</span></td></tr>
+          <tr><td class="cmd">get_inventory()</td><td>Utility</td><td class="ctr"><span class="pill no pix">NONE</span></td></tr>
+          <tr><td class="cmd">wait(seconds)</td><td>Utility</td><td class="ctr"><span class="pill no pix">NONE</span></td></tr>
+          <tr><td class="cmd">print(...)</td><td>Utility</td><td class="ctr"><span class="pill no pix">NONE</span></td></tr>
+          <tr><td class="cmd">mine_initiate()</td><td>Tile Action</td><td class="ctr"><span class="pill tile pix">MINING TERMINAL</span></td></tr>
+          <tr><td class="cmd">collect()</td><td>Tile Action</td><td class="ctr"><span class="pill tile pix">MINING TERMINAL</span></td></tr>
+          <tr><td class="cmd">crank()</td><td>Tile Action</td><td class="ctr"><span class="pill tile pix">DYNAMO</span></td></tr>
+          <tr><td class="cmd">store(amount)</td><td>Tile Action</td><td class="ctr"><span class="pill tile pix">WALLET</span></td></tr>
+          <tr><td class="cmd">plant()</td><td>Tile Action</td><td class="ctr"><span class="pill tile pix">FARMING PLOT</span></td></tr>
+          <tr><td class="cmd">harvest()</td><td>Tile Action</td><td class="ctr"><span class="pill tile pix">FARMING PLOT</span></td></tr>
+          <tr><td class="cmd">can_harvest()</td><td>Tile Action</td><td class="ctr"><span class="pill tile pix">FARMING PLOT</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top:6mm;">
+      <span class="lab">REMEMBER</span>
+      <p>Execution always begins at <span class="mono">main()</span>. Tile actions only
+      work when Qubit is standing on the matching tile, and the in-game
+      <b>Glossary</b> always shows the most up-to-date list.</p>
+    </div>
+  </div>
+  <div class="rfoot"><span class="pix">SECTION 10 &middot; QUICK REFERENCE</span><span class="pgnum pix">17</span></div>
+</div>
+
+<!-- ============ PAGE 18 - BACK COVER ============ -->
+<div class="page back">
+  <img class="bg" src="assets/title-screen.png" alt="">
+  <div class="veil"></div>
+  <div class="bwrap">
+    <img class="logo" src="assets/logo.png" alt="Binary Coven">
+    <div class="bq">Happy coding, <b>aspiring coder</b>.<br>Qubit is ready when you are.</div>
+    <div class="bline"></div>
+    <div class="bmeta pix">
+      BINARY COVEN &middot; USER MANUAL &middot; VERSION 1.0<br>
+      GORDON COLLEGE &middot; COLLEGE OF COMPUTER STUDIES<br>
+      OLONGAPO CITY, ZAMBALES, PHILIPPINES &middot; APRIL 2026
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Binary Coven Promotional Poster</title>
+<link rel="stylesheet" href="assets/font.css">
+<style>
+:root{
+  --bg:#17232f; --bg-deep:#0e161e; --bg-band:#1c2c3b;
+  --panel:#e8c4a3; --panel-hi:#f4dcc2; --box:#dcad88;
+  --ink:#210714; --ink-soft:rgba(33,7,20,.66);
+  --cream:#f4e4ce; --cream-dim:rgba(244,228,206,.62);
+  --teal:#16c2c8; --green:#5f9f2e; --amber:#e3a526; --red:#c8472f; --wood:#b9774a;
+  --rust:#7a1f12;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+@page{size:12in 18in;margin:0;}
+html,body{background:var(--bg-deep);}
+body{
+  font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;color:var(--ink);
+}
+.pix{font-family:'BoldPixels','Segoe UI',sans-serif;letter-spacing:.04em;}
+.mono{font-family:'Consolas','Courier New',monospace;}
+
+.poster{
+  width:12in;height:18in;position:relative;overflow:hidden;
+  background:var(--bg);display:flex;flex-direction:column;
+}
+
+/* ================= HERO ================= */
+.hero{height:6in;position:relative;overflow:hidden;flex:none;}
+.hero .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  image-rendering:pixelated;}
+.hero .veil{position:absolute;inset:0;
+  background:linear-gradient(180deg,
+   rgba(10,16,22,.62) 0%,rgba(10,16,22,.12) 22%,rgba(10,16,22,.1) 44%,
+   rgba(10,16,22,.78) 70%,#0e161e 100%);}
+.hero .scan{position:absolute;inset:0;opacity:.5;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 2px,transparent 2px 5px);}
+.hero-top{position:absolute;top:.42in;left:0;right:0;text-align:center;z-index:3;}
+.hero-top .k{font-size:13pt;color:var(--cream);letter-spacing:.34em;}
+.hero-top .k b{color:var(--teal);}
+.hero-bot{position:absolute;left:0;right:0;bottom:.5in;text-align:center;z-index:3;}
+.tagline{font-size:42pt;color:var(--cream);line-height:1.04;
+  text-shadow:0 3px 12px rgba(0,0,0,.95),5px 5px 0 rgba(0,0,0,.55);}
+.tagline .hl{color:var(--teal);}
+.trule{width:3.6in;height:6px;background:var(--teal);
+  margin:.2in auto .2in;box-shadow:0 4px 0 rgba(0,0,0,.55);}
+.hero-bot .sub{
+  margin-top:.26in;font-size:14.5pt;color:var(--cream);line-height:1.5;
+  max-width:8.6in;margin-left:auto;margin-right:auto;
+  text-shadow:0 2px 6px rgba(0,0,0,.9);
+}
+.hero-bot .sub b{color:var(--teal);}
+
+/* ================= STATS ================= */
+.stats{
+  height:1.72in;flex:none;background:var(--bg-band);
+  border-top:3px solid var(--teal);border-bottom:3px solid var(--ink);
+  display:flex;align-items:center;justify-content:center;gap:.34in;padding:0 .62in;
+}
+.stat{
+  flex:1;background:var(--ink);border:3px solid var(--teal);border-radius:11px;
+  box-shadow:0 6px 0 #07212340,0 8px 16px rgba(0,0,0,.45);
+  text-align:center;padding:.2in .12in .17in;
+}
+.stat .num{font-family:'BoldPixels';font-size:46pt;color:var(--teal);line-height:1;}
+.stat .lab{font-family:'BoldPixels';font-size:11.5pt;color:var(--cream);
+  letter-spacing:.07em;margin-top:.08in;}
+.stat .sub{font-size:8pt;color:var(--cream-dim);letter-spacing:.04em;margin-top:.04in;}
+
+/* ================= SECTION SHELL ================= */
+.section{flex:none;padding:.34in .62in;position:relative;}
+.sec-head{display:flex;align-items:center;gap:.2in;margin-bottom:.24in;}
+.sec-head .bar{width:.32in;height:.32in;background:var(--teal);flex:none;
+  box-shadow:.09in .09in 0 var(--ink);}
+.sec-head .tt{font-family:'BoldPixels';font-size:24pt;color:var(--cream);letter-spacing:.03em;}
+.sec-head .tt .dot{color:var(--teal);}
+.sec-head .sd{font-size:10.5pt;color:var(--cream-dim);margin-left:auto;letter-spacing:.05em;}
+
+/* ================= HOW IT WORKS ================= */
+.how{height:3.46in;}
+.steps{display:flex;align-items:stretch;gap:0;}
+.step{
+  flex:1;background:var(--panel);border:3px solid var(--ink);border-radius:10px;
+  box-shadow:0 7px 0 var(--ink),0 12px 18px rgba(0,0,0,.45);
+  padding:.18in .2in .2in;position:relative;
+}
+.step .badge{
+  position:absolute;top:-.2in;left:.18in;width:.5in;height:.5in;background:var(--ink);
+  color:var(--cream);font-family:'BoldPixels';font-size:18pt;
+  display:flex;align-items:center;justify-content:center;border-radius:7px;
+  border:3px solid var(--teal);
+}
+.step .shot{
+  margin-top:.2in;height:1.18in;border:3px solid var(--ink);background:var(--ink);
+  border-radius:6px;overflow:hidden;box-shadow:0 4px 0 #0c0207;
+}
+.step .shot img{width:100%;height:100%;object-fit:cover;object-position:top;display:block;}
+.step h3{font-family:'BoldPixels';font-size:15pt;color:var(--ink);margin-top:.15in;
+  letter-spacing:.02em;}
+.step p{font-size:9.6pt;line-height:1.4;color:var(--ink-soft);margin-top:.06in;}
+.arrow{flex:none;width:.5in;display:flex;align-items:center;justify-content:center;
+  font-family:'BoldPixels';font-size:26pt;color:var(--teal);}
+
+/* ================= CONCEPTS ================= */
+.concepts{height:1.62in;background:var(--bg-band);
+  border-top:3px solid var(--ink);border-bottom:3px solid var(--ink);}
+.pills{display:flex;flex-wrap:wrap;gap:.13in;justify-content:center;}
+.pill{
+  font-family:'BoldPixels';font-size:11pt;color:#fff;letter-spacing:.03em;
+  padding:.1in .18in;border-radius:6px;border:2.5px solid rgba(0,0,0,.4);
+  box-shadow:0 4px 0 rgba(0,0,0,.45);
+}
+.pill.c1{background:var(--green);}
+.pill.c2{background:var(--teal);color:var(--ink);}
+.pill.c3{background:var(--amber);color:var(--ink);}
+.pill.c4{background:var(--red);}
+.pill.c5{background:var(--wood);}
+.pill.c6{background:var(--rust);}
+.pill.c7{background:var(--green);}
+
+/* ================= FEATURES ================= */
+.features{height:4.5in;display:flex;gap:.36in;}
+.fpanel{
+  flex:1;background:var(--panel);border:3px solid var(--ink);border-radius:12px;
+  box-shadow:0 8px 0 var(--ink),0 15px 24px rgba(0,0,0,.5);
+  padding:.26in .3in .28in;display:flex;flex-direction:column;
+}
+.fpanel .ftag{
+  display:inline-block;align-self:flex-start;font-family:'BoldPixels';font-size:13pt;
+  color:#fff;padding:.1in .26in;border-radius:6px;letter-spacing:.06em;
+  border:2px solid rgba(0,0,0,.4);
+}
+.fpanel.stu .ftag{background:var(--green);}
+.fpanel.ins .ftag{background:var(--teal);color:var(--ink);}
+.fpanel h2{font-family:'BoldPixels';font-size:21pt;color:var(--ink);margin-top:.12in;
+  line-height:1;}
+.fpanel .shot{
+  margin-top:.16in;height:1.5in;border:3px solid var(--ink);background:var(--ink);
+  border-radius:7px;overflow:hidden;box-shadow:0 5px 0 #0c0207;
+}
+.fpanel .shot img{width:100%;height:100%;object-fit:cover;object-position:top;display:block;}
+.flist{margin-top:.18in;display:flex;flex-direction:column;gap:.13in;}
+.fitem{display:flex;gap:.16in;align-items:flex-start;}
+.fitem .tick{
+  flex:none;width:.26in;height:.26in;background:var(--ink);border-radius:4px;
+  display:flex;align-items:center;justify-content:center;color:var(--teal);
+  font-family:'BoldPixels';font-size:11pt;margin-top:.02in;
+}
+.fpanel.stu .fitem .tick{color:#8fd84e;}
+.fitem .ft{font-size:10.6pt;line-height:1.36;}
+.fitem .ft b{font-family:'BoldPixels';font-size:10.5pt;color:var(--rust);
+  letter-spacing:.01em;}
+
+/* ================= FOOTER ================= */
+.footer{
+  flex:1;background:var(--ink);display:flex;align-items:center;
+  padding:0 .62in;gap:.4in;border-top:4px solid var(--teal);
+}
+.footer .flogo{height:.62in;image-rendering:pixelated;}
+.footer .fmid{flex:1;}
+.footer .fmid .ttl{font-family:'BoldPixels';font-size:15pt;color:var(--cream);
+  letter-spacing:.1em;}
+.footer .fmid .meta{font-size:8.8pt;color:var(--cream-dim);letter-spacing:.07em;
+  margin-top:.05in;line-height:1.5;}
+.footer .cta{
+  font-family:'BoldPixels';font-size:15pt;color:var(--ink);background:var(--teal);
+  border:3px solid var(--cream);border-radius:8px;padding:.16in .32in;
+  box-shadow:0 6px 0 #0a3b3d;letter-spacing:.04em;
+}
+</style>
+</head>
+<body>
+<div class="poster">
+
+  <!-- ========= HERO ========= -->
+  <div class="hero">
+    <img class="bg" src="assets/title-screen.png" alt="">
+    <div class="veil"></div>
+    <div class="scan"></div>
+    <div class="hero-top">
+      <div class="k pix">GORDON COLLEGE &nbsp;<b>&middot;</b>&nbsp; COLLEGE OF COMPUTER STUDIES</div>
+    </div>
+    <div class="hero-bot">
+      <div class="tagline pix">LEARN TO CODE <span class="hl">BY PLAYING</span></div>
+      <div class="trule"></div>
+      <div class="sub">A web-based, quest-driven world where you program a robot named
+        <b>Qubit</b> to farm, mine, and automate, mastering real programming
+        fundamentals one challenge at a time.</div>
+    </div>
+  </div>
+
+  <!-- ========= STATS ========= -->
+  <div class="stats">
+    <div class="stat">
+      <div class="num pix">38</div><div class="lab pix">QUESTS</div>
+      <div class="sub">hands-on coding challenges</div>
+    </div>
+    <div class="stat">
+      <div class="num pix">36</div><div class="lab pix">COMMANDS</div>
+      <div class="sub">to control Qubit &amp; drones</div>
+    </div>
+    <div class="stat">
+      <div class="num pix">7</div><div class="lab pix">CATEGORIES</div>
+      <div class="sub">from tutorials to logic</div>
+    </div>
+    <div class="stat">
+      <div class="num pix">3</div><div class="lab pix">SKILL TIERS</div>
+      <div class="sub">beginner to advanced</div>
+    </div>
+  </div>
+
+  <!-- ========= HOW IT WORKS ========= -->
+  <div class="section how">
+    <div class="sec-head">
+      <div class="bar"></div>
+      <div class="tt pix">HOW IT WORKS</div>
+      <div class="sd">from session code to running code</div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="badge pix">1</div>
+        <div class="shot"><img src="assets/login.png" alt=""></div>
+        <h3>JOIN</h3>
+        <p>Enter the session code your instructor gives you and create your account.</p>
+      </div>
+      <div class="arrow pix">&#9656;</div>
+      <div class="step">
+        <div class="badge pix">2</div>
+        <div class="shot"><img src="assets/quests.png" alt=""></div>
+        <h3>QUEST</h3>
+        <p>Pick a quest. Each one teaches a single programming concept.</p>
+      </div>
+      <div class="arrow pix">&#9656;</div>
+      <div class="step">
+        <div class="badge pix">3</div>
+        <div class="shot"><img src="assets/terminal.png" alt=""></div>
+        <h3>CODE</h3>
+        <p>Write Python-like commands in a real Monaco code editor.</p>
+      </div>
+      <div class="arrow pix">&#9656;</div>
+      <div class="step">
+        <div class="badge pix">4</div>
+        <div class="shot"><img src="assets/world.png" alt=""></div>
+        <h3>RUN</h3>
+        <p>Hit Run and watch Qubit execute your code live on the grid.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========= CONCEPTS ========= -->
+  <div class="section concepts">
+    <div class="sec-head">
+      <div class="bar"></div>
+      <div class="tt pix">WHAT YOU&rsquo;LL MASTER</div>
+      <div class="sd">core concepts, taught through play</div>
+    </div>
+    <div class="pills">
+      <span class="pill c1 pix">SEQUENCING</span>
+      <span class="pill c2 pix">VARIABLES</span>
+      <span class="pill c3 pix">CONDITIONALS</span>
+      <span class="pill c4 pix">LOOPS</span>
+      <span class="pill c5 pix">FUNCTIONS</span>
+      <span class="pill c6 pix">LISTS</span>
+      <span class="pill c7 pix">OPTIMIZATION</span>
+    </div>
+  </div>
+
+  <!-- ========= FEATURES ========= -->
+  <div class="section features">
+    <div class="fpanel stu">
+      <span class="ftag pix">FOR STUDENTS</span>
+      <h2>Code an<br>adventure.</h2>
+      <div class="shot"><img src="assets/glossary.png" alt=""></div>
+      <div class="flist">
+        <div class="fitem"><div class="tick pix">&#10003;</div>
+          <div class="ft"><b>REAL CODE EDITOR.</b> Syntax highlighting &amp;
+          autocomplete, powered by Monaco.</div></div>
+        <div class="fitem"><div class="tick pix">&#10003;</div>
+          <div class="ft"><b>LIVE EXECUTION.</b> Watch your robot act out every line
+          you write.</div></div>
+        <div class="fitem"><div class="tick pix">&#10003;</div>
+          <div class="ft"><b>PHASED QUESTS.</b> Instant feedback, retry freely
+          with no penalty.</div></div>
+        <div class="fitem"><div class="tick pix">&#10003;</div>
+          <div class="ft"><b>DRONES &amp; ENERGY.</b> Program helpers and plan
+          efficient routes.</div></div>
+      </div>
+    </div>
+    <div class="fpanel ins">
+      <span class="ftag pix">FOR INSTRUCTORS</span>
+      <h2>Run the<br>classroom.</h2>
+      <div class="shot"><img src="assets/admin-dashboard.png" alt=""></div>
+      <div class="flist">
+        <div class="fitem"><div class="tick pix">&#10003;</div>
+          <div class="ft"><b>SESSION CONTROL.</b> Create, schedule &amp; curate quests
+          per class.</div></div>
+        <div class="fitem"><div class="tick pix">&#10003;</div>
+          <div class="ft"><b>LIVE DASHBOARD.</b> Track students, sessions &amp; activity
+          at a glance.</div></div>
+        <div class="fitem"><div class="tick pix">&#10003;</div>
+          <div class="ft"><b>OBJECTIVE TRACKING.</b> See exactly where each student is
+          stuck.</div></div>
+        <div class="fitem"><div class="tick pix">&#10003;</div>
+          <div class="ft"><b>CODE REVIEW.</b> Inspect every code run, by quest and
+          phase.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========= FOOTER ========= -->
+  <div class="footer">
+    <img class="flogo" src="assets/logo.png" alt="">
+    <div class="fmid">
+      <div class="ttl pix">BINARY COVEN</div>
+      <div class="meta pix">GORDON COLLEGE &middot; COLLEGE OF COMPUTER STUDIES &middot;
+        OLONGAPO CITY, ZAMBALES, PHILIPPINES &middot; VERSION 1.0</div>
+    </div>
+    <div class="cta pix">START YOUR FIRST QUEST &#9656;</div>
+  </div>
+
+</div>
+</body>
+</html>

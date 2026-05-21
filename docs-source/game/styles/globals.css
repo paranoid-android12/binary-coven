@@ -1,0 +1,209 @@
+@import "tailwindcss";
+
+@theme {
+  /* Custom Colors for Admin UI */
+  --color-admin-dark: #1a1a2e;
+  --color-admin-darker: #16213e;
+  --color-admin-primary: #0ec3c9;
+  --color-admin-primary-dark: #0a9ba0;
+  --color-admin-primary-darker: #087074;
+  --color-admin-purple: #210714;
+  --color-admin-purple-light: #3b1522;
+  --color-admin-purple-darker: #12040c;
+  --color-admin-tan: #d8a888;
+  --color-admin-tan-light: #e8c4a8;
+
+  /* Breakpoints */
+  --breakpoint-tablet: 768px;
+  --breakpoint-laptop: 1024px;
+
+  /* Font Family */
+  --font-family-pixel: 'BoldPixels', monospace, sans-serif;
+}
+
+@font-face {
+    font-family: "BoldPixels";
+    src: url("/fonts/BoldPixels.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    color: rgba(255, 255, 255, 0.87);
+    background-color: #000000;
+    /* Use Arial for small text by default */
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+}
+
+#app {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Suppress blinking text caret on Phaser game canvas and its container */
+#game-container,
+#game-container canvas,
+#game-container *:focus {
+    outline: none !important;
+    caret-color: transparent !important;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.spritePosition {
+    margin: 10px 0 0 10px;
+    font-size: 0.8em;
+}
+
+.button {
+    width: 140px;
+    margin: 10px;
+    padding: 10px;
+    background-color: #000000;
+    color: rgba(255, 255, 255, 0.87);
+    border: 1px solid rgba(255, 255, 255, 0.87);
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+        border: 1px solid #0ec3c9;
+        color: #0ec3c9;
+    }
+
+    &:active {
+        background-color: #0ec3c9;
+    }
+
+    /* Disabled styles */
+    &:disabled {
+        cursor: not-allowed;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Dialogue system animations */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Typography hierarchy */
+h1, h2, h3, h4, h5, h6 {
+    font-family: "BoldPixels", Arial, Helvetica, sans-serif;
+}
+
+/* Large text classes for blocky font */
+.title, .header, .large-text {
+    font-family: "BoldPixels", Arial, Helvetica, sans-serif;
+}
+
+/* Admin pages: override heading fonts to inherit from parent (Poppins) */
+.admin-font h1,
+.admin-font h2,
+.admin-font h3,
+.admin-font h4,
+.admin-font h5,
+.admin-font h6,
+.admin-font p,
+.admin-font span,
+.admin-font button,
+.admin-font input,
+.admin-font label,
+.admin-font a,
+.admin-font code,
+.admin-font td,
+.admin-font th {
+    font-family: inherit;
+}
+
+/* Explicitly set font sizes for headers */
+h1 {
+    font-size: 32px;
+}
+
+h2 {
+    font-size: 24px;
+}
+
+h3 {
+    font-size: 20px;
+}
+
+h4, h5, h6 {
+    font-size: 16px;
+}
+
+/* Tailwind Custom Utilities */
+@layer utilities {
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-spin-slow {
+    animation: spin 1s linear infinite;
+  }
+
+  /* Admin gradient backgrounds */
+  .bg-admin-gradient {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  }
+
+  .bg-admin-gradient-vertical {
+    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+  }
+
+  .bg-admin-primary-gradient {
+    background: linear-gradient(135deg, #0ec3c9 0%, #0a9ba0 100%);
+  }
+
+  .bg-admin-primary-gradient-hover {
+    background: linear-gradient(135deg, #0a9ba0 0%, #087074 100%);
+  }
+
+  .bg-admin-purple-gradient {
+    background: radial-gradient(circle at top, #3b1522 0%, #210714 60%, #12040c 100%);
+  }
+
+  /* Custom text shadow for admin login */
+  .text-shadow-admin {
+    text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.3);
+  }
+
+  /* Custom box shadows */
+  .shadow-admin-card {
+    box-shadow: 0 8px 0 #210714, 0 12px 20px rgba(0, 0, 0, 0.45);
+  }
+
+  .shadow-admin-button {
+    box-shadow: 0 4px 0 #210714;
+  }
+
+  .shadow-admin-button-hover {
+    box-shadow: 0 2px 0 #210714;
+  }
+}
