@@ -43,9 +43,15 @@ function AnimatedBackground() {
   );
 }
 
-const FEATURES = [
+const FEATURES: {
+  icon: string;
+  iconClass?: string;
+  title: string;
+  desc: string;
+}[] = [
   {
     icon: "/Hoe.png",
+    iconClass: "featureIconHoe",
     title: "Code to Farm",
     desc: "Write Python-inspired commands to control your character. Plant, harvest, and automate your farm through code.",
   },
@@ -56,6 +62,7 @@ const FEATURES = [
   },
   {
     icon: "/drone_idle.png",
+    iconClass: "featureIconDrone",
     title: "Quest-Based Learning",
     desc: "Progress through structured quests that teach variables, loops, conditionals, functions, and more.",
   },
@@ -64,6 +71,12 @@ const FEATURES = [
     title: "Instructor Dashboard",
     desc: "Instructors can manage sessions, curate modules, and monitor student performance in real time.",
   },
+];
+
+const SCREENSHOTS = [
+  "/assets/photo_2026-05-21_16-23-17.jpg",
+  "/assets/photo_2026-05-21_16-23-55.jpg",
+  "/assets/photo_2026-05-21_16-24-07.jpg",
 ];
 
 export default function LandingPage() {
@@ -128,18 +141,8 @@ export default function LandingPage() {
 
           {/* Decorative sprites */}
           <div className={styles.heroSprites}>
-            <img
-              src="/Idle.png"
-              alt=""
-              className={styles.spriteQubit}
-              draggable={false}
-            />
-            <img
-              src="/Manu_Idle.png"
-              alt=""
-              className={styles.spriteManu}
-              draggable={false}
-            />
+            <div className={styles.spriteQubit} />
+            <div className={styles.spriteManu} />
             <img
               src="/drone_idle.png"
               alt=""
@@ -155,6 +158,7 @@ export default function LandingPage() {
 
         {/* ===== About ===== */}
         <section id="about" className={`${styles.section} ${styles.aboutSection}`}>
+          <div className={styles.sectionInner}>
           <div className={styles.aboutGrid}>
             <div className={styles.aboutText}>
               <h2 className={styles.sectionTitle} style={{ textAlign: "left" }}>
@@ -183,6 +187,7 @@ export default function LandingPage() {
               <span className={styles.aboutBadge}>In-Game Map</span>
             </div>
           </div>
+          </div>
         </section>
 
         {/* ===== Features ===== */}
@@ -190,6 +195,7 @@ export default function LandingPage() {
           id="features"
           className={`${styles.section} ${styles.featuresSection}`}
         >
+          <div className={styles.sectionInner}>
           <h2 className={styles.sectionTitle}>How It Works</h2>
           <p className={styles.sectionSubtitle}>
             Learn programming fundamentals through hands-on gameplay. Every
@@ -198,11 +204,16 @@ export default function LandingPage() {
           <div className={styles.featuresGrid}>
             {FEATURES.map((f) => (
               <div key={f.title} className={styles.featureCard}>
-                <img src={f.icon} alt="" className={styles.featureIcon} />
+                {f.iconClass ? (
+                  <div className={styles[f.iconClass]} />
+                ) : (
+                  <img src={f.icon} alt="" className={styles.featureIcon} />
+                )}
                 <h3 className={styles.featureTitle}>{f.title}</h3>
                 <p className={styles.featureDesc}>{f.desc}</p>
               </div>
             ))}
+          </div>
           </div>
         </section>
 
@@ -211,18 +222,22 @@ export default function LandingPage() {
           id="screenshots"
           className={`${styles.section} ${styles.screenshotsSection}`}
         >
+          <div className={styles.sectionInner}>
           <h2 className={styles.sectionTitle}>Game Preview</h2>
           <p className={styles.sectionSubtitle}>
             A peek at what awaits you inside BinaryCoven.
           </p>
           <div className={styles.screenshotsGrid}>
-            {[1, 2, 3].map((n) => (
-              <div key={n} className={styles.screenshotCard}>
-                <span className={styles.screenshotPlaceholder}>
-                  Screenshot {n}
-                </span>
+            {SCREENSHOTS.map((src, i) => (
+              <div key={src} className={styles.screenshotCard}>
+                <img
+                  src={src}
+                  alt={`BinaryCoven screenshot ${i + 1}`}
+                  className={styles.screenshotImage}
+                />
               </div>
             ))}
+          </div>
           </div>
         </section>
 

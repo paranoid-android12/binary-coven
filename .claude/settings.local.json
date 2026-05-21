@@ -23,7 +23,9 @@
       "Bash(grep -rn \"^\\\\s*//\" C:/Users/Kirk/Documents/GitHub/binary-coven/docs-source --include=\"*.ts\" --include=\"*.tsx\")",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Kirk\\\\Documents\\\\GitHub\\\\binary-coven\\\\docs-source\" -Recurse -Include \"*.ts\",\"*.tsx\")",
       "Bash(Select-Object -ExpandProperty FullName)",
-      "Bash(grep *)"
+      "Bash(grep *)",
+      "PowerShell(Add-Type -AssemblyName System.Drawing; foreach \\($f in 'Idle.png','Manu_Idle.png','drone_idle.png'\\) { $p = \"C:\\\\Users\\\\Kirk\\\\Documents\\\\GitHub\\\\binary-coven\\\\public\\\\$f\"; $img = [System.Drawing.Image]::FromFile\\($p\\); \"$f -> $\\($img.Width\\) x $\\($img.Height\\)\"; $img.Dispose\\(\\) })",
+      "PowerShell(Add-Type -AssemblyName System.Drawing; $img = [System.Drawing.Image]::FromFile\\(\"C:\\\\Users\\\\Kirk\\\\Documents\\\\GitHub\\\\binary-coven\\\\public\\\\Hoe.png\"\\); \"Hoe.png -> $\\($img.Width\\) x $\\($img.Height\\)\"; $img.Dispose\\(\\))"
     ]
   }
 }
