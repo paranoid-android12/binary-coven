@@ -2,6 +2,7 @@ import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { Poppins } from "next/font/google";
 import { UserProvider } from "@/contexts/UserContext";
+import { Analytics } from "@vercel/analytics/next";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -14,6 +15,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <UserProvider>
       <div className={poppins.variable}>
         <Component {...pageProps} />
+        <Analytics />
       </div>
     </UserProvider>
   );
