@@ -3,6 +3,20 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import styles from "@/styles/Landing.module.css";
 
+function usePageViews() {
+  const [count, setCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch("/api/page-views", { method: "POST" })
+      .then((r) => r.json())
+      .then((data) => setCount(data.count))
+      .catch(() => {});
+  }, []);
+
+  if (count === null) return null;
+  return count >= 1000 ? `${(count / 1000).toFixed(1)}k` : String(count);
+}
+
 const BG_FRAMES = [
   "/assets/f0.png",
   "/assets/f1.png",
@@ -80,6 +94,8 @@ const SCREENSHOTS = [
 ];
 
 export default function LandingPage() {
+  const pageViews = usePageViews();
+
   return (
     <>
       <Head>
@@ -95,11 +111,19 @@ export default function LandingPage() {
       <div className={`${styles.page} ${styles.landingActive}`}>
         {/* ===== Navbar ===== */}
         <nav className={styles.nav}>
-          <img
-            src="/title.png"
-            alt="Binary Coven"
-            className={styles.navLogo}
-          />
+          <div className={styles.navLeft}>
+            <img
+              src="/title.png"
+              alt="Binary Coven"
+              className={styles.navLogo}
+            />
+            {pageViews !== null && (
+              <Link href="/views" className={styles.pageViews}>
+                <span className={styles.pageViewsDot} />
+                <span className={styles.pageViewsText}>{pageViews} views</span>
+              </Link>
+            )}
+          </div>
           <div className={styles.navLinks}>
             <a href="#about" className={styles.navLink}>
               About

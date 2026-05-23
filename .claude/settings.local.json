@@ -32,7 +32,8 @@
       "Bash(pwsh -NoProfile -Command 'Add-Type -AssemblyName System.Drawing; $s=[System.Drawing.Bitmap]::FromFile\\(\"$PWD\\\\_preview.png\"\\); $r=New-Object System.Drawing.Rectangle\\(0,0,2304,1100\\); $b=$s.Clone\\($r,$s.PixelFormat\\); $b.Save\\(\"$PWD\\\\_c_hero.png\"\\); $b.Dispose\\(\\); $s.Dispose\\(\\)')",
       "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless --disable-gpu --no-pdf-header-footer --allow-file-access-from-files \"--print-to-pdf=C:\\\\\\\\Users\\\\\\\\Kirk\\\\\\\\Documents\\\\\\\\GitHub\\\\\\\\binary-coven\\\\\\\\poster\\\\\\\\BinaryCoven_Poster.pdf\" \"file:///C:/Users/Kirk/Documents/GitHub/binary-coven/poster/BinaryCoven_Poster.html\")",
       "Bash(npm run *)",
-      "Bash(curl -s http://localhost:8080)"
+      "Bash(curl -s http://localhost:8080)",
+      "Bash(node -e \"const p = require\\('./package.json'\\); const deps = {...p.dependencies, ...p.devDependencies}; Object.keys\\(deps\\).filter\\(k => /chart|recharts|d3|victory|plot|apexcharts|nivo/.test\\(k\\)\\).forEach\\(k => console.log\\(k, deps[k]\\)\\)\")"
     ]
   }
 }

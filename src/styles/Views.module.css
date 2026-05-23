@@ -1,0 +1,122 @@
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+
+.page {
+  min-height: 100vh;
+  background-color: #120209;
+  color: #f5d6b8;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0 2rem;
+  height: 60px;
+  background-color: rgba(33, 7, 20, 0.95);
+  border-bottom: 3px solid #6b3a2a;
+}
+
+.back {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.8rem;
+  color: #d8a888;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.back:hover {
+  color: #f5d6b8;
+}
+
+.navLogo {
+  height: 28px;
+  image-rendering: pixelated;
+  opacity: 0.7;
+}
+
+.main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 4rem;
+}
+
+.title {
+  font-family: "BoldPixels", "Press Start 2P", monospace;
+  font-size: 1.4rem;
+  color: #e8b44c;
+  margin: 0 0 0.4rem;
+  letter-spacing: 1px;
+}
+
+.since {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.8rem;
+  color: #d8a888;
+  opacity: 0.6;
+  margin: 0 0 2.5rem;
+}
+
+.loading,
+.error {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.85rem;
+  color: #d8a888;
+  opacity: 0.6;
+}
+
+.statCards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.statCard {
+  background: rgba(33, 7, 20, 0.7);
+  border: 2px solid #6b3a2a;
+  border-radius: 8px;
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.statValue {
+  font-family: "BoldPixels", "Press Start 2P", monospace;
+  font-size: 1.5rem;
+  color: #e8b44c;
+}
+
+.statLabel {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.72rem;
+  color: #d8a888;
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.chartSection {
+  margin-bottom: 2.5rem;
+}
+
+.chartTitle {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.78rem;
+  color: #d8a888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 0 1rem;
+  opacity: 0.8;
+}
+
+@media (max-width: 500px) {
+  .statCards {
+    grid-template-columns: 1fr;
+  }
+
+  .title {
+    font-size: 1rem;
+  }
+}
