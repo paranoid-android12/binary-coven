@@ -171,4 +171,24 @@ h4, h5, h6 {
   .animate-spin-slow {
     animation: spin 1s linear infinite;
   }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0) rotate(var(--float-rot, 0deg));
+    }
+    50% {
+      transform: translateY(-14px) rotate(var(--float-rot, 0deg));
+    }
+  }
+
+  @keyframes loginCardIn {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
 }

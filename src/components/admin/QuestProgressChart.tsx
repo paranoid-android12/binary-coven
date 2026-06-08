@@ -93,20 +93,20 @@ export default function QuestProgressChart({ questProgress, showDetails = false 
     <div className="w-full">
       {/* Summary Cards */}
       {!showDetails && (
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-4 mb-8">
-          <div className="bg-admin-card border border-admin-border rounded-xl p-6 text-center transition-all duration-300 shadow-sm">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3 mb-5">
+          <div className="bg-admin-card border border-admin-border rounded-xl p-4 text-center transition-all duration-300 shadow-sm">
             <div className="text-2xl text-admin-accent leading-none mb-2 font-bold">{completedQuests.length}</div>
             <div className="text-admin-text-muted text-[0.8rem] uppercase tracking-wider font-medium">Completed</div>
           </div>
-          <div className="bg-admin-card border border-admin-border rounded-xl p-6 text-center transition-all duration-300 shadow-sm">
+          <div className="bg-admin-card border border-admin-border rounded-xl p-4 text-center transition-all duration-300 shadow-sm">
             <div className="text-2xl text-admin-accent leading-none mb-2 font-bold">{activeQuests.length}</div>
             <div className="text-admin-text-muted text-[0.8rem] uppercase tracking-wider font-medium">In Progress</div>
           </div>
-          <div className="bg-admin-card border border-admin-border rounded-xl p-6 text-center transition-all duration-300 shadow-sm">
+          <div className="bg-admin-card border border-admin-border rounded-xl p-4 text-center transition-all duration-300 shadow-sm">
             <div className="text-2xl text-admin-accent leading-none mb-2 font-bold">{formatTime(totalTime)}</div>
             <div className="text-admin-text-muted text-[0.8rem] uppercase tracking-wider font-medium">Total Time</div>
           </div>
-          <div className="bg-admin-card border border-admin-border rounded-xl p-6 text-center transition-all duration-300 shadow-sm">
+          <div className="bg-admin-card border border-admin-border rounded-xl p-4 text-center transition-all duration-300 shadow-sm">
             <div className="text-2xl text-admin-accent leading-none mb-2 font-bold">{avgAttempts}</div>
             <div className="text-admin-text-muted text-[0.8rem] uppercase tracking-wider font-medium">Avg Attempts</div>
           </div>
@@ -114,11 +114,11 @@ export default function QuestProgressChart({ questProgress, showDetails = false 
       )}
 
       {/* Quest List */}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3">
         {questProgress.map((quest) => {
           const IconComponent = getStateIcon(quest.state);
           return (
-          <div key={quest.id} className="bg-admin-card border border-admin-border rounded-xl p-6 transition-all duration-300 shadow-sm">
+          <div key={quest.id} className="bg-admin-card border border-admin-border rounded-xl p-4 transition-all duration-300 shadow-sm">
             <div className="flex items-start gap-4 max-tablet:flex-col max-tablet:items-start">
               <div className="flex flex-col items-center gap-2 min-w-[80px] max-tablet:flex-row max-tablet:items-center max-tablet:min-w-0">
                 <IconComponent

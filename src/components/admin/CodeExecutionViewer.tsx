@@ -87,35 +87,35 @@ export default function CodeExecutionViewer({ codeExecutions, compact = false }:
       {/* Summary Stats */}
       {!compact && (
         <>
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-4 mb-6">
-            <div className="bg-admin-card border border-admin-border rounded-xl p-6 text-center transition-all duration-300 shadow-sm">
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3 mb-5">
+            <div className="bg-admin-card border border-admin-border rounded-xl p-4 text-center transition-all duration-300 shadow-sm">
               <div className="text-2xl text-admin-accent leading-none mb-2 font-bold">{codeExecutions.length}</div>
               <div className="text-admin-text-muted text-[0.8rem] uppercase tracking-wider font-medium">Total Runs</div>
             </div>
-            <div className="bg-admin-card border border-admin-border rounded-xl p-6 text-center transition-all duration-300 shadow-sm">
+            <div className="bg-admin-card border border-admin-border rounded-xl p-4 text-center transition-all duration-300 shadow-sm">
               <div className="text-2xl leading-none mb-2 font-bold" style={{ color: '#4d7c0f' }}>
                 {successCount}
               </div>
               <div className="text-admin-text-muted text-[0.8rem] uppercase tracking-wider font-medium">Successful</div>
             </div>
-            <div className="bg-admin-card border border-admin-border rounded-xl p-6 text-center transition-all duration-300 shadow-sm">
+            <div className="bg-admin-card border border-admin-border rounded-xl p-4 text-center transition-all duration-300 shadow-sm">
               <div className="text-2xl leading-none mb-2 font-bold" style={{ color: '#b91c1c' }}>
                 {failedCount}
               </div>
               <div className="text-admin-text-muted text-[0.8rem] uppercase tracking-wider font-medium">Failed</div>
             </div>
-            <div className="bg-admin-card border border-admin-border rounded-xl p-6 text-center transition-all duration-300 shadow-sm">
+            <div className="bg-admin-card border border-admin-border rounded-xl p-4 text-center transition-all duration-300 shadow-sm">
               <div className="text-2xl text-admin-accent leading-none mb-2 font-bold">{avgDuration}ms</div>
               <div className="text-admin-text-muted text-[0.8rem] uppercase tracking-wider font-medium">Avg Duration</div>
             </div>
           </div>
 
           {/* Filters */}
-          <div className="flex gap-4 mb-6 flex-wrap max-tablet:flex-col">
+          <div className="flex gap-3 mb-5 flex-wrap max-tablet:flex-col">
             <select
               value={filterQuest}
               onChange={(e) => setFilterQuest(e.target.value)}
-              className="bg-admin-card border border-admin-border rounded-lg py-3 px-4 text-admin-text text-[0.95rem] cursor-pointer transition-all duration-300 min-w-[200px] focus:outline-none focus:border-admin-accent focus:shadow-[0_0_0_3px_rgba(180,83,9,0.1)] hover:border-admin-text-faint max-tablet:w-full"
+              className="bg-admin-card border border-admin-border rounded-lg py-2.5 px-3 text-admin-text text-[0.95rem] cursor-pointer transition-all duration-300 min-w-[200px] focus:outline-none focus:border-admin-accent focus:shadow-[0_0_0_3px_rgba(180,83,9,0.1)] hover:border-admin-text-faint max-tablet:w-full"
             >
               <option value="all">All Quests</option>
               {uniqueQuests.map((questId) => (
@@ -128,7 +128,7 @@ export default function CodeExecutionViewer({ codeExecutions, compact = false }:
             <select
               value={filterSuccess}
               onChange={(e) => setFilterSuccess(e.target.value)}
-              className="bg-admin-card border border-admin-border rounded-lg py-3 px-4 text-admin-text text-[0.95rem] cursor-pointer transition-all duration-300 min-w-[200px] focus:outline-none focus:border-admin-accent focus:shadow-[0_0_0_3px_rgba(180,83,9,0.1)] hover:border-admin-text-faint max-tablet:w-full"
+              className="bg-admin-card border border-admin-border rounded-lg py-2.5 px-3 text-admin-text text-[0.95rem] cursor-pointer transition-all duration-300 min-w-[200px] focus:outline-none focus:border-admin-accent focus:shadow-[0_0_0_3px_rgba(180,83,9,0.1)] hover:border-admin-text-faint max-tablet:w-full"
             >
               <option value="all">All Results</option>
               <option value="success">Success Only</option>

@@ -68,7 +68,7 @@ export default function StudentProgressCard({
     : 0;
 
   return (
-    <div className="bg-admin-card border border-admin-border rounded-xl p-5 transition-colors duration-200 hover:border-admin-border-hover">
+    <div className="bg-admin-card border border-admin-border rounded-xl p-4 transition-colors duration-200 hover:border-admin-border-hover">
       {/* Header row */}
       <div className="flex items-start justify-between gap-4 mb-3">
         <div className="flex-1 min-w-0">

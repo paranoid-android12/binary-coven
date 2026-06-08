@@ -111,31 +111,31 @@ export default function ObjectiveProgressList({ objectiveProgress, questProgress
   return (
     <div className="w-full">
       {/* Summary Cards */}
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-4 mb-8">
-        <div className="bg-admin-card border border-admin-border rounded-xl p-6 text-center transition-all duration-300 shadow-sm">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3 mb-5">
+        <div className="bg-admin-card border border-admin-border rounded-xl p-4 text-center transition-all duration-300 shadow-sm">
           <div className="text-2xl text-admin-accent leading-none mb-2 font-bold">{stats.totalObjectives}</div>
           <div className="text-admin-text-muted text-xs uppercase tracking-wider font-medium">Objectives Completed</div>
         </div>
-        <div className="bg-admin-card border border-admin-border rounded-xl p-6 text-center transition-all duration-300 shadow-sm">
+        <div className="bg-admin-card border border-admin-border rounded-xl p-4 text-center transition-all duration-300 shadow-sm">
           <div className="text-2xl text-admin-accent leading-none mb-2 font-bold">{formatTime(stats.totalTime)}</div>
           <div className="text-admin-text-muted text-xs uppercase tracking-wider font-medium">Total Time</div>
         </div>
-        <div className="bg-admin-card border border-admin-border rounded-xl p-6 text-center transition-all duration-300 shadow-sm">
+        <div className="bg-admin-card border border-admin-border rounded-xl p-4 text-center transition-all duration-300 shadow-sm">
           <div className="text-2xl text-admin-accent leading-none mb-2 font-bold">{stats.totalAttempts}</div>
           <div className="text-admin-text-muted text-xs uppercase tracking-wider font-medium">Total Attempts</div>
         </div>
-        <div className="bg-admin-card border border-admin-border rounded-xl p-6 text-center transition-all duration-300 shadow-sm">
+        <div className="bg-admin-card border border-admin-border rounded-xl p-4 text-center transition-all duration-300 shadow-sm">
           <div className="text-2xl text-admin-accent leading-none mb-2 font-bold">{stats.totalHints}</div>
           <div className="text-admin-text-muted text-xs uppercase tracking-wider font-medium">Hints Used</div>
         </div>
-        <div className="bg-admin-card border border-admin-border rounded-xl p-6 text-center transition-all duration-300 shadow-sm">
+        <div className="bg-admin-card border border-admin-border rounded-xl p-4 text-center transition-all duration-300 shadow-sm">
           <div className="text-2xl text-admin-accent leading-none mb-2 font-bold">{formatTime(stats.avgTime)}</div>
           <div className="text-admin-text-muted text-xs uppercase tracking-wider font-medium">Avg Time/Objective</div>
         </div>
       </div>
 
       {/* Sort Controls */}
-      <div className="flex items-center gap-4 mb-6 flex-wrap max-tablet:flex-col max-tablet:items-start">
+      <div className="flex items-center gap-4 mb-4 flex-wrap max-tablet:flex-col max-tablet:items-start">
         <div className="text-admin-text-muted text-[0.9rem] font-medium">Sort by:</div>
         <div className="flex gap-2 flex-wrap max-tablet:w-full">
           <button

@@ -144,7 +144,7 @@ export default function SessionCodeCard({ sessionCode, onRefresh }: SessionCodeC
   })();
 
   return (
-    <div className={`bg-admin-card border rounded-xl p-5 transition-colors duration-200 ${
+    <div className={`bg-admin-card border rounded-xl p-4 transition-colors duration-200 ${
       sessionCode.status === 'expired' || sessionCode.status === 'inactive'
         ? 'border-admin-border bg-[#faf9f7] opacity-80 hover:opacity-100 hover:border-admin-border-hover'
         : 'border-admin-border hover:border-admin-accent'
@@ -254,12 +254,12 @@ export default function SessionCodeCard({ sessionCode, onRefresh }: SessionCodeC
 
       {showExtendDialog && (
         <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/50 flex items-center justify-center z-[1000] p-5" onClick={() => setShowExtendDialog(false)}>
-          <div className="bg-admin-card rounded-xl p-7 max-w-[500px] w-full shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)]" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-admin-card rounded-xl p-5 max-w-[460px] w-full shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)]" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl font-bold text-admin-text m-0 mb-3">Extend Validity</h3>
-            <p className="text-sm text-admin-text-muted m-0 mb-6 leading-relaxed">
+            <p className="text-sm text-admin-text-muted m-0 mb-4 leading-relaxed">
               How many days do you want to extend the validity of this session code?
             </p>
-            <div className="mb-6">
+            <div className="mb-4">
               <label htmlFor="extensionDays" className="block text-sm font-semibold text-admin-text mb-2">
                 Extension Days:
               </label>
@@ -295,9 +295,9 @@ export default function SessionCodeCard({ sessionCode, onRefresh }: SessionCodeC
 
       {showDeactivateConfirm && (
         <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/50 flex items-center justify-center z-[1000] p-5" onClick={() => setShowDeactivateConfirm(false)}>
-          <div className="bg-admin-card rounded-xl p-7 max-w-[500px] w-full shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)]" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-admin-card rounded-xl p-5 max-w-[460px] w-full shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)]" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl font-bold text-admin-text m-0 mb-3">Deactivate Session Code</h3>
-            <p className="text-sm text-admin-text-muted m-0 mb-6 leading-relaxed">
+            <p className="text-sm text-admin-text-muted m-0 mb-4 leading-relaxed">
               Are you sure you want to deactivate this session code? Students will no longer be able to use it to access the platform.
             </p>
             <div className="flex gap-3 justify-end">

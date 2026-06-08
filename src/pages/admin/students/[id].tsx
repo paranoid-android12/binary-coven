@@ -243,25 +243,25 @@ export default function StudentDetailPage() {
     <AdminLayout title={analytics?.profile.username || 'Student Details'}>
       <div className="max-w-[1400px] mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <Link href="/admin/students" className="inline-block text-admin-accent no-underline text-[15px] font-medium mb-5 transition-colors duration-200 hover:text-admin-accent-hover">
+        <div className="mb-4">
+          <Link href="/admin/students" className="inline-block text-admin-accent no-underline text-sm font-medium transition-colors duration-200 hover:text-admin-accent-hover">
             ← Back to Students
           </Link>
         </div>
 
         {/* Loading State */}
         {loading && (
-          <div className="flex flex-col items-center justify-center py-[60px] px-5 text-admin-text-muted">
-            <div className="w-[50px] h-[50px] border-4 border-admin-border border-t-admin-accent rounded-full animate-spin-slow mb-5"></div>
-            <p>Loading student analytics...</p>
+          <div className="flex flex-col items-center justify-center py-12 text-admin-text-muted">
+            <div className="w-10 h-10 border-4 border-admin-border border-t-admin-accent rounded-full animate-spin-slow mb-4"></div>
+            <p className="text-sm">Loading student analytics...</p>
           </div>
         )}
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-[30px] text-center text-[#b91c1c]">
-            <p className="m-0 mb-[15px] text-base">{error}</p>
-            <button onClick={fetchStudentAnalytics} className="bg-[#b91c1c] text-white border-none py-[10px] px-5 rounded-lg text-sm cursor-pointer transition-colors duration-200 hover:bg-[#991b1b]">
+          <div className="bg-red-50 border border-red-200 rounded-xl p-5 text-center text-[#b91c1c]">
+            <p className="m-0 mb-3 text-sm">{error}</p>
+            <button onClick={fetchStudentAnalytics} className="bg-[#b91c1c] text-white border-none py-2 px-4 rounded-md text-xs cursor-pointer transition-colors duration-200 hover:bg-[#991b1b]">
               Retry
             </button>
           </div>
@@ -271,15 +271,15 @@ export default function StudentDetailPage() {
         {!loading && !error && analytics && (
           <>
             {/* Student Info Card */}
-            <div className="bg-admin-card border border-admin-border rounded-xl p-[30px] mb-8 max-tablet:p-5">
-              <div className="flex items-start gap-5 mb-8 max-tablet:flex-col">
-                <div className="w-[80px] h-[80px] rounded-full bg-admin-accent flex items-center justify-center text-white text-[32px] font-bold flex-shrink-0 max-tablet:w-[60px] max-tablet:h-[60px] max-tablet:text-[24px]">
+            <div className="bg-admin-card border border-admin-border rounded-xl p-4 mb-4">
+              <div className="flex items-start gap-4 mb-5 max-tablet:flex-col">
+                <div className="w-16 h-16 rounded-full bg-admin-accent flex items-center justify-center text-white text-2xl font-bold flex-shrink-0">
                   {analytics.profile.username.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1">
-                  <h1 className="text-[28px] font-bold text-admin-text m-0 mb-[5px] max-tablet:text-[24px]">{analytics.profile.username}</h1>
+                  <h1 className="text-2xl font-bold text-admin-text m-0 mb-0.5 max-tablet:text-xl">{analytics.profile.username}</h1>
                   {analytics.profile.displayName && analytics.profile.displayName !== analytics.profile.username && (
-                    <p className="text-base text-admin-text-muted m-0 mb-[10px]">{analytics.profile.displayName}</p>
+                    <p className="text-sm text-admin-text-muted m-0 mb-1">{analytics.profile.displayName}</p>
                   )}
                   <div className="flex items-center gap-[10px] flex-wrap text-sm text-admin-text-muted">
                     <span>
@@ -316,39 +316,39 @@ export default function StudentDetailPage() {
               </div>
 
               {/* Summary Stats */}
-              <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-5 max-tablet:grid-cols-2">
-                <div className="flex items-center gap-[12px]">
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3 max-tablet:grid-cols-2">
+                <div className="flex items-center gap-2.5">
                   <Target className="text-admin-accent flex-shrink-0" size={20} />
                   <div>
-                    <div className="text-[20px] font-bold text-admin-text m-0">{analytics.summary.questsCompleted}</div>
+                    <div className="text-lg font-bold text-admin-text m-0">{analytics.summary.questsCompleted}</div>
                     <div className="text-xs text-admin-text-muted m-0">Quests Completed</div>
                   </div>
                 </div>
-                <div className="flex items-center gap-[12px]">
+                <div className="flex items-center gap-2.5">
                   <FileText className="text-admin-accent flex-shrink-0" size={20} />
                   <div>
-                    <div className="text-[20px] font-bold text-admin-text m-0">{analytics.summary.questsActive}</div>
+                    <div className="text-lg font-bold text-admin-text m-0">{analytics.summary.questsActive}</div>
                     <div className="text-xs text-admin-text-muted m-0">Quests Active</div>
                   </div>
                 </div>
-                <div className="flex items-center gap-[12px]">
+                <div className="flex items-center gap-2.5">
                   <Clock className="text-admin-accent flex-shrink-0" size={20} />
                   <div>
-                    <div className="text-[20px] font-bold text-admin-text m-0">{formatTime(analytics.summary.totalTimeSpentSeconds)}</div>
+                    <div className="text-lg font-bold text-admin-text m-0">{formatTime(analytics.summary.totalTimeSpentSeconds)}</div>
                     <div className="text-xs text-admin-text-muted m-0">Total Time</div>
                   </div>
                 </div>
-                <div className="flex items-center gap-[12px]">
+                <div className="flex items-center gap-2.5">
                   <Play className="text-admin-accent flex-shrink-0" size={20} />
                   <div>
-                    <div className="text-[20px] font-bold text-admin-text m-0">{analytics.summary.totalCodeExecutions}</div>
+                    <div className="text-lg font-bold text-admin-text m-0">{analytics.summary.totalCodeExecutions}</div>
                     <div className="text-xs text-admin-text-muted m-0">Code Runs</div>
                   </div>
                 </div>
-                <div className="flex items-center gap-[12px]">
+                <div className="flex items-center gap-2.5">
                   <Save className="text-admin-accent flex-shrink-0" size={20} />
                   <div>
-                    <div className="text-[20px] font-bold text-admin-text m-0">
+                    <div className="text-lg font-bold text-admin-text m-0">
                       {analytics.summary.lastSaveTime ? '✓' : '✕'}
                     </div>
                     <div className="text-xs text-admin-text-muted m-0">Last Saved</div>
@@ -361,9 +361,9 @@ export default function StudentDetailPage() {
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-[10px] mb-8 border-b-2 border-admin-border overflow-x-auto max-tablet:gap-[5px]">
+            <div className="flex gap-1 mb-5 border-b border-admin-border overflow-x-auto">
               <button
-                className={`py-[12px] px-5 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-200 whitespace-nowrap ${
+                className={`py-2.5 px-4 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-200 whitespace-nowrap ${
                   activeTab === 'dashboard'
                     ? 'text-admin-accent border-b-2 border-admin-accent mb-[-2px]'
                     : 'text-admin-text-muted hover:text-admin-text'
@@ -373,7 +373,7 @@ export default function StudentDetailPage() {
                 Dashboard
               </button>
               <button
-                className={`py-[12px] px-5 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-200 whitespace-nowrap ${
+                className={`py-2.5 px-4 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-200 whitespace-nowrap ${
                   activeTab === 'quests'
                     ? 'text-admin-accent border-b-2 border-admin-accent mb-[-2px]'
                     : 'text-admin-text-muted hover:text-admin-text'
@@ -383,7 +383,7 @@ export default function StudentDetailPage() {
                 Quests
               </button>
               <button
-                className={`py-[12px] px-5 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-200 whitespace-nowrap ${
+                className={`py-2.5 px-4 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-200 whitespace-nowrap ${
                   activeTab === 'code'
                     ? 'text-admin-accent border-b-2 border-admin-accent mb-[-2px]'
                     : 'text-admin-text-muted hover:text-admin-text'
@@ -393,7 +393,7 @@ export default function StudentDetailPage() {
                 Code History
               </button>
               <button
-                className={`py-[12px] px-5 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-200 whitespace-nowrap ${
+                className={`py-2.5 px-4 border-none bg-transparent text-sm font-semibold cursor-pointer transition-all duration-200 whitespace-nowrap ${
                   activeTab === 'gamestate'
                     ? 'text-admin-accent border-b-2 border-admin-accent mb-[-2px]'
                     : 'text-admin-text-muted hover:text-admin-text'
@@ -407,32 +407,32 @@ export default function StudentDetailPage() {
             {/* Tab Content */}
             <div>
               {activeTab === 'dashboard' && (
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {/* Row 1: Summary stat cards */}
-                  <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-5">
-                    <div className="bg-admin-card border border-admin-border rounded-xl p-5 text-center">
-                      <div className="text-3xl font-bold text-admin-accent mb-1">{completionRate}%</div>
+                  <div className="grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-3">
+                    <div className="bg-admin-card border border-admin-border rounded-xl p-4 text-center">
+                      <div className="text-2xl font-bold text-admin-accent mb-1">{completionRate}%</div>
                       <div className="text-xs text-admin-text-muted font-medium">Completion Rate</div>
                     </div>
-                    <div className="bg-admin-card border border-admin-border rounded-xl p-5 text-center">
-                      <div className="text-3xl font-bold text-admin-accent mb-1">{analytics.summary.questsCompleted}</div>
+                    <div className="bg-admin-card border border-admin-border rounded-xl p-4 text-center">
+                      <div className="text-2xl font-bold text-admin-accent mb-1">{analytics.summary.questsCompleted}</div>
                       <div className="text-xs text-admin-text-muted font-medium">Quests Done</div>
                     </div>
-                    <div className="bg-admin-card border border-admin-border rounded-xl p-5 text-center">
-                      <div className="text-3xl font-bold text-admin-accent mb-1">{formatTime(analytics.summary.totalTimeSpentSeconds)}</div>
+                    <div className="bg-admin-card border border-admin-border rounded-xl p-4 text-center">
+                      <div className="text-2xl font-bold text-admin-accent mb-1">{formatTime(analytics.summary.totalTimeSpentSeconds)}</div>
                       <div className="text-xs text-admin-text-muted font-medium">Total Time</div>
                     </div>
-                    <div className="bg-admin-card border border-admin-border rounded-xl p-5 text-center">
-                      <div className="text-3xl font-bold text-admin-accent mb-1">{analytics.summary.totalCodeExecutions}</div>
+                    <div className="bg-admin-card border border-admin-border rounded-xl p-4 text-center">
+                      <div className="text-2xl font-bold text-admin-accent mb-1">{analytics.summary.totalCodeExecutions}</div>
                       <div className="text-xs text-admin-text-muted font-medium">Code Runs</div>
                     </div>
                   </div>
 
                   {/* Row 2: Charts — PieChart + BarChart */}
                   {analytics.questProgress.length > 0 && (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       {/* Quest Completion Donut */}
-                      <div className="bg-admin-card border border-admin-border rounded-xl p-6">
+                      <div className="bg-admin-card border border-admin-border rounded-xl p-4">
                         <h3 className="text-base font-bold text-admin-text m-0 mb-4">Quest Status</h3>
                         <ResponsiveContainer width="100%" height={240}>
                           <PieChart>
@@ -464,7 +464,7 @@ export default function StudentDetailPage() {
 
                       {/* Time Per Quest Bar Chart */}
                       {barData.length > 0 && (
-                        <div className="bg-admin-card border border-admin-border rounded-xl p-6">
+                        <div className="bg-admin-card border border-admin-border rounded-xl p-4">
                           <h3 className="text-base font-bold text-admin-text m-0 mb-4">Time per Quest (min)</h3>
                           <ResponsiveContainer width="100%" height={240}>
                             <BarChart data={barData} layout="vertical" margin={{ left: 10, right: 20 }}>
@@ -483,7 +483,7 @@ export default function StudentDetailPage() {
                   )}
 
                   {/* Row 3: Topic Mastery Section */}
-                  <div className="bg-admin-card border border-admin-border rounded-xl p-6">
+                  <div className="bg-admin-card border border-admin-border rounded-xl p-4">
                     <h2 className="text-lg font-bold text-admin-text m-0 mb-4">Topic Mastery</h2>
                     <div className="space-y-4">
                       {topicMastery.filter(tm => tm.totalQuests > 0).map((tm) => {
@@ -521,7 +521,7 @@ export default function StudentDetailPage() {
                   </div>
 
                   {/* Row 4: Recent Activity */}
-                  <div className="bg-admin-card border border-admin-border rounded-xl p-6">
+                  <div className="bg-admin-card border border-admin-border rounded-xl p-4">
                     <h2 className="text-lg font-bold text-admin-text m-0 mb-4">Recent Quest Activity</h2>
                     {analytics.questProgress.length > 0 ? (
                       <div className="space-y-3">
@@ -551,12 +551,12 @@ export default function StudentDetailPage() {
               )}
 
               {activeTab === 'quests' && (
-                <div className="mb-8">
-                  <h2 className="text-[22px] font-bold text-admin-text m-0 mb-5">Quest Progress Details</h2>
+                <div className="mb-5">
+                  <h2 className="text-lg font-bold text-admin-text m-0 mb-4">Quest Progress Details</h2>
                   <QuestProgressChart questProgress={analytics.questProgress} showDetails={true} />
                   {analytics.objectiveProgress.length > 0 && (
-                    <div className="mt-8">
-                      <h2 className="text-[22px] font-bold text-admin-text m-0 mb-5">Objective Completion Details</h2>
+                    <div className="mt-5">
+                      <h2 className="text-lg font-bold text-admin-text m-0 mb-4">Objective Completion Details</h2>
                       <ObjectiveProgressList
                         objectiveProgress={analytics.objectiveProgress}
                         questProgress={analytics.questProgress}
@@ -567,8 +567,8 @@ export default function StudentDetailPage() {
               )}
 
               {activeTab === 'code' && (
-                <div className="mb-8">
-                  <h2 className="text-[22px] font-bold text-admin-text m-0 mb-5">Code Execution History</h2>
+                <div className="mb-5">
+                  <h2 className="text-lg font-bold text-admin-text m-0 mb-4">Code Execution History</h2>
                   <CodeExecutionViewer
                     codeExecutions={analytics.recentCodeExecutions}
                     compact={false}
@@ -577,8 +577,8 @@ export default function StudentDetailPage() {
               )}
 
               {activeTab === 'gamestate' && (
-                <div className="mb-8">
-                  <h2 className="text-[22px] font-bold text-admin-text m-0 mb-5">Game State</h2>
+                <div className="mb-5">
+                  <h2 className="text-lg font-bold text-admin-text m-0 mb-4">Game State</h2>
                   <GameStateViewer gameState={analytics.gameState} />
                 </div>
               )}

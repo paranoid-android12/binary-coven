@@ -91,7 +91,7 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
           mobileMenuOpen ? 'translate-x-0' : 'max-laptop:-translate-x-full'
         }`}>
           {/* Logo */}
-          <div className="flex items-center gap-2.5 px-5 py-4 border-b border-white/[0.07]">
+          <div className="flex items-center gap-2.5 px-4 py-3 border-b border-white/[0.07]">
             <Image src="/assets/wheat.png" alt="wheat" width={28} height={28} style={{ imageRendering: 'pixelated' }} className="flex-shrink-0" />
             <div>
               <p className="text-sm font-bold text-white leading-none">Binary Coven</p>
@@ -136,7 +136,7 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
         {/* Main */}
         <div className="flex-1 ml-[220px] flex flex-col min-h-screen max-laptop:ml-0">
           {/* Header */}
-          <header className="bg-admin-card border-b border-admin-border px-6 py-3 sticky top-0 z-[100] flex items-center justify-between">
+          <header className="bg-admin-card border-b border-admin-border px-4 py-2.5 sticky top-0 z-[100] flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
                 className="hidden max-laptop:flex items-center justify-center border-none bg-transparent text-admin-text cursor-pointer p-1"
@@ -160,11 +160,11 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
             </div>
           </header>
 
-          <main className="flex-1 p-6 bg-admin-bg">
+          <main className="flex-1 p-4 bg-admin-bg">
             {children}
           </main>
 
-          <footer className="bg-admin-card border-t border-admin-border py-3 px-6 text-center">
+          <footer className="bg-admin-card border-t border-admin-border py-2.5 px-4 text-center">
             <p className="m-0 text-[11px] text-admin-text-faint">Binary Coven LMS © {new Date().getFullYear()}</p>
           </footer>
         </div>

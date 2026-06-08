@@ -48,7 +48,7 @@ export default function GameStateViewer({ gameState }: GameStateViewerProps) {
   return (
     <div className="w-full">
       {/* View Mode Toggle */}
-      <div className="flex items-center justify-between mb-6 gap-4 flex-wrap max-tablet:flex-col max-tablet:items-start">
+      <div className="flex items-center justify-between mb-4 gap-3 flex-wrap max-tablet:flex-col max-tablet:items-start">
         <div className="flex gap-2 max-tablet:w-full">
           <button
             className={`bg-admin-card border border-admin-border rounded-md py-2 px-4 text-admin-text-muted text-[0.85rem] cursor-pointer transition-all duration-300 hover:border-admin-text-faint hover:text-admin-text hover:bg-admin-bg max-tablet:flex-1 max-tablet:text-center ${viewMode === 'structured' ? 'bg-admin-accent border-admin-accent text-white' : ''}`}

@@ -100,17 +100,17 @@ export default function SessionStudentsPage() {
     <AdminLayout title={`Students - ${code}`}>
       <div className="max-w-[1400px] mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <Link href="/admin/sessions" className="inline-block text-admin-accent no-underline text-[15px] font-medium mb-5 transition-colors duration-300 ease-in-out hover:text-admin-accent-hover">
+        <div className="mb-5">
+          <Link href="/admin/sessions" className="inline-block text-admin-accent no-underline text-sm font-medium mb-3 transition-colors duration-300 ease-in-out hover:text-admin-accent-hover">
             ← Back to Sessions
           </Link>
 
           {sessionCode && (
             <div>
-              <h1 className="text-[28px] font-bold text-admin-text m-0 mb-[10px] max-tablet:text-[24px]">
+              <h1 className="text-2xl font-bold text-admin-text m-0 mb-1 max-tablet:text-xl">
                 Session Code: <span className="text-admin-accent">{sessionCode.code}</span>
               </h1>
-              <p className="text-[15px] text-admin-text-muted m-0">
+              <p className="text-sm text-admin-text-muted m-0">
                 Valid until: {formatDate(sessionCode.validityEnd)}
               </p>
             </div>
@@ -119,60 +119,60 @@ export default function SessionStudentsPage() {
 
         {/* Content */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-[60px] px-5 text-admin-text-muted">
-            <div className="w-[50px] h-[50px] border-4 border-[#e5e7eb] border-t-admin-accent rounded-full animate-spin-slow mb-5"></div>
-            <p>Loading students...</p>
+          <div className="flex flex-col items-center justify-center py-12 text-admin-text-muted">
+            <div className="w-10 h-10 border-4 border-[#e5e7eb] border-t-admin-accent rounded-full animate-spin-slow mb-4"></div>
+            <p className="text-sm">Loading students...</p>
           </div>
         ) : error ? (
-          <div className="bg-red-50 border border-[#fecaca] rounded-xl p-[30px] text-center text-[#b91c1c]">
-            <p className="m-0 mb-[15px] text-base">{error}</p>
-            <button onClick={fetchStudents} className="bg-[#b91c1c] text-white border-none py-[10px] px-5 rounded-lg text-sm font-[family-name:var(--font-family-admin)] cursor-pointer transition-colors duration-300 ease-in-out hover:bg-[#991b1b]">
+          <div className="bg-red-50 border border-[#fecaca] rounded-xl p-5 text-center text-[#b91c1c]">
+            <p className="m-0 mb-3 text-sm">{error}</p>
+            <button onClick={fetchStudents} className="bg-[#b91c1c] text-white border-none py-2 px-4 rounded-md text-xs cursor-pointer transition-colors duration-300 ease-in-out hover:bg-[#991b1b]">
               Retry
             </button>
           </div>
         ) : students.length === 0 ? (
-          <div className="bg-admin-card border border-admin-border rounded-xl py-[50px] px-10 text-center max-tablet:py-[30px] max-tablet:px-5">
-            <h3 className="text-xl font-bold text-admin-text m-0 mb-[10px]">No students yet</h3>
-            <p className="text-[15px] text-admin-text-muted m-0">
+          <div className="bg-admin-card border border-admin-border rounded-xl py-12 px-6 text-center">
+            <h3 className="text-base font-bold text-admin-text m-0 mb-1">No students yet</h3>
+            <p className="text-sm text-admin-text-muted m-0">
               No students have registered with this session code
             </p>
           </div>
         ) : (
           <>
             {/* Stats Summary */}
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5 mb-8 max-laptop:grid-cols-2 max-tablet:grid-cols-1">
-              <div className="bg-admin-card border border-admin-border rounded-xl p-5 flex items-center gap-[15px] transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:border-admin-border-hover">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3 mb-5 max-laptop:grid-cols-2 max-tablet:grid-cols-1">
+              <div className="bg-admin-card border border-admin-border rounded-xl p-4 flex items-center gap-3 transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:border-admin-border-hover">
                 <Users className="text-admin-accent flex-shrink-0" size={17} />
                 <div className="flex-1">
-                  <h3 className="text-[24px] font-bold text-admin-accent m-0 mb-[5px]">{students.length}</h3>
+                  <h3 className="text-xl font-bold text-admin-accent m-0 mb-0.5">{students.length}</h3>
                   <p className="text-xs text-admin-text-muted m-0 font-medium">Total Students</p>
                 </div>
               </div>
 
-              <div className="bg-admin-card border border-admin-border rounded-xl p-5 flex items-center gap-[15px] transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:border-admin-border-hover">
+              <div className="bg-admin-card border border-admin-border rounded-xl p-4 flex items-center gap-3 transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:border-admin-border-hover">
                 <CheckCircle className="text-admin-accent flex-shrink-0" size={10} />
                 <div className="flex-1">
-                  <h3 className="text-[24px] font-bold text-admin-accent m-0 mb-[5px]">
+                  <h3 className="text-xl font-bold text-admin-accent m-0 mb-0.5">
                     {students.reduce((sum, s) => sum + s.questsCompleted, 0)}
                   </h3>
                   <p className="text-xs text-admin-text-muted m-0 font-medium">Quests Completed</p>
                 </div>
               </div>
 
-              <div className="bg-admin-card border border-admin-border rounded-xl p-5 flex items-center gap-[15px] transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:border-admin-border-hover">
+              <div className="bg-admin-card border border-admin-border rounded-xl p-4 flex items-center gap-3 transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:border-admin-border-hover">
                 <Zap className="text-admin-accent flex-shrink-0" size={17} />
                 <div className="flex-1">
-                  <h3 className="text-[24px] font-bold text-admin-accent m-0 mb-[5px]">
+                  <h3 className="text-xl font-bold text-admin-accent m-0 mb-0.5">
                     {students.reduce((sum, s) => sum + s.totalCodeExecutions, 0)}
                   </h3>
                   <p className="text-xs text-admin-text-muted m-0 font-medium">Code Executions</p>
                 </div>
               </div>
 
-              <div className="bg-admin-card border border-admin-border rounded-xl p-5 flex items-center gap-[15px] transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:border-admin-border-hover">
+              <div className="bg-admin-card border border-admin-border rounded-xl p-4 flex items-center gap-3 transition-all duration-300 ease-in-out shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:border-admin-border-hover">
                 <Clock className="text-admin-accent flex-shrink-0" size={17} />
                 <div className="flex-1">
-                  <h3 className="text-[24px] font-bold text-admin-accent m-0 mb-[5px]">
+                  <h3 className="text-xl font-bold text-admin-accent m-0 mb-0.5">
                     {formatTime(students.reduce((sum, s) => sum + s.totalTimeSpentSeconds, 0))}
                   </h3>
                   <p className="text-xs text-admin-text-muted m-0 font-medium">Total Time</p>
