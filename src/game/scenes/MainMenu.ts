@@ -11,6 +11,7 @@ export class MainMenu extends Scene
     mainButton: GameObjects.Sprite;
     startText: GameObjects.Text;
     overlay: GameObjects.Rectangle;
+    muteButton: GameObjects.Text;
     constructor ()
     {
         super('MainMenu');
@@ -114,6 +115,26 @@ export class MainMenu extends Scene
         this.mainTitle.setDepth(101);
         this.mainButton.setDepth(101);
         this.startText.setDepth(102);
+
+        // Mute background music toggle (top-right corner)
+        const isMutedInit = typeof window !== 'undefined' && localStorage.getItem('bgm-muted') === 'true';
+        this.muteButton = this.add.text(width - 20, 20, isMutedInit ? '♪ MUSIC: OFF' : '♪ MUSIC: ON', {
+            fontSize: '24px',
+            color: '#ffffff',
+            fontFamily: 'BoldPixels',
+            fontStyle: 'bold'
+        });
+        this.muteButton.setOrigin(1, 0);
+        this.muteButton.setDepth(102);
+        this.muteButton.setInteractive({ useHandCursor: true });
+        this.muteButton.on('pointerover', () => this.muteButton.setColor('#ffd700'));
+        this.muteButton.on('pointerout', () => this.muteButton.setColor('#ffffff'));
+        this.muteButton.on('pointerup', () => {
+            const newMuted = !(localStorage.getItem('bgm-muted') === 'true');
+            this.sound.getAll('bgm').forEach(s => { (s as any).mute = newMuted; });
+            localStorage.setItem('bgm-muted', String(newMuted));
+            this.muteButton.setText(newMuted ? '♪ MUSIC: OFF' : '♪ MUSIC: ON');
+        });
 
         // Start background music (persists across scenes via global SoundManager)
         const existingBgm = this.sound.getAll('bgm');
