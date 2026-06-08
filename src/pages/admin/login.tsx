@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { Eye, EyeOff } from 'lucide-react';
+import { useUser } from '../../contexts/UserContext';
 
 export default function AdminLogin() {
   const router = useRouter();
+  const { login } = useUser();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -52,6 +54,11 @@ export default function AdminLogin() {
       const data = await response.json();
 
       if (data.success) {
+        // Populate the global UserContext so pages that gate on useUser()
+        // (e.g. /admin/users) don't bounce back due to a stale null session.
+        if (data.admin) {
+          login(data.admin, 'admin');
+        }
         router.push('/admin');
       } else {
         setError(data.message || 'Invalid username or password');
