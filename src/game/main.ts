@@ -16,6 +16,10 @@ const config: Types.Core.GameConfig = {
     parent: 'game-container',
     pixelArt: true,
     backgroundColor: '#028af8',
+    scale: {
+        mode: Phaser.Scale.RESIZE,
+        autoCenter: Phaser.Scale.CENTER_BOTH
+    },
     // Use window as keyboard target so the canvas doesn't need focus/tabIndex,
     // which prevents the browser from showing a blinking text caret on the canvas.
     input: {

@@ -12,6 +12,7 @@ export class MainMenu extends Scene
     startText: GameObjects.Text;
     overlay: GameObjects.Rectangle;
     muteButton: GameObjects.Text;
+    startTextBaseY: number = 0;
     constructor ()
     {
         super('MainMenu');
@@ -48,8 +49,6 @@ export class MainMenu extends Scene
 
     create ()
     {
-        const { width, height } = this.scale;
-
         // Create animation for background
         this.anims.create({
             key: 'background_animation',
@@ -67,39 +66,41 @@ export class MainMenu extends Scene
             repeat: -1 // Loop indefinitely
         });
 
-        // Create animated background sprite
-        this.background = this.add.sprite(width / 2, height / 2, 'background_frame_0');
+        // Create animated background sprite (scaled to cover the screen in applyLayout)
+        this.background = this.add.sprite(0, 0, 'background_frame_0');
         this.background.play('background_animation');
 
         // Black overlay dimming the animated background behind UI
-        this.overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.8);
+        this.overlay = this.add.rectangle(0, 0, 10, 10, 0x000000, 0.8);
         this.overlay.setDepth(100);
 
-        this.mainTitle = this.add.image(width / 2, (height / 2) - 170, "mainTitle").setScale(0.7);
+        this.mainTitle = this.add.image(0, 0, "mainTitle");
+        this.mainTitle.setDepth(101);
 
-        this.mainButton = this.add.sprite(width / 2, (height / 2 + 190), "mainButton", "startButtonUp").setScale(8);
+        this.mainButton = this.add.sprite(0, 0, "mainButton", "startButtonUp").setScale(8);
         this.mainButton.setInteractive();
-        
+        this.mainButton.setDepth(101);
+
         // Add "Start" text in the middle of the button
-        const startTextY = (height / 2 + 185);
-        this.startText = this.add.text(width / 2, startTextY, "Start", {
+        this.startText = this.add.text(0, 0, "Start", {
             fontSize: '60px',
             color: '#1e0818',
             fontFamily: 'BoldPixels',
             fontStyle: 'bold'
         });
         this.startText.setOrigin(0.5, 0.5);
-        
+        this.startText.setDepth(102);
+
         this.mainButton.on("pointerdown", () => {
             this.mainButton.setFrame("startButtonDown");
-            // Move text down by 20px when button is pressed
-            this.startText.setY(startTextY + 10);
+            // Nudge text down while the button is pressed
+            this.startText.setY(this.startTextBaseY + 10);
         });
         this.mainButton.on("pointerup", () => {
             // When pressed down, wait to be pressed up to change frame
             this.mainButton.setFrame("startButtonUp");
             // Move text back to original position
-            this.startText.setY(startTextY);
+            this.startText.setY(this.startTextBaseY);
 
             // Check if user is authenticated by emitting event to show login modal
             // The React side will check authentication and show modal if needed
@@ -111,14 +112,9 @@ export class MainMenu extends Scene
             this.scene.start('ProgrammingGame');
         });
 
-        // All buttons and title should be higher than overlay
-        this.mainTitle.setDepth(101);
-        this.mainButton.setDepth(101);
-        this.startText.setDepth(102);
-
         // Mute background music toggle (top-right corner)
         const isMutedInit = typeof window !== 'undefined' && localStorage.getItem('bgm-muted') === 'true';
-        this.muteButton = this.add.text(width - 20, 20, isMutedInit ? '♪ MUSIC: OFF' : '♪ MUSIC: ON', {
+        this.muteButton = this.add.text(0, 0, isMutedInit ? '♪ MUSIC: OFF' : '♪ MUSIC: ON', {
             fontSize: '24px',
             color: '#ffffff',
             fontFamily: 'BoldPixels',
@@ -135,6 +131,13 @@ export class MainMenu extends Scene
             localStorage.setItem('bgm-muted', String(newMuted));
             this.muteButton.setText(newMuted ? '♪ MUSIC: OFF' : '♪ MUSIC: ON');
         });
+
+        // Position everything for the current screen size, and reflow on resize
+        this.applyLayout(this.scale.width, this.scale.height);
+        this.scale.on('resize', (gameSize: Phaser.Structs.Size) => {
+            this.applyLayout(gameSize.width, gameSize.height);
+        });
+        this.events.once('shutdown', () => this.scale.off('resize'));
 
         // Start background music (persists across scenes via global SoundManager)
         const existingBgm = this.sound.getAll('bgm');
@@ -156,7 +159,34 @@ export class MainMenu extends Scene
 
         EventBus.emit('current-scene-ready', this);
     }
-    
+
+    // Lay out all menu elements responsively for the given canvas size.
+    applyLayout (width: number, height: number)
+    {
+        if (!width || !height) return;
+
+        // Background: scale to cover the whole screen (like CSS background-size: cover)
+        // so the island fills the view instead of floating in the water-blue backdrop.
+        const cover = Math.max(width / this.background.width, height / this.background.height);
+        this.background.setScale(cover).setPosition(width / 2, height / 2);
+
+        // Dimming overlay covers the full canvas.
+        this.overlay.setSize(width, height).setPosition(width / 2, height / 2);
+
+        // Title: sized relative to the screen, capped so it never dominates large displays.
+        const titleWidth = Math.min(width * 0.5, 620);
+        this.mainTitle.setScale(titleWidth / this.mainTitle.width);
+        this.mainTitle.setPosition(width / 2, height * 0.32);
+
+        // Start button anchored in the lower third, with its label centred on it.
+        this.mainButton.setPosition(width / 2, height * 0.7);
+        this.startTextBaseY = this.mainButton.y - 5;
+        this.startText.setPosition(width / 2, this.startTextBaseY);
+
+        // Mute toggle in the top-right corner.
+        this.muteButton.setPosition(width - 20, 20);
+    }
+
     changeScene ()
     {
 
