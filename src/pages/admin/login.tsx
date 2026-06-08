@@ -87,7 +87,7 @@ export default function AdminLogin() {
                 id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full py-[14px] px-4 bg-white border border-[#e7e5e0] rounded-md text-[#1c1917] text-[15px] transition-all duration-200 ease-in-out box-border outline-none focus:border-[#b45309] focus:shadow-[0_0_0_2px_rgba(180,83,9,0.15)] disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-[#a8a29e]"
+                className="w-full py-[14px] px-4 bg-white border border-[#e7e5e0] rounded-md text-[#1c1917] text-[15px] transition-all duration-200 ease-in-out box-border outline-none focus:border-[#2563eb] focus:shadow-[0_0_0_2px_rgba(37,99,235,0.15)] disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-[#a8a29e]"
                 placeholder="Enter admin username"
                 disabled={loading}
                 autoFocus
@@ -104,7 +104,7 @@ export default function AdminLogin() {
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full py-[14px] px-4 pr-10 bg-white border border-[#e7e5e0] rounded-md text-[#1c1917] text-[15px] transition-all duration-200 ease-in-out box-border outline-none focus:border-[#b45309] focus:shadow-[0_0_0_2px_rgba(180,83,9,0.15)] disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-[#a8a29e]"
+                  className="w-full py-[14px] px-4 pr-10 bg-white border border-[#e7e5e0] rounded-md text-[#1c1917] text-[15px] transition-all duration-200 ease-in-out box-border outline-none focus:border-[#2563eb] focus:shadow-[0_0_0_2px_rgba(37,99,235,0.15)] disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-[#a8a29e]"
                   placeholder="Enter admin password"
                   disabled={loading}
                 />
@@ -127,7 +127,7 @@ export default function AdminLogin() {
 
             <button
               type="submit"
-              className="w-full py-[14px] px-6 bg-[#b45309] text-white border-none rounded-md text-base font-bold cursor-pointer transition-all duration-200 ease-in-out uppercase tracking-[2px] hover:bg-[#92400e] active:bg-[#78350f] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-[14px] px-6 bg-[#2563eb] text-white border-none rounded-md text-base font-bold cursor-pointer transition-all duration-200 ease-in-out uppercase tracking-[2px] hover:bg-[#1d4ed8] active:bg-[#1e40af] disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={loading}
             >
               {loading ? 'Logging in...' : 'Login'}

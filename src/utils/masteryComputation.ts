@@ -133,7 +133,7 @@ export const MASTERY_COLORS: Record<MasteryLevel, { bg: string; text: string; bo
 /** Admin-side Tailwind-friendly class names for mastery badges */
 export const MASTERY_ADMIN_CLASSES: Record<MasteryLevel, string> = {
   mastered: 'bg-lime-50 text-lime-800 border-lime-300',
-  'in-progress': 'bg-amber-50 text-amber-800 border-amber-300',
+  'in-progress': 'bg-blue-50 text-blue-700 border-blue-200',
   'not-started': 'bg-stone-100 text-stone-500 border-stone-300',
 };
 

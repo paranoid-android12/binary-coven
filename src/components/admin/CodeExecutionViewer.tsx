@@ -190,7 +190,7 @@ export default function CodeExecutionViewer({ codeExecutions, compact = false }:
                   <div className="py-0 px-4 pb-4 border-t border-admin-border bg-admin-bg">
                     <div className="mt-4">
                       <div className="text-admin-accent text-[0.85rem] uppercase tracking-wider mb-2 font-bold">Code:</div>
-                      <pre className="bg-gray-800 border border-gray-700 rounded-md p-4 text-amber-300 font-mono text-[0.9rem] overflow-x-auto m-0 whitespace-pre-wrap break-words">{exec.codeContent || 'No code content'}</pre>
+                      <pre className="bg-gray-800 border border-gray-700 rounded-md p-4 text-sky-300 font-mono text-[0.9rem] overflow-x-auto m-0 whitespace-pre-wrap break-words">{exec.codeContent || 'No code content'}</pre>
                     </div>
 
                     {exec.executionResult && (

@@ -222,7 +222,7 @@ export default function GameStateViewer({ gameState }: GameStateViewerProps) {
                           )}
                         </div>
                         {window.code && (
-                          <pre className="bg-gray-800 border border-gray-700 rounded-md p-4 text-amber-300 font-mono text-[0.85rem] overflow-x-auto m-0 whitespace-pre-wrap break-words max-h-[300px] overflow-y-auto">{window.code}</pre>
+                          <pre className="bg-gray-800 border border-gray-700 rounded-md p-4 text-sky-300 font-mono text-[0.85rem] overflow-x-auto m-0 whitespace-pre-wrap break-words max-h-[300px] overflow-y-auto">{window.code}</pre>
                         )}
                       </div>
                     ))}
@@ -248,7 +248,7 @@ export default function GameStateViewer({ gameState }: GameStateViewerProps) {
             </div>
               {expandedSections.has('questProgress') && (
                 <div className="py-0 px-4 pb-4 border-t border-admin-border">
-                  <pre className="bg-gray-800 border border-gray-700 rounded-md p-4 text-amber-300 font-mono text-[0.85rem] overflow-x-auto m-0 whitespace-pre-wrap break-words max-h-[600px] overflow-y-auto">
+                  <pre className="bg-gray-800 border border-gray-700 rounded-md p-4 text-sky-300 font-mono text-[0.85rem] overflow-x-auto m-0 whitespace-pre-wrap break-words max-h-[600px] overflow-y-auto">
                     {JSON.stringify(state.questProgress, null, 2)}
                   </pre>
                 </div>
@@ -258,7 +258,7 @@ export default function GameStateViewer({ gameState }: GameStateViewerProps) {
         </div>
       ) : (
         <div className="bg-admin-card border border-admin-border rounded-xl p-4 shadow-sm">
-          <pre className="bg-gray-800 border border-gray-700 rounded-md p-4 text-amber-300 font-mono text-[0.85rem] overflow-x-auto m-0 whitespace-pre-wrap break-words max-h-[600px] overflow-y-auto">
+          <pre className="bg-gray-800 border border-gray-700 rounded-md p-4 text-sky-300 font-mono text-[0.85rem] overflow-x-auto m-0 whitespace-pre-wrap break-words max-h-[600px] overflow-y-auto">
             {JSON.stringify(state, null, 2)}
           </pre>
         </div>

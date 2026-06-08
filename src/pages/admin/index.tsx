@@ -33,19 +33,9 @@ export default function AdminDashboard() {
   const [recentSessions, setRecentSessions] = useState<SessionCode[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [adminName, setAdminName] = useState('Admin');
 
   useEffect(() => {
     fetchDashboardData();
-    // Fetch admin name for greeting
-    fetch('/api/auth/session')
-      .then(res => res.json())
-      .then(data => {
-        if (data.authenticated && data.user?.username) {
-          setAdminName(data.user.username);
-        }
-      })
-      .catch(() => {});
   }, []);
 
   const fetchDashboardData = async () => {
@@ -55,24 +45,17 @@ export default function AdminDashboard() {
 
       if (data.success) {
         const sessions: SessionCode[] = data.sessionCodes;
-
-        // Calculate stats
-        const totalStudents = sessions.reduce((sum, s) => sum + s.studentCount, 0);
-        const activeSessions = sessions.filter(s => s.status === 'active').length;
-        const recentActivity = sessions.reduce((sum, s) => sum + s.activeStudents24h, 0);
-
         setStats({
-          totalStudents,
-          activeSessions,
+          totalStudents: sessions.reduce((sum, s) => sum + s.studentCount, 0),
+          activeSessions: sessions.filter(s => s.status === 'active').length,
           totalSessions: sessions.length,
-          recentActivity,
+          recentActivity: sessions.reduce((sum, s) => sum + s.activeStudents24h, 0),
         });
-
-        // Get most recent 5 sessions
-        const sortedSessions = [...sessions].sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        setRecentSessions(
+          [...sessions]
+            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+            .slice(0, 5)
         );
-        setRecentSessions(sortedSessions.slice(0, 5));
       } else {
         setError('Failed to load dashboard data');
       }
@@ -84,194 +67,113 @@ export default function AdminDashboard() {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+  const statusClass = (status: string) => {
+    if (status === 'active') return 'bg-lime-50 text-[#4d7c0f]';
+    if (status === 'expired') return 'bg-red-50 text-[#b91c1c]';
+    return 'bg-slate-100 text-[#475569]';
   };
 
-  const getStatusBadgeClass = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'bg-lime-50 text-[#4d7c0f]';
-      case 'expired':
-        return 'bg-red-50 text-[#b91c1c]';
-      case 'scheduled':
-        return 'bg-slate-100 text-[#475569]';
-      default:
-        return '';
-    }
-  };
+  const statCards = [
+    { label: 'Total Students', value: stats.totalStudents, icon: Users },
+    { label: 'Active Sessions', value: stats.activeSessions, icon: Key },
+    { label: 'Total Sessions', value: stats.totalSessions, icon: BookOpen },
+    { label: 'Active (24h)', value: stats.recentActivity, icon: Zap },
+  ];
+
+  const quickLinks = [
+    { href: '/admin/sessions', label: 'Session Codes', desc: 'Create and manage session codes', icon: Key },
+    { href: '/admin/students', label: 'Students', desc: 'Track progress across all sessions', icon: Users },
+    { href: '/admin/users', label: 'Admin Users', desc: 'Manage accounts and permissions', icon: UserCog },
+  ];
 
   return (
     <AdminLayout title="Dashboard">
-      <div className="max-w-[1400px] mx-auto">
+      <div className="max-w-[1200px] mx-auto space-y-6">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-[60px] px-5 text-admin-text-muted">
-            <div className="w-[50px] h-[50px] border-4 border-admin-border border-t-admin-accent rounded-full animate-spin-slow mb-5"></div>
-            <p>Loading dashboard...</p>
+          <div className="flex flex-col items-center justify-center py-16 text-admin-text-muted">
+            <div className="w-10 h-10 border-4 border-admin-border border-t-admin-accent rounded-full animate-spin-slow mb-4" />
+            <p className="text-sm">Loading...</p>
           </div>
         ) : error ? (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-[30px] text-center text-[#b91c1c]">
-            <p className="m-0 mb-[15px] text-base">{error}</p>
-            <button
-              onClick={fetchDashboardData}
-              className="bg-[#b91c1c] text-white border-none py-[10px] px-5 rounded-lg text-sm cursor-pointer transition-colors duration-200 hover:bg-[#991b1b]"
-            >
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center text-[#b91c1c] text-sm">
+            <p className="mb-3">{error}</p>
+            <button onClick={fetchDashboardData} className="bg-[#b91c1c] text-white border-none py-2 px-4 rounded-md text-xs cursor-pointer hover:bg-[#991b1b]">
               Retry
             </button>
           </div>
         ) : (
           <>
-            {/* Greeting */}
-            <div className="mb-8">
-              <h1 className="text-[28px] font-bold text-admin-text m-0 mb-1">
-                {(() => {
-                  const hour = new Date().getHours();
-                  if (hour < 12) return 'Good morning';
-                  if (hour < 18) return 'Good afternoon';
-                  return 'Good evening';
-                })()}, {adminName}
-              </h1>
-              <p className="text-sm text-admin-text-muted m-0">Here&apos;s your overview for today.</p>
+            {/* Stats */}
+            <div className="grid grid-cols-4 gap-3 max-laptop:grid-cols-2 max-tablet:grid-cols-2">
+              {statCards.map(({ label, value, icon: Icon }) => (
+                <div key={label} className="bg-admin-card border border-admin-border rounded-lg p-4 relative">
+                  <Icon className="absolute top-3.5 right-3.5 text-admin-text-faint" size={14} />
+                  <p className="text-2xl font-bold text-admin-text mb-0.5">{value}</p>
+                  <p className="text-xs text-admin-text-muted">{label}</p>
+                </div>
+              ))}
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-5 mb-10 max-laptop:grid-cols-2 max-tablet:grid-cols-1">
-              <div className="bg-admin-card border border-admin-border rounded-xl overflow-hidden transition-colors duration-200 hover:border-admin-border-hover">
-                <div className="p-[25px] flex items-center gap-5 max-tablet:p-5">
-                  <Users className="text-admin-accent flex-shrink-0" size={22} />
-                  <div className="flex-1">
-                    <h3 className="text-[32px] font-bold text-admin-text m-0 mb-[2px] max-tablet:text-[26px]">{stats.totalStudents}</h3>
-                    <p className="text-sm text-admin-text-muted m-0 font-medium">Total Students</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-admin-card border border-admin-border rounded-xl overflow-hidden transition-colors duration-200 hover:border-admin-border-hover">
-                <div className="p-[25px] flex items-center gap-5 max-tablet:p-5">
-                  <Key className="text-admin-accent flex-shrink-0" size={22} />
-                  <div className="flex-1">
-                    <h3 className="text-[32px] font-bold text-admin-text m-0 mb-[2px] max-tablet:text-[26px]">{stats.activeSessions}</h3>
-                    <p className="text-sm text-admin-text-muted m-0 font-medium">Active Sessions</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-admin-card border border-admin-border rounded-xl overflow-hidden transition-colors duration-200 hover:border-admin-border-hover">
-                <div className="p-[25px] flex items-center gap-5 max-tablet:p-5">
-                  <BookOpen className="text-admin-accent flex-shrink-0" size={22} />
-                  <div className="flex-1">
-                    <h3 className="text-[32px] font-bold text-admin-text m-0 mb-[2px] max-tablet:text-[26px]">{stats.totalSessions}</h3>
-                    <p className="text-sm text-admin-text-muted m-0 font-medium">Total Sessions</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-admin-card border border-admin-border rounded-xl overflow-hidden transition-colors duration-200 hover:border-admin-border-hover">
-                <div className="p-[25px] flex items-center gap-5 max-tablet:p-5">
-                  <Zap className="text-admin-accent flex-shrink-0" size={22} />
-                  <div className="flex-1">
-                    <h3 className="text-[32px] font-bold text-admin-text m-0 mb-[2px] max-tablet:text-[26px]">{stats.recentActivity}</h3>
-                    <p className="text-sm text-admin-text-muted m-0 font-medium">Active (24h)</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="mb-10">
-              <h2 className="text-[22px] font-bold text-admin-text m-0 mb-5">Quick Actions</h2>
-              <div className="grid grid-cols-3 gap-5 max-laptop:grid-cols-2 max-tablet:grid-cols-1">
-                <Link
-                  href="/admin/sessions"
-                  className="group bg-admin-card border border-admin-border rounded-xl p-6 no-underline transition-colors duration-200 block hover:border-admin-accent"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <Key className="text-admin-accent" size={24} />
-                    <ArrowRight className="text-admin-text-faint transition-all duration-200 group-hover:text-admin-accent group-hover:translate-x-1" size={20} />
-                  </div>
-                  <h3 className="text-lg font-bold text-admin-text m-0 mb-[6px]">Manage Sessions</h3>
-                  <p className="text-sm text-admin-text-muted m-0 leading-[1.5]">
-                    Create and manage session codes for students
-                  </p>
-                </Link>
-
-                <Link
-                  href="/admin/students"
-                  className="group bg-admin-card border border-admin-border rounded-xl p-6 no-underline transition-colors duration-200 block hover:border-admin-accent"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <Users className="text-admin-accent" size={24} />
-                    <ArrowRight className="text-admin-text-faint transition-all duration-200 group-hover:text-admin-accent group-hover:translate-x-1" size={20} />
-                  </div>
-                  <h3 className="text-lg font-bold text-admin-text m-0 mb-[6px]">View Students</h3>
-                  <p className="text-sm text-admin-text-muted m-0 leading-[1.5]">
-                    Track student progress and analytics
-                  </p>
-                </Link>
-
-                <Link
-                  href="/admin/users"
-                  className="group bg-admin-card border border-admin-border rounded-xl p-6 no-underline transition-colors duration-200 block hover:border-admin-accent"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <UserCog className="text-admin-accent" size={24} />
-                    <ArrowRight className="text-admin-text-faint transition-all duration-200 group-hover:text-admin-accent group-hover:translate-x-1" size={20} />
-                  </div>
-                  <h3 className="text-lg font-bold text-admin-text m-0 mb-[6px]">Admin Users</h3>
-                  <p className="text-sm text-admin-text-muted m-0 leading-[1.5]">
-                    Manage admin accounts and permissions
-                  </p>
-                </Link>
+            {/* Quick links */}
+            <div>
+              <h2 className="text-xs font-bold text-admin-text-muted uppercase tracking-wider mb-2">Quick Actions</h2>
+              <div className="bg-admin-card border border-admin-border rounded-lg divide-y divide-admin-border">
+                {quickLinks.map(({ href, label, desc, icon: Icon }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className="group flex items-center gap-4 px-4 py-3 no-underline transition-colors duration-150 hover:bg-[#faf9f7]"
+                  >
+                    <Icon className="text-admin-accent flex-shrink-0" size={16} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-admin-text m-0">{label}</p>
+                      <p className="text-xs text-admin-text-muted m-0 truncate">{desc}</p>
+                    </div>
+                    <ArrowRight className="text-admin-text-faint transition-transform duration-150 group-hover:translate-x-0.5 flex-shrink-0" size={14} />
+                  </Link>
+                ))}
               </div>
             </div>
 
             {/* Recent Sessions */}
             {recentSessions.length > 0 && (
-              <div className="mb-10">
-                <div className="flex items-center justify-between mb-5 max-tablet:flex-col max-tablet:items-start max-tablet:gap-[10px]">
-                  <h2 className="text-[22px] font-bold text-admin-text m-0">Recent Session Codes</h2>
-                  <Link
-                    href="/admin/sessions"
-                    className="text-admin-accent no-underline text-[15px] font-medium transition-colors duration-200 hover:text-admin-accent-hover"
-                  >
-                    View All →
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-xs font-bold text-admin-text-muted uppercase tracking-wider m-0">Recent Sessions</h2>
+                  <Link href="/admin/sessions" className="text-xs text-admin-accent no-underline hover:text-admin-accent-hover">
+                    View all →
                   </Link>
                 </div>
-
-                <div className="bg-admin-card border border-admin-border rounded-xl overflow-hidden max-tablet:overflow-x-auto">
-                  <table className="w-full border-collapse max-tablet:min-w-[600px]">
+                <div className="bg-admin-card border border-admin-border rounded-lg overflow-hidden">
+                  <table className="w-full border-collapse text-sm">
                     <thead>
-                      <tr className="bg-[#faf9f7] border-b-2 border-admin-border">
-                        <th className="p-[15px_20px] text-left text-[13px] font-bold text-admin-text uppercase tracking-[0.5px]">Code</th>
-                        <th className="p-[15px_20px] text-left text-[13px] font-bold text-admin-text uppercase tracking-[0.5px]">Status</th>
-                        <th className="p-[15px_20px] text-left text-[13px] font-bold text-admin-text uppercase tracking-[0.5px]">Students</th>
-                        <th className="p-[15px_20px] text-left text-[13px] font-bold text-admin-text uppercase tracking-[0.5px]">Active (24h)</th>
-                        <th className="p-[15px_20px] text-left text-[13px] font-bold text-admin-text uppercase tracking-[0.5px]">Valid Until</th>
-                        <th className="p-[15px_20px] text-left text-[13px] font-bold text-admin-text uppercase tracking-[0.5px]">Created</th>
+                      <tr className="border-b border-admin-border">
+                        <th className="px-4 py-2.5 text-left text-[11px] font-semibold text-admin-text-muted uppercase tracking-wide">Code</th>
+                        <th className="px-4 py-2.5 text-left text-[11px] font-semibold text-admin-text-muted uppercase tracking-wide">Status</th>
+                        <th className="px-4 py-2.5 text-right text-[11px] font-semibold text-admin-text-muted uppercase tracking-wide">Students</th>
+                        <th className="px-4 py-2.5 text-right text-[11px] font-semibold text-admin-text-muted uppercase tracking-wide">Active 24h</th>
+                        <th className="px-4 py-2.5 text-right text-[11px] font-semibold text-admin-text-muted uppercase tracking-wide">Valid Until</th>
+                        <th className="px-4 py-2.5 text-right text-[11px] font-semibold text-admin-text-muted uppercase tracking-wide">Created</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {recentSessions.map((session) => (
-                        <tr key={session.id} className="border-b border-admin-border last:border-b-0 transition-colors duration-200 ease-in-out hover:bg-[#faf9f7]">
-                          <td className="p-[15px_20px] text-sm text-admin-text font-medium">
-                            <code className="bg-stone-100 py-1 px-[10px] rounded-md font-mono text-[13px] text-admin-text font-bold">
-                              {session.code}
-                            </code>
+                      {recentSessions.map((s) => (
+                        <tr key={s.id} className="border-b border-admin-border last:border-0 hover:bg-[#faf9f7]">
+                          <td className="px-4 py-2.5">
+                            <code className="bg-stone-100 py-0.5 px-2 rounded text-[12px] font-mono font-bold text-admin-text">{s.code}</code>
                           </td>
-                          <td className="p-[15px_20px] text-sm text-admin-text">
-                            <span className={`inline-block py-1 px-3 rounded-xl text-xs font-bold uppercase tracking-[0.5px] ${getStatusBadgeClass(session.status)}`}>
-                              {session.status}
+                          <td className="px-4 py-2.5">
+                            <span className={`inline-block py-0.5 px-2 rounded text-[11px] font-semibold uppercase tracking-wide ${statusClass(s.status)}`}>
+                              {s.status}
                             </span>
                           </td>
-                          <td className="p-[15px_20px] text-sm text-admin-text font-semibold text-center">{session.studentCount}</td>
-                          <td className="p-[15px_20px] text-sm text-admin-text font-semibold text-center">{session.activeStudents24h}</td>
-                          <td className="p-[15px_20px] text-sm text-admin-text">{formatDate(session.validityEnd)}</td>
-                          <td className="p-[15px_20px] text-sm text-admin-text">{formatDate(session.createdAt)}</td>
+                          <td className="px-4 py-2.5 text-right text-admin-text font-medium">{s.studentCount}</td>
+                          <td className="px-4 py-2.5 text-right text-admin-text font-medium">{s.activeStudents24h}</td>
+                          <td className="px-4 py-2.5 text-right text-admin-text-muted">{formatDate(s.validityEnd)}</td>
+                          <td className="px-4 py-2.5 text-right text-admin-text-muted">{formatDate(s.createdAt)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -280,15 +182,12 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {/* Welcome Message */}
+            {/* Empty state */}
             {stats.totalSessions === 0 && (
-              <div className="bg-admin-accent-light border border-admin-accent rounded-xl py-[50px] px-10 text-center mt-10 max-tablet:py-[30px] max-tablet:px-5">
-                <h2 className="text-[28px] text-admin-accent-hover m-0 mb-[15px] max-tablet:text-[22px]">Welcome to Binary Coven Admin</h2>
-                <p className="text-base text-admin-text m-0 mb-[25px] max-tablet:text-sm">Get started by creating your first session code!</p>
-                <Link
-                  href="/admin/sessions"
-                  className="inline-block bg-admin-accent text-white py-[14px] px-7 rounded-lg no-underline text-[15px] font-bold transition-colors duration-200 hover:bg-admin-accent-hover"
-                >
+              <div className="bg-admin-accent-light border border-admin-accent rounded-lg py-10 px-6 text-center">
+                <p className="text-base font-semibold text-admin-accent-hover mb-1">Welcome to Binary Coven Admin</p>
+                <p className="text-sm text-admin-text-muted mb-4">Get started by creating your first session code.</p>
+                <Link href="/admin/sessions" className="inline-block bg-admin-accent text-white py-2 px-5 rounded-md no-underline text-sm font-semibold hover:bg-admin-accent-hover">
                   Create Session Code
                 </Link>
               </div>

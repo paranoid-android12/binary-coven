@@ -84,7 +84,7 @@ interface StudentAnalytics {
 
 const CHART_COLORS = {
   completed: '#4d7c0f',
-  active: '#b45309',
+  active: '#2563eb',
   available: '#78716c',
   locked: '#a8a29e',
   failed: '#b91c1c',
@@ -306,7 +306,7 @@ export default function StudentDetailPage() {
                         </span>
                       ))}
                       {allMastered && (
-                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border bg-amber-50 text-admin-accent border-amber-300">
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border bg-blue-50 text-admin-accent border-blue-200">
                           <Award size={12} /> All Mastered
                         </span>
                       )}
@@ -474,7 +474,7 @@ export default function StudentDetailPage() {
                                 contentStyle={{ borderRadius: 8, border: '1px solid #e7e5e0', fontSize: 13 }}
                                 formatter={(value: number) => [`${value} min`, 'Time']}
                               />
-                              <Bar dataKey="minutes" fill="#b45309" radius={[0, 4, 4, 0]} />
+                              <Bar dataKey="minutes" fill="#2563eb" radius={[0, 4, 4, 0]} />
                             </BarChart>
                           </ResponsiveContainer>
                         </div>
@@ -488,7 +488,7 @@ export default function StudentDetailPage() {
                     <div className="space-y-4">
                       {topicMastery.filter(tm => tm.totalQuests > 0).map((tm) => {
                         const barColor = tm.level === 'mastered' ? '#4d7c0f'
-                          : tm.level === 'in-progress' ? '#b45309'
+                          : tm.level === 'in-progress' ? '#2563eb'
                           : '#d5d3ce';
                         return (
                           <div key={tm.topic}>
@@ -535,7 +535,7 @@ export default function StudentDetailPage() {
                             </div>
                             <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
                               qp.state === 'completed' ? 'bg-lime-50 text-[#4d7c0f]' :
-                              qp.state === 'active' ? 'bg-amber-50 text-[#b45309]' :
+                              qp.state === 'active' ? 'bg-blue-50 text-[#2563eb]' :
                               'bg-stone-100 text-stone-500'
                             }`}>
                               {qp.state}

@@ -344,7 +344,7 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
                         key={quest.id}
                         className={`flex items-start gap-3 p-3 cursor-pointer hover:bg-gray-50 transition-colors ${
                           index !== filteredQuests.length - 1 ? 'border-b border-gray-100' : ''
-                        } ${selectedQuests.has(quest.id) ? 'bg-amber-50' : ''}`}
+                        } ${selectedQuests.has(quest.id) ? 'bg-blue-50' : ''}`}
                         onClick={() => !loading && handleToggleQuest(quest.id)}
                       >
                         <input
@@ -355,7 +355,7 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
                             e.stopPropagation();
                             if (!loading) handleToggleQuest(quest.id);
                           }}
-                          className="mt-1 w-4 h-4 accent-[#b45309] cursor-pointer"
+                          className="mt-1 w-4 h-4 accent-[#2563eb] cursor-pointer"
                           disabled={loading}
                         />
                         <div className="flex-1 min-w-0">
@@ -432,7 +432,7 @@ export default function CreateSessionModal({ isOpen, onClose, onSuccess }: Creat
                 type="button"
                 onClick={() => setEnforcePrerequisites(!enforcePrerequisites)}
                 disabled={loading}
-                className={`relative w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#b45309] focus:ring-offset-2 ${
+                className={`relative w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 ${
                   enforcePrerequisites ? 'bg-admin-accent' : 'bg-gray-300'
                 } disabled:opacity-60 disabled:cursor-not-allowed`}
               >

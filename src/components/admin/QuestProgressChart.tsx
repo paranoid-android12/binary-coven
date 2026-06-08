@@ -44,7 +44,7 @@ export default function QuestProgressChart({ questProgress, showDetails = false 
       case 'completed':
         return '#4d7c0f';
       case 'active':
-        return '#b45309';
+        return '#2563eb';
       case 'failed':
         return '#b91c1c';
       case 'available':

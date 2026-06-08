@@ -111,7 +111,7 @@ export default function StudentProgressCard({
             className="h-full rounded-full transition-all duration-500"
             style={{
               width: `${completionPercent}%`,
-              backgroundColor: completionPercent === 100 ? '#4d7c0f' : '#b45309',
+              backgroundColor: completionPercent === 100 ? '#4d7c0f' : '#2563eb',
             }}
           />
         </div>
