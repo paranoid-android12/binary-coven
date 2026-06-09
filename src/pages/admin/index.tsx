@@ -1,8 +1,30 @@
 import { useEffect, useState } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import Link from 'next/link';
-import { Users, Key, BookOpen, Zap, ArrowRight, UserCog } from 'lucide-react';
+import { Users, Key, BookOpen, Zap, ArrowRight, UserCog, Target, Clock, Play, Gauge } from 'lucide-react';
 import { adminFetch } from '../../utils/adminFetch';
+import {
+  PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+} from 'recharts';
+
+interface AggStats {
+  totalStudents: number;
+  activeToday: number;
+  questsCompleted: number;
+  questsActive: number;
+  totalTimeSeconds: number;
+  codeExecutions: number;
+  avgQuestsPerStudent: number;
+}
+
+// Quest-state colors, matching the student detail view
+const QUEST_STATE_COLORS: Record<string, string> = {
+  completed: '#4d7c0f',
+  active: '#2563eb',
+  available: '#78716c',
+  locked: '#a8a29e',
+  failed: '#b91c1c',
+};
 
 interface SessionCode {
   id: string;
@@ -31,6 +53,9 @@ export default function AdminDashboard() {
     recentActivity: 0,
   });
   const [recentSessions, setRecentSessions] = useState<SessionCode[]>([]);
+  const [agg, setAgg] = useState<AggStats | null>(null);
+  const [questStateCounts, setQuestStateCounts] = useState<Record<string, number>>({});
+  const [signups, setSignups] = useState<Array<{ label: string; count: number }>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -40,9 +65,13 @@ export default function AdminDashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const response = await adminFetch('/api/session-codes/list');
-      const data = await response.json();
+      // Sessions list (required) + platform aggregate (best-effort) in parallel
+      const [sessionsRes, aggRes] = await Promise.all([
+        adminFetch('/api/session-codes/list'),
+        adminFetch('/api/admin/dashboard').catch(() => null),
+      ]);
 
+      const data = await sessionsRes.json();
       if (data.success) {
         const sessions: SessionCode[] = data.sessionCodes;
         setStats({
@@ -59,6 +88,18 @@ export default function AdminDashboard() {
       } else {
         setError('Failed to load dashboard data');
       }
+
+      // Aggregate learning stats — optional; dashboard still renders without it
+      if (aggRes) {
+        try {
+          const aggData = await aggRes.json();
+          if (aggData.success) {
+            setAgg(aggData.stats);
+            setQuestStateCounts(aggData.questStateCounts || {});
+            setSignups(aggData.signups || []);
+          }
+        } catch { /* ignore — leave learning stats empty */ }
+      }
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
       setError('An error occurred while loading data');
@@ -70,18 +111,40 @@ export default function AdminDashboard() {
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
+  const formatDuration = (seconds: number) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    if (h >= 1) return `${h}h ${m}m`;
+    return `${m}m`;
+  };
+
   const statusClass = (status: string) => {
     if (status === 'active') return 'bg-lime-50 text-[#4d7c0f]';
     if (status === 'expired') return 'bg-red-50 text-[#b91c1c]';
     return 'bg-slate-100 text-[#475569]';
   };
 
-  const statCards = [
-    { label: 'Total Students', value: stats.totalStudents, icon: Users },
+  const statCards: { label: string; value: string | number; icon: typeof Users }[] = [
+    { label: 'Students', value: agg?.totalStudents ?? stats.totalStudents, icon: Users },
+    { label: 'Active Today', value: agg?.activeToday ?? stats.recentActivity, icon: Zap },
     { label: 'Active Sessions', value: stats.activeSessions, icon: Key },
     { label: 'Total Sessions', value: stats.totalSessions, icon: BookOpen },
-    { label: 'Active (24h)', value: stats.recentActivity, icon: Zap },
+    { label: 'Quests Completed', value: agg?.questsCompleted ?? 0, icon: Target },
+    { label: 'Avg / Student', value: agg?.avgQuestsPerStudent ?? 0, icon: Gauge },
+    { label: 'Learning Time', value: formatDuration(agg?.totalTimeSeconds ?? 0), icon: Clock },
+    { label: 'Code Runs', value: agg?.codeExecutions ?? 0, icon: Play },
   ];
+
+  // Quest-status chart data (only non-zero slices)
+  const questStateData = Object.entries(questStateCounts)
+    .filter(([, v]) => v > 0)
+    .map(([name, value]) => ({
+      name: name.charAt(0).toUpperCase() + name.slice(1),
+      value,
+      color: QUEST_STATE_COLORS[name] || '#a8a29e',
+    }));
+  const totalQuestRecords = questStateData.reduce((sum, d) => sum + d.value, 0);
+  const hasSignups = signups.some((s) => s.count > 0);
 
   const quickLinks = [
     { href: '/admin/sessions', label: 'Session Codes', desc: 'Create and manage session codes', icon: Key },
@@ -116,6 +179,66 @@ export default function AdminDashboard() {
                 </div>
               ))}
             </div>
+
+            {/* Charts: quest status + new students over time */}
+            {(totalQuestRecords > 0 || hasSignups) && (
+              <div className="grid grid-cols-2 gap-3 max-tablet:grid-cols-1">
+                {/* Quest Status donut */}
+                <div className="bg-admin-card border border-admin-border rounded-lg p-4">
+                  <h2 className="text-xs font-bold text-admin-text-muted uppercase tracking-wider mb-2">Quest Status</h2>
+                  {totalQuestRecords > 0 ? (
+                    <div className="flex items-center gap-3">
+                      <ResponsiveContainer width="50%" height={150}>
+                        <PieChart>
+                          <Pie data={questStateData} cx="50%" cy="50%" innerRadius={38} outerRadius={62} paddingAngle={2} dataKey="value">
+                            {questStateData.map((entry) => (
+                              <Cell key={entry.name} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #e7e5e0', fontSize: 12 }} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                      {/* Legend with counts */}
+                      <div className="flex-1 flex flex-col gap-1.5">
+                        {questStateData.map((d) => (
+                          <div key={d.name} className="flex items-center justify-between text-xs">
+                            <span className="flex items-center gap-2 text-admin-text-muted">
+                              <span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ backgroundColor: d.color }} />
+                              {d.name}
+                            </span>
+                            <span className="font-semibold text-admin-text">
+                              {d.value}
+                              <span className="text-admin-text-faint font-normal ml-1">
+                                {Math.round((d.value / totalQuestRecords) * 100)}%
+                              </span>
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-admin-text-faint py-10 text-center">No quest activity yet.</p>
+                  )}
+                </div>
+
+                {/* New students over the last 8 weeks */}
+                <div className="bg-admin-card border border-admin-border rounded-lg p-4">
+                  <h2 className="text-xs font-bold text-admin-text-muted uppercase tracking-wider mb-2">New Students · 8 weeks</h2>
+                  {hasSignups ? (
+                    <ResponsiveContainer width="100%" height={150}>
+                      <BarChart data={signups} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                        <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#78716c' }} interval={0} tickLine={false} axisLine={{ stroke: '#e7e5e0' }} />
+                        <YAxis allowDecimals={false} tick={{ fontSize: 10, fill: '#78716c' }} tickLine={false} axisLine={false} width={28} />
+                        <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #e7e5e0', fontSize: 12 }} cursor={{ fill: 'rgba(37,99,235,0.06)' }} />
+                        <Bar dataKey="count" name="Signups" fill="#2563eb" radius={[3, 3, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <p className="text-xs text-admin-text-faint py-10 text-center">No recent signups.</p>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Quick links */}
             <div>

@@ -18,7 +18,7 @@ interface StudentLoginResponse {
   error?: string;
 }
 
-type DialogStep = 'login' | 'otp' | 'forgot' | 'forgot-otp' | 'forgot-newpass';
+type DialogStep = 'login' | 'signup' | 'otp' | 'forgot' | 'forgot-otp' | 'forgot-newpass';
 
 interface LoginModalProps {
   isVisible: boolean;
@@ -337,21 +337,110 @@ export default function LoginModal({ isVisible, onLoginSuccess, onClose }: Login
     }
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  // Session-code input with live validity detection (✓ / ✗). Shared by both the
+  // Log In and Sign Up forms so the check appears wherever a code is entered.
+  const renderSessionCodeField = (id: string) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      <label htmlFor={id} style={LABEL_STYLE}>Session Code</label>
+      <input
+        type="text"
+        id={id}
+        style={INPUT_STYLE}
+        value={formData.sessionCode}
+        onChange={(e) => handleSessionCodeChange(e.target.value.toUpperCase())}
+        placeholder="Enter session code"
+        disabled={isLoading}
+        required
+      />
+      {isValidatingCode && (
+        <p style={{ fontFamily: 'Arial', fontSize: '0.85em', margin: 0, padding: '3px 0' }}>Validating…</p>
+      )}
+      {codeValidationMessage && (
+        <p style={{
+          fontFamily: 'Arial',
+          fontSize: '0.85em',
+          margin: 0,
+          padding: '3px 0',
+          color: codeValidationMessage.startsWith('✓') ? '#0b7607' : '#b10000',
+        }}>
+          {codeValidationMessage}
+        </p>
+      )}
+    </div>
+  );
+
+  // Shared: complete a successful login (clear stale state, sync save, set context)
+  const completeLogin = useCallback(async (student: NonNullable<StudentLoginResponse['student']>) => {
+    console.log('[LoginModal] Loading game state from database...');
+    const syncSuccess = await loadAndSyncGameState(student.id);
+    if (syncSuccess) {
+      console.log('[LoginModal] Game state loaded and synced successfully');
+    } else {
+      console.warn('[LoginModal] Failed to load game state, but continuing with login');
+    }
+
+    login(student, 'student');
+
+    setFormData({ username: '', password: '', sessionCode: '', email: '' });
+    setError('');
+    logLocalStorageState();
+    onLoginSuccess();
+  }, [login, onLoginSuccess]);
+
+  // LOG IN — existing account: username + password + session code (no email)
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
 
-    // Validation
-    if (!formData.username.trim()) {
-      setError('Please enter a username');
-      return;
-    }
-    if (!formData.password) {
-      setError('Please enter a password');
-      return;
-    }
+    if (!formData.sessionCode.trim()) { setError('Please enter your session code'); return; }
+    if (!formData.username.trim()) { setError('Please enter your username'); return; }
+    if (!formData.password) { setError('Please enter your password'); return; }
 
-    // Validate password requirements
+    setIsLoading(true);
+    try {
+      // Clear any existing localStorage state before switching accounts
+      logLocalStorageState();
+      clearAllGameState();
+
+      const response = await fetch('/api/auth/student-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: formData.username.trim(),
+          password: formData.password,
+          sessionCode: formData.sessionCode.trim(),
+          // No email → backend uses the login-by-username path
+        }),
+      });
+
+      const data: StudentLoginResponse = await response.json();
+
+      if (data.success && data.student) {
+        console.log('[LoginModal] Login successful:', data.student.username);
+        await completeLogin(data.student);
+      } else {
+        setError(data.error || data.message || 'Login failed');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('Network error. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // SIGN UP — new account: session code + email + username + password → OTP
+  const handleSignup = async (e: FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (!formData.sessionCode.trim()) { setError('Please enter a session code'); return; }
+    if (!formData.email.trim()) { setError('Please enter your email address'); return; }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email.trim())) { setError('Please enter a valid email address'); return; }
+    if (!formData.username.trim()) { setError('Please choose a username'); return; }
+    if (!formData.password) { setError('Please choose a password'); return; }
+
     const passwordValidation = validatePassword(formData.password);
     if (!passwordValidation.isValid) {
       setError(passwordValidation.errors[0]);
@@ -359,41 +448,15 @@ export default function LoginModal({ isVisible, onLoginSuccess, onClose }: Login
       return;
     }
 
-    if (!formData.sessionCode.trim()) {
-      setError('Please enter a session code');
-      return;
-    }
-
-    if (!formData.email.trim()) {
-      setError('Please enter your email address');
-      return;
-    }
-
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email.trim())) {
-      setError('Please enter a valid email address');
-      return;
-    }
-
     setIsLoading(true);
-
     try {
-      console.log('[LoginModal] Logging in...');
-
-      // STEP 1: Clear any existing localStorage state BEFORE login
-      // This ensures fresh state for both new and existing accounts
-      console.log('[LoginModal] Clearing existing localStorage state...');
       logLocalStorageState();
       clearAllGameState();
-      console.log('[LoginModal] localStorage cleared');
 
-      // STEP 2: Perform login
+      // Pre-check via student-login (with email): detects new vs existing account
       const response = await fetch('/api/auth/student-login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           username: formData.username.trim(),
           password: formData.password,
@@ -405,50 +468,24 @@ export default function LoginModal({ isVisible, onLoginSuccess, onClose }: Login
       const data: StudentLoginResponse = await response.json();
 
       if (data.needsOtp) {
-        // New account — transition to OTP step and auto-send OTP
-        console.log('[LoginModal] New account detected, OTP verification required');
-        setDialogStep('otp');
+        // Brand-new account — verify email, then create the account
+        console.log('[LoginModal] New account — OTP verification required');
         setError('');
         setOtpMessage('');
-        // Auto-send OTP since email is already provided
+        setDialogStep('otp');
         setIsLoading(false);
         setTimeout(() => handleSendOtp(), 100);
         return;
       } else if (data.success && data.student) {
-        console.log('[LoginModal] Login successful:', data.student.username);
-        if (data.linkedNewSession) {
-          console.log('[LoginModal] Welcome back — account linked to new session');
-        }
-
-        // STEP 3: Load and sync game state from database to localStorage
-        console.log('[LoginModal] Loading game state from database...');
-        const syncSuccess = await loadAndSyncGameState(data.student.id);
-
-        if (syncSuccess) {
-          console.log('[LoginModal] Game state loaded and synced successfully');
-        } else {
-          console.warn('[LoginModal] Failed to load game state, but continuing with login');
-        }
-
-        // STEP 4: Update user context
-        login(data.student, 'student');
-
-        // Reset form
-        setFormData({ username: '', password: '', sessionCode: '', email: '' });
-        setError('');
-
-        // Log final state
-        console.log('[LoginModal] Login complete. Final localStorage state:');
-        logLocalStorageState();
-
-        // Notify parent component
-        onLoginSuccess();
+        // The credentials already match an existing account — just log them in
+        console.log('[LoginModal] Account already exists — logging in:', data.student.username);
+        await completeLogin(data.student);
       } else {
-        setError(data.error || data.message || 'Login failed');
-        console.error('[LoginModal] Login failed:', data.message);
+        // Conflicts (username/email taken, mismatch, wrong password) surface here
+        setError(data.error || data.message || 'Could not create account');
       }
     } catch (err) {
-      console.error('Login error:', err);
+      console.error('Signup error:', err);
       setError('Network error. Please try again.');
     } finally {
       setIsLoading(false);
@@ -534,9 +571,76 @@ export default function LoginModal({ isVisible, onLoginSuccess, onClose }: Login
           opacity: 0.8,
         }}>Student Portal</p>
 
-        {dialogStep === 'login' ? (
+        {(dialogStep === 'login' || dialogStep === 'signup') ? (
           <>
-            <form onSubmit={handleSubmit} style={{
+            {/* Mode tabs — make Log In vs Sign Up unmistakable */}
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+              {(['login', 'signup'] as const).map((mode) => {
+                const active = dialogStep === mode;
+                return (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => { setDialogStep(mode); setError(''); setOtpMessage(''); setPasswordTouched(false); }}
+                    style={{
+                      flex: 1,
+                      padding: '9px',
+                      fontFamily: 'BoldPixels',
+                      fontSize: '0.95em',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                      cursor: 'pointer',
+                      border: '2px solid #210714',
+                      borderRadius: '6px',
+                      backgroundColor: active ? '#210714' : 'transparent',
+                      color: active ? '#d8a888' : '#210714',
+                      boxShadow: active ? 'none' : '0 3px 0 #210714',
+                      transform: active ? 'translateY(2px)' : 'translateY(0)',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    {mode === 'login' ? 'Log In' : 'Sign Up'}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Status banners (shared by both modes) */}
+            {otpMessage && (
+              <div style={{ fontFamily: 'Arial, Helvetica, sans-serif', backgroundColor: 'rgba(11, 118, 7, 0.1)', border: '2px solid #0b7607', color: '#0b7607', padding: '12px 15px', fontSize: '0.9em', borderRadius: '4px', marginBottom: '12px' }}>
+                {otpMessage}
+              </div>
+            )}
+            {error && (
+              <div style={{ fontFamily: 'Arial, Helvetica, sans-serif', backgroundColor: 'rgba(255, 0, 0, 0.1)', border: '2px solid #ff0000', color: '#ff0000', padding: '12px 15px', fontSize: '0.9em', borderRadius: '4px', marginBottom: '12px' }}>
+                {error}
+              </div>
+            )}
+
+            {dialogStep === 'login' && (
+              /* ───────────────── LOG IN (existing account) ───────────────── */
+              <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', maxWidth: '360px', margin: '0 auto' }}>
+                {renderSessionCodeField('login-session')}
+                <LabeledInput id="login-username" label="Username" value={formData.username} placeholder="Your username" disabled={isLoading} onChange={(v) => setFormData({ ...formData, username: v })} />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <label htmlFor="login-password" style={LABEL_STYLE}>Password</label>
+                    <button type="button" onClick={() => { setDialogStep('forgot'); setError(''); setOtpCode(''); setOtpMessage(''); setNewPassword(''); setNewPasswordTouched(false); }} style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '0.75em', color: '#210714', background: 'none', border: 'none', cursor: 'pointer', padding: 0, opacity: 0.7, textDecoration: 'underline' }}>
+                      Forgot Password?
+                    </button>
+                  </div>
+                  <div style={{ position: 'relative' }}>
+                    <input type={showPassword ? 'text' : 'password'} id="login-password" style={{ ...INPUT_STYLE, paddingRight: '45px' }} value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} placeholder="Enter password" disabled={isLoading} required />
+                    <PasswordToggle show={showPassword} onToggle={() => setShowPassword(!showPassword)} />
+                  </div>
+                </div>
+                <LoginButton text={isLoading ? 'Logging in…' : 'Log In'} disabled={isLoading} />
+              </form>
+            )}
+
+            {dialogStep === 'signup' && (
+            /* ───────────────── SIGN UP (new account) ───────────────── */
+            <form onSubmit={handleSignup} style={{
               display: 'flex',
               flexDirection: 'column',
               gap: '12px',
@@ -544,78 +648,8 @@ export default function LoginModal({ isVisible, onLoginSuccess, onClose }: Login
               maxWidth: '360px',
               margin: '0 auto',
             }}>
-              {otpMessage && dialogStep === 'login' && (
-                <div style={{
-                  fontFamily: 'Arial, Helvetica, sans-serif',
-                  backgroundColor: 'rgba(11, 118, 7, 0.1)',
-                  border: '2px solid #0b7607',
-                  color: '#0b7607',
-                  padding: '12px 15px',
-                  fontSize: '0.9em',
-                  borderRadius: '4px',
-                }}>
-                  {otpMessage}
-                </div>
-              )}
-              {error && (
-                <div style={{
-                  fontFamily: 'Arial, Helvetica, sans-serif',
-                  backgroundColor: 'rgba(255, 0, 0, 0.1)',
-                  border: '2px solid #ff0000',
-                  color: '#ff0000',
-                  padding: '12px 15px',
-                  marginBottom: '10px',
-                  fontSize: '0.9em',
-                  borderRadius: '4px',
-                }}>
-                  {error}
-                </div>
-              )}
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label htmlFor="sessionCode" style={{
-                  fontFamily: 'BoldPixels',
-                  fontSize: '0.8em',
-                  color: '#210714',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px',
-                }}>
-                  Session Code
-                </label>
-                <input
-                  type="text"
-                  id="sessionCode"
-                  style={{
-                    fontFamily: 'Arial, Helvetica, sans-serif',
-                    fontSize: '1em',
-                    padding: '8px 12px',
-                    backgroundColor: '#e8c4a8',
-                    color: '#210714',
-                    border: '2px solid #210714',
-                    borderRadius: '6px',
-                    outline: 'none',
-                  }}
-                  value={formData.sessionCode}
-                  onChange={(e) => handleSessionCodeChange(e.target.value.toUpperCase())}
-                  placeholder="Enter session code"
-                  disabled={isLoading}
-                  required
-                />
-                {isValidatingCode && (
-                  <p style={{ fontFamily: 'Arial', fontSize: '0.85em', margin: 0, padding: '5px 0' }}>Validating...</p>
-                )}
-                {codeValidationMessage && (
-                  <p style={{
-                    fontFamily: 'Arial',
-                    fontSize: '0.85em',
-                    margin: 0,
-                    padding: '5px 0',
-                    color: codeValidationMessage.startsWith('✓') ? '#0b7607' : '#b10000'
-                  }}>
-                    {codeValidationMessage}
-                  </p>
-                )}
-              </div>
+              {renderSessionCodeField('sessionCode')}
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <label htmlFor="email" style={{
@@ -805,11 +839,13 @@ export default function LoginModal({ isVisible, onLoginSuccess, onClose }: Login
               </div>
 
               <LoginButton
-                text={isLoading ? 'Logging in...' : 'Enter Game'}
+                text={isLoading ? 'Creating account…' : 'Create Account'}
                 disabled={isLoading}
               />
             </form>
+            )}
 
+            {/* Switch between Log In and Sign Up */}
             <div style={{
               marginTop: '16px',
               paddingTop: '12px',
@@ -822,11 +858,17 @@ export default function LoginModal({ isVisible, onLoginSuccess, onClose }: Login
                 textAlign: 'center',
                 margin: 0,
                 lineHeight: '1.5',
-                opacity: 0.7,
+                opacity: 0.75,
               }}>
-                First time? Just enter your session code and create a username/password.
+                {dialogStep === 'login' ? 'New to Binary Coven? ' : 'Already have an account? '}
+                <button
+                  type="button"
+                  onClick={() => { setDialogStep(dialogStep === 'login' ? 'signup' : 'login'); setError(''); setOtpMessage(''); setPasswordTouched(false); }}
+                  style={{ background: 'none', border: 'none', padding: 0, color: '#210714', fontFamily: 'inherit', fontSize: 'inherit', fontWeight: 'bold', cursor: 'pointer', textDecoration: 'underline' }}
+                >
+                  {dialogStep === 'login' ? 'Create an account' : 'Log in'}
+                </button>
               </p>
-
             </div>
           </>
         ) : dialogStep === 'otp' ? (
@@ -959,7 +1001,7 @@ export default function LoginModal({ isVisible, onLoginSuccess, onClose }: Login
               <button
                 type="button"
                 onClick={() => {
-                  setDialogStep('login');
+                  setDialogStep('signup');
                   setError('');
                   setOtpCode('');
                   setOtpMessage('');
@@ -1441,6 +1483,75 @@ export default function LoginModal({ isVisible, onLoginSuccess, onClose }: Login
     </div>
   );
 }
+
+// Shared field styling (matches the wood/parchment login theme)
+const LABEL_STYLE: React.CSSProperties = {
+  fontFamily: 'BoldPixels',
+  fontSize: '0.8em',
+  color: '#210714',
+  textTransform: 'uppercase',
+  letterSpacing: '1px',
+};
+
+const INPUT_STYLE: React.CSSProperties = {
+  fontFamily: 'Arial, Helvetica, sans-serif',
+  fontSize: '1em',
+  padding: '8px 12px',
+  backgroundColor: '#e8c4a8',
+  color: '#210714',
+  border: '2px solid #210714',
+  borderRadius: '6px',
+  outline: 'none',
+  width: '100%',
+  boxSizing: 'border-box',
+};
+
+// Labeled text input used across the Log In / Sign Up forms
+interface LabeledInputProps {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  type?: string;
+  disabled?: boolean;
+}
+
+const LabeledInput: React.FC<LabeledInputProps> = ({ id, label, value, onChange, placeholder, type = 'text', disabled }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+    <label htmlFor={id} style={LABEL_STYLE}>{label}</label>
+    <input
+      id={id}
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      disabled={disabled}
+      required
+      style={INPUT_STYLE}
+    />
+  </div>
+);
+
+// Eye / EyeOff toggle positioned inside a password input
+interface PasswordToggleProps { show: boolean; onToggle: () => void; }
+const PasswordToggle: React.FC<PasswordToggleProps> = ({ show, onToggle }) => (
+  <button
+    type="button"
+    onClick={onToggle}
+    aria-label={show ? 'Hide password' : 'Show password'}
+    style={{
+      position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)',
+      background: 'none', border: 'none', cursor: 'pointer', padding: '4px',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      color: '#210714', opacity: 0.6, transition: 'opacity 0.2s',
+    }}
+    onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+    onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.6')}
+  >
+    {show ? <EyeOff size={20} /> : <Eye size={20} />}
+  </button>
+);
 
 // Login Button Component with CSS background
 interface LoginButtonProps {

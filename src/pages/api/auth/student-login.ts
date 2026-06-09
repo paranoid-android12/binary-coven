@@ -13,7 +13,7 @@ type LoginRequest = {
   username: string
   password: string
   sessionCode: string
-  email: string
+  email?: string // required only for sign-up (new accounts), omitted for login
 }
 
 type LoginResponse = {
@@ -43,14 +43,16 @@ export default async function handler(
   try {
     const { username, password, sessionCode, email }: LoginRequest = req.body
 
-    if (!username || !password || !sessionCode || !email) {
+    // Email is required only for sign-up (creating a new account). Logging in
+    // needs just username + password + session code.
+    if (!username || !password || !sessionCode) {
       return res.status(400).json({
         success: false,
-        message: 'Username, password, session code, and email are required',
+        message: 'Username, password, and session code are required',
       })
     }
 
-    const normalizedEmail = email.trim().toLowerCase()
+    const normalizedEmail = (email || '').trim().toLowerCase()
 
     const adminSupabase = getSupabaseAdminClient()
 
@@ -86,154 +88,151 @@ export default async function handler(
 
     const supabase = getSupabaseApiClient(req, res)
 
-    // ── Look up by username AND by email separately ────────────────────
+    // Username is unique, so it's the primary key for resolving an account.
     const { data: studentByUsername, error: usernameError } = await supabase
       .from('student_profiles')
       .select('*')
       .eq('username', username)
       .maybeSingle() as { data: StudentProfile | null, error: any }
 
-    const { data: studentByEmail, error: emailError } = await supabase
-      .from('student_profiles')
-      .select('*')
-      .eq('email', normalizedEmail)
-      .maybeSingle() as { data: StudentProfile | null, error: any }
-
     if (usernameError) {
       console.error('Error looking up student by username:', usernameError)
       return res.status(500).json({ success: false, message: 'An error occurred during login' })
     }
-    if (emailError) {
-      console.error('Error looking up student by email:', emailError)
-      return res.status(500).json({ success: false, message: 'An error occurred during login' })
-    }
 
-    // ── Case 1: Account found (email + username match same account) ────
-    if (studentByUsername && studentByEmail && studentByUsername.id === studentByEmail.id) {
-      // Both match the same account — proceed with password verification
-      const studentData = studentByUsername
-      // (password check happens below)
+    // ── Decide which account (if any) we're authenticating ─────────────
+    let studentData: StudentProfile | null = null
 
-      // ── Verify password ──────────────────────────────────────────────
-      let passwordMatch = false
-      const storedHash = studentData.password_hash
+    if (normalizedEmail) {
+      // SIGN-UP path: email present. Cross-check email + username so we can
+      // either match an existing account, surface a conflict, or detect a
+      // brand-new account that needs OTP verification.
+      const { data: studentByEmail, error: emailError } = await supabase
+        .from('student_profiles')
+        .select('*')
+        .eq('email', normalizedEmail)
+        .maybeSingle() as { data: StudentProfile | null, error: any }
 
-      if (storedHash.startsWith('$2a$') || storedHash.startsWith('$2b$')) {
-        passwordMatch = await bcrypt.compare(password, storedHash)
+      if (emailError) {
+        console.error('Error looking up student by email:', emailError)
+        return res.status(500).json({ success: false, message: 'An error occurred during login' })
+      }
+
+      if (studentByUsername && studentByEmail && studentByUsername.id === studentByEmail.id) {
+        // Existing account — both match. Treat as a normal login.
+        studentData = studentByUsername
+      } else if (studentByUsername && !studentByEmail) {
+        return res.status(400).json({ success: false, message: 'That username is already taken. Try logging in, or choose a different username.' })
+      } else if (!studentByUsername && studentByEmail) {
+        return res.status(400).json({ success: false, message: 'That email already has an account. Try logging in instead.' })
+      } else if (studentByUsername && studentByEmail && studentByUsername.id !== studentByEmail.id) {
+        return res.status(400).json({ success: false, message: 'That email and username belong to different accounts.' })
       } else {
-        // Legacy plaintext comparison + auto-upgrade
-        passwordMatch = password === storedHash
-        if (passwordMatch) {
-          const newHash = await bcrypt.hash(password, 10)
-          await (supabase
-            .from('student_profiles') as any)
-            .update({ password_hash: newHash })
-            .eq('id', studentData.id)
-        }
-      }
-
-      if (!passwordMatch) {
-        return res.status(401).json({ success: false, message: 'Incorrect password' })
-      }
-
-      // ── Check / create student_sessions link ─────────────────────────
-      let linkedNewSession = false
-
-      const { data: existingLink } = await (supabase
-        .from('student_sessions') as any)
-        .select('id')
-        .eq('student_profile_id', studentData.id)
-        .eq('session_code_id', sessionCodeData.id)
-        .maybeSingle()
-
-      if (!existingLink) {
-        const { error: linkError } = await (supabase
-          .from('student_sessions') as any)
-          .insert({
-            student_profile_id: studentData.id,
-            session_code_id: sessionCodeData.id,
-          })
-
-        if (linkError) {
-          console.error('Error linking student to session:', linkError)
-        } else {
-          linkedNewSession = true
-          console.log(`[Login] Linked ${username} to new session ${sessionCode}`)
-        }
-
-        // Create a fresh game save for this new session
-        await (supabase
-          .from('game_saves') as any)
-          .upsert({
-            student_profile_id: studentData.id,
-            session_code_id: sessionCodeData.id,
-            game_state: {
-              grids: [],
-              entities: [],
-              globalResources: { wheat: 0, energy: 100 },
-              codeWindows: [],
-              questProgress: {},
-            },
-            save_name: 'autosave',
-          })
-      }
-
-      // ── Update legacy session_code_id on profile (transition period) ─
-      await (supabase
-        .from('student_profiles') as any)
-        .update({
-          session_code_id: sessionCodeData.id,
-          last_login: new Date().toISOString(),
+        // Neither exists → brand-new account: kick off OTP verification.
+        return res.status(200).json({
+          success: false,
+          needsOtp: true,
+          message: 'New account — email verification required.',
         })
-        .eq('id', studentData.id)
-
-      // ── Set session cookie ───────────────────────────────────────────
-      const securePart = process.env.NODE_ENV === 'production' ? ' Secure;' : ''
-      res.setHeader('Set-Cookie', `student_session_id=${studentData.id}; Path=/; HttpOnly;${securePart} SameSite=Strict; Max-Age=2592000`)
-
-      return res.status(200).json({
-        success: true,
-        message: linkedNewSession ? 'Welcome back! You\'ve been linked to this session.' : 'Login successful',
-        linkedNewSession,
-        student: {
-          id: studentData.id,
-          username: studentData.username,
-          displayName: studentData.display_name,
-          sessionCodeId: sessionCodeData.id,
-        },
-      })
+      }
+    } else {
+      // LOGIN path: no email. Resolve purely by username.
+      if (!studentByUsername) {
+        return res.status(401).json({
+          success: false,
+          message: 'No account found with that username. Switch to Sign Up to create one.',
+        })
+      }
+      studentData = studentByUsername
     }
 
-    // ── Case 2: Email/username mismatch (one exists with different account) ─
-    if (studentByUsername && !studentByEmail) {
-      // Username taken by a different email
-      return res.status(400).json({
-        success: false,
-        message: 'This username is already registered with a different email address.',
-      })
+    // ── Verify password ──────────────────────────────────────────────────
+    let passwordMatch = false
+    const storedHash = studentData.password_hash
+
+    if (storedHash.startsWith('$2a$') || storedHash.startsWith('$2b$')) {
+      passwordMatch = await bcrypt.compare(password, storedHash)
+    } else {
+      // Legacy plaintext comparison + auto-upgrade to a bcrypt hash
+      passwordMatch = password === storedHash
+      if (passwordMatch) {
+        const newHash = await bcrypt.hash(password, 10)
+        await (supabase
+          .from('student_profiles') as any)
+          .update({ password_hash: newHash })
+          .eq('id', studentData.id)
+      }
     }
 
-    if (!studentByUsername && studentByEmail) {
-      // Email taken by a different username
-      return res.status(400).json({
-        success: false,
-        message: 'This email is already registered with a different username.',
-      })
+    if (!passwordMatch) {
+      return res.status(401).json({ success: false, message: 'Incorrect password' })
     }
 
-    if (studentByUsername && studentByEmail && studentByUsername.id !== studentByEmail.id) {
-      // Both exist but belong to different accounts
-      return res.status(400).json({
-        success: false,
-        message: 'Email and username are associated with different accounts.',
-      })
+    // ── Link the account to this session if not already linked ───────────
+    let linkedNewSession = false
+
+    const { data: existingLink } = await (supabase
+      .from('student_sessions') as any)
+      .select('id')
+      .eq('student_profile_id', studentData.id)
+      .eq('session_code_id', sessionCodeData.id)
+      .maybeSingle()
+
+    if (!existingLink) {
+      const { error: linkError } = await (supabase
+        .from('student_sessions') as any)
+        .insert({
+          student_profile_id: studentData.id,
+          session_code_id: sessionCodeData.id,
+        })
+
+      if (linkError) {
+        console.error('Error linking student to session:', linkError)
+      } else {
+        linkedNewSession = true
+        console.log(`[Login] Linked ${username} to new session ${sessionCode}`)
+      }
+
+      // Create a fresh game save for this new session
+      await (supabase
+        .from('game_saves') as any)
+        .upsert({
+          student_profile_id: studentData.id,
+          session_code_id: sessionCodeData.id,
+          game_state: {
+            grids: [],
+            entities: [],
+            globalResources: { wheat: 0, energy: 100 },
+            codeWindows: [],
+            questProgress: {},
+          },
+          save_name: 'autosave',
+        })
     }
 
-    // ── Case 3: Neither exists — new user, needs OTP ───────────────────
+    // ── Update legacy session_code_id on profile (transition period) ─────
+    await (supabase
+      .from('student_profiles') as any)
+      .update({
+        session_code_id: sessionCodeData.id,
+        last_login: new Date().toISOString(),
+      })
+      .eq('id', studentData.id)
+
+    // ── Set session cookie ───────────────────────────────────────────────
+    const securePart = process.env.NODE_ENV === 'production' ? ' Secure;' : ''
+    res.setHeader('Set-Cookie', `student_session_id=${studentData.id}; Path=/; HttpOnly;${securePart} SameSite=Strict; Max-Age=2592000`)
+
     return res.status(200).json({
-      success: false,
-      needsOtp: true,
-      message: 'New account detected. Email verification required.',
+      success: true,
+      message: linkedNewSession ? 'Welcome back! You\'ve been linked to this session.' : 'Login successful',
+      linkedNewSession,
+      student: {
+        id: studentData.id,
+        username: studentData.username,
+        displayName: studentData.display_name,
+        sessionCodeId: sessionCodeData.id,
+      },
     })
   } catch (error) {
     console.error('Student login error:', error)
