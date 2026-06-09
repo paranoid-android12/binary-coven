@@ -67,19 +67,13 @@ export default async function handler(
       })
     }
 
-    // Get active session_code_id from student_sessions (fall back to legacy field)
-    let activeSessionCodeId = student.session_code_id
-    const { data: activeSession } = await (supabase.from('student_sessions') as any)
-      .select('session_code_id')
-      .eq('student_profile_id', studentSessionId)
-      .eq('is_active', true)
-      .order('joined_at', { ascending: false })
-      .limit(1)
-      .single()
-    if (activeSession) activeSessionCodeId = activeSession.session_code_id
-
-    // Fetch quest progress for this student in the active session
-    let progressQuery = supabase
+    // Fetch ALL quest progress for this student across EVERY session. A
+    // student's progress and topic mastery are an overall learning journey —
+    // this matches the admin student view, which aggregates cross-session.
+    // Previously this was scoped to the active session, so completions earned
+    // in an earlier session vanished from "My Progress" even though the
+    // database (and admin panel) still had them.
+    const { data: progressData, error: progressError } = await supabase
       .from('quest_progress')
       .select(`
         quest_id,
@@ -93,12 +87,6 @@ export default async function handler(
         score
       `)
       .eq('student_profile_id', studentSessionId)
-    
-    if (activeSessionCodeId) {
-      progressQuery = progressQuery.eq('session_code_id', activeSessionCodeId)
-    }
-
-    const { data: progressData, error: progressError } = await progressQuery
       .order('completed_at', { ascending: false, nullsFirst: false })
 
     if (progressError) {
@@ -109,8 +97,29 @@ export default async function handler(
       })
     }
 
+    // The same quest can have rows in multiple sessions — collapse to one entry
+    // per quest, keeping the most-advanced state (completed > active > …), and
+    // on ties the most recent / richest record.
+    const STATE_RANK: Record<string, number> = {
+      locked: 0, available: 1, active: 2, failed: 3, completed: 4,
+    }
+    const bestByQuest = new Map<string, any>()
+    for (const item of ((progressData || []) as any[])) {
+      const existing = bestByQuest.get(item.quest_id)
+      if (!existing) { bestByQuest.set(item.quest_id, item); continue }
+      const rankNew = STATE_RANK[item.state] ?? 0
+      const rankOld = STATE_RANK[existing.state] ?? 0
+      if (rankNew > rankOld) {
+        bestByQuest.set(item.quest_id, item)
+      } else if (rankNew === rankOld) {
+        const tNew = new Date(item.completed_at || item.started_at || 0).getTime()
+        const tOld = new Date(existing.completed_at || existing.started_at || 0).getTime()
+        if (tNew > tOld) bestByQuest.set(item.quest_id, item)
+      }
+    }
+
     // Transform to response format
-    const questProgress: QuestProgressItem[] = (progressData || []).map((item: any) => ({
+    const questProgress: QuestProgressItem[] = Array.from(bestByQuest.values()).map((item: any) => ({
       questId: item.quest_id,
       questTitle: item.quest_title || '',
       state: item.state,

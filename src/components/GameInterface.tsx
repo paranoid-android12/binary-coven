@@ -945,7 +945,6 @@ export const GameInterface: React.FC = () => {
 
         const scene = phaserRef.current?.scene as ProgrammingGame;
 
-        console.log(scene);
         if (isCodeRunning) {
             console.log("Stopping execution");
             // Stop execution via the scene

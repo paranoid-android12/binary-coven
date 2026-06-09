@@ -223,7 +223,8 @@ export class ProgrammingGame extends Scene {
   };
   private isLockedToQubit: boolean = true;
   private cameraSpeed: number = 300;
-  
+  private hasAutoLoaded: boolean = false; // Guards one-time auto-load on scene start
+
   // Constants
   private readonly GRID_SIZE = 128; // About 1/3 of 128 for smaller, more detailed grids
   private readonly GRID_COLOR = 0x444444;
@@ -329,11 +330,18 @@ export class ProgrammingGame extends Scene {
     // Emit event so React component can get scene reference
     EventBus.emit('current-scene-ready', this);
 
-    // Note: Auto-sync removed - quest progress only loads when user clicks "Load"
-    // This prevents showing progress before user explicitly loads their save
-
-    // Note: Auto-load removed to prevent race condition with React initialization
-    // Users can manually load their save via the menu if needed
+    // Auto-load on initial start: restore the player's saved game state (and
+    // hydrate quest progress) without requiring a manual "Load". Deferred to the
+    // next tick — running the full load synchronously inside create() (before
+    // GameInterface has mounted and subscribed to EventBus events) is the race
+    // that originally got auto-load disabled. By the next tick React has wired
+    // up, the scene is fully built, and the load only mutates the store/sprites
+    // that are already in place. Guarded so it runs exactly once per scene.
+    this.time.delayedCall(0, () => {
+      if (this.hasAutoLoaded) return;
+      this.hasAutoLoaded = true;
+      void this.autoLoadSavedGame();
+    });
   }
 
   private createPlaceholderSprites() {
@@ -1611,26 +1619,32 @@ export class ProgrammingGame extends Scene {
       
       // Only allow movement if entity is not currently moving and not blocked by tasks
       if (!activeEntity.movementState?.isMoving && !activeEntity.taskState.isBlocked) {
-        // Handle movement with smooth transitions
-        if (Phaser.Input.Keyboard.JustDown(this.cameraKeys.up)) {
-          const targetPos = { x: activeEntity.position.x, y: activeEntity.position.y - 1 };
-          this.movementManager.moveEntity(activeEntity, targetPos);
-          EventBus.emit('tutorial-movement', { direction: 'ArrowUp' });
+        // Hold-to-move: while a direction key is held, keep stepping that way.
+        // moveEntity() sets isMoving synchronously, so the guard above throttles
+        // repeats to one step per movement — holding produces continuous motion,
+        // a quick tap still moves exactly one tile.
+        // Only one direction is processed per frame (if/else if) so holding two
+        // opposing keys can't issue conflicting moves in the same frame.
+        let targetPos: Position | null = null;
+        let direction: 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight' | null = null;
+
+        if (this.cameraKeys.up.isDown) {
+          targetPos = { x: activeEntity.position.x, y: activeEntity.position.y - 1 };
+          direction = 'ArrowUp';
+        } else if (this.cameraKeys.down.isDown) {
+          targetPos = { x: activeEntity.position.x, y: activeEntity.position.y + 1 };
+          direction = 'ArrowDown';
+        } else if (this.cameraKeys.left.isDown) {
+          targetPos = { x: activeEntity.position.x - 1, y: activeEntity.position.y };
+          direction = 'ArrowLeft';
+        } else if (this.cameraKeys.right.isDown) {
+          targetPos = { x: activeEntity.position.x + 1, y: activeEntity.position.y };
+          direction = 'ArrowRight';
         }
-        if (Phaser.Input.Keyboard.JustDown(this.cameraKeys.down)) {
-          const targetPos = { x: activeEntity.position.x, y: activeEntity.position.y + 1 };
+
+        if (targetPos && direction) {
           this.movementManager.moveEntity(activeEntity, targetPos);
-          EventBus.emit('tutorial-movement', { direction: 'ArrowDown' });
-        }
-        if (Phaser.Input.Keyboard.JustDown(this.cameraKeys.left)) {
-          const targetPos = { x: activeEntity.position.x - 1, y: activeEntity.position.y };
-          this.movementManager.moveEntity(activeEntity, targetPos);
-          EventBus.emit('tutorial-movement', { direction: 'ArrowLeft' });
-        }
-        if (Phaser.Input.Keyboard.JustDown(this.cameraKeys.right)) {
-          const targetPos = { x: activeEntity.position.x + 1, y: activeEntity.position.y };
-          this.movementManager.moveEntity(activeEntity, targetPos);
-          EventBus.emit('tutorial-movement', { direction: 'ArrowRight' });
+          EventBus.emit('tutorial-movement', { direction });
         }
       }
     }
@@ -2280,17 +2294,28 @@ export class ProgrammingGame extends Scene {
       if (hasSave) {
         console.log('[AUTO-LOAD] Found existing database save, loading...');
 
-        // Load the saved game state
+        // Load the saved game state (also hydrates quest progress from the DB)
         await this.loadGameState();
 
         console.log('[AUTO-LOAD] Auto-load completed successfully');
       } else {
         console.log('[AUTO-LOAD] No database save found, starting fresh');
+        // Quest progress lives in separate analytics tables from the game-state
+        // snapshot, so hydrate it even when there's no save — otherwise "My
+        // Progress" and in-game quest gating would show nothing despite the
+        // database (and admin panel) having the student's completions.
+        await QuestManager.getInstance().loadProgressFromDatabase();
       }
     } catch (error) {
       console.error('[AUTO-LOAD] Failed to auto-load saved game:', error);
       // Don't show error notification - just proceed with normal initialization
       console.log('[AUTO-LOAD] Proceeding with fresh start due to error');
+      // Best-effort quest progress hydration even if the game-state load failed
+      try {
+        await QuestManager.getInstance().loadProgressFromDatabase();
+      } catch (questError) {
+        console.warn('[AUTO-LOAD] Quest progress hydration failed:', questError);
+      }
     }
   }
 

@@ -3,6 +3,7 @@ import Editor from '@monaco-editor/react';
 import { useGameStore } from '../stores/gameStore';
 import { Entity, CodeWindow } from '../types/game';
 import { EventBus } from '../game/EventBus';
+import { BuiltInFunctionRegistry } from '../game/systems/BuiltInFunctions';
 
 interface ProgrammingInterfaceProps {
   entity: Entity;
@@ -110,6 +111,71 @@ def main():
   }
 };
 
+// ---- Quick command reference ----
+interface CommandItem {
+  key: string;
+  signature: string;   // shown to the user, e.g. "move_to(x, y)"
+  description: string;
+  snippet: string;     // copied to clipboard (usually === signature)
+}
+interface CommandGroup {
+  label: string;
+  items: CommandItem[];
+}
+
+// Common Python constructs — not built-in functions, but the things learners
+// type most often. Snippets include a trailing indent so they're ready to fill in.
+const SYNTAX_SNIPPETS: CommandGroup = {
+  label: 'Python Syntax',
+  items: [
+    { key: 'syntax-for', signature: 'for i in range(n):', description: 'Repeat something n times', snippet: 'for i in range(5):\n    ' },
+    { key: 'syntax-while', signature: 'while condition:', description: 'Loop while a condition holds', snippet: 'while True:\n    ' },
+    { key: 'syntax-if', signature: 'if condition:', description: 'Run code only when true', snippet: 'if condition:\n    ' },
+    { key: 'syntax-ifelse', signature: 'if / else:', description: 'Choose between two paths', snippet: 'if condition:\n    \nelse:\n    ' },
+    { key: 'syntax-def', signature: 'def name():', description: 'Define your own function', snippet: 'def my_function():\n    ' },
+    { key: 'syntax-var', signature: 'x = value', description: 'Store a value in a variable', snippet: 'x = 0' },
+    { key: 'syntax-list', signature: 'items = [...]', description: 'Make a list of values', snippet: 'items = [1, 2, 3]' },
+  ],
+};
+
+const CATEGORY_LABELS: Record<string, string> = {
+  movement: 'Movement',
+  interaction: 'Interaction',
+  system: 'System',
+  utility: 'Utility',
+  arrays: 'Lists',
+  objects: 'Objects',
+  control_flow: 'Control Flow',
+};
+const CATEGORY_ORDER = ['movement', 'interaction', 'system', 'utility', 'arrays', 'objects', 'control_flow'];
+
+// Build the reference straight from the live built-in registry so it always
+// matches what the interpreter actually supports. Internal debug_* helpers are hidden.
+const buildCommandGroups = (): CommandGroup[] => {
+  const byCategory = new Map<string, CommandItem[]>();
+
+  BuiltInFunctionRegistry.getAllFunctions()
+    .filter((func) => !func.name.startsWith('debug_'))
+    .forEach((func) => {
+      const params = func.parameters.map((p) => p.name).join(', ');
+      const signature = `${func.name}(${params})`;
+      const item: CommandItem = {
+        key: func.name,
+        signature,
+        description: func.description,
+        snippet: signature,
+      };
+      if (!byCategory.has(func.category)) byCategory.set(func.category, []);
+      byCategory.get(func.category)!.push(item);
+    });
+
+  const groups = CATEGORY_ORDER
+    .filter((cat) => byCategory.has(cat))
+    .map((cat) => ({ label: CATEGORY_LABELS[cat] ?? cat, items: byCategory.get(cat)! }));
+
+  return [SYNTAX_SNIPPETS, ...groups];
+};
+
 export const ProgrammingInterface: React.FC<ProgrammingInterfaceProps> = ({ entity }) => {
   const { 
     codeWindows, 
@@ -124,6 +190,37 @@ export const ProgrammingInterface: React.FC<ProgrammingInterfaceProps> = ({ enti
   } = useGameStore();
   const [selectedFunctionId, setSelectedFunctionId] = useState<string>('');
   const [showPresetMenu, setShowPresetMenu] = useState(false);
+  const [showCommands, setShowCommands] = useState(false);
+  const [commandSearch, setCommandSearch] = useState('');
+  const [copiedCommand, setCopiedCommand] = useState<string | null>(null);
+
+  // Quick-reference command list, built once from the live registry
+  const commandGroups = React.useMemo(() => buildCommandGroups(), []);
+
+  const filteredCommandGroups = React.useMemo(() => {
+    const q = commandSearch.trim().toLowerCase();
+    if (!q) return commandGroups;
+    return commandGroups
+      .map((group) => ({
+        ...group,
+        items: group.items.filter(
+          (item) =>
+            item.signature.toLowerCase().includes(q) ||
+            item.description.toLowerCase().includes(q)
+        ),
+      }))
+      .filter((group) => group.items.length > 0);
+  }, [commandGroups, commandSearch]);
+
+  const handleCopyCommand = async (item: CommandItem) => {
+    try {
+      await navigator.clipboard.writeText(item.snippet);
+      setCopiedCommand(item.key);
+      setTimeout(() => setCopiedCommand((current) => (current === item.key ? null : current)), 1200);
+    } catch {
+      // Clipboard may be unavailable (e.g. insecure context); fail silently
+    }
+  };
 
   // Check if entity is a drone
   const isDrone = entity.isDrone === true;
@@ -539,6 +636,28 @@ export const ProgrammingInterface: React.FC<ProgrammingInterfaceProps> = ({ enti
                   Python-like syntax
                 </div>
               </div>
+
+              {/* Quick command reference toggle */}
+              <button
+                onClick={() => setShowCommands((v) => !v)}
+                style={{
+                  backgroundColor: showCommands ? '#007acc' : '#1e1e1e',
+                  color: 'white',
+                  border: '1px solid #3c3c3c',
+                  borderRadius: '4px',
+                  padding: '6px 12px',
+                  cursor: 'pointer',
+                  fontSize: '12px',
+                  fontWeight: 'bold',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  whiteSpace: 'nowrap'
+                }}
+                title="Quick reference of commands you can copy"
+              >
+                📋 Commands
+              </button>
             </div>
 
             {/* Monaco Editor */}
@@ -605,8 +724,141 @@ export const ProgrammingInterface: React.FC<ProgrammingInterfaceProps> = ({ enti
           </div>
         )}
       </div>
+
+      {/* Quick Reference Panel - copyable commands */}
+      {showCommands && (
+        <div style={{
+          width: '290px',
+          flexShrink: 0,
+          backgroundColor: '#252526',
+          borderLeft: '1px solid #3c3c3c',
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
+          {/* Header */}
+          <div style={{
+            padding: '12px 16px',
+            borderBottom: '1px solid #3c3c3c',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <h4 style={{ margin: 0, fontSize: '14px', color: '#007acc' }}>Quick Reference</h4>
+            <button
+              onClick={() => setShowCommands(false)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#888',
+                cursor: 'pointer',
+                fontSize: '16px',
+                lineHeight: 1,
+                padding: '2px'
+              }}
+              title="Close"
+            >
+              ×
+            </button>
+          </div>
+
+          {/* Search */}
+          <div style={{ padding: '10px 12px', borderBottom: '1px solid #3c3c3c' }}>
+            <input
+              type="text"
+              value={commandSearch}
+              onChange={(e) => setCommandSearch(e.target.value)}
+              placeholder="Search commands..."
+              style={{
+                width: '100%',
+                boxSizing: 'border-box',
+                backgroundColor: '#1e1e1e',
+                color: 'white',
+                border: '1px solid #3c3c3c',
+                borderRadius: '4px',
+                padding: '6px 10px',
+                fontSize: '12px',
+                outline: 'none'
+              }}
+            />
+          </div>
+
+          {/* Command list */}
+          <div style={{ flex: 1, overflowY: 'auto', padding: '4px 0' }}>
+            {filteredCommandGroups.length === 0 ? (
+              <div style={{ padding: '16px', color: '#888', fontSize: '12px', fontStyle: 'italic', textAlign: 'center' }}>
+                No commands match "{commandSearch}"
+              </div>
+            ) : (
+              filteredCommandGroups.map((group) => (
+                <div key={group.label} style={{ marginBottom: '4px' }}>
+                  <div style={{
+                    padding: '8px 16px 4px',
+                    fontSize: '10px',
+                    fontWeight: 'bold',
+                    letterSpacing: '0.5px',
+                    textTransform: 'uppercase',
+                    color: '#16c60c'
+                  }}>
+                    {group.label}
+                  </div>
+                  {group.items.map((item) => {
+                    const isCopied = copiedCommand === item.key;
+                    return (
+                      <div
+                        key={item.key}
+                        onClick={() => handleCopyCommand(item)}
+                        style={{
+                          padding: '6px 16px',
+                          cursor: 'pointer',
+                          borderLeft: '2px solid transparent',
+                          transition: 'background-color 0.15s'
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#2d2d30'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                        title="Click to copy"
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+                          <code style={{
+                            fontFamily: 'Consolas, "Courier New", monospace',
+                            fontSize: '12px',
+                            color: '#9cdcfe',
+                            wordBreak: 'break-word'
+                          }}>
+                            {item.signature}
+                          </code>
+                          <span style={{
+                            fontSize: '10px',
+                            fontWeight: 'bold',
+                            color: isCopied ? '#16c60c' : '#666',
+                            flexShrink: 0
+                          }}>
+                            {isCopied ? '✓ Copied' : 'copy'}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#888', marginTop: '2px', lineHeight: 1.3 }}>
+                          {item.description}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Footer hint */}
+          <div style={{
+            padding: '8px 16px',
+            borderTop: '1px solid #3c3c3c',
+            fontSize: '11px',
+            color: '#888'
+          }}>
+            Click any command to copy it
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default ProgrammingInterface; 
+export default ProgrammingInterface;

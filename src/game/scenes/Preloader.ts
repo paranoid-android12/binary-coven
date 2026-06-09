@@ -9,22 +9,120 @@ export class Preloader extends Scene
 
     init ()
     {
-        //  We loaded this image in our Boot Scene, so we can display it here
-        this.add.image(512, 384, 'background');
+        // Themed, responsive loading screen. Everything is laid out from the
+        // live canvas size (the game runs in Scale.RESIZE / full window), so it
+        // stays centred on any display — the old template used hardcoded
+        // (512, 384) coordinates, which is why the bar was off-centre.
 
-        //  A simple progress bar. This is the outline of the bar.
-        this.add.rectangle(512, 384, 468, 32).setStrokeStyle(1, 0xffffff);
+        // Warm, dark farm-toned gradient backdrop covering the whole viewport.
+        const bgGfx = this.add.graphics();
+        const drawBg = (w: number, h: number) => {
+            bgGfx.clear();
+            bgGfx.fillGradientStyle(0x2a1d10, 0x2a1d10, 0x130d07, 0x130d07, 1);
+            bgGfx.fillRect(0, 0, w, h);
+        };
 
-        //  This is the progress bar itself. It will increase in size from the left based on the % of progress.
-        const bar = this.add.rectangle(512-230, 384, 4, 28, 0xffffff);
+        // Wood "BINARY COVEN" logo (crisp pixel scaling).
+        let title: Phaser.GameObjects.Image | null = null;
+        if (this.textures.exists('gameTitle')) {
+            this.textures.get('gameTitle').setFilter(Phaser.Textures.FilterMode.NEAREST);
+            title = this.add.image(0, 0, 'gameTitle').setOrigin(0.5);
+        }
 
-        //  Use the 'progress' event emitted by the LoaderPlugin to update the loading bar
-        this.load.on('progress', (progress: number) => {
+        const subtitle = this.add.text(0, 0, 'Learn to code · grow your farm', {
+            fontFamily: 'BoldPixels', fontSize: '22px', color: '#d8c39a',
+        }).setOrigin(0.5);
+        subtitle.setShadow(0, 2, '#000000', 2, false, true);
 
-            //  Update the progress bar (our bar is 464px wide, so 100% = 464px)
-            bar.width = 4 + (460 * progress);
+        // Progress bar (rounded track + gold fill) drawn via Graphics so it can
+        // re-render on each progress tick and on resize.
+        const trackGfx = this.add.graphics();
+        const fillGfx = this.add.graphics();
 
+        const label = this.add.text(0, 0, 'Loading… 0%', {
+            fontFamily: 'BoldPixels', fontSize: '18px', color: '#f0e6cf',
+        }).setOrigin(0.5);
+        label.setShadow(0, 2, '#000000', 2, false, true);
+
+        // Decorative pixel wheat flanking the bar.
+        const hasWheat = this.textures.exists('wheatIcon');
+        if (hasWheat) this.textures.get('wheatIcon').setFilter(Phaser.Textures.FilterMode.NEAREST);
+        const wheatL = hasWheat ? this.add.image(0, 0, 'wheatIcon').setOrigin(0.5).setAlpha(0.9) : null;
+        const wheatR = hasWheat ? this.add.image(0, 0, 'wheatIcon').setOrigin(0.5).setAlpha(0.9).setFlipX(true) : null;
+
+        let progress = 0;
+        const geo = { x: 0, y: 0, w: 0, h: 22 };
+
+        const drawFill = () => {
+            fillGfx.clear();
+            const pad = 4;
+            const maxW = geo.w - pad * 2;
+            const fw = Math.max(0, maxW * progress);
+            if (fw <= 0) return;
+            fillGfx.fillStyle(0xf5a623, 1);
+            fillGfx.fillRoundedRect(geo.x + pad, geo.y + pad, fw, geo.h - pad * 2, (geo.h - pad * 2) / 2);
+        };
+
+        const layout = (w: number, h: number) => {
+            if (!w || !h) return;
+            const cx = w / 2;
+            drawBg(w, h);
+
+            if (title) {
+                const tw = Math.min(w * 0.5, 560);
+                title.setScale(tw / title.width).setPosition(cx, h * 0.40);
+                subtitle.setPosition(cx, title.y + title.displayHeight * 0.5 + 26);
+            } else {
+                subtitle.setPosition(cx, h * 0.42);
+            }
+
+            const barW = Math.min(w * 0.5, 460);
+            geo.x = cx - barW / 2;
+            geo.y = h * 0.66;
+            geo.w = barW;
+            geo.h = 22;
+
+            trackGfx.clear();
+            trackGfx.fillStyle(0x000000, 0.45);
+            trackGfx.fillRoundedRect(geo.x, geo.y, geo.w, geo.h, geo.h / 2);
+            trackGfx.lineStyle(2, 0x6b5836, 1);
+            trackGfx.strokeRoundedRect(geo.x, geo.y, geo.w, geo.h, geo.h / 2);
+            drawFill();
+
+            label.setPosition(cx, geo.y + geo.h + 22);
+
+            const wy = geo.y + geo.h / 2;
+            if (wheatL) wheatL.setScale(2).setPosition(geo.x - 34, wy);
+            if (wheatR) wheatR.setScale(2).setPosition(geo.x + geo.w + 34, wy);
+        };
+
+        // Register progress BEFORE preload() begins loading.
+        this.load.on('progress', (value: number) => {
+            progress = value;
+            drawFill();
+            label.setText(`Loading… ${Math.round(value * 100)}%`);
         });
+        this.load.on('complete', () => {
+            progress = 1;
+            drawFill();
+            label.setText('Ready!');
+        });
+
+        // Initial layout + reflow on resize, cleaned up when the scene ends.
+        layout(this.scale.width, this.scale.height);
+        const onResize = (size: Phaser.Structs.Size) => layout(size.width, size.height);
+        this.scale.on('resize', onResize);
+        this.events.once('shutdown', () => this.scale.off('resize', onResize));
+
+        // BoldPixels is a CSS @font-face and may not be ready on first paint;
+        // re-stamp the text once it loads so it renders in the pixel font.
+        const doc: any = typeof document !== 'undefined' ? document : null;
+        if (doc?.fonts?.ready) {
+            doc.fonts.ready.then(() => {
+                subtitle.setText(subtitle.text);
+                label.setText(label.text);
+            }).catch(() => {});
+        }
     }
 
     preload ()

@@ -106,6 +106,37 @@ interface StudentDetailedStats {
 
 type TabType = 'profile' | 'progress' | 'insights' | 'class';
 
+// Rank quest states so two progress sources (database + localStorage) can be
+// merged, keeping whichever is further along for each quest.
+const QUEST_STATE_RANK: Record<string, number> = {
+  locked: 0,
+  available: 1,
+  active: 2,
+  failed: 3,
+  completed: 4,
+};
+
+// Merge a localStorage entry with a database entry for the same quest: prefer
+// the more-advanced state and keep the richest fields from either source.
+const mergeQuestProgress = (
+  local: DatabaseQuestProgress,
+  db: DatabaseQuestProgress
+): DatabaseQuestProgress => {
+  const primary = (QUEST_STATE_RANK[db.state] ?? 0) >= (QUEST_STATE_RANK[local.state] ?? 0) ? db : local;
+  const secondary = primary === db ? local : db;
+  return {
+    questId: primary.questId,
+    questTitle: primary.questTitle || secondary.questTitle,
+    state: primary.state,
+    currentPhaseIndex: primary.currentPhaseIndex || secondary.currentPhaseIndex || 0,
+    startedAt: primary.startedAt || secondary.startedAt || null,
+    completedAt: primary.completedAt || secondary.completedAt || null,
+    timeSpentSeconds: Math.max(primary.timeSpentSeconds || 0, secondary.timeSpentSeconds || 0),
+    attempts: Math.max(primary.attempts || 0, secondary.attempts || 0),
+    score: primary.score ?? secondary.score ?? null,
+  };
+};
+
 export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState<TabType>('profile');
   const { user } = useUser();
@@ -379,13 +410,68 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
     setProgressLoading(false);
   }, []);
 
+  // Fetch quest progress directly from the database (authoritative, like the
+  // admin panel) and merge it with any fresher in-session localStorage progress.
+  // This guarantees "My Progress" reflects the database even if the start-up
+  // hydration into localStorage didn't run (e.g. network hiccup, fresh device).
+  const loadDatabaseProgress = useCallback(async () => {
+    try {
+      const response = await fetch('/api/analytics/student-progress');
+      if (!response.ok) return;
+      const data = await response.json();
+      if (!data.success || !Array.isArray(data.questProgress)) return;
+
+      // Seed with local (in-session) progress, then overlay the database.
+      const merged = new Map<string, DatabaseQuestProgress>();
+      analyticsService.getQuestProgressData().forEach((p) => {
+        merged.set(p.questId, {
+          questId: p.questId,
+          questTitle: p.questTitle,
+          state: p.state,
+          currentPhaseIndex: p.currentPhaseIndex || 0,
+          startedAt: p.startedAt || null,
+          completedAt: p.completedAt || null,
+          timeSpentSeconds: p.timeSpentSeconds || 0,
+          attempts: p.attempts || 0,
+          score: p.score ?? null,
+        });
+      });
+      (data.questProgress as DatabaseQuestProgress[]).forEach((db) => {
+        const local = merged.get(db.questId);
+        merged.set(db.questId, local ? mergeQuestProgress(local, db) : db);
+      });
+
+      const list = Array.from(merged.values());
+      setLocalQuestProgress(list);
+      setLocalProgressSummary({
+        totalQuests: list.length,
+        completedQuests: list.filter((q) => q.state === 'completed').length,
+        inProgressQuests: list.filter((q) => q.state === 'active').length,
+        totalTimeSpentSeconds: list.reduce((sum, q) => sum + (q.timeSpentSeconds || 0), 0),
+        totalAttempts: list.reduce((sum, q) => sum + (q.attempts || 0), 0),
+      });
+      setHasLoadedSave(true);
+    } catch (error) {
+      console.error('[StudentProgressModal] Failed to load DB progress:', error);
+    }
+  }, []);
+
   useEffect(() => {
     if (isOpen) {
       fetchQuestStats();
       fetchObjectiveStats();
-      loadLocalProgress(); // Load from localStorage for real-time updates
+      loadLocalProgress(); // Instant: show cached localStorage data
     }
   }, [isOpen, refreshTrigger]);
+
+  // On open, pull the authoritative database progress and merge it in. Kept in a
+  // separate effect (deps: isOpen only) so it runs once per open rather than on
+  // every in-session refreshTrigger bump.
+  useEffect(() => {
+    if (isOpen) {
+      loadDatabaseProgress();
+    }
+  }, [isOpen, loadDatabaseProgress]);
 
   // Subscribe to quest completion events to refresh data
   useEffect(() => {
@@ -404,6 +490,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
       useGameStore.getState().refreshQuestState();
       setRefreshTrigger(prev => prev + 1);
       loadLocalProgress();
+      loadDatabaseProgress(); // Re-pull authoritative DB progress after a sync
     };
 
     // Listen for various quest events to update UI immediately
@@ -418,12 +505,37 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
       EventBus.off('phase-completed', handleQuestUpdate);
       EventBus.off('quest-progress-synced', handleProgressSynced);
     };
-  }, [loadLocalProgress]);
+  }, [loadLocalProgress, loadDatabaseProgress]);
 
   // Call store selectors to get fresh data (ensures dynamic updates on each render)
   // IMPORTANT: These hooks MUST be called before any conditional returns!
-  const allLoadedQuests = useGameStore((state) => state.getAllLoadedQuests()); // All quests for display
+  const allLoadedQuests = useGameStore((state) => state.getAllLoadedQuests()); // In-session loaded quests
   const currentActiveQuest = useGameStore((state) => state.getActiveQuest());
+
+  // Full quest catalog from the server (every topic), fetched on open. Without
+  // this, mastery/grouping only see the lazily-loaded in-session subset (often
+  // just the tutorial), so a student who finished many quests sees almost
+  // nothing here. Falls back to in-session quests until the catalog loads.
+  const [questDefinitions, setQuestDefinitions] = useState<Quest[]>([]);
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/quests/definitions');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled && data.success && Array.isArray(data.quests)) {
+          setQuestDefinitions(data.quests as Quest[]);
+        }
+      } catch (e) {
+        console.error('[StudentProgressModal] Failed to load quest definitions:', e);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [isOpen]);
+
+  const catalogQuests: Quest[] = questDefinitions.length > 0 ? questDefinitions : allLoadedQuests;
 
   // Create a set of completed quest IDs from localStorage for fast lookup
   const completedQuestIds = new Set(
@@ -432,15 +544,14 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
       .map(q => q.questId)
   );
 
-  // Create mock Quest objects for completed quests from localStorage
-  // This allows existing functions like getOrganizedQuests to work
+  // Resolve completed quest IDs against the full catalog so they carry their
+  // real category/concepts (needed for correct topic mastery). Falls back to a
+  // minimal object if a completed quest isn't in the catalog.
   const localCompletedQuests: Quest[] = localQuestProgress
     .filter(q => q.state === 'completed')
     .map(qp => {
-      // Find matching quest from loaded quests, or create minimal object
-      const loadedQuest = allLoadedQuests.find(q => q.id === qp.questId);
-      if (loadedQuest) return loadedQuest;
-      // Create minimal Quest object for display purposes (when quest JSON not loaded)
+      const catalogQuest = catalogQuests.find(q => q.id === qp.questId);
+      if (catalogQuest) return catalogQuest;
       return {
         id: qp.questId,
         title: qp.questTitle,
@@ -455,32 +566,46 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
   // Compute topic mastery (memoised for performance)
   const topicMastery = useMemo(
     () => computeTopicMastery(
-      allLoadedQuests,
+      catalogQuests,
       localCompletedQuests,
       questStats as QuestExecutionStatsInput[],
     ),
-    [allLoadedQuests, localCompletedQuests, questStats],
+    [catalogQuests, localCompletedQuests, questStats],
   );
   const activeMasteryTags = useMemo(() => getActiveMasteryTags(topicMastery), [topicMastery]);
   const fullyMastered = useMemo(() => isFullyMastered(topicMastery), [topicMastery]);
 
   // Fetch class stats when tab is active - needs to be after store hooks so we have completed count
-  // Only fetch when we have loaded quests (to ensure data is ready)
-  // Use localStorage completed count
   useEffect(() => {
-    if (isOpen && activeTab === 'class' && allLoadedQuests.length > 0) {
+    if (isOpen && activeTab === 'class' && catalogQuests.length > 0) {
       const completedCount = localProgressSummary?.completedQuests || 0;
       fetchClassStats(completedCount);
     }
-  }, [isOpen, activeTab, localProgressSummary?.completedQuests, allLoadedQuests.length]);
+  }, [isOpen, activeTab, localProgressSummary?.completedQuests, catalogQuests.length]);
 
   if (!isOpen) return null;
 
-  // Use localStorage completed quests for insights
-  const insights = getLearningInsights(allLoadedQuests, localCompletedQuests);
+  // Use the full catalog for insights and totals so they reflect every quest
+  const insights = getLearningInsights(catalogQuests, localCompletedQuests);
   const totalCompleted = localProgressSummary?.completedQuests || 0;
-  const totalQuests = allLoadedQuests.length;
+  const totalQuests = catalogQuests.length;
   const overallProgress = totalQuests > 0 ? Math.round((totalCompleted / totalQuests) * 100) : 0;
+
+  // Quest-status breakdown across the full catalog (for the Profile overview)
+  const inProgressCount = localProgressSummary?.inProgressQuests || 0;
+  const notStartedCount = Math.max(0, totalQuests - totalCompleted - inProgressCount);
+  const completedPct = totalQuests > 0 ? (totalCompleted / totalQuests) * 100 : 0;
+  const inProgressPct = totalQuests > 0 ? (inProgressCount / totalQuests) * 100 : 0;
+
+  // Recently completed quests (most recent first) for the Profile summary
+  const recentCompleted = [...localQuestProgress]
+    .filter(q => q.state === 'completed')
+    .sort((a, b) => {
+      const ta = a.completedAt ? new Date(a.completedAt).getTime() : 0;
+      const tb = b.completedAt ? new Date(b.completedAt).getTime() : 0;
+      return tb - ta;
+    })
+    .slice(0, 5);
 
   // Helper to format timestamps (accepts string ISO date or number timestamp)
   const formatDateTime = (timestamp?: string | number | null) => {
@@ -864,6 +989,134 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                   ))}
                 </div>
 
+                {/* Status Overview: completion donut + current focus + recent wins */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '220px 1fr',
+                  gap: '12px',
+                }}>
+                  {/* Completion Donut */}
+                  <div style={{
+                    backgroundColor: '#1e1e1e',
+                    border: '2px solid #3c3c3c',
+                    borderRadius: '8px',
+                    padding: '20px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '14px',
+                  }}>
+                    <div style={{
+                      width: '128px',
+                      height: '128px',
+                      borderRadius: '50%',
+                      background: `conic-gradient(#7ed321 0% ${completedPct}%, #f5a623 ${completedPct}% ${completedPct + inProgressPct}%, #3c3c3c ${completedPct + inProgressPct}% 100%)`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}>
+                      <div style={{
+                        width: '90px',
+                        height: '90px',
+                        borderRadius: '50%',
+                        backgroundColor: '#1e1e1e',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}>
+                        <span style={{ fontSize: '28px', fontWeight: 'bold', color: '#7ed321', fontFamily: 'BoldPixels, monospace', lineHeight: 1 }}>
+                          {overallProgress}%
+                        </span>
+                        <span style={{ fontSize: '13px', color: '#888888', fontFamily: 'BoldPixels, monospace', marginTop: '2px' }}>
+                          Complete
+                        </span>
+                      </div>
+                    </div>
+                    {/* Legend */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+                      {[
+                        { label: 'Completed', value: totalCompleted, color: '#7ed321' },
+                        { label: 'In Progress', value: inProgressCount, color: '#f5a623' },
+                        { label: 'Not Started', value: notStartedCount, color: '#555555' },
+                      ].map((row) => (
+                        <div key={row.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontFamily: 'BoldPixels, monospace' }}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', color: '#cccccc' }}>
+                            <span style={{ width: '10px', height: '10px', borderRadius: '2px', backgroundColor: row.color, display: 'inline-block' }} />
+                            {row.label}
+                          </span>
+                          <span style={{ fontSize: '14px', color: 'white', fontWeight: 'bold' }}>{row.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Current focus + recent wins */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {/* Currently working on */}
+                    <div style={{
+                      backgroundColor: '#1e1e1e',
+                      border: `2px solid ${currentActiveQuest ? '#f5a623' : '#3c3c3c'}`,
+                      borderRadius: '8px',
+                      padding: '16px',
+                    }}>
+                      <div style={{ fontSize: '13px', color: '#888888', fontFamily: 'BoldPixels, monospace', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>
+                        Currently Working On
+                      </div>
+                      {currentActiveQuest ? (
+                        <>
+                          <div style={{ fontSize: '18px', color: '#f5a623', fontWeight: 'bold', fontFamily: 'BoldPixels, monospace' }}>
+                            {currentActiveQuest.title}
+                          </div>
+                          {currentActiveQuest.description && (
+                            <div style={{ fontSize: '14px', color: '#999999', fontFamily: 'BoldPixels, monospace', marginTop: '2px' }}>
+                              {currentActiveQuest.description}
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <div style={{ fontSize: '15px', color: '#666666', fontFamily: 'BoldPixels, monospace' }}>
+                          No active quest — pick one to keep learning!
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Recently completed */}
+                    <div style={{
+                      backgroundColor: '#1e1e1e',
+                      border: '2px solid #3c3c3c',
+                      borderRadius: '8px',
+                      padding: '16px',
+                      flex: 1,
+                    }}>
+                      <div style={{ fontSize: '13px', color: '#888888', fontFamily: 'BoldPixels, monospace', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
+                        Recently Completed
+                      </div>
+                      {recentCompleted.length > 0 ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          {recentCompleted.map((q) => (
+                            <div key={q.questId} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                              <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '15px', color: '#cccccc', fontFamily: 'BoldPixels, monospace', minWidth: 0 }}>
+                                <span style={{ color: '#7ed321', flexShrink: 0 }}>✓</span>
+                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{q.questTitle}</span>
+                              </span>
+                              <span style={{ fontSize: '13px', color: '#666666', fontFamily: 'BoldPixels, monospace', flexShrink: 0 }}>
+                                {formatDateTime(q.completedAt)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div style={{ fontSize: '15px', color: '#666666', fontFamily: 'BoldPixels, monospace' }}>
+                          No quests completed yet — your wins will show up here.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
                 {/* Mastery Tags */}
                 <div style={{
                   backgroundColor: '#1e1e1e',
@@ -1043,6 +1296,30 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                   }}>
                     {totalCompleted} / {totalQuests} Quests Completed
                   </p>
+                  {/* Status breakdown */}
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '12px', flexWrap: 'wrap' }}>
+                    {[
+                      { label: 'Completed', value: totalCompleted, color: '#7ed321' },
+                      { label: 'In Progress', value: inProgressCount, color: '#f5a623' },
+                      { label: 'Remaining', value: notStartedCount, color: '#888888' },
+                    ].map((s) => (
+                      <div key={s.label} style={{
+                        flex: 1,
+                        minWidth: '100px',
+                        backgroundColor: '#252526',
+                        border: '1px solid #3c3c3c',
+                        borderRadius: '6px',
+                        padding: '10px 12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                      }}>
+                        <span style={{ width: '10px', height: '10px', borderRadius: '2px', backgroundColor: s.color, flexShrink: 0 }} />
+                        <span style={{ fontSize: '20px', fontWeight: 'bold', color: 'white', fontFamily: 'BoldPixels, monospace' }}>{s.value}</span>
+                        <span style={{ fontSize: '13px', color: '#999999', fontFamily: 'BoldPixels, monospace', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Code Execution History */}
@@ -1200,7 +1477,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                     Quests
                   </h3>
                   {(() => {
-                    const organized = getOrganizedQuests(allLoadedQuests, localCompletedQuests);
+                    const organized = getOrganizedQuests(catalogQuests, localCompletedQuests);
                     const categories = Object.keys(organized).filter(cat => organized[cat].length > 0);
                     
                     return categories.length > 0 ? (
@@ -1848,7 +2125,7 @@ export const StudentProgressModal: React.FC<StudentProgressModalProps> = ({ isOp
                               ? Math.round((topicSuccessRuns / topicTotalRuns) * 100) : 0;
                             // Get average time per quest in this topic
                             const topicQuestProgress = localQuestProgress.filter(qp =>
-                              allLoadedQuests.some(q =>
+                              catalogQuests.some(q =>
                                 q.id === qp.questId &&
                                 q.concepts?.some((c: string) => {
                                   const norm = c.toLowerCase().replace(/[ -]/g, '_');
