@@ -933,16 +933,8 @@ export const useGameStore = create<GameStore>()(
       const questManager = QuestManager.getInstance();
       await questManager.loadQuests(questFilePaths, forceUnlock);
 
-      // Update local state
-      const availableQuests = questManager.getAvailableQuests();
-      const unlockedQuestIds = questManager.getAllQuests()
-        .filter(q => questManager.isQuestUnlocked(q.id))
-        .map(q => q.id);
-
-      set({
-        availableQuests,
-        unlockedQuests: new Set(unlockedQuestIds)
-      });
+      // Sync all quest state from QuestManager (including activeQuest restored from localStorage)
+      get().refreshQuestState();
 
       console.log('[STORE] Quests loaded and state updated');
     },
@@ -951,16 +943,13 @@ export const useGameStore = create<GameStore>()(
       const questManager = QuestManager.getInstance();
       const success = questManager.startQuest(questId);
 
+      // Sync all quest state regardless of success so UI reflects the true state
+      get().refreshQuestState();
+
       if (success) {
-        const quest = questManager.getQuest(questId);
-        const progress = questManager.getQuestProgress(questId);
-
-        set({
-          activeQuest: quest || null,
-          questProgress: new Map([...get().questProgress, [questId, progress!]])
-        });
-
         console.log(`[STORE] Started quest: ${questId}`);
+      } else {
+        console.warn(`[STORE] Failed to start quest: ${questId}`);
       }
 
       return success;

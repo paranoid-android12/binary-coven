@@ -811,13 +811,27 @@ export class ProgrammingGame extends Scene {
       this.resetGameState();
     });
 
-    // Quest events — save locally only (database sync happens on manual save or auto-save interval)
+    // Quest events — sync store so UI stays reactive
     EventBus.on('quest-completed', () => {
-      console.log('[QUEST] Quest completed — progress saved locally');
+      console.log('[QUEST] Quest completed — syncing store');
+      useGameStore.getState().refreshQuestState();
     });
 
     EventBus.on('quest-phase-completed', () => {
-      console.log('[QUEST] Quest phase completed — progress saved locally');
+      console.log('[QUEST] Quest phase completed — syncing store');
+      useGameStore.getState().refreshQuestState();
+    });
+
+    // Handle challenge grid activation from quest phases
+    EventBus.on('quest-challenge-grids', (data: { questId: string; phaseIndex: number; positions: Array<{ x: number; y: number }>; activate: boolean }) => {
+      const store = useGameStore.getState();
+      if (data.activate) {
+        console.log(`[QUEST] Activating ${data.positions.length} challenge grids`);
+        store.activateChallengeGrids(data.positions);
+      } else {
+        console.log(`[QUEST] Deactivating challenge grids`);
+        data.positions.forEach(pos => store.deactivateChallengeGrid(pos));
+      }
     });
 
     // Handle debug requests from map editor UI
@@ -2266,6 +2280,8 @@ export class ProgrammingGame extends Scene {
         } else {
           console.log('[LOAD] Using localStorage quest progress (database sync failed or no session)');
         }
+        // Sync store so UI reflects the loaded quest state
+        useGameStore.getState().refreshQuestState();
       } catch (questError) {
         console.warn('[LOAD] Quest progress database sync failed:', questError);
       }
@@ -2305,6 +2321,7 @@ export class ProgrammingGame extends Scene {
         // Progress" and in-game quest gating would show nothing despite the
         // database (and admin panel) having the student's completions.
         await QuestManager.getInstance().loadProgressFromDatabase();
+        useGameStore.getState().refreshQuestState();
       }
     } catch (error) {
       console.error('[AUTO-LOAD] Failed to auto-load saved game:', error);
@@ -2313,6 +2330,7 @@ export class ProgrammingGame extends Scene {
       // Best-effort quest progress hydration even if the game-state load failed
       try {
         await QuestManager.getInstance().loadProgressFromDatabase();
+        useGameStore.getState().refreshQuestState();
       } catch (questError) {
         console.warn('[AUTO-LOAD] Quest progress hydration failed:', questError);
       }
