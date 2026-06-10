@@ -971,10 +971,11 @@ export const useGameStore = create<GameStore>()(
       const success = questManager.cancelQuest();
 
       if (success) {
-        set({ activeQuest: null });
-
         // Deactivate challenge grids
         get().deactivateAllChallengeGrids();
+
+        // Sync all quest state from QuestManager so UI updates reactively
+        get().refreshQuestState();
 
         console.log('[STORE] Quest cancelled');
       }
@@ -987,19 +988,13 @@ export const useGameStore = create<GameStore>()(
       const success = questManager.restartQuest();
 
       if (success) {
-        const activeQuest = questManager.getActiveQuest();
-        const questId = activeQuest?.id;
+        // Deactivate challenge grids from the old quest state
+        get().deactivateAllChallengeGrids();
 
-        if (activeQuest && questId) {
-          const progress = questManager.getQuestProgress(questId);
+        // Sync all quest state from QuestManager so UI updates reactively
+        get().refreshQuestState();
 
-          set({
-            activeQuest: activeQuest,
-            questProgress: new Map([...get().questProgress, [questId, progress!]])
-          });
-
-          console.log('[STORE] Quest restarted');
-        }
+        console.log('[STORE] Quest restarted');
       }
 
       return success;
@@ -1053,10 +1048,20 @@ export const useGameStore = create<GameStore>()(
         .filter(q => questManager.isQuestUnlocked(q.id))
         .map(q => q.id);
 
+      // Sync quest progress from QuestManager
+      const newQuestProgress = new Map<string, QuestProgress>();
+      for (const quest of questManager.getAllQuests()) {
+        const progress = questManager.getQuestProgress(quest.id);
+        if (progress) {
+          newQuestProgress.set(quest.id, progress);
+        }
+      }
+
       set({
         availableQuests,
         activeQuest: activeQuest || null,
-        unlockedQuests: new Set(unlockedQuestIds)
+        unlockedQuests: new Set(unlockedQuestIds),
+        questProgress: newQuestProgress
       });
 
       console.log('[STORE] Quest state refreshed');
